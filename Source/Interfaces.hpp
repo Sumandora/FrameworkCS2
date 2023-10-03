@@ -1,5 +1,4 @@
-#ifndef INTERFACES
-#define INTERFACES
+#pragma once
 
 namespace Interfaces {
 	inline void* source2Client;
@@ -8,5 +7,3 @@ namespace Interfaces {
 
 	void* uncoverCreateFunction(void* createFunc);
 }
-
-#endif
