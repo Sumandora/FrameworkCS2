@@ -12,7 +12,7 @@ struct InterfacedLibrary {
 
 	std::unordered_map<const char*, void*> interfaces{};
 
-	InterfacedLibrary(const char* path)
+	explicit InterfacedLibrary(const char* path)
 	{
 		handle = dlmopen(LM_ID_BASE, path, RTLD_NOW | RTLD_NOLOAD | RTLD_LOCAL);
 		printf("Got handle for %s at %p\n", path, handle);
