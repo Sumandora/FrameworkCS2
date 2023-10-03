@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <dlfcn.h>
+#include <link.h>
 
 #include "SDK/InterfaceReg.hpp"
 
@@ -15,7 +16,6 @@ struct InterfacedLibrary {
 	explicit InterfacedLibrary(const char* path)
 	{
 		handle = dlmopen(LM_ID_BASE, path, RTLD_NOW | RTLD_NOLOAD | RTLD_LOCAL);
-		printf("Got handle for %s at %p\n", path, handle);
 		auto session = BCRL::Session::pointer(dlsym(handle, "CreateInterface"))
 						   .add(1)
 						   .relativeToAbsolute()
@@ -30,12 +30,11 @@ struct InterfacedLibrary {
 						   .getPointer();
 
 		if (!session.has_value()) {
-			printf("Couldn't find interface list in %s\n", path);
+			printf("Couldn't find interface list for %s\n", path);
 			return;
 		}
 
 		for (InterfaceReg* interface = *reinterpret_cast<InterfaceReg**>(session.value()); interface; interface = interface->m_pNext) {
-			printf("Looped over %s with func %p\n", interface->m_pName, interface->m_CreateFn);
 			interfaces[interface->m_pName] = interface->m_CreateFn;
 		}
 	}
@@ -45,14 +44,12 @@ struct InterfacedLibrary {
 	T* getInterface(const char* name) {
 		for(const auto& [interfaceName, createFn] : interfaces) {
 			if(std::strncmp(name, interfaceName, std::strlen(interfaceName) - 3 /*Ignore the version*/) == 0)
-				return Interfaces::uncoverCreateFunction(createFn);
+				return static_cast<T*>(Interfaces::uncoverCreateFunction(createFn));
 		}
 		return nullptr;
 	}
 };
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-result"
 void* Interfaces::uncoverCreateFunction(void* createFunc)
 {
 	void* interfacePtr = nullptr;
@@ -71,15 +68,20 @@ void* Interfaces::uncoverCreateFunction(void* createFunc)
 		});
 	return interfacePtr;
 }
-#pragma clang diagnostic pop
 
 void Interfaces::getInterfaces()
 {
 	auto client = InterfacedLibrary("libclient.so");
+	auto schemasystem = InterfacedLibrary("libschemasystem.so");
 
 	source2Client = client.getInterface<void>("Source2Client");
 	if(source2Client)
 		printf("Found Source2Client interface at %p\n", source2Client);
 	else
 		printf("Couldn't find Source2Client\n");
+	schemaSystem = schemasystem.getInterface<SchemaSystem>("SchemaSystem_");
+	if(schemaSystem)
+		printf("Found SchemaSystem interface at %p\n", source2Client);
+	else
+		printf("Couldn't find SchemaSystem\n");
 }

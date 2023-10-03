@@ -1,0 +1,24 @@
+#pragma once
+
+#include "RetAddrSpoofer.hpp"
+
+// Inspired by danielkrupinski/Osiris
+
+namespace VirtualMethod {
+	inline void** getVTable(void* gameClass) {
+		return *reinterpret_cast<void***>(gameClass);
+	}
+
+	template <typename Ret, unsigned long Index, typename... Args>
+	inline auto invoke(void* gameClass, Args... args) -> Ret
+	{
+		return RetAddrSpoofer::invoke<Ret, void*, Args...>(getVTable(gameClass)[Index], gameClass, args...);
+	}
+}
+
+#define VIRTUAL_METHOD(index, name, returnType, argsType, argsCall) \
+	inline returnType name argsType                                 \
+	{                                                               \
+		return VirtualMethod::invoke<returnType, index> argsCall;   \
+	}
+
