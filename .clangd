@@ -1,0 +1,4 @@
+CompileFlags:
+  CompilationDatabase: Build
+  Add: "-std=gnu++20"
+  Remove: ["--no-gnu-unique", "-fimplicit-constexpr"]

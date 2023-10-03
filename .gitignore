@@ -1,0 +1,18 @@
+# Framework Example leaves the following files behind, after a build
+Build/
+Build-Debug/
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+
+# CLion
+.idea/
+# This folder is being created to house CLion internal CMake data
+cmake-build-debug/
+
+# VSCode
+.vscode/
+
+# Clangd
+.cache/
