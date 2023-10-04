@@ -37,7 +37,6 @@ static int peepEventsHook(SDL_Event* events, int numevents, SDL_eventaction acti
 			printf("Initialized ImGui Context\n");
 		} else {
 			std::lock_guard<std::mutex> lock{GraphicsHook::eventAccessMutex};
-			printf("thread 1: %lx\n", pthread_self());
 			ImGui_ImplSDL3_ProcessEvent(&event);
 			// TODO Discard events in case the menu is open
 		}

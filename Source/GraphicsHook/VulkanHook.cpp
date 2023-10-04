@@ -346,7 +346,6 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 
 		{
 			std::lock_guard<std::mutex> lock{GraphicsHook::eventAccessMutex};
-			printf("thread 2: %lx\n", pthread_self());
 			ImGui::NewFrame();
 		}
 
