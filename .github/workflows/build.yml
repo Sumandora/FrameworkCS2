@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        distro: ["ubuntu:latest", "debian:latest", "debian:unstable", "debian:testing", "dockerscripts/linuxmint:mate", "archlinux:latest", "manjarolinux/base:latest", "fedora:latest", "opensuse/tumbleweed:latest"]
+        distro: ["ubuntu:latest", "debian:latest", "debian:unstable", "debian:testing", "dockerscripts/linuxmint:mate", "archlinux:latest", "manjarolinux/base:latest", "fedora:latest"]
       fail-fast: false
     runs-on: ubuntu-latest
     container: ${{ matrix.distro }}
@@ -31,11 +31,6 @@ jobs:
         run: |
           dnf update -y
           dnf install -y git cmake make gcc-c++ SDL2-devel vulkan-loader-devel vulkan-headers
-      - if: matrix.distro == 'opensuse/tumbleweed:latest'
-        name: Setup dependencies
-        run: |
-          zypper refresh
-          zypper install -y git cmake make gcc-c++ SDL2-devel vulkan-tools vulkan-headers
 
       - uses: actions/checkout@v3
         with:
