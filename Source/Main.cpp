@@ -4,6 +4,8 @@
 
 #include "Memory.hpp"
 
+#include "GraphicsHook/GraphicsHook.hpp"
+
 #include "SDK/Schema/Types/FieldData.hpp"
 #include "SDK/Schema/Types/SchemaType.hpp"
 #include "SDK/Schema/Types/StaticFieldData.hpp"
@@ -29,9 +31,19 @@ void initializer()
 		StaticFieldData* field = &schema->staticFields[i];
 		printf("%s is type of %s and is located at %p\n", field->fieldName, field->type->name, field->data);
 	}
+
+	if (!GraphicsHook::hookSDL()) {
+		printf("Failed to hook SDL\n");
+		return;
+	}
+
+	if(!GraphicsHook::hookVulkan()) {
+		printf("Failed to hook vulkan\n");
+		return;
+	}
 }
 
-int __attribute((constructor)) startup()
+int __attribute((constructor, used)) startup()
 {
 	printf("Hello, world!\n");
 	std::thread t(initializer);
@@ -42,4 +54,6 @@ int __attribute((constructor)) startup()
 
 void __attribute((destructor)) shutdown()
 {
+	GraphicsHook::unhookSDL();
+	GraphicsHook::unhookVulkan();
 }

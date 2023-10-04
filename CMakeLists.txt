@@ -23,7 +23,9 @@ include(FetchContent)
 include("Buildscripts/BCRL.cmake")
 include("Buildscripts/ReturnAddressSpoofer.cmake")
 find_package(Vulkan REQUIRED)
+include("Buildscripts/ImGUI.cmake")
+include("Buildscripts/DetourHooking.cmake")
 
 include("Buildscripts/Obfuscation.cmake")
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE dl)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE dl ${Vulkan_LIBRARIES})
