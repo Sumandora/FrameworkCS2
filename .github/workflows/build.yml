@@ -30,12 +30,12 @@ jobs:
         name: Setup dependencies
         run: |
           dnf update -y
-          dnf install -y git cmake make gcc-c++ SDL2-devel vulkan-loader vulkan-headers
+          dnf install -y git cmake make gcc-c++ SDL2-devel vulkan-tools vulkan-headers
       - if: matrix.distro == 'opensuse/tumbleweed:latest'
         name: Setup dependencies
         run: |
           zypper refresh
-          zypper install -y git cmake make gcc-c++ SDL2-devel vulkan-loader vulkan-headers
+          zypper install -y git cmake make gcc-c++ SDL2-devel vulkan-tools vulkan-headers
 
       - uses: actions/checkout@v3
         with:
