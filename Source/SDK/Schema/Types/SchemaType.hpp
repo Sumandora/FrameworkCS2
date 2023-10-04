@@ -5,11 +5,6 @@
 struct Flag;
 
 struct SchemaType {
-	PADDING(8);
-
+	void* vtable;
 	char* name;
-
-	PADDING(8);
-
-	Flag* arrayOfFlags;
 };

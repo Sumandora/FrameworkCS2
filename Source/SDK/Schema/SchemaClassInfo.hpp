@@ -16,16 +16,13 @@ struct SchemaClassInfo {
 
 	std::uint32_t size;
 
-	std::uint8_t fieldsCount;
+	std::uint16_t fieldsCount;
+	std::uint16_t staticFieldsCount;
 
-	PADDING(4); // no clue what this is
-
-	std::uint8_t baseClassCount;
-
-	PADDING(4);
+private:
+	PADDING(7);
+public:
 
 	FieldData* fields;
 	StaticFieldData* staticFields;
-
-	BaseClassData* baseClass;
 };
