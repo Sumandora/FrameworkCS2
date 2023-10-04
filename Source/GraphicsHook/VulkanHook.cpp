@@ -341,13 +341,18 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 			ImGui_ImplVulkan_CreateFontsTexture(fd->CommandBuffer);
 		}
 
+		{
+			std::lock_guard<std::mutex> lock{GraphicsHook::eventAccessMutex};
+			std::erase_if(GraphicsHook::eventQueue, [](const SDL_Event& event) {
+				ImGui_ImplSDL3_ProcessEvent(&event);
+				return true;
+			});
+		}
+
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplSDL3_NewFrame();
 
-		{
-			std::lock_guard<std::mutex> lock{GraphicsHook::eventAccessMutex};
-			ImGui::NewFrame();
-		}
+		ImGui::NewFrame();
 
 		if (ImGui::Begin("Hello, world!")) {
 			ImGui::Text("Hello, world!");
