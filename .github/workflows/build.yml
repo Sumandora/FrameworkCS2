@@ -30,7 +30,7 @@ jobs:
         name: Setup dependencies
         run: |
           dnf update -y
-          dnf install -y git cmake make gcc-c++ SDL2-devel vulkan-loader-devel vulkan-headers
+          dnf install -y git cmake make gcc-c++ SDL2-devel vulkan-loader-devel vulkan-headers libXext-devel
 
       - name: Install SDL3
         run: |
