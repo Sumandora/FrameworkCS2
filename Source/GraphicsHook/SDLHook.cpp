@@ -36,7 +36,7 @@ static int peepEventsHook(SDL_Event* events, int numevents, SDL_eventaction acti
 			io.LogFilename = nullptr;
 			printf("Initialized ImGui Context\n");
 		} else {
-			std::lock_guard<std::mutex> lock{GraphicsHook::eventAccessMutex};
+			std::lock_guard<std::mutex> lock{ GraphicsHook::eventAccessMutex };
 			GraphicsHook::eventQueue.push_back(event);
 			// TODO Discard events in case the menu is open
 		}
@@ -47,15 +47,11 @@ static int peepEventsHook(SDL_Event* events, int numevents, SDL_eventaction acti
 
 bool GraphicsHook::hookSDL() // TODO Write something that works universally on SDL
 {
-	functionPtr = static_cast<SDL_PeepEventsFunc*>([]() {
-		auto ptr = BCRL::Session::pointer(reinterpret_cast<void*>(SDL_PeepEvents)).add(2).relativeToAbsolute().getPointer();
-		return ptr.has_value() ? ptr.value() : nullptr;
-	}());
-
-	if (functionPtr == nullptr) {
-		printf("Failed to find backend function pointer for SDL_PeepEvents\n");
-		return false;
-	}
+	functionPtr = static_cast<SDL_PeepEventsFunc*>(
+		BCRL::Session::pointer(reinterpret_cast<void*>(SDL_PeepEvents))
+			.add(2)
+			.relativeToAbsolute()
+			.expect("Failed to find backend function pointer for SDL_PeepEvents"));
 
 	originalPeepEvents = *functionPtr;
 	*functionPtr = peepEventsHook;

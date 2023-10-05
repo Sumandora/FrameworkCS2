@@ -2,7 +2,7 @@
 
 #include <cstring>
 #include <dlfcn.h>
-#include <link.h>
+#include <format>
 
 #include "SDK/InterfaceReg.hpp"
 
@@ -16,7 +16,7 @@ struct InterfacedLibrary {
 	explicit InterfacedLibrary(const char* path)
 	{
 		handle = dlmopen(LM_ID_BASE, path, RTLD_NOW | RTLD_NOLOAD | RTLD_LOCAL);
-		auto session = BCRL::Session::pointer(dlsym(handle, "CreateInterface"))
+		auto interfaceList = BCRL::Session::pointer(dlsym(handle, "CreateInterface"))
 						   .add(1)
 						   .relativeToAbsolute()
 						   .repeater([](BCRL::SafePointer& ptr) {
@@ -27,14 +27,10 @@ struct InterfacedLibrary {
 						   })
 						   .add(3)
 						   .relativeToAbsolute()
-						   .getPointer();
+						   .expect(std::format("Couldn't find interface list for {}", path));
 
-		if (!session.has_value()) {
-			printf("Couldn't find interface list for %s\n", path);
-			return;
-		}
 
-		for (InterfaceReg* interface = *reinterpret_cast<InterfaceReg**>(session.value()); interface; interface = interface->m_pNext) {
+		for (InterfaceReg* interface = *reinterpret_cast<InterfaceReg**>(interfaceList); interface; interface = interface->m_pNext) {
 			interfaces[interface->m_pName] = interface->m_CreateFn;
 		}
 	}
@@ -53,7 +49,7 @@ struct InterfacedLibrary {
 void* Interfaces::uncoverCreateFunction(void* createFunc)
 {
 	void* interfacePtr = nullptr;
-	BCRL::Session::pointer(createFunc)
+	(void)BCRL::Session::pointer(createFunc)
 		.repeater([&interfacePtr](BCRL::SafePointer& pointer) {
 			if (pointer.doesMatch("48 8d 05")) { // LEA rax, [rip + offset]
 				interfacePtr = pointer.add(3).relativeToAbsolute().getPointer();
