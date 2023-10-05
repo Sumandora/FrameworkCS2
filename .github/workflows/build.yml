@@ -15,7 +15,7 @@ jobs:
         name: Setup dependencies
         run: |
           apt-get update
-          apt-get install -y git cmake make build-essential libsdl2-dev gcc-12 g++-12 libvulkan-dev
+          apt-get install -y git cmake make build-essential libsdl2-dev gcc-13 g++-13 libvulkan-dev
       - if: startsWith(matrix.distro, 'debian:')
         name: Setup dependencies
         run: |
@@ -46,7 +46,7 @@ jobs:
 
       - if: startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate'
         name: Build
-        run: CC=gcc-12 CXX=g++-12 ./Build.sh
+        run: CC=gcc-13 CXX=g++-13 ./Build.sh
 
       - if: "!(startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate')"
         name: Build
