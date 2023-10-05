@@ -11,12 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     container: ${{ matrix.distro }}
     steps:
-      - if: startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate'
+      - if: startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest'
         name: Setup dependencies
         run: |
+          add-apt-repository ppa:ubuntu-toolchain-r/ppa
           apt-get update
           apt-get install -y git cmake make build-essential libsdl2-dev gcc-13 g++-13 libvulkan-dev
-      - if: startsWith(matrix.distro, 'debian:')
+      - if: matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing'
         name: Setup dependencies
         run: |
           apt-get update
@@ -44,11 +45,11 @@ jobs:
         with:
           submodules: recursive
 
-      - if: startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate'
+      - if: startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest'
         name: Build
         run: CC=gcc-13 CXX=g++-13 ./Build.sh
 
-      - if: "!(startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate')"
+      - if: "!(startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate') || matrix.distro == 'debian:latest'"
         name: Build
         run: ./Build.sh
 
