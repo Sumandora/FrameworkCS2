@@ -14,11 +14,10 @@ jobs:
       - if: startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest'
         name: Setup dependencies
         run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install gcc@13
           apt-get update
-          apt-get install -y software-properties-common
-          add-apt-repository ppa:ubuntu-toolchain-r/ppa
-          apt-get update
-          apt-get install -y git cmake make build-essential libsdl2-dev gcc-13 g++-13 libvulkan-dev
+          apt-get install -y git cmake make build-essential libsdl2-dev libvulkan-dev
       - if: matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing'
         name: Setup dependencies
         run: |
