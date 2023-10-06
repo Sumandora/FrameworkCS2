@@ -8,7 +8,7 @@ A fully-featured training software for Counter Strike: 2, made for Linux
 
   If you're running Ubuntu 23.10 or above or Debian Sid, you have gcc 13 in repos:
   ```sh
-  apt-get install gdb git cmake make build-essential libsdl2-dev gcc-13 g++-13
+  apt-get install gdb git cmake make build-essential libvulkan-dev gcc-13 g++-13
   ```
   Otherwise, you will need to install gcc 13 the hard way.
   For Ubuntu and Mint, there is a PPA (doesn't seem to work on debian stable)
@@ -18,13 +18,22 @@ A fully-featured training software for Counter Strike: 2, made for Linux
   apt install gcc-13 g++-13
   ```
   For debian stable, you're SOL - either build it from source or install it with e.g. brew.
+
+  You also need to install SDL3 from source:
+  ```sh
+  git clone https://github.com/libsdl-org/SDL ~/SDL
+  cd ~/SDL
+  cmake -S . -B build
+  cmake --build build
+  cmake --install build
+  ```
 </details>
 
 <details>
   <summary> Arch Linux / Manjaro Linux </summary>
 
   ```sh
-  pacman -S base-devel cmake gdb git sdl2
+  pacman -S gdb base-devel cmake git vulkan-icd-loader vulkan-headers sdl3-git
   ```
 </details>
 
@@ -32,7 +41,12 @@ A fully-featured training software for Counter Strike: 2, made for Linux
   <summary> Fedora </summary>
 
   ```sh
-  dnf install gdb git cmake make gcc-c++ SDL2-devel
+  dnf install gdb git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel
+  git clone https://github.com/libsdl-org/SDL ~/SDL
+  cd ~/SDL
+  cmake -S . -B build
+  cmake --build build
+  cmake --install build
   ```
 </details>
 These might be outdated, in that case please open an issue or a pull request, which updates the package names.
