@@ -5,22 +5,18 @@ A fully-featured training software for Counter Strike: 2, made for Linux
 ### Dependencies
 <details>
   <summary> Ubuntu / Debian / Linux Mint </summary>
-
-  If you're running Ubuntu 23.10 or above or Debian Sid, you have gcc 13 in repos:
-  ```sh
-  apt-get install gdb git cmake make build-essential libvulkan-dev gcc-13 g++-13
-  ```
-  Otherwise, you will need to install gcc 13 the hard way.
-  For Ubuntu and Mint, there is a PPA (doesn't seem to work on debian stable)
+  
+  If you're running Ubuntu 23.04 or below (or Mint), you need to add a PPA to get gcc 13:
   ```sh
   add-apt-repository -y ppa:ubuntu-toolchain-r/test
   apt update
   apt install gcc-13 g++-13
   ```
-  For debian stable, you're SOL - either build it from source or install it with e.g. brew.
 
-  You also need to install SDL3 from source:
+  For debian stable, you're SOL - either build it from source or install it with e.g. homebrew.
+
   ```sh
+  apt-get install gdb git cmake make build-essential libvulkan-dev libx11-dev libxext-dev gcc-13 g++-13
   git clone https://github.com/libsdl-org/SDL ~/SDL
   cd ~/SDL
   cmake -S . -B build
@@ -33,7 +29,7 @@ A fully-featured training software for Counter Strike: 2, made for Linux
   <summary> Arch Linux / Manjaro Linux </summary>
 
   ```sh
-  pacman -S gdb base-devel cmake git vulkan-icd-loader vulkan-headers sdl3-git
+  pacman -S gdb base-devel cmake git vulkan-icd-loader vulkan-headers sdl3-git libX11 libxext
   ```
 </details>
 
