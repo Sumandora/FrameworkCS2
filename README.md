@@ -3,22 +3,38 @@ A fully-featured training software for Counter Strike: 2, made for Linux
 ### WARNING: This program is being detected by Valve. Usage on official, custom or private servers will most likely result in punishment from Valve!
 ## Installation
 ### Dependencies
-**Ubuntu / Debian / Linux Mint**
-```sh
-apt-get install gdb git cmake make build-essential libsdl2-dev
-```
-**Arch Linux / Manjaro Linux**
-```sh
-pacman -S base-devel cmake gdb git sdl2
-```
-**Fedora**
-```sh
-dnf install gdb git cmake make gcc-c++ SDL2-devel
-```
-**OpenSUSE Tumbleweed**
-```sh
-zypper install patchelf gdb git cmake make gcc-c++ SDL2-devel
-```
+<details>
+  <summary> Ubuntu / Debian / Linux Mint </summary>
+
+  If you're running Ubuntu 23.10 or above or Debian Sid, you have gcc 13 in repos:
+  ```sh
+  apt-get install gdb git cmake make build-essential libsdl2-dev gcc-13 g++-13
+  ```
+  Otherwise, you will need to install gcc 13 the hard way.
+  For Ubuntu and Mint, there is a PPA (doesn't seem to work on debian stable)
+  ```sh
+  add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  apt update
+  apt install gcc-13 g++-13
+  ```
+  For debian stable, you're SOL - either build it from source or install it with e.g. brew.
+</details>
+
+<details>
+  <summary> Arch Linux / Manjaro Linux </summary>
+
+  ```sh
+  pacman -S base-devel cmake gdb git sdl2
+  ```
+</details>
+
+<details>
+  <summary> Fedora </summary>
+
+  ```sh
+  dnf install gdb git cmake make gcc-c++ SDL2-devel
+  ```
+</details>
 These might be outdated, in that case please open an issue or a pull request, which updates the package names.
 
 ### Download
