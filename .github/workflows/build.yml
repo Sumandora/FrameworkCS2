@@ -6,20 +6,20 @@ jobs:
   build:
     strategy:
       matrix:
-        distro: ["ubuntu:22.04", "ubuntu:23.04", "ubuntu:23.10", "debian:latest", "debian:unstable", "debian:testing", "dockerscripts/linuxmint:mate", "archlinux:latest", "manjarolinux/base:latest", "fedora:latest"]
+        distro: ["ubuntu:22.04", "ubuntu:23.04", "ubuntu:23.10", "debian:unstable", "debian:testing", "dockerscripts/linuxmint:mate", "archlinux:latest", "manjarolinux/base:latest", "fedora:latest"]
       fail-fast: false
     runs-on: ubuntu-latest
     container: ${{ matrix.distro }}
     steps:
-      - if: startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest'
+      - if: matrix.distro == 'ubuntu:22.04' || matrix.distro == 'ubuntu:23.04' || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest'
         name: Setup dependencies
         run: |
           apt update
           apt install -y software-properties-common
-          add-apt-repository ppa:ubuntu-toolchain-r/test
+          add-apt-repository -y ppa:ubuntu-toolchain-r/test
           apt update
           apt install -y git cmake make build-essential libsdl2-dev libvulkan-dev gcc-13 g++-13
-      - if: matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing'
+      - if: matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing' || matrix.distro == 'ubuntu:23.10'
         name: Setup dependencies
         run: |
           apt-get update
@@ -47,11 +47,11 @@ jobs:
         with:
           submodules: recursive
 
-      - if: startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest'
+      - if: matrix.distro == 'ubuntu:22.04' || matrix.distro == 'ubuntu:23.04' || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest'
         name: Build
         run: CC=gcc-13 CXX=g++-13 ./Build.sh
 
-      - if: "!(startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate') || matrix.distro == 'debian:latest'"
+      - if: "!(matrix.distro == 'ubuntu:22.04' || matrix.distro == 'ubuntu:23.04' || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest')"
         name: Build
         run: ./Build.sh
 
