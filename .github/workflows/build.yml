@@ -15,7 +15,7 @@ jobs:
         name: Setup dependencies
         run: |
           apt update
-          apt install software-properties-common
+          apt install -y software-properties-common
           add-apt-repository ppa:ubuntu-toolchain-r/test
           apt update
           apt install -y git cmake make build-essential libsdl2-dev libvulkan-dev gcc-13 g++-13
