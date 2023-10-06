@@ -18,22 +18,22 @@ jobs:
           apt install -y software-properties-common
           add-apt-repository -y ppa:ubuntu-toolchain-r/test
           apt update
-          apt install -y git cmake make build-essential libsdl2-dev libvulkan-dev gcc-13 g++-13
+          apt install -y git cmake make build-essential libvulkan-dev gcc-13 g++-13
       - if: matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing' || matrix.distro == 'ubuntu:23.10'
         name: Setup dependencies
         run: |
           apt-get update
-          apt-get install -y git cmake make build-essential libsdl2-dev libvulkan-dev
+          apt-get install -y git cmake make build-essential libvulkan-dev
       - if: matrix.distro == 'archlinux:latest' || matrix.distro == 'manjarolinux/base:latest'
         name: Setup dependencies
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm base-devel cmake git sdl2 vulkan-icd-loader vulkan-headers
+          pacman -S --noconfirm base-devel cmake git vulkan-icd-loader vulkan-headers
       - if: matrix.distro == 'fedora:latest'
         name: Setup dependencies
         run: |
           dnf update -y
-          dnf install -y git cmake make gcc-c++ SDL2-devel vulkan-loader-devel vulkan-headers libXext-devel
+          dnf install -y git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel
 
       - name: Install SDL3
         run: |
