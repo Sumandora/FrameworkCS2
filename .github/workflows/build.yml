@@ -1,36 +1,39 @@
 name: Build
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
     strategy:
       matrix:
-        distro: ["ubuntu:22.04", "ubuntu:23.04", "ubuntu:23.10", "debian:latest", "debian:unstable", "debian:testing", "dockerscripts/linuxmint:mate", "archlinux:latest", "manjarolinux/base:latest", "fedora:latest"]
+        distro: ["ubuntu:22.04", "ubuntu:23.04", "ubuntu:23.10", "debian:unstable", "debian:testing", "dockerscripts/linuxmint:mate", "archlinux:latest", "manjarolinux/base:latest", "fedora:latest"]
       fail-fast: false
     runs-on: ubuntu-latest
     container: ${{ matrix.distro }}
     steps:
-      - if: startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate'
+      - if: matrix.distro == 'ubuntu:22.04' || matrix.distro == 'ubuntu:23.04' || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest'
+        name: Setup dependencies
+        run: |
+          apt update
+          apt install -y software-properties-common
+          add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          apt update
+          apt install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev gcc-13 g++-13
+      - if: matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing' || matrix.distro == 'ubuntu:23.10'
         name: Setup dependencies
         run: |
           apt-get update
-          apt-get install -y git cmake make build-essential libsdl2-dev gcc-12 g++-12 libvulkan-dev
-      - if: startsWith(matrix.distro, 'debian:')
-        name: Setup dependencies
-        run: |
-          apt-get update
-          apt-get install -y git cmake make build-essential libsdl2-dev libvulkan-dev
+          apt-get install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev
       - if: matrix.distro == 'archlinux:latest' || matrix.distro == 'manjarolinux/base:latest'
         name: Setup dependencies
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm base-devel cmake git sdl2 vulkan-icd-loader vulkan-headers
+          pacman -S --noconfirm base-devel cmake git vulkan-icd-loader vulkan-headers libx11 libxext
       - if: matrix.distro == 'fedora:latest'
         name: Setup dependencies
         run: |
           dnf update -y
-          dnf install -y git cmake make gcc-c++ SDL2-devel vulkan-loader-devel vulkan-headers libXext-devel
+          dnf install -y git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel
 
       - name: Install SDL3
         run: |
@@ -44,11 +47,11 @@ jobs:
         with:
           submodules: recursive
 
-      - if: startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate'
+      - if: matrix.distro == 'ubuntu:22.04' || matrix.distro == 'ubuntu:23.04' || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest'
         name: Build
-        run: CC=gcc-12 CXX=g++-12 ./Build.sh
+        run: CC=gcc-13 CXX=g++-13 ./Build.sh
 
-      - if: "!(startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate')"
+      - if: "!(matrix.distro == 'ubuntu:22.04' || matrix.distro == 'ubuntu:23.04' || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest')"
         name: Build
         run: ./Build.sh
 
