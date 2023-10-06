@@ -49,7 +49,7 @@ jobs:
 
       - if: startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest'
         name: Build
-        run: CC=gcc-13 CXX=g++-13 ./Build.sh
+        run: CC=/home/linuxbrew/.linuxbrew/bin/gcc-13 CXX=/home/linuxbrew/.linuxbrew/bin/g++-13 ./Build.sh
 
       - if: "!(startsWith(matrix.distro, 'ubuntu:') || matrix.distro == 'dockerscripts/linuxmint:mate') || matrix.distro == 'debian:latest'"
         name: Build
