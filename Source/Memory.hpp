@@ -15,5 +15,7 @@ namespace Memory {
 		inline void* getBaseEntity;
 	}
 
+	inline void* fireEvent;
+
 	void Create();
 }

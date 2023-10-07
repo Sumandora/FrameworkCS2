@@ -17,6 +17,8 @@ using namespace DetourHooking;
 
 #include "BCRL.hpp"
 
+#include "../Hooks/Hooks.hpp" // TODO Unhappy with this
+
 static constexpr uint32_t g_MinImageCount = 2;
 
 static VkAllocationCallbacks* g_Allocator = nullptr;
@@ -415,25 +417,15 @@ bool GraphicsHook::hookVulkan() {
 		return false;
 	}
 
-	auto acquireNextImageKHR = vkGetDeviceProcAddr(g_FakeDevice, "vkAcquireNextImageKHR");
-	auto queuePresentKHR = vkGetDeviceProcAddr(g_FakeDevice, "vkQueuePresentKHR");
-	auto createSwapchainKHR = vkGetDeviceProcAddr(g_FakeDevice, "vkCreateSwapchainKHR");
+	auto acquireNextImageKHR = reinterpret_cast<void*>(vkGetDeviceProcAddr(g_FakeDevice, "vkAcquireNextImageKHR"));
+	auto queuePresentKHR = reinterpret_cast<void*>(vkGetDeviceProcAddr(g_FakeDevice, "vkQueuePresentKHR"));
+	auto createSwapchainKHR = reinterpret_cast<void*>(vkGetDeviceProcAddr(g_FakeDevice, "vkCreateSwapchainKHR"));
 
 	vkDestroyDevice(g_FakeDevice, g_Allocator);
 
-	auto hookLength = [](auto* start) {
-		char* cPointer = reinterpret_cast<char*>(start);
-		auto ptr = BCRL::Session::pointer(cPointer).repeater([cPointer](BCRL::SafePointer& safePointer) {
-			safePointer = safePointer.nextInstruction();
-			return reinterpret_cast<char*>(safePointer.getPointer()) - cPointer < minLength;
-		}).getPointer();
-
-		return reinterpret_cast<char*>(ptr.value()) - cPointer;
-	};
-
-	acquireNextImageKHRHook = std::make_unique<Hook>(reinterpret_cast<void*>(acquireNextImageKHR), reinterpret_cast<void*>(hkAcquireNextImageKHR), hookLength(acquireNextImageKHR));
-	queuePresentKHRHook = std::make_unique<Hook>(reinterpret_cast<void*>(queuePresentKHR), reinterpret_cast<void*>(hkQueuePresentKHR), hookLength(queuePresentKHR));
-	createSwapchainKHRHook = std::make_unique<Hook>(reinterpret_cast<void*>(createSwapchainKHR), reinterpret_cast<void*>(hkCreateSwapchainKHR), hookLength(createSwapchainKHR));
+	acquireNextImageKHRHook = std::make_unique<Hook>(reinterpret_cast<void*>(acquireNextImageKHR), reinterpret_cast<void*>(hkAcquireNextImageKHR), Hooks::CalculateHookLength(acquireNextImageKHR));
+	queuePresentKHRHook = std::make_unique<Hook>(reinterpret_cast<void*>(queuePresentKHR), reinterpret_cast<void*>(hkQueuePresentKHR), Hooks::CalculateHookLength(queuePresentKHR));
+	createSwapchainKHRHook = std::make_unique<Hook>(reinterpret_cast<void*>(createSwapchainKHR), reinterpret_cast<void*>(hkCreateSwapchainKHR), Hooks::CalculateHookLength(createSwapchainKHR));
 
 	acquireNextImageKHRHook->enable();
 	queuePresentKHRHook->enable();

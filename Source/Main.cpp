@@ -19,6 +19,8 @@
 
 #include "SDK/Math/Vector.hpp"
 
+#include "Hooks/Hooks.hpp"
+
 SchemaClassInfo* gameSceneNode;
 SchemaClassInfo* csPlayerPawn;
 SchemaClassInfo* baseEntity;
@@ -30,6 +32,8 @@ int collisionOffset;
 
 int vecMins;
 int vecMaxs;
+
+std::unordered_map<std::string, std::size_t> eventCounter{};
 
 void initializer()
 {
@@ -159,7 +163,22 @@ void initializer()
 
 			ImGui::End();
 		}
+
+		if(ImGui::Begin("Game events")) {
+			if (ImGui::BeginTable("Events", 2)) {
+				for(const auto& [eventName, count] : eventCounter) {
+					ImGui::TableNextColumn();
+					ImGui::Text("%s", eventName.c_str());
+					ImGui::TableNextColumn();
+					ImGui::Text("%lu", count);
+				}
+				ImGui::EndTable();
+			}
+			ImGui::End();
+		}
 	};
+
+	Hooks::Create();
 }
 
 int __attribute((constructor, used)) startup()
@@ -173,6 +192,7 @@ int __attribute((constructor, used)) startup()
 
 void __attribute((destructor)) shutdown()
 {
+	Hooks::Destroy();
 	GraphicsHook::unhookSDL();
 	GraphicsHook::unhookVulkan();
 }
