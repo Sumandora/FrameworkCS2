@@ -6,5 +6,5 @@ struct SchemaSystemTypeScope;
 
 class SchemaSystem {
 public:
-	VIRTUAL_METHOD(13, FindTypeScopeForModule, SchemaSystemTypeScope*, (const char* name), (this, name, 0))
+	VIRTUAL_METHOD(13, FindTypeScopeForModule, SchemaSystemTypeScope*, (const char* name), (this, name, 0));
 };
