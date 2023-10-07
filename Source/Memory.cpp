@@ -8,6 +8,27 @@
 
 void* RetAddrSpoofer::leaveRet;
 
+static void FindEntitySystem()
+{
+	// To the valve employee, who wrote this function: Kuss auf Nuss!
+	auto /*CPrediction::*/ reinitPredictables = BCRL::Session::module("libclient.so")
+													.nextStringOccurrence("CL:  reinitialized %i predictable entities\n")
+													.findXREFs("libclient.so", true, false)
+													.prevByteOccurrence("48 83 ec ? 4c 8d 35")
+													.add(7);
+
+	printf("ReinitPredictables at %p\n", reinitPredictables.expect("Can't find ReinitPredictables"));
+
+	Memory::EntitySystem::gameEntitySystem = static_cast<GameEntitySystem**>(reinitPredictables.relativeToAbsolute().expect("Couldn't find GameEntitySystem"));
+	printf("Found GameEntitySystem at: %p\n", Memory::EntitySystem::gameEntitySystem);
+	reinitPredictables = reinitPredictables.add(4).nextByteOccurrence("49 8b 3e e8").add(4);
+	Memory::EntitySystem::getHighestEntityIndex = reinitPredictables.relativeToAbsolute().expect("Couldn't find getHighestEntityIndex");
+	printf("Found getHighestEntityIndex at: %p\n", Memory::EntitySystem::getHighestEntityIndex);
+	reinitPredictables = reinitPredictables.add(4).nextByteOccurrence("3e 44 89 fe e8").add(5);
+	Memory::EntitySystem::getBaseEntity = reinitPredictables.relativeToAbsolute().expect("Couldn't find getBaseEntity");
+	printf("Found getBaseEntity at: %p\n", Memory::EntitySystem::getBaseEntity);
+}
+
 void Memory::Create()
 {
 	// Set the address for the return address spoofer
@@ -39,7 +60,9 @@ void Memory::Create()
 			})
 			.add(3)
 			.relativeToAbsolute()
-			.expect("Couldn't find view render structure"));
+			.expect("Couldn't find ViewRender structure"));
+
+	printf("Found ViewRender at: %p\n", viewRender);
 
 	//  CRenderGameSystem::GetMatricesForView
 	//            (_g_pRenderGameSystem,(CViewSetup *)(CFrustum *)(this + 0x10),(VMatrix *)&g_WorldToView,
@@ -50,7 +73,9 @@ void Memory::Create()
 			.nextByteOccurrence("4c 8d 05")
 			.add(3)
 			.relativeToAbsolute()
-			.expect("Couldn't find world to projection matrix"));
+			.expect("Couldn't find WorldToProjection matrix"));
 
-	printf("%p", worldToProjectionMatrix);
+	printf("Found WorldToProjection matrix at: %p\n", worldToProjectionMatrix);
+
+	FindEntitySystem();
 }

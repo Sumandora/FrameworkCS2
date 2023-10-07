@@ -4,7 +4,6 @@
 
 struct SchemaClassInfo;
 
-class SchemaSystemTypeScope {
-public:
+struct SchemaSystemTypeScope {
 	VIRTUAL_METHOD(2, FindDeclaredClass, SchemaClassInfo*, (const char* name), (this, name));
 };

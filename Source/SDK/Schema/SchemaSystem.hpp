@@ -4,7 +4,6 @@
 
 struct SchemaSystemTypeScope;
 
-class SchemaSystem {
-public:
+struct SchemaSystem {
 	VIRTUAL_METHOD(13, FindTypeScopeForModule, SchemaSystemTypeScope*, (const char* name), (this, name, 0));
 };

@@ -77,7 +77,7 @@ void Interfaces::getInterfaces()
 		printf("Couldn't find Source2Client\n");
 	schemaSystem = schemasystem.getInterface<SchemaSystem>("SchemaSystem_");
 	if(schemaSystem)
-		printf("Found SchemaSystem interface at %p\n", source2Client);
+		printf("Found SchemaSystem interface at %p\n", schemaSystem);
 	else
 		printf("Couldn't find SchemaSystem\n");
 }

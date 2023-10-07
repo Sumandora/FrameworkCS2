@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDK/Schema/SchemaSystem.hpp"
+struct SchemaSystem;
 
 namespace Interfaces {
 	inline void* source2Client;
