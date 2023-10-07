@@ -51,4 +51,6 @@ void Memory::Create()
 			.add(3)
 			.relativeToAbsolute()
 			.expect("Couldn't find world to projection matrix"));
+
+	printf("%p", worldToProjectionMatrix);
 }

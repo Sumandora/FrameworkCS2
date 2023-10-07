@@ -1,7 +1,7 @@
 #pragma once
 
+#include "SDK/Math/Matrix.hpp"
 struct ViewRender;
-struct VMatrix;
 
 namespace Memory {
 	inline ViewRender* viewRender;

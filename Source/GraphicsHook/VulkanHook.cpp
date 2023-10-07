@@ -354,11 +354,7 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 
 		ImGui::NewFrame();
 
-		if (ImGui::Begin("Hello, world!")) {
-			ImGui::Text("Hello, world!");
-
-			ImGui::End();
-		}
+		GraphicsHook::mainLoop();
 
 		ImGui::Render();
 
