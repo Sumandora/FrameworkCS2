@@ -1,0 +1,24 @@
+#pragma once
+
+#include "../Padding.hpp"
+
+#include <cstdint>
+#include <bitset>
+
+union ConVarValue {
+	char* string;
+	int integer;
+	float floatingPoint;
+	bool boolean;
+};
+
+struct ConVar {
+	char* name;
+	PADDING(24);
+	char* description;
+	PADDING(8);
+	std::bitset<32> flags;
+	PADDING(12);
+	ConVarValue value;
+	ConVarValue valueBackup;
+};
