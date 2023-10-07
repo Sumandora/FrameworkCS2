@@ -1,11 +1,13 @@
 #pragma once
 
 #include "RetAddrSpoofer.hpp"
+#include <cstdint>
 
 // Inspired by danielkrupinski/Osiris
 
 namespace VirtualMethod {
-	inline void** getVTable(void* gameClass) {
+	inline void** getVTable(void* gameClass)
+	{
 		return *reinterpret_cast<void***>(gameClass);
 	}
 
@@ -20,5 +22,5 @@ namespace VirtualMethod {
 	inline returnType name argsType                                 \
 	{                                                               \
 		return VirtualMethod::invoke<returnType, index> argsCall;   \
-	}
-
+	}                                                               \
+	static constexpr std::size_t name##Idx = index
