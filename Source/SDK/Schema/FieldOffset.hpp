@@ -2,6 +2,10 @@
 
 #include <cstdint>
 
+#include "../../Interfaces.hpp"
+#include "SchemaSystem.hpp"
+#include "SchemaSystemTypeScope.hpp"
+
 struct SchemaClassInfo;
 
 std::int32_t findOffset(SchemaClassInfo* classInfo, const char* fieldName);

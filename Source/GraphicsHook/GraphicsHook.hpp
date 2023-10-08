@@ -9,7 +9,7 @@ namespace GraphicsHook {
 	inline std::mutex eventAccessMutex; // https://github.com/ocornut/imgui/issues/6895
 	inline std::vector<SDL_Event> eventQueue;
 
-	inline std::function<void()> mainLoop;
+	void mainLoop();
 
 	bool hookSDL();
 	bool hookVulkan();
