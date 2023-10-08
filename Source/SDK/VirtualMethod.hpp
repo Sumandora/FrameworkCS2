@@ -12,7 +12,7 @@ namespace VirtualMethod {
 	}
 
 	template <typename Ret, unsigned long Index, typename... Args>
-	inline auto invoke(void* gameClass, Args... args) -> Ret
+	inline Ret invoke(void* gameClass, Args... args)
 	{
 		return RetAddrSpoofer::invoke<Ret, void*, Args...>(getVTable(gameClass)[Index], gameClass, args...);
 	}
