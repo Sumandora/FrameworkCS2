@@ -17,10 +17,10 @@
 #include "SDK/Entities/BaseEntity.hpp"
 #include "SDK/Entities/GameEntitySystem.hpp"
 
-#include "SDK/GameClass/CGameSceneNode.hpp"
 #include "SDK/GameClass/CollisionProperty.hpp"
 #include "SDK/GameClass/CSPlayerPawn.hpp"
-#include "SDK/GameClass/CTransform.hpp"
+#include "SDK/GameClass/GameSceneNode.hpp"
+#include "SDK/GameClass/Transform.hpp"
 
 #include "SDK/Math/Vector.hpp"
 
