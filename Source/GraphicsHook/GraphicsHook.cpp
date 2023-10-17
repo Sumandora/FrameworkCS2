@@ -6,6 +6,7 @@
 #include "../SDK/GameClass/CollisionProperty.hpp"
 #include "../SDK/GameClass/CSPlayerPawn.hpp"
 #include "../SDK/GameClass/GameSceneNode.hpp"
+#include "../Utils/Projection.hpp"
 #include "imgui.h"
 
 void drawViewMatrix()
@@ -63,6 +64,8 @@ void drawEntityList()
 					Vector3 vec = transform->m_Position;
 
 					auto* collision = entity->collision();
+					if (collision == nullptr)
+						continue;
 					Vector3 mins = collision->mins();
 					Vector3 maxs = collision->maxs();
 
