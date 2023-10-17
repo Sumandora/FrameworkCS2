@@ -1,12 +1,13 @@
-//#############################################
-//# CREDITS: https://github.com/bruhmoment21/ #
-//#############################################
+// #############################################
+// # CREDITS: https://github.com/bruhmoment21/ #
+// #############################################
 
 #include "GraphicsHook.hpp"
 
 #include "backends/imgui_impl_vulkan.h"
 #include "backends/imgui_impl_sdl3.h"
 #include "imgui.h"
+#include "imgui_internal.h"
 
 #include <cstdio>
 #include <vector>
@@ -30,7 +31,8 @@ static VkDescriptorPool g_DescriptorPool = VK_NULL_HANDLE;
 static VkRenderPass g_RenderPass = VK_NULL_HANDLE;
 static ImGui_ImplVulkanH_Frame g_Frames[8] = {};
 
-static VkQueue GetGraphicQueue() {
+static VkQueue GetGraphicQueue()
+{
 	for (uint32_t i = 0; i < g_QueueFamilies.size(); ++i) {
 		const VkQueueFamilyProperties& family = g_QueueFamilies[i];
 		for (uint32_t j = 0; j < family.queueCount; ++j) {
@@ -46,7 +48,8 @@ static VkQueue GetGraphicQueue() {
 	return VK_NULL_HANDLE;
 }
 
-static void CreateDevice() {
+static void CreateDevice()
+{
 	// Create Vulkan Instance
 	{
 		VkInstanceCreateInfo create_info = {};
@@ -124,7 +127,8 @@ static void CreateDevice() {
 	}
 }
 
-static void CreateRenderTarget(VkDevice device, VkSwapchainKHR swapchain) {
+static void CreateRenderTarget(VkDevice device, VkSwapchainKHR swapchain)
+{
 	uint32_t uImageCount;
 	vkGetSwapchainImagesKHR(device, swapchain, &uImageCount, nullptr);
 
@@ -224,19 +228,19 @@ static void CreateRenderTarget(VkDevice device, VkSwapchainKHR swapchain) {
 		}
 	}
 
-	if (!g_DescriptorPool)  // Create Descriptor Pool.
+	if (!g_DescriptorPool) // Create Descriptor Pool.
 	{
-		constexpr VkDescriptorPoolSize pool_sizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
-			{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
-			{VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
-			{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
-			{VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
-			{VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
-			{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
-			{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
-			{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
-			{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
-			{VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}};
+		constexpr VkDescriptorPoolSize pool_sizes[] = { { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+			{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 } };
 
 		VkDescriptorPoolCreateInfo pool_info = {};
 		pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -249,8 +253,9 @@ static void CreateRenderTarget(VkDevice device, VkSwapchainKHR swapchain) {
 	}
 }
 
-static void CleanupRenderTarget() {
-	for (auto & g_Frame : g_Frames) {
+static void CleanupRenderTarget()
+{
+	for (auto& g_Frame : g_Frames) {
 		if (g_Frame.CommandBuffer) {
 			vkFreeCommandBuffers(g_Device, g_Frame.CommandPool, 1, &g_Frame.CommandBuffer);
 			g_Frame.CommandBuffer = VK_NULL_HANDLE;
@@ -270,7 +275,8 @@ static void CleanupRenderTarget() {
 	}
 }
 
-static void CleanupDevice() {
+static void CleanupDevice()
+{
 	CleanupRenderTarget();
 
 	if (g_DescriptorPool) {
@@ -285,8 +291,10 @@ static void CleanupDevice() {
 	g_Device = nullptr;
 }
 
-static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* pPresentInfo) {
-	if (!ImGui::GetCurrentContext() || !g_Device) return;
+static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* pPresentInfo)
+{
+	if (!ImGui::GetCurrentContext() || !g_Device)
+		return;
 
 	VkQueue graphicQueue = GetGraphicQueue();
 	if (!graphicQueue) {
@@ -342,7 +350,7 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 		}
 
 		{
-			std::lock_guard<std::mutex> lock{GraphicsHook::eventAccessMutex};
+			std::lock_guard<std::mutex> lock{ GraphicsHook::eventAccessMutex };
 			std::erase_if(GraphicsHook::eventQueue, [](const SDL_Event& event) {
 				ImGui_ImplSDL3_ProcessEvent(&event);
 				return true;
@@ -358,8 +366,21 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 
 		ImGui::Render();
 
+		auto* drawData = ImGui::GetDrawData();
+		{
+			const std::lock_guard<std::mutex> lock(GraphicsHook::espMutex);
+			if (GraphicsHook::espDrawList != nullptr) {
+				drawData->AddDrawList(GraphicsHook::espDrawList);
+				ImGui_ImplVulkan_RenderDrawData(drawData, fd->CommandBuffer);
+			}
+		}
 		// Record dear imgui primitives into command buffer
-		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), fd->CommandBuffer);
+
+		static std::once_flag espDrawListFlag;
+		std::call_once(espDrawListFlag, [&]() {
+			GraphicsHook::espDrawListSharedData = new ImDrawListSharedData(*ImGui::GetDrawListSharedData());
+			GraphicsHook::espDrawList = new ImDrawList(GraphicsHook::espDrawListSharedData);
+		});
 
 		// Submit command buffer
 		vkCmdEndRenderPass(fd->CommandBuffer);
@@ -380,34 +401,38 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 	}
 }
 
-using AcquireNextImageKHRFunc = VkResult(*)(VkDevice, VkSwapchainKHR, uint64_t, VkSemaphore, VkFence, uint32_t*);
+using AcquireNextImageKHRFunc = VkResult (*)(VkDevice, VkSwapchainKHR, uint64_t, VkSemaphore, VkFence, uint32_t*);
 static std::unique_ptr<Hook> acquireNextImageKHRHook;
 
-static VkResult VKAPI_CALL hkAcquireNextImageKHR(VkDevice device, VkSwapchainKHR swapchain, uint64_t timeout, VkSemaphore semaphore, VkFence fence, uint32_t* pImageIndex) {
+static VkResult VKAPI_CALL hkAcquireNextImageKHR(VkDevice device, VkSwapchainKHR swapchain, uint64_t timeout, VkSemaphore semaphore, VkFence fence, uint32_t* pImageIndex)
+{
 	g_Device = device;
 
 	return reinterpret_cast<AcquireNextImageKHRFunc>(acquireNextImageKHRHook->getTrampoline())(device, swapchain, timeout, semaphore, fence, pImageIndex);
 }
 
-using QueuePresentKHRFunc = VkResult(*)(VkQueue, const VkPresentInfoKHR*);
+using QueuePresentKHRFunc = VkResult (*)(VkQueue, const VkPresentInfoKHR*);
 static std::unique_ptr<Hook> queuePresentKHRHook;
 
-static VkResult VKAPI_CALL hkQueuePresentKHR(VkQueue queue, const VkPresentInfoKHR* pPresentInfo) {
+static VkResult VKAPI_CALL hkQueuePresentKHR(VkQueue queue, const VkPresentInfoKHR* pPresentInfo)
+{
 	RenderImGui(queue, pPresentInfo);
 
 	return reinterpret_cast<QueuePresentKHRFunc>(queuePresentKHRHook->getTrampoline())(queue, pPresentInfo);
 }
 
-using CreateSwapchainKHRFunc = VkResult(*)(VkDevice, const VkSwapchainCreateInfoKHR*, const VkAllocationCallbacks*, VkSwapchainKHR*);
+using CreateSwapchainKHRFunc = VkResult (*)(VkDevice, const VkSwapchainCreateInfoKHR*, const VkAllocationCallbacks*, VkSwapchainKHR*);
 static std::unique_ptr<Hook> createSwapchainKHRHook;
 
-static VkResult VKAPI_CALL hkCreateSwapchainKHR(VkDevice device, const VkSwapchainCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSwapchainKHR* pSwapchain) {
+static VkResult VKAPI_CALL hkCreateSwapchainKHR(VkDevice device, const VkSwapchainCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSwapchainKHR* pSwapchain)
+{
 	CleanupRenderTarget();
 
 	return reinterpret_cast<CreateSwapchainKHRFunc>(createSwapchainKHRHook->getTrampoline())(device, pCreateInfo, pAllocator, pSwapchain);
 }
 
-bool GraphicsHook::hookVulkan() {
+bool GraphicsHook::hookVulkan()
+{
 	CreateDevice();
 
 	if (!g_FakeDevice) {
@@ -424,9 +449,10 @@ bool GraphicsHook::hookVulkan() {
 	auto hookLength = [](auto* start) {
 		char* cPointer = reinterpret_cast<char*>(start);
 		auto ptr = BCRL::Session::pointer(cPointer).repeater([cPointer](BCRL::SafePointer& safePointer) {
-			safePointer = safePointer.nextInstruction();
-			return reinterpret_cast<char*>(safePointer.getPointer()) - cPointer < minLength;
-		}).getPointer();
+													   safePointer = safePointer.nextInstruction();
+													   return reinterpret_cast<char*>(safePointer.getPointer()) - cPointer < minLength;
+												   })
+					   .getPointer();
 
 		return reinterpret_cast<char*>(ptr.value()) - cPointer;
 	};
@@ -442,7 +468,8 @@ bool GraphicsHook::hookVulkan() {
 	return true;
 }
 
-void GraphicsHook::unhookVulkan() {
+void GraphicsHook::unhookVulkan()
+{
 	// Destroy hooks
 	acquireNextImageKHRHook = nullptr;
 	queuePresentKHRHook = nullptr;

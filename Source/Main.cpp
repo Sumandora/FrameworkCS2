@@ -23,6 +23,7 @@
 #include "SDK/GameClass/Transform.hpp"
 
 #include "SDK/Math/Vector.hpp"
+#include "GameHook/GameHook.hpp"
 
 void printFields(SchemaClassInfo* classInfo)
 {
@@ -58,6 +59,8 @@ void initializer()
 		printf("Failed to hook vulkan\n");
 		return;
 	}
+
+	GameHook::hook();
 }
 
 int __attribute((constructor, used)) startup()
@@ -73,4 +76,5 @@ void __attribute((destructor)) shutdown()
 {
 	GraphicsHook::unhookSDL();
 	GraphicsHook::unhookVulkan();
+	GameHook::unhook();
 }
