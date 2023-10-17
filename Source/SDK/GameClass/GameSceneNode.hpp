@@ -5,7 +5,7 @@
 #include "Transform.hpp"
 
 struct GameSceneNode {
-	CLASS_INFO("libclient.so", "GameSceneNode");
+	CLASS_INFO("libclient.so", "CGameSceneNode");
 
 	SCHEMA_VAR(Transform, transform, "m_nodeToWorld");
 };
