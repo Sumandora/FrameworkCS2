@@ -200,12 +200,30 @@ void drawLocalPlayer() {
 	ImGui::End();
 }
 
+extern std::unordered_map<std::string, std::size_t> eventCounters;
+
+void drawEventList() {
+	if(ImGui::Begin("Game events")) {
+		if (ImGui::BeginTable("Events", 2)) {
+			for(const auto& [eventName, count] : eventCounters) {
+				ImGui::TableNextColumn();
+				ImGui::Text("%s", eventName.c_str());
+				ImGui::TableNextColumn();
+				ImGui::Text("%lu", count);
+			}
+			ImGui::EndTable();
+		}
+	}
+	ImGui::End();
+}
+
 void GraphicsHook::mainLoop()
 {
 	drawViewMatrix();
 	drawEntityList();
 	drawConVars();
 	drawLocalPlayer();
+	drawEventList();
 
 	Features::ESP::imguiRender();
 	Features::ForceCrosshair::imguiRender();
