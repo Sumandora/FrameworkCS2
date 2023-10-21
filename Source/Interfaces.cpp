@@ -69,6 +69,7 @@ void Interfaces::getInterfaces()
 {
 	auto client = InterfacedLibrary("libclient.so");
 	auto schemasystem = InterfacedLibrary("libschemasystem.so");
+	auto tier0 = InterfacedLibrary("libtier0.so");
 
 	source2Client = client.getInterface<void>("Source2Client");
 	if(source2Client)
@@ -80,4 +81,9 @@ void Interfaces::getInterfaces()
 		printf("Found SchemaSystem interface at %p\n", schemaSystem);
 	else
 		printf("Couldn't find SchemaSystem\n");
+	engineCvar = tier0.getInterface<EngineCvar>("VEngineCvar");
+	if(engineCvar)
+		printf("Found EngineCvar interface at %p\n", engineCvar);
+	else
+		printf("Couldn't find EngineCvar\n");
 }
