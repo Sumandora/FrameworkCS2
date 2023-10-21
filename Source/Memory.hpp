@@ -18,5 +18,7 @@ namespace Memory {
 	inline void* shouldShowCrosshair;
 	inline void* getLocalPlayer;
 
+	inline void* fireEvent;
+
 	void Create();
 }

@@ -4,7 +4,6 @@
 
 #include "Interfaces.hpp"
 
-#include "SDK/GameClass/EngineCvar.hpp"
 #include "SDK/GameClass/ViewRender.hpp"
 
 void* RetAddrSpoofer::leaveRet;
@@ -100,4 +99,10 @@ void Memory::Create()
 						 .add(1)
 						 .relativeToAbsolute()
 						 .expect("Couldn't find getLocalPlayer");
+
+	fireEvent = BCRL::Session::module("libclient.so")
+					.nextStringOccurrence("FireEvent: event '%s' not registered.\n")
+					.findXREFs("libclient.so", true, false)
+					.prevByteOccurrence("55 48 8d 87 ? ? ? ? 48 89 e5") // What is the lea in the middle of the prologue?
+					.expect("Couldn't find FireEvent");
 }
