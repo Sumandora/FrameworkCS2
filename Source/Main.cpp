@@ -19,15 +19,18 @@
 
 #include "SDK/Math/Vector.hpp"
 
-#include "SDK/GameClass/EngineCvar.hpp"
 #include "SDK/GameClass/ConVar.hpp"
+#include "SDK/GameClass/EngineCvar.hpp"
 
 #include "BCRL.hpp"
+#include "DetourHooking.hpp"
+using namespace DetourHooking;
 
 SchemaClassInfo* gameSceneNode;
 SchemaClassInfo* csPlayerPawn;
 SchemaClassInfo* baseEntity;
 SchemaClassInfo* collisionProperty;
+SchemaClassInfo* csPlayerPawnBase;
 
 int gameSceneNodeOffset;
 int transformOffset;
@@ -35,6 +38,22 @@ int collisionOffset;
 
 int vecMins;
 int vecMaxs;
+
+int m_bIsScoped;
+
+std::unique_ptr<Hook> shouldShowCrosshairHook;
+
+bool forceCrosshair = false;
+
+static bool hookedShouldShowCrosshair(void* weapon)
+{
+	if(forceCrosshair) {
+		auto player = BaseEntity::getLocalPlayer();
+		if(player == nullptr || !*(bool*)((char*)player + m_bIsScoped))
+			return true;
+	}
+	return RetAddrSpoofer::invoke<bool>(shouldShowCrosshairHook->getTrampoline(), weapon);
+}
 
 void initializer()
 {
@@ -48,13 +67,14 @@ void initializer()
 	baseEntity = Interfaces::schemaSystem->FindTypeScopeForModule("libclient.so")->FindDeclaredClass("C_BaseEntity");
 	collisionProperty = Interfaces::schemaSystem->FindTypeScopeForModule("libclient.so")->FindDeclaredClass("CCollisionProperty");
 	gameSceneNode = Interfaces::schemaSystem->FindTypeScopeForModule("libclient.so")->FindDeclaredClass("CGameSceneNode");
+	csPlayerPawnBase = Interfaces::schemaSystem->FindTypeScopeForModule("libclient.so")->FindDeclaredClass("C_CSPlayerPawnBase");
 
 	printf("CSPlayerPawn: %p\nBaseEntity: %p\nCollisionProp: %p\n", csPlayerPawn, baseEntity, collisionProperty);
 
 	auto findField = [](SchemaClassInfo* classInfo, const char* fieldName) {
 		for (std::size_t i = 0; i < classInfo->fieldsCount; i++) {
 			FieldData& field = classInfo->fields[i];
-			if(strcmp(field.fieldName, fieldName) == 0)
+			if (strcmp(field.fieldName, fieldName) == 0)
 				return field.offset;
 		}
 		return 0;
@@ -66,6 +86,8 @@ void initializer()
 
 	vecMins = findField(collisionProperty, "m_vecMins");
 	vecMaxs = findField(collisionProperty, "m_vecMaxs");
+
+	m_bIsScoped = findField(csPlayerPawnBase, "m_bIsScoped");
 
 	printf("mins: %x\nmaxs: %x\n", vecMins, vecMaxs);
 
@@ -100,7 +122,6 @@ void initializer()
 				}
 				ImGui::EndTable();
 			}
-
 		}
 		ImGui::End();
 
@@ -114,7 +135,7 @@ void initializer()
 					for (int i = 0; i <= highest; i++) {
 						BaseEntity* entity = (*Memory::EntitySystem::gameEntitySystem)->getBaseEntity(i);
 						if (entity == nullptr) {
-							if(!onlyPlayers) {
+							if (!onlyPlayers) {
 								ImGui::TableNextColumn();
 								ImGui::Text("null entity?");
 								ImGui::TableNextColumn();
@@ -124,7 +145,7 @@ void initializer()
 							continue;
 						}
 						auto schemaType = entity->getSchemaType();
-						if(onlyPlayers && schemaType != csPlayerPawn)
+						if (onlyPlayers && schemaType != csPlayerPawn)
 							continue;
 						ImGui::TableNextColumn();
 						ImGui::Text("%d", i);
@@ -140,15 +161,13 @@ void initializer()
 								alignas(16) Vector3 m_Position;
 							};
 							auto* transform = (CTransform*)(gameSceneNode + transformOffset);
-							if(transform == nullptr)
+							if (transform == nullptr)
 								continue;
 							Vector3 vec = transform->m_Position;
-
 
 							char* collision = *(char**)((char*)entity + collisionOffset);
 							Vector3 mins = *(Vector3*)(collision + vecMins);
 							Vector3 maxs = *(Vector3*)(collision + vecMaxs);
-
 
 							Vector3 finalMins = { vec[0] + mins[0], vec[1] + mins[1], vec[2] + mins[2] };
 							Vector3 finalMaxs = { vec[0] + maxs[0], vec[1] + maxs[1], vec[2] + maxs[2] };
@@ -161,17 +180,16 @@ void initializer()
 
 					ImGui::EndTable();
 				}
-
 		}
 		ImGui::End();
 
-		if(ImGui::Begin("Convars")) {
+		if (ImGui::Begin("Convars")) {
 			static char search[128] = "";
 			ImGui::InputText("Search", search, IM_ARRAYSIZE(search));
 			static bool searchBackend = false;
 			ImGui::Checkbox("Search backend", &searchBackend);
 
-			if(ImGui::Button("Remove dev protection")) {
+			if (ImGui::Button("Remove dev protection")) {
 				auto& list = Interfaces::engineCvar->convarList;
 				auto it = list.head;
 				while (it != list.INVALID_INDEX) {
@@ -184,7 +202,7 @@ void initializer()
 
 			ImGui::SameLine();
 
-			if(ImGui::Button("Remove hidden state")) {
+			if (ImGui::Button("Remove hidden state")) {
 				auto& list = Interfaces::engineCvar->convarList;
 				auto it = list.head;
 				while (it != list.INVALID_INDEX) {
@@ -197,7 +215,7 @@ void initializer()
 
 			ImGui::SameLine();
 
-			if(ImGui::Button("Remove cheat protection")) {
+			if (ImGui::Button("Remove cheat protection")) {
 				auto& list = Interfaces::engineCvar->convarList;
 				auto it = list.head;
 				while (it != list.INVALID_INDEX) {
@@ -210,10 +228,10 @@ void initializer()
 
 			if (ImGui::BeginTable("List", 6)) {
 				auto process = [](ConVar* convar) {
-					if(convar == nullptr)
+					if (convar == nullptr)
 						return false;
 
-					if(search[0] != '\0' && strncmp(convar->name, search, strlen(search)) != 0)
+					if (search[0] != '\0' && strncmp(convar->name, search, strlen(search)) != 0)
 						return true;
 
 					ImGui::TableNextColumn();
@@ -230,7 +248,7 @@ void initializer()
 					};
 					ImGui::Text("%s", bitsetToString(convar->flags).c_str());
 					ImGui::TableNextColumn();
-					if(BCRL::SafePointer(convar->value.string).isValid() /*:thumbsup:*/)
+					if (BCRL::SafePointer(convar->value.string).isValid() /*:thumbsup:*/)
 						ImGui::Text("%s", convar->value.string);
 					else
 						ImGui::Text("null");
@@ -242,40 +260,45 @@ void initializer()
 					return true;
 				};
 
-				if(searchBackend) {
+				if (searchBackend) {
 					auto& list = Interfaces::engineCvar->convarList;
 					auto it = list.head;
 					while (it != list.INVALID_INDEX) {
 						auto& listElem = list.memory.memory[it];
-						if(!process(listElem.element))
+						if (!process(listElem.element))
 							break;
 
 						it = listElem.next;
 					}
 				} else {
-					for(auto it = Interfaces::engineCvar->getFirstCvarIterator(); it; it = Interfaces::engineCvar->getNextCvarIterator(it)) {
+					for (auto it = Interfaces::engineCvar->getFirstCvarIterator(); it; it = Interfaces::engineCvar->getNextCvarIterator(it)) {
 						auto* convar = Interfaces::engineCvar->getCvar(it);
-						if(!process(convar))
+						if (!process(convar))
 							break;
 					}
 				}
 				ImGui::EndTable();
 			}
-
 		}
 		ImGui::End();
 
-
-		if(ImGui::Begin("Local player")) {
+		if (ImGui::Begin("Local player")) {
 			auto localPlayer = BaseEntity::getLocalPlayer();
-			if(localPlayer != nullptr)
+			if (localPlayer != nullptr)
 				ImGui::Text("Local player: %p", localPlayer);
 			else
 				ImGui::Text("No local player found!");
 		}
 		ImGui::End();
 
+		if (ImGui::Begin("Force crosshair")) {
+			ImGui::Checkbox("Enabled", &forceCrosshair);
+		}
+		ImGui::End();
 	};
+
+	shouldShowCrosshairHook = std::make_unique<Hook>(Memory::shouldShowCrosshair, reinterpret_cast<void*>(hookedShouldShowCrosshair), 6);
+	shouldShowCrosshairHook->enable();
 }
 
 int __attribute((constructor, used)) startup()
