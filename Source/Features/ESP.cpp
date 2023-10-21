@@ -79,3 +79,11 @@ void Features::ESP::drawEsp(ImDrawList* drawList)
 		next_ent:;
 		}
 }
+
+void Features::ESP::imguiRender()
+{
+	if (ImGui::Begin("ESP")) {
+		ImGui::Checkbox("Enabled", &enabled);
+	}
+	ImGui::End();
+}

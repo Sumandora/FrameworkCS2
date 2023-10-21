@@ -200,18 +200,13 @@ void drawLocalPlayer() {
 	ImGui::End();
 }
 
-void drawForceCrosshair() {
-	if (ImGui::Begin("Force crosshair")) {
-		ImGui::Checkbox("Enabled", &Features::ForceCrosshair::enabled);
-	}
-	ImGui::End();
-}
-
 void GraphicsHook::mainLoop()
 {
 	drawViewMatrix();
 	drawEntityList();
 	drawConVars();
 	drawLocalPlayer();
-	drawForceCrosshair();
+
+	Features::ESP::imguiRender();
+	Features::ForceCrosshair::imguiRender();
 }

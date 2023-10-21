@@ -10,3 +10,11 @@ bool Features::ForceCrosshair::shouldForce()
 	auto player = BaseEntity::getLocalPlayer();
 	return player == nullptr || !player->isScoped();
 }
+
+void Features::ForceCrosshair::imguiRender()
+{
+	if (ImGui::Begin("Force crosshair")) {
+		ImGui::Checkbox("Enabled", &enabled);
+	}
+	ImGui::End();
+}
