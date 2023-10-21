@@ -16,5 +16,5 @@ struct EngineCvar {
 	PADDING(0x40);
 	CUtlLinkedList<ConVar*> convarList;
 
-	ConVar* findByName(char* name);
+	ConVar* findByName(const char* name);
 };

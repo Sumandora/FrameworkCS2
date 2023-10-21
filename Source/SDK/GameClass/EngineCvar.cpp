@@ -3,8 +3,9 @@
 
 #include <cstring>
 
-ConVar* EngineCvar::findByName(char* name)
+ConVar* EngineCvar::findByName(const char* name)
 {
+	// TODO hashmap name -> ConVar
 	auto it = convarList.head;
 	while (it != convarList.INVALID_INDEX) {
 		auto& listElem = convarList.memory.memory[it];
