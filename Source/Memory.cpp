@@ -4,6 +4,7 @@
 
 #include "Interfaces.hpp"
 
+#include "SDK/GameClass/EngineCvar.hpp"
 #include "SDK/GameClass/ViewRender.hpp"
 
 void* RetAddrSpoofer::leaveRet;
@@ -78,4 +79,24 @@ void Memory::Create()
 	printf("Found WorldToProjection matrix at: %p\n", worldToProjectionMatrix);
 
 	FindEntitySystem();
+
+	shouldShowCrosshair = BCRL::Session::module("libclient.so")
+							  .nextStringOccurrence("weapon_reticle_knife_show")
+							  .findXREFs("libclient.so", true, false)
+							  .nextByteOccurrence("48 8d 3d")
+							  .add(3)
+							  .relativeToAbsolute()  // This is a ConVar instance (not the ConVar type in the SDK)
+							  .findXREFs("libclient.so", true, false)
+							  .add(4)
+							  .filter([](const BCRL::SafePointer& ptr) { return ptr.doesMatch("be ff ff ff ff"); })
+							  .prevByteOccurrence("55 48 89 e5")
+							  .expect("Couldn't find shouldShowCrosshair");
+
+	getLocalPlayer = BCRL::Session::pointer(shouldShowCrosshair).repeater([](BCRL::SafePointer& ptr) {
+																	ptr = ptr.nextInstruction();
+																	return !ptr.doesMatch("e8");
+																})
+						 .add(1)
+						 .relativeToAbsolute()
+						 .expect("Couldn't find getLocalPlayer");
 }

@@ -15,5 +15,8 @@ namespace Memory {
 		inline void* getBaseEntity;
 	}
 
+	inline void* shouldShowCrosshair;
+	inline void* getLocalPlayer;
+
 	void Create();
 }

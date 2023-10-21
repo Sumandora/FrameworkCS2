@@ -264,6 +264,17 @@ void initializer()
 
 		}
 		ImGui::End();
+
+
+		if(ImGui::Begin("Local player")) {
+			auto localPlayer = BaseEntity::getLocalPlayer();
+			if(localPlayer != nullptr)
+				ImGui::Text("Local player: %p", localPlayer);
+			else
+				ImGui::Text("No local player found!");
+		}
+		ImGui::End();
+
 	};
 }
 
