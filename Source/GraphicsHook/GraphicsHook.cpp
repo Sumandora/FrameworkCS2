@@ -188,9 +188,31 @@ void drawConVars() {
 	ImGui::End();
 }
 
+void drawLocalPlayer() {
+	if (ImGui::Begin("Local player")) {
+		auto localPlayer = BaseEntity::getLocalPlayer();
+		if (localPlayer != nullptr)
+			ImGui::Text("Local player: %p", localPlayer);
+		else
+			ImGui::Text("No local player found!");
+	}
+	ImGui::End();
+}
+
+extern bool forceCrosshair;
+
+void drawForceCrosshair() {
+	if (ImGui::Begin("Force crosshair")) {
+		ImGui::Checkbox("Enabled", &forceCrosshair);
+	}
+	ImGui::End();
+}
+
 void GraphicsHook::mainLoop()
 {
 	drawViewMatrix();
 	drawEntityList();
 	drawConVars();
+	drawLocalPlayer();
+	drawForceCrosshair();
 }

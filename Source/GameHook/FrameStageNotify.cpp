@@ -90,5 +90,5 @@ void GameHook::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Client
 		}
 		break;
 	}
-	return reinterpret_cast<Func>(hook->proxy)(thisptr, stage);
+	return RetAddrSpoofer::invoke<void>(hook->proxy, thisptr, stage);
 }

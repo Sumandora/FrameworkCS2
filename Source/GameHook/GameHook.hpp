@@ -20,7 +20,11 @@ namespace GameHook {
 
 	namespace FrameStageNotify {
 		inline GameHook* hook;
-		using Func = void(*)(void*, ClientFrameStage);
 		void hookFunc([[maybe_unused]] void* thisptr, ClientFrameStage stage);
+	}
+
+	namespace ShouldShowCrosshair {
+		inline GameHook* hook;
+		bool hookFunc([[maybe_unused]] void* weapon);
 	}
 }
