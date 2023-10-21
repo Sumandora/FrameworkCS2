@@ -3,12 +3,12 @@
 #include "ldisasm.h"
 
 #include "../Interfaces.hpp"
-#include "../Utils/VMT.hpp"
+#include "BCRL.hpp"
 
 namespace GameHook {
 	void hook()
 	{
-		FrameStageNotify::hook = new GameHook(vtable(Interfaces::source2Client)[31], reinterpret_cast<void*>(FrameStageNotify::hookFunc));
+		FrameStageNotify::hook = new GameHook(BCRL::Session::arrayPointer(Interfaces::source2Client, 31).expect("Couldn't find FrameStageNotify"), reinterpret_cast<void*>(FrameStageNotify::hookFunc));
 	}
 
 	void unhook()
