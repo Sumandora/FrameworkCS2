@@ -20,9 +20,8 @@ void drawViewMatrix()
 			}
 			ImGui::EndTable();
 		}
-
-		ImGui::End();
 	}
+	ImGui::End();
 }
 
 void drawEntityList()
@@ -78,9 +77,8 @@ void drawEntityList()
 
 				ImGui::EndTable();
 			}
-
-		ImGui::End();
 	}
+	ImGui::End();
 }
 
 
