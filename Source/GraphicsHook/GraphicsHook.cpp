@@ -7,8 +7,8 @@
 #include "../SDK/GameClass/CollisionProperty.hpp"
 #include "../SDK/GameClass/GameSceneNode.hpp"
 
-#include "../SDK/GameClass/EngineCvar.hpp"
-#include "../SDK/GameClass/ConVar.hpp"
+#include "../SDK/ConVar/ConVar.hpp"
+#include "../SDK/ConVar/EngineCvar.hpp"
 
 #include "../Features/Features.hpp"
 #include "BCRL.hpp"
