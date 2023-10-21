@@ -1,11 +1,9 @@
 #include "Projection.hpp"
 
 #include "../Memory.hpp"
-#include "../SDK/Math/Matrix.hpp"
-#include "../SDK/Math/Vector.hpp"
 #include "imgui.h"
 
-bool project(const Vector3& world, ImVec2& screen)
+bool Projection::project(const Vector3& world, ImVec2& screen)
 {
 	const VMatrix& matrix = *Memory::worldToProjectionMatrix;
 

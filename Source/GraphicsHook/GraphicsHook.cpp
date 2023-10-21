@@ -2,14 +2,15 @@
 
 #include "../Memory.hpp"
 #include "../SDK/Entities/BaseEntity.hpp"
+#include "../SDK/Entities/CSPlayerPawn.hpp"
 #include "../SDK/Entities/GameEntitySystem.hpp"
 #include "../SDK/GameClass/CollisionProperty.hpp"
-#include "../SDK/GameClass/CSPlayerPawn.hpp"
 #include "../SDK/GameClass/GameSceneNode.hpp"
 
 #include "../SDK/GameClass/EngineCvar.hpp"
 #include "../SDK/GameClass/ConVar.hpp"
 
+#include "../Features/Features.hpp"
 #include "BCRL.hpp"
 #include "imgui.h"
 
@@ -199,11 +200,9 @@ void drawLocalPlayer() {
 	ImGui::End();
 }
 
-extern bool forceCrosshair;
-
 void drawForceCrosshair() {
 	if (ImGui::Begin("Force crosshair")) {
-		ImGui::Checkbox("Enabled", &forceCrosshair);
+		ImGui::Checkbox("Enabled", &Features::ForceCrosshair::enabled);
 	}
 	ImGui::End();
 }

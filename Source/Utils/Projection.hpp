@@ -4,4 +4,6 @@
 
 struct ImVec2;
 
-bool project(const Vector3& world, ImVec2& screen);
+namespace Projection {
+	bool project(const Vector3& world, ImVec2& screen);
+}

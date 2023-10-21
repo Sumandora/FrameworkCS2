@@ -17,8 +17,8 @@
 #include "SDK/Entities/BaseEntity.hpp"
 #include "SDK/Entities/GameEntitySystem.hpp"
 
+#include "SDK/Entities/CSPlayerPawn.hpp"
 #include "SDK/GameClass/CollisionProperty.hpp"
-#include "SDK/GameClass/CSPlayerPawn.hpp"
 #include "SDK/GameClass/GameSceneNode.hpp"
 #include "SDK/GameClass/Transform.hpp"
 
