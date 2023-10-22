@@ -105,4 +105,10 @@ void Memory::Create()
 					.findXREFs("libclient.so", true, false)
 					.prevByteOccurrence("55 48 8d 87 ? ? ? ? 48 89 e5") // What is the lea in the middle of the prologue?
 					.expect("Couldn't find FireEvent");
+
+	getFunLoading = BCRL::Session::module("libclient.so")
+						.nextStringOccurrence("#LoadingProgress_CSFunLoading%d")
+						.findXREFs(true, false)
+						.prevByteOccurrence("55 48 89 e5")
+						.expect("Couldn't find getFunLoading");
 }

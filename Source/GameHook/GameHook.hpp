@@ -34,4 +34,9 @@ namespace GameHook {
 		inline GameHook* hook;
 		void* hookFunc([[maybe_unused]] void* gameEventManager, GameEvent* event, [[maybe_unused]] bool rdx, [[maybe_unused]] bool rcx);
 	}
+
+	namespace GetFunLoading {
+		inline GameHook* hook;
+		const char* hookFunc(char* fallback);
+	}
 }

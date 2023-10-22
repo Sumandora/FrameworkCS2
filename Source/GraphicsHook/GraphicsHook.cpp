@@ -227,4 +227,5 @@ void GraphicsHook::mainLoop()
 
 	Features::ESP::imguiRender();
 	Features::ForceCrosshair::imguiRender();
+	Features::LoadingTextChanger::imguiRender();
 }

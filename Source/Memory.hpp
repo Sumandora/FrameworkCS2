@@ -19,6 +19,7 @@ namespace Memory {
 	inline void* getLocalPlayer;
 
 	inline void* fireEvent;
+	inline void* getFunLoading;
 
 	void Create();
 }

@@ -16,6 +16,7 @@ list(APPEND IMGUI_SOURCE_FILES "${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
 list(APPEND IMGUI_SOURCE_FILES "${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.cpp") # Vulkan
 
 list(APPEND IMGUI_SOURCE_FILES "${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp") # C++ stdlib
+target_include_directories(imgui PUBLIC "${imgui_SOURCE_DIR}/misc/cpp")
 
 # Remove unused components
 list(REMOVE_ITEM IMGUI_SOURCE_FILES "${imgui_SOURCE_DIR}/imgui_demo.cpp")

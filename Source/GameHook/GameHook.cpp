@@ -13,10 +13,12 @@ namespace GameHook {
 		FrameStageNotify::hook = new GameHook(BCRL::Session::arrayPointer(Interfaces::source2Client, 31).expect("Couldn't find FrameStageNotify"), reinterpret_cast<void*>(FrameStageNotify::hookFunc));
 		ShouldShowCrosshair::hook = new GameHook(Memory::shouldShowCrosshair, reinterpret_cast<void*>(ShouldShowCrosshair::hookFunc));
 		FireEvent::hook = new GameHook(Memory::fireEvent, reinterpret_cast<void*>(FireEvent::hookFunc));
+		GetFunLoading::hook = new GameHook(Memory::getFunLoading, reinterpret_cast<void*>(GetFunLoading::hookFunc));
 	}
 
 	void unhook()
 	{
+		delete GetFunLoading::hook;
 		delete FireEvent::hook;
 		delete ShouldShowCrosshair::hook;
 		delete FrameStageNotify::hook;
