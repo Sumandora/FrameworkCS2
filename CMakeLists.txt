@@ -24,6 +24,7 @@ include("Buildscripts/BCRL.cmake")
 include("Buildscripts/ReturnAddressSpoofer.cmake")
 find_package(Vulkan REQUIRED)
 include("Buildscripts/ImGUI.cmake")
+include("Buildscripts/SDL3.cmake")
 include("Buildscripts/DetourHooking.cmake")
 
 include("Buildscripts/Obfuscation.cmake")
