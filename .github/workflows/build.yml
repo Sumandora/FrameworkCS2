@@ -36,12 +36,15 @@ jobs:
           dnf install -y git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel
 
       - name: Install SDL3
-        run: |
+        run: | # Official build instructions from https://wiki.libsdl.org/SDL3/Installation
           git clone https://github.com/libsdl-org/SDL
           cd SDL
-          cmake -S . -B build
-          cmake --build build
-          cmake --install build
+          git checkout SDL-prerelease-3.0.0-2926-gaaf54b09a # Found by calling SDL_GetRevision (https://wiki.libsdl.org/SDL3/SDL_GetRevision)
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake --build . --config Release --parallel
+          cmake --install . --config Release
 
       - uses: actions/checkout@v3
         with:
