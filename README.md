@@ -17,11 +17,6 @@ A fully-featured training software for Counter Strike: 2, made for Linux
 
   ```sh
   apt-get install gdb git cmake make build-essential libvulkan-dev libx11-dev libxext-dev gcc-13 g++-13
-  git clone https://github.com/libsdl-org/SDL ~/SDL
-  cd ~/SDL
-  cmake -S . -B build
-  cmake --build build
-  cmake --install build
   ```
 </details>
 
@@ -29,7 +24,7 @@ A fully-featured training software for Counter Strike: 2, made for Linux
   <summary> Arch Linux / Manjaro Linux </summary>
 
   ```sh
-  pacman -S gdb base-devel cmake git vulkan-icd-loader vulkan-headers sdl3-git libX11 libxext
+  pacman -S gdb base-devel cmake git vulkan-icd-loader vulkan-headers libX11 libxext
   ```
 </details>
 
@@ -38,11 +33,6 @@ A fully-featured training software for Counter Strike: 2, made for Linux
 
   ```sh
   dnf install gdb git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel
-  git clone https://github.com/libsdl-org/SDL ~/SDL
-  cd ~/SDL
-  cmake -S . -B build
-  cmake --build build
-  cmake --install build
   ```
 </details>
 These might be outdated, in that case please open an issue or a pull request, which updates the package names.
