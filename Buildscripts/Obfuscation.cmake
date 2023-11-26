@@ -13,7 +13,8 @@ function(apply_obfuscation_recursively TARGET)
 
     # If not a header-only library, apply parameters
     get_target_property(LIB_TYPE ${TARGET} TYPE)
-    if (NOT LIB_TYPE STREQUAL "INTERFACE_LIBRARY")
+    get_property(IS_ALIAS TARGET ${TARGET} PROPERTY ALIASED_TARGET)
+    if ((NOT LIB_TYPE STREQUAL "INTERFACE_LIBRARY") AND (NOT IS_ALIAS))
         apply_obfuscation_parameters(${TARGET})
     endif ()
 
