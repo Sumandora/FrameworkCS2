@@ -10,7 +10,7 @@
 namespace GameHook {
 	void hook()
 	{
-		FrameStageNotify::hook = new GameHook(BCRL::Session::arrayPointer(Interfaces::source2Client, 31).expect("Couldn't find FrameStageNotify"), reinterpret_cast<void*>(FrameStageNotify::hookFunc));
+		FrameStageNotify::hook = new GameHook(BCRL::Session::arrayPointer(Interfaces::source2Client, 33).expect("Couldn't find FrameStageNotify"), reinterpret_cast<void*>(FrameStageNotify::hookFunc));
 		ShouldShowCrosshair::hook = new GameHook(Memory::shouldShowCrosshair, reinterpret_cast<void*>(ShouldShowCrosshair::hookFunc));
 		FireEvent::hook = new GameHook(Memory::fireEvent, reinterpret_cast<void*>(FireEvent::hookFunc));
 	}
