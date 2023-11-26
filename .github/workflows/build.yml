@@ -63,14 +63,8 @@ jobs:
         run: |
           CONTAINER_NAME=${{ matrix.distro }}
           . /etc/os-release
-          TMP_OUTPUT=$(echo "name=$NAME" | sed "s/\// /g")
-          if [ "$CONTAINER_NAME" == "debian:unstable" ]; then
-            echo "$TMP_OUTPUT unstable" >> "$GITHUB_OUTPUT"
-          elif [ "$CONTAINER_NAME" == "debian:testing" ]; then
-            echo "$TMP_OUTPUT testing" >> "$GITHUB_OUTPUT"
-          else
-            echo $TMP_OUTPUT >> "$GITHUB_OUTPUT"
-          fi
+          TMP_OUTPUT=$(echo "name=$PRETTY_NAME" | tr ':/' '  ')
+          echo $TMP_OUTPUT >> "$GITHUB_OUTPUT"
         shell: bash
 
       - name: Upload artifacts
