@@ -2,7 +2,7 @@
 FetchContent_Declare(imgui
         GIT_REPOSITORY https://github.com/ocornut/imgui
         GIT_PROGRESS TRUE
-        GIT_TAG master
+        GIT_TAG v1.90
         BUILD_COMMAND ""
         INSTALL_COMMAND "")
 FetchContent_MakeAvailable(imgui)

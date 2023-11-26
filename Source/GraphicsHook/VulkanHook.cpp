@@ -346,7 +346,6 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 			init_info.Allocator = g_Allocator;
 
 			ImGui_ImplVulkan_Init(&init_info, g_RenderPass);
-			ImGui_ImplVulkan_CreateFontsTexture(fd->CommandBuffer);
 		}
 
 		{
