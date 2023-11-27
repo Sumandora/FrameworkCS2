@@ -6,7 +6,7 @@
 
 #include "SDK/GameClass/ViewRender.hpp"
 
-void* RetAddrSpoofer::leaveRet;
+const void* RetAddrSpoofer::leaveRet;
 
 static void FindEntitySystem()
 {
