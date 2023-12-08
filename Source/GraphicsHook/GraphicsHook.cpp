@@ -11,6 +11,7 @@
 #include "../SDK/ConVar/EngineCvar.hpp"
 
 #include "../Features/Features.hpp"
+#include "../Menu/Menu.hpp"
 #include "BCRL.hpp"
 #include "imgui.h"
 
@@ -219,12 +220,16 @@ void drawEventList() {
 
 void GraphicsHook::mainLoop()
 {
-	drawViewMatrix();
-	drawEntityList();
-	drawConVars();
-	drawLocalPlayer();
-	drawEventList();
+	if (Menu::isOpen) {
+		drawViewMatrix();
+		drawEntityList();
+		drawConVars();
+		drawLocalPlayer();
+		drawEventList();
+	}
 
 	Features::ESP::imguiRender();
 	Features::ForceCrosshair::imguiRender();
+
+	Menu::draw();
 }

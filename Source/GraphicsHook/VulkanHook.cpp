@@ -9,6 +9,8 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
+#include "../Menu/Menu.hpp"
+
 #include <cstdio>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -355,6 +357,8 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 				return true;
 			});
 		}
+
+		Menu::postRender();
 
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplSDL3_NewFrame();

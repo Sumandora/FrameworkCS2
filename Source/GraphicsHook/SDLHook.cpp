@@ -9,6 +9,8 @@
 
 #include "backends/imgui_impl_sdl3.h"
 
+#include "../Menu/Menu.hpp"
+
 using SDL_PeepEventsFunc = int (*)(SDL_Event* events, int numevents, SDL_eventaction action, Uint32 minType, Uint32 maxType);
 static SDL_PeepEventsFunc originalPeepEvents;
 static SDL_PeepEventsFunc* functionPtr;
@@ -34,6 +36,8 @@ static int peepEventsHook(SDL_Event* events, int numevents, SDL_eventaction acti
 
 			io.IniFilename = nullptr; // TODO Bring it back
 			io.LogFilename = nullptr;
+
+			Menu::init();
 			printf("Initialized ImGui Context\n");
 		} else {
 			std::lock_guard<std::mutex> lock{ GraphicsHook::eventAccessMutex };
