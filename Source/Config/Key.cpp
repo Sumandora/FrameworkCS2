@@ -7,6 +7,11 @@
 #include <imgui.h>
 
 namespace Config {
+	Key Key::disabled()
+	{
+		return Key(1);
+	}
+
 	Key Key::fromKey(const ImGuiKey key)
 	{
 		return Key(key);
@@ -33,6 +38,9 @@ namespace Config {
 
 	bool Key::isDown() const
 	{
+		if (code == 1) {
+			return false;
+		}
 		if (code > 0) {
 			return ImGui::IsKeyDown(static_cast<ImGuiKey>(code));
 		}
@@ -43,13 +51,17 @@ namespace Config {
 
 	std::string_view Key::toString() const
 	{
+		if (code == 1) {
+			static constexpr std::string_view unbound = "Unbound";
+			return unbound;
+		}
 		if (code > 0) {
 			return ImGui::GetKeyName(static_cast<ImGuiKey>(code));
 		}
 		static constexpr std::string_view mouseButtons[] = {
-			"Left MB",
-			"Right MB",
-			"Middle MB",
+			"Left Mouse Button",
+			"Right Mouse Button"
+			"Middle Mouse Button"
 			"Mouse4",
 			"Mouse5",
 		};

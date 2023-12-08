@@ -22,7 +22,6 @@ namespace Config {
 		virtual ~Keybind() = default;
 		virtual void processInput() = 0;
 
-	protected:
 		Key key;
 	};
 

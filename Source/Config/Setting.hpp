@@ -25,6 +25,11 @@ namespace Config {
 			return value;
 		}
 
+		T* getPointer()
+		{
+			return &value;
+		}
+
 		T operator*() const
 		{
 			return getValue();

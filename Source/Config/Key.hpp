@@ -7,6 +7,7 @@ enum ImGuiKey : int;
 namespace Config {
 	class Key {
 	public:
+		static Key disabled();
 		static Key fromKey(ImGuiKey key);
 		static Key fromMouseButton(int mouseButton);
 		[[nodiscard]] bool isDown() const;
