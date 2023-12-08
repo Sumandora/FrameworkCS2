@@ -8,7 +8,7 @@ static ImVector<ImRect> s_GroupPanelLabelStack;
 static float lastWidth;
 
 namespace Menu::GroupPanel {
-	void BeginGroupPanel(const char* name, const ImVec2& size)
+	void Begin(const char* name, const ImVec2& size)
 	{
 		ImGui::BeginGroup();
 
@@ -62,7 +62,7 @@ namespace Menu::GroupPanel {
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 2.0f));
 	}
 
-	void EndGroupPanel()
+	void End()
 	{
 		ImGui::PopStyleVar(); // frame padding
 		ImGui::PopItemWidth();
@@ -122,7 +122,7 @@ namespace Menu::GroupPanel {
 			}
 
 			ImGui::GetWindowDrawList()->AddRect(frameRect.Min, frameRect.Max,
-				ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), 4);
+				ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), 4 * Config::getDpiScale());
 
 			ImGui::PopClipRect();
 		}

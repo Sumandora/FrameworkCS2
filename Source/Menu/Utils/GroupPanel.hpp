@@ -3,6 +3,6 @@
 #include <imgui.h>
 
 namespace Menu::GroupPanel {
-	void BeginGroupPanel(const char* name, const ImVec2& size = ImVec2(0.0f, 0.0f));
-	void EndGroupPanel();
+	void Begin(const char* name, const ImVec2& size = ImVec2(-1.0f, 0.0f));
+	void End();
 }

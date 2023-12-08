@@ -10,11 +10,11 @@ namespace Menu {
 
 	void Group::draw() const
 	{
-		GroupPanel::BeginGroupPanel(name.c_str());
+		GroupPanel::Begin(name.c_str());
 		for (const auto& widget : widgets) {
 			widget->draw();
 		}
-		GroupPanel::EndGroupPanel();
+		GroupPanel::End();
 	}
 
 	void Group::addWidget(std::unique_ptr<Widget> widget) { widgets.push_back(std::move(widget)); }
