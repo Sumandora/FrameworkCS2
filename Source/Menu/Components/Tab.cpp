@@ -30,7 +30,6 @@ namespace Menu {
 
 	void Tab2::draw() const
 	{
-		ImGui::TextUnformatted(getName().c_str());
 		ImGui::Columns(2, nullptr, false);
 		const auto width = ImGui::GetWindowContentRegionMax().x / 2.f;
 		ImGui::SetColumnWidth(0, width);

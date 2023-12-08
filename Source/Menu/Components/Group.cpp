@@ -1,6 +1,7 @@
 #include "Group.hpp"
 
 #include "../Utils/GroupPanel.hpp"
+#include "../Utils/Spacing.hpp"
 
 namespace Menu {
 	Group::Group(std::string name)
@@ -13,6 +14,7 @@ namespace Menu {
 		GroupPanel::Begin(name.c_str());
 		for (const auto& widget : widgets) {
 			widget->draw();
+			addSpacing(4);
 		}
 		GroupPanel::End();
 	}

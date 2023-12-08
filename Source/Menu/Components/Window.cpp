@@ -5,6 +5,7 @@
 
 #include "../Menu.hpp"
 #include "../Utils/Spacing.hpp"
+#include "../Widgets/ComboArray.hpp"
 #include "../Widgets/Keybinder.hpp"
 #include "Tab.hpp"
 
