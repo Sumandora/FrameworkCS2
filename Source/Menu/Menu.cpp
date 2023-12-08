@@ -65,6 +65,8 @@ void updateFontDPIImpl()
 	fontsNeedUpdate = false;
 }
 
+Config::KeybindButton* openMenuKeybind;
+
 namespace Menu {
 	void init()
 	{
@@ -77,12 +79,16 @@ namespace Menu {
 		updateFontDPIImpl();
 
 		ImGui::GetStyle().FramePadding = ImVec2(4, 2);
+
+		openMenuKeybind = new Config::KeybindButton([] { isOpen = !isOpen; }, *Config::c.menu.openKey);
+		addKeybind(openMenuKeybind);
 	}
 
 	void draw()
 	{
 		const float windowScale = Config::getDpiScale();
 
+		openMenuKeybind->key = *Config::c.menu.openKey;
 		auto& style = ImGui::GetStyle();
 		style.WindowRounding = 8.0f * windowScale;
 		style.ChildRounding = 8.0f * windowScale;
@@ -153,10 +159,6 @@ namespace Menu {
 
 		if (isOpen) {
 			window.draw();
-		}
-
-		if (ImGui::IsKeyPressed(ImGuiKey_Escape, false)) {
-			isOpen = !isOpen;
 		}
 
 		// Features::Misc::Menu::draw();
