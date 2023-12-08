@@ -2,6 +2,7 @@
 
 #include "../../Config/Config.hpp"
 
+#include <cmath>
 #include <imgui.h>
 
 namespace Menu {
@@ -14,13 +15,12 @@ namespace Menu {
 	{
 	}
 
-	ButtonArray::ButtonArray(std::vector<std::string> names, const std::optional<float> width)
-		: ButtonArray(std::move(names), true, std::nullopt, width)
+	ButtonArray::ButtonArray(std::vector<std::string> names)
+		: ButtonArray(std::move(names), true, std::nullopt)
 	{
 	}
 
-	ButtonArray::ButtonArray(
-		const std::vector<std::pair<std::string, std::function<void()>>>& actions, const std::optional<float> width)
+	ButtonArray::ButtonArray(const std::vector<std::pair<std::string, std::function<void()>>>& actions)
 	{
 		std::vector<std::function<void()>> callbacks;
 		names.reserve(actions.size());
@@ -31,12 +31,11 @@ namespace Menu {
 		}
 		callback = [callbacks = std::move(callbacks)](const std::size_t selected) { callbacks[selected](); };
 		highlightSelected = false;
-		this->width = width;
+		width = std::nullopt;
 	}
 
-	ButtonArray::ButtonArray(
-		std::vector<std::string> names, std::function<void(std::size_t)> callback, const std::optional<float> width)
-		: ButtonArray(std::move(names), false, std::move(callback), width)
+	ButtonArray::ButtonArray(std::vector<std::string> names, std::function<void(std::size_t)> callback)
+		: ButtonArray(std::move(names), false, std::move(callback))
 	{
 	}
 
@@ -112,4 +111,12 @@ namespace Menu {
 	std::size_t ButtonArray::getSelected() const { return selected; }
 
 	void ButtonArray::addButton(std::string name) { names.push_back(std::move(name)); }
+
+	void ButtonArray::setWidth(const float width) { this->width = width; }
+
+	void ButtonArray::setHighlightSelected(const bool highlightSelected)
+	{
+		this->highlightSelected = highlightSelected;
+	}
+
 }

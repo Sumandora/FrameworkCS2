@@ -13,13 +13,8 @@ namespace Menu {
 	Window::Window(std::string name)
 		: name(std::move(name))
 	{
-		auto tab1 = std::make_unique<Tab2>("Test tab 1");
-		Group group("Test group");
-		group.addWidget(std::make_unique<ButtonArray>(
-			std::vector<std::string>{ "100%", "125%", "150%", "200%" }, [](std::size_t index) {
-				Config::c.menu.dpi.setValue(static_cast<Config::DPI>(index));
-				updateFontDPI();
-			}));
+		tabSelector.setHighlightSelected(true);
+		tabSelector.setWidth(80);
 		tab1->addLeftGroup(std::move(group));
 		auto tab2 = std::make_unique<Tab2>("Test tab 2");
 		auto tab3 = std::make_unique<Tab2>("Test tab 3");
@@ -30,7 +25,7 @@ namespace Menu {
 
 	void Window::addTab(std::unique_ptr<Tab> tab)
 	{
-		buttonArray.addButton(tab->getName());
+		tabSelector.addButton(tab->getName());
 		tabs.push_back(std::move(tab));
 	}
 

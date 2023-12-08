@@ -20,8 +20,8 @@ namespace Menu {
 	private:
 		std::string name;
 		std::vector<std::unique_ptr<Tab>> tabs;
-		ButtonArray buttonArray{std::vector<std::string>{}, std::optional{80.0f}};
 		ImVec2 lastSize{400, 300};
+		ButtonArray tabSelector{std::vector<std::string>{}};
 		Config::DPI lastDPI{Config::DPI::X1};
 	};
 }
