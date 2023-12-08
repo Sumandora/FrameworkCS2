@@ -220,6 +220,8 @@ void drawEventList() {
 
 void GraphicsHook::mainLoop()
 {
+	Config::processInput();
+
 	if (Menu::isOpen) {
 		drawViewMatrix();
 		drawEntityList();
