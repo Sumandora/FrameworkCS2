@@ -8,11 +8,15 @@
 namespace Menu {
 	ButtonArray::ButtonArray(std::vector<std::string> names, const bool highlightSelected,
 		std::optional<std::function<void(std::size_t)>> callback, const std::optional<float> width)
-		: names(std::move(names))
-		, highlightSelected(highlightSelected)
+		: highlightSelected(highlightSelected)
 		, callback(std::move(callback))
 		, width(width)
 	{
+		this->names.reserve(names.size());
+		const auto label = getLabel();
+		for (auto& name : names) {
+			this->names.push_back(name + label);
+		}
 	}
 
 	ButtonArray::ButtonArray(std::vector<std::string> names)
