@@ -15,6 +15,11 @@ namespace Menu {
 	{
 		tabSelector.setHighlightSelected(true);
 		tabSelector.setWidth(80);
+		auto tab1 = std::make_unique<Tab2>("\xef\x82\x85 Misc");
+		Group group("Menu");
+		group.addWidget(std::make_unique<ComboArray<Config::DPI>>("DPI", std::vector<std::string>{ "100%", "125%", "150%", "200%" },
+			&Config::c.menu.dpi, std::optional{[]([[maybe_unused]] std::size_t index) { updateFontDPI(); }}));
+		group.addWidget(std::make_unique<Keybinder>("Menu key", Config::c.menu.openKey.getPointer()));
 		tab1->addLeftGroup(std::move(group));
 		auto tab2 = std::make_unique<Tab2>("Test tab 2");
 		auto tab3 = std::make_unique<Tab2>("Test tab 3");
