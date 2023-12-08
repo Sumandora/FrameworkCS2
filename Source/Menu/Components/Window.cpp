@@ -5,6 +5,7 @@
 
 #include "../Menu.hpp"
 #include "../Utils/Spacing.hpp"
+#include "../Widgets/Keybinder.hpp"
 #include "Tab.hpp"
 
 #include <cmath>
@@ -36,7 +37,7 @@ namespace Menu {
 
 	void Window::draw()
 	{
-		ImGui::SetNextWindowSize({ 400, 300 }, ImGuiCond_Once);
+		ImGui::SetNextWindowSize(lastSize, ImGuiCond_Once);
 		if (*Config::c.menu.dpi != lastDPI) {
 			const float delta = getDpiScale(*Config::c.menu.dpi) / getDpiScale(lastDPI);
 			lastSize.x *= delta;
@@ -56,12 +57,13 @@ namespace Menu {
 		ImGui::PopFont();
 
 		ImGui::SameLine();
-		buttonArray.draw();
+		tabSelector.draw();
 		addSpacingUnscaled(4);
 		addSpacing(3);
 		ImGui::Separator();
-		tabs[buttonArray.getSelected()]->draw();
+		tabs[tabSelector.getSelected()]->draw();
 
+		lastSize = ImGui::GetWindowSize();
 		ImGui::End();
 	}
 }
