@@ -48,13 +48,17 @@ namespace Menu {
 		}
 		ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
+		addSpacingUnscaled(-7);
+		addSpacing(7);
+
 		ImGui::PushFont(fonts.menuBig);
 		ImGui::TextUnformatted(name.c_str());
 		ImGui::PopFont();
 
 		ImGui::SameLine();
 		buttonArray.draw();
-		addSpacing(6);
+		addSpacingUnscaled(4);
+		addSpacing(3);
 		ImGui::Separator();
 		tabs[buttonArray.getSelected()]->draw();
 
