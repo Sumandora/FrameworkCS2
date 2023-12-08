@@ -97,8 +97,8 @@ namespace Menu::GroupPanel {
 		s_GroupPanelLabelStack.pop_back();
 
 		ImVec2 halfFrame = ImVec2(frameHeight * 0.25f * 0.5f, frameHeight * 0.5f);
-		ImVec2 pmin = ImVec2(itemMin.x + halfFrame.x, itemMin.y + halfFrame.y);
-		ImVec2 pmax = ImVec2(itemMax.x - halfFrame.x, itemMax.y);
+		ImVec2 pmin = ImVec2(std::round(itemMin.x + halfFrame.x), std::round(itemMin.y + halfFrame.y));
+		ImVec2 pmax = ImVec2(std::round(itemMax.x - halfFrame.x), std::round(itemMax.y));
 		ImRect frameRect = ImRect(pmin, pmax);
 		labelRect.Min.x -= itemSpacing.x;
 		labelRect.Max.x += itemSpacing.x;

@@ -45,7 +45,7 @@ namespace Menu {
 		const float totalWidth
 			= width ? *width * Config::getDpiScale() * names.size() : ImGui::GetContentRegionAvail().x;
 		if (width) { // right-align
-			ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - totalWidth);
+			ImGui::SetCursorPosX(std::round(ImGui::GetContentRegionMax().x - totalWidth));
 		}
 
 		// draw background rect and outline
@@ -94,8 +94,8 @@ namespace Menu {
 			}
 			if (i != 0) {
 				const float lineHeight = (top - screenPos.y) / 2;
-				drawList->AddLine({ screenPos.x, screenPos.y + lineHeight / 2 }, { screenPos.x, top - lineHeight / 2 },
-					ImGui::GetColorU32(ImGuiCol_Border));
+				drawList->AddLine({ std::floor(screenPos.x), std::floor(screenPos.y + lineHeight / 2) },
+					{ std::floor(screenPos.x), std::floor(top - lineHeight / 2) }, ImGui::GetColorU32(ImGuiCol_Border));
 			}
 			if (ImGui::Button(names[i].c_str(), { buttonWidth, 0 })) {
 				selected = i;
