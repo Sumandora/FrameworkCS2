@@ -59,7 +59,8 @@ namespace Menu::GroupPanel {
 
 		s_GroupPanelLabelStack.push_back(ImRect(labelMin, labelMax));
 
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 2.0f));
+		ImGui::PushStyleVar(
+			ImGuiStyleVar_FramePadding, ImVec2(4.0f * Config::getDpiScale(), 2.0f * Config::getDpiScale()));
 	}
 
 	void End()
@@ -76,8 +77,8 @@ namespace Menu::GroupPanel {
 
 		ImGui::EndGroup();
 
-		// ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(0, 255, 0,
-		// 64), 4.0f);
+		// ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(0, 255,
+		// 0, 64), 4.0f);
 
 		ImGui::EndGroup();
 
@@ -122,7 +123,7 @@ namespace Menu::GroupPanel {
 			}
 
 			ImGui::GetWindowDrawList()->AddRect(frameRect.Min, frameRect.Max,
-				ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), 4 * Config::getDpiScale());
+				ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), 6 * Config::getDpiScale());
 
 			ImGui::PopClipRect();
 		}

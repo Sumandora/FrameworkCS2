@@ -51,7 +51,7 @@ namespace Menu {
 		// draw background rect and outline
 		auto screenPos = ImGui::GetCursorScreenPos();
 		const auto drawList = ImGui::GetWindowDrawList();
-		const float top = screenPos.y + ImGui::GetTextLineHeight() + 4;
+		const float top = screenPos.y + ImGui::GetTextLineHeight() + ImGui::GetStyle().FramePadding.y * 2;
 		drawList->AddRectFilled(screenPos, ImVec2(screenPos.x + totalWidth, top), ImGui::GetColorU32(ImGuiCol_FrameBg),
 			ImGui::GetStyle().FrameRounding);
 		drawList->AddRect(screenPos, ImVec2(screenPos.x + totalWidth, top), ImGui::GetColorU32(ImGuiCol_Border),
