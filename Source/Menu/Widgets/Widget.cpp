@@ -4,8 +4,10 @@
 #include <format>
 
 namespace Menu {
-	std::string Widget::getLabel()
+	Widget::Widget()
+		: label(std::format("##{}", reinterpret_cast<std::uintptr_t>(this)))
 	{
-		return std::format("##{}", reinterpret_cast<std::uintptr_t>(this));
 	}
+
+	const std::string& Widget::getLabel() const { return label; }
 }

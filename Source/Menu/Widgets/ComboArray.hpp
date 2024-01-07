@@ -14,16 +14,17 @@ namespace Menu {
 		requires std::is_enum_v<T>
 	class ComboArray final : public Widget {
 	public:
-		ComboArray(std::string label, std::vector<std::string> items, Config::Setting<T>* setting,
+		ComboArray(std::string name, std::vector<std::string> items, Config::Setting<T>* setting,
 			std::optional<std::function<void(std::size_t)>> callback = std::nullopt)
-			: label(std::move(label))
+			: array(std::move(items), true,
+				  [setting, callback = std::move(callback)](std::size_t index) {
+					  setting->setValue(static_cast<T>(index));
+					  if (callback) {
+						  callback.value()(index);
+					  }
+				  })
+			, name(std::move(name))
 			, setting(setting)
-			, array(std::move(items), true, [setting, callback = std::move(callback)](std::size_t index) {
-				setting->setValue(static_cast<T>(index));
-				if (callback) {
-					callback.value()(index);
-				}
-			})
 		{
 		}
 
@@ -31,19 +32,19 @@ namespace Menu {
 		{
 			const auto yPadding = ImGui::GetStyle().FramePadding.y;
 			const auto lineStart = ImGui::GetCursorPos();
-			ImGui::Dummy(ImGui::CalcTextSize(label.c_str()));
+			ImGui::Dummy(ImGui::CalcTextSize(name.c_str()));
 			ImGui::SameLine();
 
 			array.draw();
 
 			ImGui::SetCursorPosX(lineStart.x);
 			ImGui::SetCursorPosY(lineStart.y + yPadding);
-			ImGui::TextUnformatted(label.c_str());
+			ImGui::TextUnformatted(name.c_str());
 		}
 
 	private:
 		ButtonArray array;
-		std::string label;
+		std::string name;
 		Config::Setting<T>* setting;
 	};
 }

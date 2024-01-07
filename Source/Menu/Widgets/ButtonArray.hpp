@@ -18,13 +18,13 @@ namespace Menu {
 		 * A simplified constructor for a button array which has the same semantics as `ImGui::Combo`
 		 * i.e. the user selects one of multiple options and that selection is stored.
 		 */
-		ButtonArray(std::vector<std::string> names);
+		explicit ButtonArray(std::vector<std::string> names);
 
 		/**
 		 * A simplified constructor for a button array which has the same semantics as n `ImGui::Button`s,
 		 * i.e. each button represents a separate action, no state is stored.
 		 */
-		ButtonArray(const std::vector<std::pair<std::string, std::function<void()>>>& actions);
+		explicit ButtonArray(const std::vector<std::pair<std::string, std::function<void()>>>& actions);
 
 		ButtonArray(std::vector<std::string> names, std::function<void(std::size_t)> callback);
 

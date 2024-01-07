@@ -26,16 +26,16 @@ std::optional<Config::Key> applyKeypress()
 }
 
 namespace Menu {
-	Keybinder::Keybinder(std::string label, Config::Key* key)
-		: label(std::move(label))
+	Keybinder::Keybinder(std::string name, Config::Key& key)
+		: label(std::move(name))
 		, key(key)
 	{
 	}
 
-	void Keybinder::draw(const std::string& label, Config::Key& key)
+	void Keybinder::draw(const std::string& name, Config::Key& key)
 	{
 		static const char* waitingFor = nullptr;
-		const bool isWaitingForThis = waitingFor == label.c_str();
+		const bool isWaitingForThis = waitingFor == name.c_str();
 		if (isWaitingForThis) {
 			if (const auto keyPressed = applyKeypress()) {
 				waitingFor = nullptr;
@@ -53,14 +53,14 @@ namespace Menu {
 
 		const auto yPadding = ImGui::GetStyle().FramePadding.y;
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + yPadding);
-		ImGui::TextUnformatted(label.c_str());
+		ImGui::TextUnformatted(name.c_str());
 		ImGui::SameLine(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(currentLabel.data()).x
 			- 2 * ImGui::GetStyle().FramePadding.x);
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() - yPadding);
 		if (ImGui::Button(currentLabel.data())) {
-			waitingFor = label.c_str();
+			waitingFor = name.c_str();
 		}
 	}
 
-	void Keybinder::draw() { draw(label, *key); }
+	void Keybinder::draw() { draw(label, key); }
 }

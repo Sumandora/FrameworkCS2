@@ -9,14 +9,14 @@ namespace Config {
 }
 
 namespace Menu {
-	class Keybinder : public Widget {
+	class Keybinder final : public Widget {
 	public:
-		Keybinder(std::string label, Config::Key* key);
-		static void draw(const std::string& label, Config::Key& key);
+		Keybinder(std::string name, Config::Key& key);
+		static void draw(const std::string& name, Config::Key& key);
 		void draw() override;
 
 	private:
 		const std::string label;
-		Config::Key* key;
+		Config::Key& key;
 	};
 }
