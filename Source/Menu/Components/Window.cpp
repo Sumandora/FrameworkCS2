@@ -5,6 +5,7 @@
 
 #include "../Menu.hpp"
 #include "../Utils/Spacing.hpp"
+#include "../Widgets/ColorPicker.hpp"
 #include "../Widgets/ComboArray.hpp"
 #include "../Widgets/Keybinder.hpp"
 #include "Tab.hpp"
@@ -21,7 +22,8 @@ namespace Menu {
 		Group group("Menu");
 		group.addWidget(std::make_unique<ComboArray<Config::DPI>>("DPI", std::vector<std::string>{ "100%", "125%", "150%", "200%" },
 			&Config::c.menu.dpi, std::optional{[]([[maybe_unused]] std::size_t index) { updateFontDPI(); }}));
-		group.addWidget(std::make_unique<Keybinder>("Menu key", Config::c.menu.openKey.getPointer()));
+		group.addWidget(std::make_unique<Keybinder>("Menu key", *Config::c.menu.openKey.getPointer()));
+		group.addWidget(std::make_unique<ColorPicker>("Accent color", Config::c.menu.accentColor));
 		tab1->addLeftGroup(std::move(group));
 		auto tab2 = std::make_unique<Tab2>("Test tab 2");
 		auto tab3 = std::make_unique<Tab2>("Test tab 3");
