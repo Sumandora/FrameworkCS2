@@ -7,8 +7,14 @@
 #include <vector>
 
 namespace GraphicsHook {
+	class SDLEventWrapper {
+	public:
+		SDLEventWrapper(const SDL_Event& event);
+		~SDLEventWrapper();
+		SDL_Event event;
+	};
 	inline std::mutex eventAccessMutex; // https://github.com/ocornut/imgui/issues/6895
-	inline std::vector<SDL_Event> eventQueue;
+	inline std::vector<SDLEventWrapper> eventQueue;
 
 	inline std::mutex espMutex;
 	inline ImDrawList* espDrawList;

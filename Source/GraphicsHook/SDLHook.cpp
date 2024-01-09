@@ -41,7 +41,7 @@ static int peepEventsHook(SDL_Event* events, int numevents, SDL_eventaction acti
 			printf("Initialized ImGui Context\n");
 		} else {
 			std::lock_guard<std::mutex> lock{ GraphicsHook::eventAccessMutex };
-			GraphicsHook::eventQueue.push_back(event);
+			GraphicsHook::eventQueue.emplace_back(event);
 			// TODO Discard events in case the menu is open
 		}
 	}

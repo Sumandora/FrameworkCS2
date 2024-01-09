@@ -352,8 +352,8 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 
 		{
 			std::lock_guard<std::mutex> lock{ GraphicsHook::eventAccessMutex };
-			std::erase_if(GraphicsHook::eventQueue, [](const SDL_Event& event) {
-				ImGui_ImplSDL3_ProcessEvent(&event);
+			std::erase_if(GraphicsHook::eventQueue, [](const GraphicsHook::SDLEventWrapper& event) {
+				ImGui_ImplSDL3_ProcessEvent(&event.event);
 				return true;
 			});
 		}
