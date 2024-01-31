@@ -52,7 +52,7 @@ void* Interfaces::uncoverCreateFunction(void* createFunc)
 	(void)BCRL::Session::pointer(createFunc)
 		.repeater([&interfacePtr](BCRL::SafePointer& pointer) {
 			if (pointer.doesMatch("48 8d 05")) { // LEA rax, [rip + offset]
-				interfacePtr = pointer.add(3).relativeToAbsolute().getPointer();
+				interfacePtr = reinterpret_cast<void*>(pointer.add(3).relativeToAbsolute().getPointer());
 			} else if (pointer.doesMatch("48 8b 00")) { // MOV rax, [rax]
 				interfacePtr = *reinterpret_cast<void**>(interfacePtr);
 			} else if (pointer.doesMatch("c3")) { // RET

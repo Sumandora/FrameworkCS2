@@ -2,7 +2,7 @@
 FetchContent_Declare(SDL3
         GIT_REPOSITORY https://github.com/libsdl-org/SDL
         GIT_PROGRESS TRUE
-        GIT_TAG SDL-prerelease-3.0.0-2926-gaaf54b09a)
+        GIT_TAG SDL-prerelease-3.0.0-2949-g666301f9f)
 FetchContent_MakeAvailable(SDL3)
 
 target_link_libraries(imgui PRIVATE SDL3::SDL3)
