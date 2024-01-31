@@ -59,7 +59,7 @@ void Memory::Create()
 			})
 			.add(3)
 			.relativeToAbsolute()
-			.expect<ViewRender*>("Couldn't find ViewRender structure"));
+			.expect<ViewRender*>("Couldn't find ViewRender structure");
 
 	printf("Found ViewRender at: %p\n", viewRender);
 

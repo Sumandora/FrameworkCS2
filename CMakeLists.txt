@@ -26,6 +26,7 @@ find_package(Vulkan REQUIRED)
 include("Buildscripts/ImGUI.cmake")
 include("Buildscripts/SDL3.cmake")
 include("Buildscripts/DetourHooking.cmake")
+include("Buildscripts/GenericESP.cmake")
 
 include("Buildscripts/Obfuscation.cmake")
 

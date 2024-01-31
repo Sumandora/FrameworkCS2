@@ -8,6 +8,7 @@ namespace Features {
 
 		void drawEsp(ImDrawList* drawList);
 		void imguiRender();
+		void update();
 	}
 	namespace ForceCrosshair {
 		inline bool enabled = false;

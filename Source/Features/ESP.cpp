@@ -12,9 +12,27 @@
 #include "../SDK/GameClass/GameSceneNode.hpp"
 #include "../Utils/Projection.hpp"
 
+#include "GenericESP.hpp"
+#include "GenericESP/DefaultRenderers.hpp"
+
+using namespace GenericESP;
+
+static DefaultRenderers renderers;
+RendererFactory& GenericESP::rendererFactory = renderers;
+
+static struct EntityESP : ESP {
+	Rectangle box{this, "Box"};
+
+	void draw(ImDrawList* drawList, const BaseEntity* e, const ImRect& rect) const
+	{
+		UnionedRect unionedRect{ rect };
+		box.draw(drawList, e, unionedRect);
+	}
+} entityEsp;
+
 void Features::ESP::drawEsp(ImDrawList* drawList)
 {
-	if (!Features::ESP::enabled)
+	if (!Features::ESP::enabled && false)
 		return;
 	int highest = (*Memory::EntitySystem::gameEntitySystem)->getHighestEntityIndex();
 	if (highest > -1)
@@ -54,8 +72,10 @@ void Features::ESP::drawEsp(ImDrawList* drawList)
 				Vector3{ finalMins[0], finalMaxs[1], finalMaxs[2] }
 			};
 
-			Vector4 rectangle{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
-				std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest() };
+			ImRect rectangle{
+				{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() },
+				{ std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest() }
+			};
 
 			for (const auto& point : points) {
 				ImVec2 point2D;
@@ -64,18 +84,18 @@ void Features::ESP::drawEsp(ImDrawList* drawList)
 					goto next_ent;
 				}
 
-				if (point2D.x < rectangle[0])
-					rectangle[0] = point2D.x;
-				else if (point2D.x > rectangle[2])
-					rectangle[2] = point2D.x;
+				if (point2D.x < rectangle.Min.x)
+					rectangle.Min.x = point2D.x;
+				else if (point2D.x > rectangle.Max.x)
+					rectangle.Max.x = point2D.x;
 
-				if (point2D.y < rectangle[1])
-					rectangle[1] = point2D.y;
-				else if (point2D.y > rectangle[3])
-					rectangle[3] = point2D.y;
+				if (point2D.y < rectangle.Min.y)
+					rectangle.Min.y = point2D.y;
+				else if (point2D.y > rectangle.Max.y)
+					rectangle.Max.y = point2D.y;
 			}
 
-			drawList->AddRect(ImVec2{ rectangle[0], rectangle[1] }, ImVec2{ rectangle[2], rectangle[3] }, ImColor(255, 255, 255, 255), 2.0f, 0, 5.0f);
+			entityEsp.draw(drawList, entity, rectangle);
 		next_ent:;
 		}
 }
@@ -83,7 +103,7 @@ void Features::ESP::drawEsp(ImDrawList* drawList)
 void Features::ESP::imguiRender()
 {
 	if (ImGui::Begin("ESP")) {
-		ImGui::Checkbox("Enabled", &enabled);
+		entityEsp.renderGui();
 	}
 	ImGui::End();
 }

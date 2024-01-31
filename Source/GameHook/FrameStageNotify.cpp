@@ -9,7 +9,7 @@ void GameHook::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Client
 {
 	switch (stage) {
 		using enum ClientFrameStage;
-	case FRAME_NET_UPDATE_END:
+	case FRAME_NET_UPDATE_END: {
 		const std::lock_guard<std::mutex> lock(GraphicsHook::espMutex);
 		if (GraphicsHook::espDrawList != nullptr) { // it was not yet initialized by the other thread
 			GraphicsHook::espDrawList->_ResetForNewFrame();
@@ -17,6 +17,9 @@ void GameHook::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Client
 			GraphicsHook::espDrawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
 			Features::ESP::drawEsp(GraphicsHook::espDrawList);
 		}
+		break;
+	}
+	default:
 		break;
 	}
 	return RetAddrSpoofer::invoke<void>(hook->proxy, thisptr, stage);
