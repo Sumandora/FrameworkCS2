@@ -21,7 +21,7 @@ static DefaultRenderers renderers;
 RendererFactory& GenericESP::rendererFactory = renderers;
 
 static struct EntityESP : ESP {
-	Rectangle box{this, "Box"};
+	Rectangle box{ this, "Box" };
 
 	void draw(ImDrawList* drawList, const BaseEntity* e, const ImRect& rect) const
 	{
@@ -32,13 +32,15 @@ static struct EntityESP : ESP {
 
 void Features::ESP::drawEsp(ImDrawList* drawList)
 {
-	if (!Features::ESP::enabled && false)
+	if (entityEsp.isDefinitelyDisabled())
 		return;
 	int highest = (*Memory::EntitySystem::gameEntitySystem)->getHighestEntityIndex();
 	if (highest > -1)
 		for (int i = 0; i <= highest; i++) {
 			BaseEntity* entity = (*Memory::EntitySystem::gameEntitySystem)->getBaseEntity(i);
 			if (entity == nullptr)
+				continue;
+			if (!entityEsp.isEnabled(entity))
 				continue;
 			auto schemaType = entity->getSchemaType();
 			if (schemaType != CSPlayerPawn::classInfo())
