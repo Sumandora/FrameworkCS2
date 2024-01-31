@@ -4,4 +4,4 @@ FetchContent_Declare(DetourHooking
         GIT_PROGRESS TRUE
         GIT_TAG 4f14fde)
 FetchContent_MakeAvailable(DetourHooking)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE DetourHooking)
+target_link_libraries(${CMAKE_PROJECT_NAME} DetourHooking)

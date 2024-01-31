@@ -27,4 +27,4 @@ target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
 
 set_target_properties(imgui PROPERTIES LINKER_LANGUAGE CXX)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE imgui)
+target_link_libraries(${CMAKE_PROJECT_NAME} imgui)

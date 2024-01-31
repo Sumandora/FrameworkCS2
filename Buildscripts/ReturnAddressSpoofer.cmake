@@ -4,7 +4,7 @@ FetchContent_Declare(ReturnAddressSpoofer
         GIT_PROGRESS TRUE
         GIT_TAG 04a655d)
 FetchContent_MakeAvailable(ReturnAddressSpoofer)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ReturnAddressSpoofer)
+target_link_libraries(${CMAKE_PROJECT_NAME} ReturnAddressSpoofer)
 
 target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE "-ffunction-sections") # This is required for the transformation
 

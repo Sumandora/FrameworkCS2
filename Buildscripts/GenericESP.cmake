@@ -6,4 +6,4 @@ FetchContent_Declare(GenericESP
         GIT_TAG 03b2aa1)
 FetchContent_MakeAvailable(GenericESP)
 add_subdirectory("${GenericESP_SOURCE_DIR}/Extensions/DefaultRenderers")
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE GenericESP GenericESPDefaultRenderers)
+target_link_libraries(${CMAKE_PROJECT_NAME} GenericESP GenericESPDefaultRenderers)

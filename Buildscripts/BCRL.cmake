@@ -4,4 +4,4 @@ FetchContent_Declare(bcrl
         GIT_PROGRESS TRUE
         GIT_TAG 1b325d4)
 FetchContent_MakeAvailable(bcrl)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE bcrl)
+target_link_libraries(${CMAKE_PROJECT_NAME} bcrl)
