@@ -18,18 +18,21 @@ namespace Menu {
 	{
 		tabSelector.setHighlightSelected(true);
 		tabSelector.setWidth(80);
-		auto tab1 = std::make_unique<Tab2>("\xef\x82\x85 Misc");
-		Group group("Menu");
-		group.addWidget(std::make_unique<ComboArray<Config::DPI>>("DPI", std::vector<std::string>{ "100%", "125%", "150%", "200%" },
+		auto legitTab = std::make_unique<Tab2>("Legit");
+		auto rageTab = std::make_unique<Tab2>("Rage");
+		auto visualsTab = std::make_unique<Tab2>("Visuals");
+		addTab(std::move(legitTab));
+		addTab(std::move(rageTab));
+		addTab(std::move(visualsTab));
+
+		auto miscTab = std::make_unique<Tab2>("\xef\x82\x85 Misc");
+		Group menuGroup("Menu");
+		menuGroup.addWidget(std::make_unique<ComboArray<Config::DPI>>("DPI", std::vector<std::string>{ "100%", "125%", "150%", "200%" },
 			&Config::c.menu.dpi, std::optional{[]([[maybe_unused]] std::size_t index) { updateFontDPI(); }}));
-		group.addWidget(std::make_unique<Keybinder>("Menu key", *Config::c.menu.openKey.getPointer()));
-		group.addWidget(std::make_unique<ColorPicker>("Accent color", Config::c.menu.accentColor));
-		tab1->addLeftGroup(std::move(group));
-		auto tab2 = std::make_unique<Tab2>("Test tab 2");
-		auto tab3 = std::make_unique<Tab2>("Test tab 3");
-		addTab(std::move(tab1));
-		addTab(std::move(tab2));
-		addTab(std::move(tab3));
+		menuGroup.addWidget(std::make_unique<Keybinder>("Menu key", *Config::c.menu.openKey.getPointer()));
+		menuGroup.addWidget(std::make_unique<ColorPicker>("Accent color", Config::c.menu.accentColor));
+		miscTab->addLeftGroup(std::move(menuGroup));
+		addTab(std::move(miscTab));
 	}
 
 	void Window::addTab(std::unique_ptr<Tab> tab)
