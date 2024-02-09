@@ -74,7 +74,7 @@ int __attribute((constructor, used)) startup()
 
 void __attribute((destructor)) shutdown()
 {
-	GraphicsHook::unhookSDL();
-	GraphicsHook::unhookVulkan();
 	GameHook::unhook();
+	GraphicsHook::unhookVulkan();
+	GraphicsHook::unhookSDL();
 }
