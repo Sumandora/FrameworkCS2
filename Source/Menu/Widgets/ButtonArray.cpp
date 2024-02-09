@@ -6,25 +6,27 @@
 #include <imgui.h>
 
 namespace Menu {
-	ButtonArray::ButtonArray(std::vector<std::string> names, const bool highlightSelected,
+	ButtonArray::ButtonArray(std::string name, std::vector<std::string> names, const bool highlightSelected,
 		std::optional<std::function<void(std::size_t)>> callback, const std::optional<float> width)
-		: highlightSelected(highlightSelected)
+		: Widget(std::move(name))
+		, highlightSelected(highlightSelected)
 		, callback(std::move(callback))
 		, width(width)
 	{
 		this->names.reserve(names.size());
 		const auto label = getLabel();
-		for (auto& name : names) {
-			this->names.push_back(name + label);
+		for (auto& buttonName : names) {
+			this->names.push_back(buttonName + label);
 		}
 	}
 
-	ButtonArray::ButtonArray(std::vector<std::string> names)
-		: ButtonArray(std::move(names), true, std::nullopt)
+	ButtonArray::ButtonArray(std::string name, std::vector<std::string> names)
+		: ButtonArray(std::move(name), std::move(names), true, std::nullopt)
 	{
 	}
 
-	ButtonArray::ButtonArray(const std::vector<std::pair<std::string, std::function<void()>>>& actions)
+	ButtonArray::ButtonArray(std::string name, const std::vector<std::pair<std::string, std::function<void()>>>& actions)
+		: Widget(std::move(name))
 	{
 		std::vector<std::function<void()>> callbacks;
 		names.reserve(actions.size());
@@ -38,8 +40,8 @@ namespace Menu {
 		width = std::nullopt;
 	}
 
-	ButtonArray::ButtonArray(std::vector<std::string> names, std::function<void(std::size_t)> callback)
-		: ButtonArray(std::move(names), false, std::move(callback))
+	ButtonArray::ButtonArray(std::string name, std::vector<std::string> names, std::function<void(std::size_t)> callback)
+		: ButtonArray(std::move(name), std::move(names), false, std::move(callback))
 	{
 	}
 

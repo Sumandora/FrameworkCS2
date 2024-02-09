@@ -2,10 +2,12 @@
 
 #include <cstdint>
 #include <format>
+#include <utility>
 
 namespace Menu {
-	Widget::Widget()
-		: label(std::format("##{}", reinterpret_cast<std::uintptr_t>(this)))
+	Widget::Widget(std::string name)
+		: name(std::move(name))
+		, label(std::format("##{}", reinterpret_cast<std::uintptr_t>(this)))
 	{
 	}
 

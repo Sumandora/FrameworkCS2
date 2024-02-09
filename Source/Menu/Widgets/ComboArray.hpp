@@ -16,14 +16,14 @@ namespace Menu {
 	public:
 		ComboArray(std::string name, std::vector<std::string> items, Config::Setting<T>* setting,
 			std::optional<std::function<void(std::size_t)>> callback = std::nullopt)
-			: array(std::move(items), true,
+			: Widget(name)
+			, array(std::move(name), std::move(items), true,
 				  [setting, callback = std::move(callback)](std::size_t index) {
 					  setting->setValue(static_cast<T>(index));
 					  if (callback) {
 						  callback.value()(index);
 					  }
 				  })
-			, name(std::move(name))
 			, setting(setting)
 		{
 		}
@@ -44,7 +44,6 @@ namespace Menu {
 
 	private:
 		ButtonArray array;
-		std::string name;
 		Config::Setting<T>* setting;
 	};
 }

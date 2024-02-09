@@ -7,10 +7,7 @@
 namespace Menu {
 	class Label final : public Widget {
 	public:
-		explicit Label(std::string text);
+		explicit Label(std::string name);
 		void draw() override;
-
-	private:
-		const std::string text;
 	};
 } // Menu

@@ -16,7 +16,6 @@ namespace Menu {
 		void draw() override;
 
 	private:
-		const std::string label;
 		Config::Key& key;
 	};
 }

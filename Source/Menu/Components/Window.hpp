@@ -20,7 +20,7 @@ namespace Menu {
 	private:
 		std::string name;
 		std::vector<std::unique_ptr<Tab>> tabs;
-		ButtonArray tabSelector{std::vector<std::string>{}};
+		ButtonArray tabSelector{"Tabs", std::vector<std::string>{}};
 		ImVec2 lastSize{500, 400};
 		Config::DPI lastDPI{Config::DPI::X1};
 	};

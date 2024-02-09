@@ -8,6 +8,7 @@
 #include "../Widgets/ColorPicker.hpp"
 #include "../Widgets/ComboArray.hpp"
 #include "../Widgets/Keybinder.hpp"
+#include "../Widgets/TextInput.hpp"
 #include "Tab.hpp"
 
 #include <cmath>
@@ -28,10 +29,20 @@ namespace Menu {
 		auto miscTab = std::make_unique<Tab2>("\xef\x82\x85 Misc");
 		Group menuGroup("Menu");
 		menuGroup.addWidget(std::make_unique<ComboArray<Config::DPI>>("DPI", std::vector<std::string>{ "100%", "125%", "150%", "200%" },
-			&Config::c.menu.dpi, std::optional{[]([[maybe_unused]] std::size_t index) { updateFontDPI(); }}));
+			&Config::c.menu.dpi, std::optional{ []([[maybe_unused]] std::size_t index) { updateFontDPI(); } }));
 		menuGroup.addWidget(std::make_unique<Keybinder>("Menu key", *Config::c.menu.openKey.getPointer()));
 		menuGroup.addWidget(std::make_unique<ColorPicker>("Accent color", Config::c.menu.accentColor));
 		miscTab->addLeftGroup(std::move(menuGroup));
+
+		static Config::Setting<std::string> configName("config.json");
+		Group configGroup("Config");
+		configGroup.addWidget(std::make_unique<TextInput>("Config name", configName));
+		configGroup.addWidget(std::make_unique<ButtonArray>("I/O",
+			std::vector<std::pair<std::string, std::function<void()>>>{
+				{ "Save", []() { Config::save(*configName); } },
+				{ "Load", []() { Config::load(*configName); } } }));
+		miscTab->addRightGroup(std::move(configGroup));
+
 		addTab(std::move(miscTab));
 	}
 

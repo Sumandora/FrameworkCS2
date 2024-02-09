@@ -1,7 +1,3 @@
-//
-// Created by snek on 12/8/23.
-//
-
 #include "Label.hpp"
 
 #include "../Utils/Spacing.hpp"
@@ -10,14 +6,14 @@
 #include <utility>
 
 namespace Menu {
-	Label::Label(std::string text)
-		: text(std::move(text))
+	Label::Label(std::string name)
+		: Widget(std::move(name))
 	{
 	}
 
 	void Label::draw()
 	{
-		ImGui::TextUnformatted(text.c_str());
+		ImGui::TextUnformatted(name.c_str());
 		addSpacing(-4);
 	}
 } // Menu

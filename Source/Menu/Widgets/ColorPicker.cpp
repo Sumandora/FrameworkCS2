@@ -4,22 +4,22 @@
 
 namespace Menu {
 	ColorPicker::ColorPicker(std::string name, Config::Setting<ImU32>& setting, bool noAlpha)
-		: name(std::move(name))
+		: Widget(std::move(name))
 		, mainPopupLabel(getLabel() + "mainPopup")
 		, setting(setting)
 		, noAlpha(noAlpha)
-		, copyPasteButtons({ { "\xef\x83\x85 Copy",
-								 [this] {
-									 const auto color = *this->setting.getPointer();
-									 ImGui::SetClipboardText(std::format("#{:08x}", color).c_str());
-								 } },
-			  { "\xef\x83\xaa Paste", [this] {
-				   const auto clipboardText = ImGui::GetClipboardText();
-				   if (!clipboardText || clipboardText[0] != '#')
-					   return;
-				   const auto color = std::strtoul(clipboardText + 1, nullptr, 16);
-				   *this->setting.getPointer() = color;
-			   } } })
+		, copyPasteButtons("Copy/paste",
+			  { { "\xef\x83\x85 Copy", [this] {
+					 const auto color = *this->setting.getPointer();
+					 ImGui::SetClipboardText(std::format("#{:08x}", color).c_str());
+				 } },
+				  { "\xef\x83\xaa Paste", [this] {
+					   const auto clipboardText = ImGui::GetClipboardText();
+					   if (!clipboardText || clipboardText[0] != '#')
+						   return;
+					   const auto color = std::strtoul(clipboardText + 1, nullptr, 16);
+					   *this->setting.getPointer() = color;
+				   } } })
 	{
 	}
 

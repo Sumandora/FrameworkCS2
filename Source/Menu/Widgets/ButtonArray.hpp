@@ -10,7 +10,7 @@
 namespace Menu {
 	class ButtonArray final : public Widget {
 	public:
-		ButtonArray(std::vector<std::string> names, bool highlightSelected,
+		ButtonArray(std::string name, std::vector<std::string> names, bool highlightSelected,
 			std::optional<std::function<void(std::size_t)>> callback,
 			std::optional<float> width = std::nullopt);
 
@@ -18,15 +18,15 @@ namespace Menu {
 		 * A simplified constructor for a button array which has the same semantics as `ImGui::Combo`
 		 * i.e. the user selects one of multiple options and that selection is stored.
 		 */
-		explicit ButtonArray(std::vector<std::string> names);
+		ButtonArray(std::string name, std::vector<std::string> names);
 
 		/**
 		 * A simplified constructor for a button array which has the same semantics as n `ImGui::Button`s,
 		 * i.e. each button represents a separate action, no state is stored.
 		 */
-		explicit ButtonArray(const std::vector<std::pair<std::string, std::function<void()>>>& actions);
+		ButtonArray(std::string name, const std::vector<std::pair<std::string, std::function<void()>>>& actions);
 
-		ButtonArray(std::vector<std::string> names, std::function<void(std::size_t)> callback);
+		ButtonArray(std::string name, std::vector<std::string> names, std::function<void(std::size_t)> callback);
 
 		void draw() override;
 		[[nodiscard]] std::size_t getSelected() const;

@@ -19,7 +19,6 @@ namespace Menu {
 		[[nodiscard]] static float width();
 
 	private:
-		const std::string name;
 		const std::string mainPopupLabel;
 		Config::Setting<ImU32>& setting;
 		const bool noAlpha;

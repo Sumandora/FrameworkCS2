@@ -27,7 +27,7 @@ std::optional<Config::Key> applyKeypress()
 
 namespace Menu {
 	Keybinder::Keybinder(std::string name, Config::Key& key)
-		: label(std::move(name))
+		: Widget(std::move(name))
 		, key(key)
 	{
 	}
@@ -62,5 +62,5 @@ namespace Menu {
 		}
 	}
 
-	void Keybinder::draw() { draw(label, key); }
+	void Keybinder::draw() { draw(name, key); }
 }
