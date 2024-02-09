@@ -52,5 +52,8 @@ namespace Config {
 
 	inline C c;
 
+	void save(std::string path);
+	void load(std::string path);
+
 	float getDpiScale(DPI dpi = *c.menu.dpi);
 }

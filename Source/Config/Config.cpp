@@ -1,5 +1,9 @@
 #include "Config.hpp"
 
+#include <string>
+#include <valarray>
+
+#include "../Utils/Log.hpp"
 #include "Keybinds.hpp"
 
 namespace Config {
@@ -27,5 +31,15 @@ namespace Config {
 		default: // bleeh
 			return 1.0f;
 		}
+	}
+
+	void save(std::string path)
+	{
+		Log::log(Log::Level::Debug, "Saving config to {}", path);
+	}
+
+	void load(std::string path)
+	{
+		Log::log(Log::Level::Debug, "Loading config from {}", path);
 	}
 }
