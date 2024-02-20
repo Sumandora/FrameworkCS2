@@ -4,9 +4,9 @@
 
 #include "../Memory.hpp"
 #include "../SDK/Entities/BaseEntity.hpp"
-#include "../SDK/Entities/CSPlayerPawn.hpp"
-#include "../SDK/Entities/CSPlayerPawnBase.hpp"
 #include "../SDK/Entities/GameEntitySystem.hpp"
+#include "../SDK/Entities/Player/CSPlayerPawn.hpp"
+#include "../SDK/Services/CSPlayerWeaponServices.hpp"
 
 #include "../SDK/GameClass/CollisionProperty.hpp"
 #include "../SDK/GameClass/GameSceneNode.hpp"
@@ -23,16 +23,50 @@ RendererFactory& GenericESP::rendererFactory = renderers;
 static struct EntityESP : ESP {
 	Rectangle box{ this, "Box" };
 
-	void draw(ImDrawList* drawList, const BaseEntity* e, const ImRect& rect) const
+	UnionedRect draw(ImDrawList* drawList, const BaseEntity* e, const ImRect& rect) const
 	{
 		UnionedRect unionedRect{ rect };
 		box.draw(drawList, e, unionedRect);
+		return unionedRect;
 	}
 } entityEsp;
 
+static struct PlayerESP : ESP {
+	Rectangle box{ this, "Box" };
+	Bar healthBar{ this, "Health bar", [](const CSPlayerPawn* pawn) { return static_cast<float>(pawn->health()) / 100.0f; } };
+	Bar ammoBar{ this, "Ammo bar", [](const CSPlayerPawn* pawn) {
+					const auto weapon = pawn->weaponServices()->activeWeapon().get();
+					if (weapon == nullptr)
+						return 0.0f;
+					const auto vdata = weapon->getWeaponVData();
+					if (vdata == nullptr)
+						return 0.0f;
+					return static_cast<float>(weapon->clip1()) / static_cast<float>(vdata->maxClip1());
+				} };
+	Bar armorBar{ this, "Armor bar", [](const CSPlayerPawn* pawn) { return static_cast<float>(pawn->armorValue()) / 100.0f; } };
+	SidedText name{ this, "Name", Side::TOP };
+	SidedText weapon{ this, "Weapon", Side::BOTTOM };
+
+	UnionedRect draw(ImDrawList* drawList, const CSPlayerPawn* e, const ImRect& rect) const
+	{
+		UnionedRect unionedRect{ rect };
+		box.draw(drawList, e, unionedRect);
+		healthBar.draw(drawList, e, unionedRect);
+		ammoBar.draw(drawList, e, unionedRect);
+		armorBar.draw(drawList, e, unionedRect);
+		const auto nameStr = std::string{ e->originalController().get()->sanitizedPlayerName() };
+		name.draw(drawList, e, nameStr, unionedRect);
+		const auto activeWeapon = e->weaponServices()->activeWeapon().get();
+		if (activeWeapon != nullptr) {
+			weapon.draw(drawList, e, activeWeapon->attributeManager().item().getName(), unionedRect);
+		}
+		return unionedRect;
+	}
+} playerEsp;
+
 void Features::ESP::drawEsp(ImDrawList* drawList)
 {
-	if (entityEsp.isDefinitelyDisabled())
+	if (playerEsp.isDefinitelyDisabled())
 		return;
 	int highest = Memory::gameEntitySystem->getHighestEntityIndex();
 	if (highest > -1)
@@ -40,11 +74,12 @@ void Features::ESP::drawEsp(ImDrawList* drawList)
 			BaseEntity* entity = Memory::gameEntitySystem->getBaseEntity(i);
 			if (entity == nullptr)
 				continue;
-			if (!entityEsp.isEnabled(entity))
+			if (!playerEsp.isEnabled(entity))
 				continue;
 			auto schemaType = entity->getSchemaType();
 			if (schemaType != CSPlayerPawn::classInfo())
 				continue;
+			auto* player = static_cast<CSPlayerPawn*>(entity);
 
 			auto* gameSceneNode = entity->gameSceneNode();
 			auto* transform = gameSceneNode->transformPtr();
@@ -97,7 +132,12 @@ void Features::ESP::drawEsp(ImDrawList* drawList)
 					rectangle.Max.y = point2D.y;
 			}
 
-			entityEsp.draw(drawList, entity, rectangle);
+			rectangle.Min.x = std::round(rectangle.Min.x);
+			rectangle.Min.y = std::round(rectangle.Min.y);
+			rectangle.Max.x = std::round(rectangle.Max.x);
+			rectangle.Max.y = std::round(rectangle.Max.y);
+
+			playerEsp.draw(drawList, player, rectangle);
 		next_ent:;
 		}
 }
@@ -105,7 +145,7 @@ void Features::ESP::drawEsp(ImDrawList* drawList)
 void Features::ESP::imguiRender()
 {
 	if (ImGui::Begin("ESP")) {
-		entityEsp.renderGui();
+		playerEsp.renderGui();
 	}
 	ImGui::End();
 }

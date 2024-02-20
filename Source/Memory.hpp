@@ -1,6 +1,7 @@
 #pragma once
 
-struct VMatrix;
+#include "SDK/Math/Matrix.hpp"
+
 struct ViewRender;
 class GameEntitySystem;
 struct BaseEntity;

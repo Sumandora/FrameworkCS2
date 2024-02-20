@@ -1,16 +1,17 @@
 #pragma once
 
 #include "../../Memory.hpp"
-#include "RetAddrSpoofer.hpp"
 
-#include "BaseEntity.hpp"
+struct BaseEntity;
 
-struct GameEntitySystem { // TODO Reorganize the entire structure of this
-	inline int getHighestEntityIndex() {
-		return RetAddrSpoofer::invoke<int, void*>(Memory::EntitySystem::getHighestEntityIndex, this);
-	}
+class GameEntitySystem {
+public:
+	GameEntitySystem();
+	[[nodiscard]] int getHighestEntityIndex() const;
+	[[nodiscard]] BaseEntity* getBaseEntity(int index) const;
 
-	inline BaseEntity* getBaseEntity(int index) {
-		return RetAddrSpoofer::invoke<BaseEntity*, void*, int>(Memory::EntitySystem::getBaseEntity, this, index);
-	}
+private:
+	void** thisPtrPtr;
+	void* getHighestEntityIndexPtr;
+	void* getBaseEntityPtr;
 };

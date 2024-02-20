@@ -2,8 +2,8 @@
 
 #include "../Memory.hpp"
 #include "../SDK/Entities/BaseEntity.hpp"
-#include "../SDK/Entities/CSPlayerPawn.hpp"
 #include "../SDK/Entities/GameEntitySystem.hpp"
+#include "../SDK/Entities/Player/CSPlayerPawn.hpp"
 #include "../SDK/GameClass/CollisionProperty.hpp"
 #include "../SDK/GameClass/GameSceneNode.hpp"
 

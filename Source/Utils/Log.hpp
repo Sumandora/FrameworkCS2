@@ -13,7 +13,7 @@ namespace Log {
 
 	// TODO: let the users specify the level
 	// Maybe during compilation, maybe in menu
-	inline Level logLevel = Level::Info;
+	inline Level logLevel = Level::Debug;
 
 	namespace {
 		std::string_view getPrefix(Level level)
@@ -31,7 +31,7 @@ namespace Log {
 		std::string_view getANSIColor(Level level)
 		{
 			static constexpr std::string_view colors[] = {
-				"\033[0m",
+				"\033[0;36m",
 				"\033[0;32m",
 				"\033[0;33m",
 				"\033[0;31m",

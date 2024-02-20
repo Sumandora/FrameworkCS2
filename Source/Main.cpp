@@ -17,13 +17,13 @@
 #include "SDK/Entities/BaseEntity.hpp"
 #include "SDK/Entities/GameEntitySystem.hpp"
 
-#include "SDK/Entities/CSPlayerPawn.hpp"
+#include "SDK/Entities/Player/CSPlayerPawn.hpp"
 #include "SDK/GameClass/CollisionProperty.hpp"
 #include "SDK/GameClass/GameSceneNode.hpp"
 #include "SDK/GameClass/Transform.hpp"
 
-#include "SDK/Math/Vector.hpp"
 #include "GameHook/GameHook.hpp"
+#include "SDK/Math/Vector.hpp"
 
 void printFields(SchemaClassInfo* classInfo)
 {

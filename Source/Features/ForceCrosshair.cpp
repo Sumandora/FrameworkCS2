@@ -1,6 +1,6 @@
 #include "Features.hpp"
 
-#include "../SDK/Entities/CSPlayerPawnBase.hpp"
+#include "../SDK/Entities/Player/CSPlayerPawnBase.hpp"
 
 bool Features::ForceCrosshair::shouldForce()
 {
