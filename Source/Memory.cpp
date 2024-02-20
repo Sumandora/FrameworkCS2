@@ -3,31 +3,11 @@
 #include "BCRL.hpp"
 
 #include "Interfaces.hpp"
+#include "SDK/Entities/GameEntitySystem.hpp"
 
 #include "SDK/GameClass/ViewRender.hpp"
 
 void* RetAddrSpoofer::leaveRet;
-
-static void FindEntitySystem()
-{
-	// To the valve employee, who wrote this function: Kuss auf Nuss!
-	auto /*CPrediction::*/ reinitPredictables = BCRL::Session::module("libclient.so")
-													.nextStringOccurrence("CL:  reinitialized %i predictable entities\n")
-													.findXREFs("libclient.so", true, false)
-													.prevByteOccurrence("48 83 ec ? 4c 8d 35")
-													.add(7);
-
-	printf("ReinitPredictables at %p\n", reinitPredictables.expect("Can't find ReinitPredictables"));
-
-	Memory::EntitySystem::gameEntitySystem = static_cast<GameEntitySystem**>(reinitPredictables.relativeToAbsolute().expect("Couldn't find GameEntitySystem"));
-	printf("Found GameEntitySystem at: %p\n", Memory::EntitySystem::gameEntitySystem);
-	reinitPredictables = reinitPredictables.add(4).nextByteOccurrence("49 8b 3e e8").add(4);
-	Memory::EntitySystem::getHighestEntityIndex = reinitPredictables.relativeToAbsolute().expect("Couldn't find getHighestEntityIndex");
-	printf("Found getHighestEntityIndex at: %p\n", Memory::EntitySystem::getHighestEntityIndex);
-	reinitPredictables = reinitPredictables.add(4).nextByteOccurrence("3e 44 89 fe e8").add(5);
-	Memory::EntitySystem::getBaseEntity = reinitPredictables.relativeToAbsolute().expect("Couldn't find getBaseEntity");
-	printf("Found getBaseEntity at: %p\n", Memory::EntitySystem::getBaseEntity);
-}
 
 void Memory::Create()
 {
@@ -75,7 +55,7 @@ void Memory::Create()
 
 	printf("Found WorldToProjection matrix at: %p\n", worldToProjectionMatrix);
 
-	FindEntitySystem();
+	gameEntitySystem = new GameEntitySystem();
 
 	shouldShowCrosshair = BCRL::Session::module("libclient.so")
 							  .nextStringOccurrence("weapon_reticle_knife_show")

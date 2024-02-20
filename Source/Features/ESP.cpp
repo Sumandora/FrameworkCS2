@@ -34,10 +34,10 @@ void Features::ESP::drawEsp(ImDrawList* drawList)
 {
 	if (entityEsp.isDefinitelyDisabled())
 		return;
-	int highest = (*Memory::EntitySystem::gameEntitySystem)->getHighestEntityIndex();
+	int highest = Memory::gameEntitySystem->getHighestEntityIndex();
 	if (highest > -1)
 		for (int i = 0; i <= highest; i++) {
-			BaseEntity* entity = (*Memory::EntitySystem::gameEntitySystem)->getBaseEntity(i);
+			BaseEntity* entity = Memory::gameEntitySystem->getBaseEntity(i);
 			if (entity == nullptr)
 				continue;
 			if (!entityEsp.isEnabled(entity))

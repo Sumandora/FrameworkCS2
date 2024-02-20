@@ -1,19 +1,14 @@
 #pragma once
 
-#include "SDK/Math/Matrix.hpp"
+struct VMatrix;
 struct ViewRender;
-struct GameEntitySystem;
+class GameEntitySystem;
 struct BaseEntity;
 
 namespace Memory {
 	inline ViewRender* viewRender;
 	inline VMatrix* worldToProjectionMatrix;
-
-	namespace EntitySystem { // TODO Reorganize the entire structure of this
-		inline ::GameEntitySystem** gameEntitySystem;
-		inline void* getHighestEntityIndex;
-		inline void* getBaseEntity;
-	}
+	inline GameEntitySystem* gameEntitySystem;
 
 	inline void* shouldShowCrosshair;
 	inline void* getLocalPlayer;
