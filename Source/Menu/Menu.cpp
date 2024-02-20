@@ -24,6 +24,7 @@ ImVec4 accentColorTransparent(const float transparency)
 	return makeTransparent(ImGui::ColorConvertU32ToFloat4(*Config::c.menu.accentColor), transparency);
 }
 
+bool firstInit = true;
 bool fontsNeedUpdate = true; // for the first load
 
 void updateFontDPIImpl()
@@ -63,6 +64,11 @@ void updateFontDPIImpl()
 	Menu::espFonts[2] = Menu::fonts.espSmall;
 
 	fontsNeedUpdate = false;
+
+	if (!firstInit) {
+		ImGui_ImplVulkan_CreateFontsTexture();
+	}
+	firstInit = false;
 }
 
 Config::KeybindButton* openMenuKeybind;
@@ -175,6 +181,5 @@ namespace Menu {
 	void postRender()
 	{
 		updateFontDPIImpl();
-		ImGui_ImplVulkan_CreateFontsTexture();
 	}
 }
