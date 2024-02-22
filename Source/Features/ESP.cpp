@@ -54,8 +54,11 @@ static struct PlayerESP : ESP {
 		healthBar.draw(drawList, e, unionedRect);
 		ammoBar.draw(drawList, e, unionedRect);
 		armorBar.draw(drawList, e, unionedRect);
-		const auto nameStr = std::string{ e->originalController().get()->sanitizedPlayerName() };
-		name.draw(drawList, e, nameStr, unionedRect);
+    const auto controller = e->originalController();
+    if (controller.isValid()) {
+      const auto nameStr = std::string{ controller.get()->sanitizedPlayerName() };
+      name.draw(drawList, e, nameStr, unionedRect);
+    }
 		const auto activeWeapon = e->weaponServices()->activeWeapon().get();
 		if (activeWeapon != nullptr) {
 			weapon.draw(drawList, e, activeWeapon->attributeManager().item().getName(), unionedRect);
