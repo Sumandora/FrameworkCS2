@@ -8,7 +8,13 @@
 namespace Menu {
 	TextInput::TextInput(std::string name, Config::Setting<std::string>& setting)
 		: Widget(std::move(name))
-		, setting(setting)
+		, ownedString(setting.getValue())
+	{
+
+	}
+	TextInput::TextInput(std::string name, std::string& string)
+		: Widget(std::move(name))
+		, ownedString(string)
 	{
 	}
 
@@ -17,7 +23,7 @@ namespace Menu {
 		ImGui::TextUnformatted(name.c_str());
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-std::numeric_limits<float>::min());
-		ImGui::InputText(getLabel().c_str(), setting.getPointer());
+		ImGui::InputText(getLabel().c_str(), &ownedString);
 		ImGui::PopItemWidth();
 	}
 } // Menu

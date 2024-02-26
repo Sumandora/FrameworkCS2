@@ -34,13 +34,13 @@ namespace Menu {
 		menuGroup.addWidget(std::make_unique<ColorPicker>("Accent color", Config::c.menu.accentColor));
 		miscTab->addLeftGroup(std::move(menuGroup));
 
-		static Config::Setting<std::string> configName("config.json");
+		static std::string configName{ "config.json" }; // TODO Make this save maybe?
 		Group configGroup("Config");
 		configGroup.addWidget(std::make_unique<TextInput>("Config name", configName));
 		configGroup.addWidget(std::make_unique<ButtonArray>("I/O",
 			std::vector<std::pair<std::string, std::function<void()>>>{
-				{ "Save", []() { Config::save(*configName); } },
-				{ "Load", []() { Config::load(*configName); } } }));
+				{ "Save", []() { Config::save(configName); } },
+				{ "Load", []() { Config::load(configName); } } }));
 		miscTab->addRightGroup(std::move(configGroup));
 
 		addTab(std::move(miscTab));

@@ -7,9 +7,10 @@ namespace Menu {
 	class TextInput final : public Widget {
 	public:
 		TextInput(std::string name, Config::Setting<std::string>& setting);
+		TextInput(std::string name, std::string& string);
 		void draw() override;
 
 	private:
-		Config::Setting<std::string>& setting;
+		std::string& ownedString;
 	};
 } // Menu
