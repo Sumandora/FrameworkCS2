@@ -8,8 +8,8 @@
 
 namespace Config {
 	class Keybind;
-	template <typename T>
 
+	template <typename T>
 	class Setting {
 	public:
 		explicit Setting(T value)
