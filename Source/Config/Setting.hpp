@@ -4,6 +4,8 @@
 
 #include "Keybinds.hpp"
 
+#include "libconfig.h++"
+
 namespace Config {
 	class Keybind;
 	template <typename T>
