@@ -1,10 +1,13 @@
 #include "Config.hpp"
 
+#include <fstream>
 #include <string>
 #include <valarray>
 
 #include "../Utils/Log.hpp"
 #include "Keybinds.hpp"
+
+#include "../Features/Features.hpp"
 
 namespace Config {
 	void addKeybind(KeybindButton* keybind) { keybinds.push_back(keybind); }
@@ -16,30 +19,33 @@ namespace Config {
 		}
 	}
 
-	float getDpiScale(const DPI dpi)
-	{
-		switch (dpi) {
-			using enum DPI;
-		case X1:
-			return 1.0f;
-		case X1_25:
-			return 1.25f;
-		case X1_5:
-			return 1.5f;
-		case X2:
-			return 2.0f;
-		default: // bleeh
-			return 1.0f;
-		}
-	}
-
 	void save(std::string path)
 	{
 		Log::log(Log::Level::Debug, "Saving config to {}", path);
+		nlohmann::json cfg;
+
+		for(Features::Feature* feature : Features::allFeatures) {
+			nlohmann::json e = feature;
+			cfg[feature->getName()] = e;
+		}
+
+		std::ofstream output{ path };
+		output << cfg << std::endl;
+		output.close();
 	}
 
 	void load(std::string path)
 	{
 		Log::log(Log::Level::Debug, "Loading config from {}", path);
+		libconfig::Config cfg;
+		cfg.readFile(path);
+
+
+		auto& root = cfg.getRoot();
+
+		for(Features::Feature* feature : Features::allFeatures) {
+			auto& group = root.lookup(feature->getName());
+			feature->deserialize(group);
+		}
 	}
 }

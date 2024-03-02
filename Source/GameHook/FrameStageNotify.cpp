@@ -15,7 +15,7 @@ void GameHook::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Client
 			GraphicsHook::espDrawList->_ResetForNewFrame();
 			GraphicsHook::espDrawList->PushClipRectFullScreen();
 			GraphicsHook::espDrawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
-			Features::ESP::drawEsp(GraphicsHook::espDrawList);
+			Features::esp.drawEsp(GraphicsHook::espDrawList);
 		}
 		break;
 	}

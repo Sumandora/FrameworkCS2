@@ -27,7 +27,7 @@ include("Buildscripts/ImGUI.cmake")
 include("Buildscripts/SDL3.cmake")
 include("Buildscripts/DetourHooking.cmake")
 include("Buildscripts/GenericESP.cmake")
-include("Buildscripts/LibConfig.cmake")
+include("Buildscripts/Nlohmann.cmake")
 
 include("Buildscripts/Obfuscation.cmake")
 

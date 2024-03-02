@@ -1,6 +1,7 @@
 #include "Menu.hpp"
 
 #include "../Config/Config.hpp"
+#include "../Features/Features.hpp"
 #include "Components/Window.hpp"
 #include "Fonts/fontawesome.hpp"
 #include "Fonts/smallestpixel7.hpp"
@@ -21,7 +22,7 @@ ImVec4 makeTransparent(ImVec4 color, const float transparency)
 
 ImVec4 accentColorTransparent(const float transparency)
 {
-	return makeTransparent(ImGui::ColorConvertU32ToFloat4(*Config::c.menu.accentColor), transparency);
+	return makeTransparent(ImGui::ColorConvertU32ToFloat4(Features::menu.getAccentColor()), transparency);
 }
 
 bool firstInit = true;
@@ -40,7 +41,8 @@ void updateFontDPIImpl()
 
 	const auto io = ImGui::GetIO();
 
-	const float fourteen = static_cast<int>(14.0f * Config::getDpiScale());
+	const float dpiScale = Features::menu.getDpiScale();
+	const float fourteen = static_cast<int>(14.0f * dpiScale);
 
 	io.Fonts->Clear();
 	Menu::fonts.menuDefault
@@ -50,7 +52,7 @@ void updateFontDPIImpl()
 	Menu::fonts.menuBold
 		= io.Fonts->AddFontFromMemoryCompressedTTF(VerdanaBold_compressed_data, VerdanaBold_compressed_size, fourteen);
 	Menu::fonts.menuBig = io.Fonts->AddFontFromMemoryCompressedTTF(
-		VerdanaBold_compressed_data, VerdanaBold_compressed_size, static_cast<int>(18.0f * Config::getDpiScale()));
+		VerdanaBold_compressed_data, VerdanaBold_compressed_size, static_cast<int>(18.0f * dpiScale));
 
 	Menu::fonts.espDefault
 		= io.Fonts->AddFontFromMemoryCompressedTTF(Verdana_compressed_data, Verdana_compressed_size, 12.0f);
@@ -86,15 +88,15 @@ namespace Menu {
 
 		ImGui::GetStyle().FramePadding = ImVec2(4, 2);
 
-		openMenuKeybind = new Config::KeybindButton([] { isOpen = !isOpen; }, *Config::c.menu.openKey);
+		openMenuKeybind = new Config::KeybindButton([] { isOpen = !isOpen; }, Features::menu.getOpenKey());
 		addKeybind(openMenuKeybind);
 	}
 
 	void draw()
 	{
-		const float windowScale = Config::getDpiScale();
+		const float windowScale = Features::menu.getDpiScale();
 
-		openMenuKeybind->key = *Config::c.menu.openKey;
+		openMenuKeybind->key = Features::menu.getOpenKey();
 		auto& style = ImGui::GetStyle();
 		style.WindowRounding = 8.0f * windowScale;
 		style.ChildRounding = 8.0f * windowScale;
@@ -104,7 +106,7 @@ namespace Menu {
 
 		ImVec4* colors = style.Colors;
 
-		const ImVec4 accentColor = ImGui::ColorConvertU32ToFloat4(*Config::c.menu.accentColor);
+		const ImVec4 accentColor = ImGui::ColorConvertU32ToFloat4(Features::menu.getAccentColor());
 		const ImVec4 halfAccentColor = ImLerp(ImVec4(0.0f, 0.0f, 0.0f, 0.0f), accentColor, 0.5f);
 
 		// based on the dark imgui theme

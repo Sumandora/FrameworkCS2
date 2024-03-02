@@ -1,19 +1,19 @@
 #include "Spacing.hpp"
 
-#include "../../Config/Config.hpp"
+#include "../../Features/Features.hpp"
 
 #include <imgui.h>
 
 namespace Menu {
-	void addSpacing(const int pixels)
+	void addSpacing(const float pixels)
 	{
-		const float scaled = static_cast<float>(pixels) * Config::getDpiScale();
+		const float scaled = pixels * Features::menu.getDpiScale();
 		return addSpacingUnscaled(scaled);
 	}
 
-	void addSpacingUnscaled(const int pixels)
+	void addSpacingUnscaled(const float pixels)
 	{
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, static_cast<float>(pixels) });
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, pixels });
 		ImGui::Spacing();
 		ImGui::PopStyleVar();
 	}

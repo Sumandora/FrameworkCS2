@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <utility>
 
+#include "../../Features/Features.hpp"
 #include "../Menu.hpp"
 #include "../Utils/Spacing.hpp"
 #include "../Widgets/ColorPicker.hpp"
@@ -28,10 +29,7 @@ namespace Menu {
 
 		auto miscTab = std::make_unique<Tab2>("\xef\x82\x85 Misc");
 		Group menuGroup("Menu");
-		menuGroup.addWidget(std::make_unique<ComboArray<Config::DPI>>("DPI", std::vector<std::string>{ "100%", "125%", "150%", "200%" },
-			&Config::c.menu.dpi, std::optional{ []([[maybe_unused]] std::size_t index) { updateFontDPI(); } }));
-		menuGroup.addWidget(std::make_unique<Keybinder>("Menu key", *Config::c.menu.openKey.getPointer()));
-		menuGroup.addWidget(std::make_unique<ColorPicker>("Accent color", Config::c.menu.accentColor));
+		Features::menu.imguiRender(menuGroup);
 		miscTab->addLeftGroup(std::move(menuGroup));
 
 		static std::string configName{ "config.json" }; // TODO Make this save maybe?
@@ -55,13 +53,14 @@ namespace Menu {
 	void Window::draw()
 	{
 		ImGui::SetNextWindowSize(lastSize, ImGuiCond_Once);
-		if (*Config::c.menu.dpi != lastDPI) {
-			const float delta = getDpiScale(*Config::c.menu.dpi) / getDpiScale(lastDPI);
+		float newDPI = Features::menu.getDpiScale();
+		if (newDPI != lastDPI) {
+			const float delta = newDPI / lastDPI;
 			lastSize.x *= delta;
 			lastSize.y *= delta;
 			lastSize.x = std::floor(lastSize.x);
 			lastSize.y = std::floor(lastSize.y);
-			lastDPI = *Config::c.menu.dpi;
+			lastDPI = newDPI;
 			ImGui::SetNextWindowSize(lastSize, ImGuiCond_Always);
 		}
 		ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);

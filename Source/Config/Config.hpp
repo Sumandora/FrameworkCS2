@@ -33,27 +33,6 @@ namespace Config {
 
 	void processInput();
 
-	enum class DPI {
-		X1,
-		X1_25,
-		X1_5,
-		X2,
-	};
-
-	struct Menu {
-		Setting<ImU32> accentColor { IM_COL32(66, 150, 249, 255) };
-		Setting<Key> openKey { Key::fromKey(ImGuiKey_Insert) };
-		Setting<DPI> dpi { DPI::X1 };
-	};
-
-	struct C {
-		Menu menu;
-	};
-
-	inline C c;
-
 	void save(std::string path);
 	void load(std::string path);
-
-	float getDpiScale(DPI dpi = *c.menu.dpi);
 }

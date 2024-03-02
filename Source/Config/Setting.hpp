@@ -4,19 +4,15 @@
 
 #include "Keybinds.hpp"
 
-#include "libconfig.h++"
-
 namespace Config {
-	template<typename T>
-	using SerializableType = std::conditional_t<std::is_enum_v<T>, std::underlying_type_t<T>, T>;
 
 	class Keybind;
 
 	template <typename T>
 	class Setting {
 	public:
-		explicit Setting(T value)
-			: value(value)
+		explicit Setting(T&& value)
+			: value(std::move(value))
 		{
 		}
 
@@ -55,13 +51,7 @@ namespace Config {
 			this->value = std::move(value);
 		}
 
-		void serialize(const std::string& name /* TODO Member variable */, libconfig::Setting& settingsGroup) {
-			settingsGroup[name] = static_cast<SerializableType<T>>(value);
-		}
-
-		void deserialize(const std::string& name /* TODO Member variable */, libconfig::Setting& settingsGroup) {
-			settingsGroup[name] = static_cast<SerializableType<T>>(value);
-		}
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(Setting<T>, value);
 
 	private:
 		T value;

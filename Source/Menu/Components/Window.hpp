@@ -10,6 +10,8 @@
 #include <imgui.h>
 #include <memory>
 
+#include "../../Features/Menu.hpp"
+
 namespace Menu {
 	class Window {
 	public:
@@ -22,6 +24,6 @@ namespace Menu {
 		std::vector<std::unique_ptr<Tab>> tabs;
 		ButtonArray tabSelector{"Tabs", std::vector<std::string>{}};
 		ImVec2 lastSize{500, 400};
-		Config::DPI lastDPI{Config::DPI::X1};
+		float lastDPI = 0.0f;
 	};
 }

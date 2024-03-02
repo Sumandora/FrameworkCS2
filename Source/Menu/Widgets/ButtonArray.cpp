@@ -1,6 +1,7 @@
 #include "ButtonArray.hpp"
 
 #include "../../Config/Config.hpp"
+#include "../../Features/Features.hpp"
 
 #include <cmath>
 #include <imgui.h>
@@ -48,7 +49,7 @@ namespace Menu {
 	void ButtonArray::draw()
 	{
 		const float totalWidth
-			= width ? *width * Config::getDpiScale() * names.size() : ImGui::GetContentRegionAvail().x;
+			= width ? *width * Features::menu.getDpiScale() * names.size() : ImGui::GetContentRegionAvail().x;
 		if (width) { // right-align
 			ImGui::SetCursorPosX(std::round(ImGui::GetContentRegionMax().x - totalWidth));
 		}

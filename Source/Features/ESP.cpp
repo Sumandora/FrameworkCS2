@@ -30,6 +30,10 @@ static struct EntityESP : ESP {
 	}
 } entityEsp;
 
+Features::ESP::ESP() : Feature("ESP") {
+
+}
+
 void Features::ESP::drawEsp(ImDrawList* drawList)
 {
 	if (entityEsp.isDefinitelyDisabled())
@@ -108,4 +112,12 @@ void Features::ESP::imguiRender()
 		entityEsp.renderGui();
 	}
 	ImGui::End();
+}
+
+void Features::ESP::serialize(libconfig::Setting& settingsGroup) const {
+	// TODO
+}
+
+void Features::ESP::deserialize(const libconfig::Setting& settingsGroup) {
+	// TODO
 }

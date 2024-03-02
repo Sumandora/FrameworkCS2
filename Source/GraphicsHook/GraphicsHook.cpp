@@ -278,8 +278,8 @@ void GraphicsHook::mainLoop()
 		drawLocalPlayer();
 		drawEventList();
 
-		Features::ESP::imguiRender();
-		Features::ForceCrosshair::imguiRender();
+		Features::esp.imguiRender();
+		Features::forceCrosshair.imguiRender();
 	}
 
 	Menu::draw();

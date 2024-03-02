@@ -68,4 +68,12 @@ namespace Config {
 		const int mouseButton = -code;
 		return mouseButtons[mouseButton];
 	}
+
+	void Key::serialize(libconfig::Setting& settingsGroup) const {
+		settingsGroup["code"] = code;
+	}
+
+	void Key::deserialize(const libconfig::Setting& settingsGroup) {
+		settingsGroup.lookupValue("code", code);
+	}
 }

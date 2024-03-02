@@ -8,7 +8,7 @@
 
 bool GameHook::ShouldShowCrosshair::hookFunc([[maybe_unused]] void* weapon)
 {
-	if(Features::ForceCrosshair::shouldForce())
+	if(Features::forceCrosshair.shouldForce())
 		return true;
 	return RetAddrSpoofer::invoke<bool>(hook->proxy, weapon);
 }

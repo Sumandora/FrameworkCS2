@@ -23,6 +23,8 @@ namespace Config {
 		virtual void processInput() = 0;
 
 		Key key;
+
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(Keybind, key);
 	};
 
 	template <typename T>
@@ -41,6 +43,8 @@ namespace Config {
 			}
 			return std::nullopt;
 		}
+
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(KeybindWithValue, overrideValue);
 
 	protected:
 		T overrideValue;

@@ -1,5 +1,6 @@
 #include "GroupPanel.hpp"
 
+#include "../../Features/Features.hpp"
 #include "../Menu.hpp"
 
 #include <imgui_internal.h>
@@ -59,8 +60,9 @@ namespace Menu::GroupPanel {
 
 		s_GroupPanelLabelStack.push_back(ImRect(labelMin, labelMax));
 
+		float dpiScale = Features::menu.getDpiScale();
 		ImGui::PushStyleVar(
-			ImGuiStyleVar_FramePadding, ImVec2(4.0f * Config::getDpiScale(), 2.0f * Config::getDpiScale()));
+			ImGuiStyleVar_FramePadding, ImVec2(4.0f * dpiScale, 2.0f * dpiScale));
 	}
 
 	void End()
@@ -123,7 +125,7 @@ namespace Menu::GroupPanel {
 			}
 
 			ImGui::GetWindowDrawList()->AddRect(frameRect.Min, frameRect.Max,
-				ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), 6 * Config::getDpiScale());
+				ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), 6 * Features::menu.getDpiScale());
 
 			ImGui::PopClipRect();
 		}

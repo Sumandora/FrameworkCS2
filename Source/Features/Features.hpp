@@ -1,19 +1,13 @@
 #pragma once
 
-#include "imgui.h"
+#include "ESP.hpp"
+#include "ForceCrosshair.hpp"
+#include "Menu.hpp"
 
 namespace Features {
-	namespace ESP {
-		inline bool enabled = false;
+	inline ESP esp;
+	inline ForceCrosshair forceCrosshair;
+	inline Menu menu;
 
-		void drawEsp(ImDrawList* drawList);
-		void imguiRender();
-		void update();
-	}
-	namespace ForceCrosshair {
-		inline bool enabled = false;
-
-		bool shouldForce();
-		void imguiRender();
-	}
+	inline std::initializer_list<Feature* const> allFeatures { &esp, &forceCrosshair, &menu };
 }
