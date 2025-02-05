@@ -8,12 +8,11 @@
 #include "BCRL.hpp"
 
 #include "backends/imgui_impl_sdl3.h"
-
-using SDL_PeepEventsFunc = int (*)(SDL_Event* events, int numevents, SDL_eventaction action, Uint32 minType, Uint32 maxType);
+using SDL_PeepEventsFunc = int(*)(SDL_Event *events, int numevents, SDL_EventAction action, Uint32 minType, Uint32 maxType);
 static SDL_PeepEventsFunc originalPeepEvents;
 static SDL_PeepEventsFunc* functionPtr;
 
-static int peepEventsHook(SDL_Event* events, int numevents, SDL_eventaction action, Uint32 minType, Uint32 maxType)
+static int peepEventsHook(SDL_Event* events, int numevents, SDL_EventAction action, Uint32 minType, Uint32 maxType)
 {
 	int rv = originalPeepEvents(events, numevents, action, minType, maxType);
 	if (rv == 0)

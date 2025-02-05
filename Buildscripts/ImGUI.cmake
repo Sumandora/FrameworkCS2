@@ -1,10 +1,10 @@
 # Add ImGUI to the project
-FetchContent_Declare(imgui
-        GIT_REPOSITORY https://github.com/ocornut/imgui
-        GIT_PROGRESS TRUE
-        GIT_TAG v1.90
-        BUILD_COMMAND ""
-        INSTALL_COMMAND "")
+FetchContent_Declare(
+	imgui
+	GIT_REPOSITORY https://github.com/ocornut/imgui
+	GIT_PROGRESS TRUE
+	GIT_TAG v1.91.7
+	BUILD_COMMAND "" INSTALL_COMMAND "")
 FetchContent_MakeAvailable(imgui)
 
 add_library(imgui STATIC)
@@ -27,4 +27,4 @@ target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
 
 set_target_properties(imgui PROPERTIES LINKER_LANGUAGE CXX)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE imgui)
+target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC imgui)

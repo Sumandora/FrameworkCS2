@@ -344,8 +344,9 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 			init_info.ImageCount = g_MinImageCount;
 			init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 			init_info.Allocator = g_Allocator;
+			init_info.RenderPass = g_RenderPass;
 
-			ImGui_ImplVulkan_Init(&init_info, g_RenderPass);
+			ImGui_ImplVulkan_Init(&init_info);
 		}
 
 		{

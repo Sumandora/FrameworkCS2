@@ -2,11 +2,17 @@
 FetchContent_Declare(SDL3
         GIT_REPOSITORY https://github.com/libsdl-org/SDL
         GIT_PROGRESS TRUE
-        GIT_TAG SDL-prerelease-3.0.0-2926-gaaf54b09a)
-FetchContent_MakeAvailable(SDL3)
+        GIT_TAG SDL-prerelease-3.1.2-1827-g34c601136)
+FetchContent_GetProperties(SDL3)
+if (NOT SDL3_POPULATED)
+    FetchContent_Populate(SDL3)
+endif ()
 
-target_link_libraries(imgui PRIVATE SDL3::SDL3)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SDL3::SDL3)
+add_library(SDL INTERFACE)
+target_include_directories(SDL INTERFACE "${SDL3_SOURCE_DIR}/include")
+
+target_link_libraries(imgui PRIVATE SDL)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SDL)
 
 target_include_directories(imgui PRIVATE ${SDL3_SOURCE_DIR}/include)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${SDL3_SOURCE_DIR}/include)
