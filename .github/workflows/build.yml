@@ -6,25 +6,17 @@ jobs:
   build:
     strategy:
       matrix:
-        distro: ["ubuntu:22.04", "ubuntu:23.04", "ubuntu:23.10", "debian:unstable", "debian:testing", "dockerscripts/linuxmint:mate", "archlinux:latest", "manjarolinux/base:latest", "fedora:latest"]
+        distro: ["debian:unstable", "debian:testing", "archlinux:latest", "fedora:latest"]
       fail-fast: false
     runs-on: ubuntu-latest
     container: ${{ matrix.distro }}
     steps:
-      - if: matrix.distro == 'ubuntu:22.04' || matrix.distro == 'ubuntu:23.04' || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest'
-        name: Setup dependencies
-        run: |
-          apt update
-          apt install -y software-properties-common
-          add-apt-repository -y ppa:ubuntu-toolchain-r/test
-          apt update
-          apt install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev gcc-13 g++-13
-      - if: matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing' || matrix.distro == 'ubuntu:23.10'
+      - if: matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing'
         name: Setup dependencies
         run: |
           apt-get update
           apt-get install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev
-      - if: matrix.distro == 'archlinux:latest' || matrix.distro == 'manjarolinux/base:latest'
+      - if: matrix.distro == 'archlinux:latest'
         name: Setup dependencies
         run: |
           pacman -Syu --noconfirm
@@ -35,36 +27,9 @@ jobs:
           dnf update -y
           dnf install -y git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - if: matrix.distro == 'ubuntu:22.04' || matrix.distro == 'ubuntu:23.04' || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest'
-        name: Build
-        run: CC=gcc-13 CXX=g++-13 ./Build.sh
-
-      - if: "!(matrix.distro == 'ubuntu:22.04' || matrix.distro == 'ubuntu:23.04' || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest')"
-        name: Build
+      - name: Build
         run: ./Build.sh
-
-      - name: Distro name for artifact
-        id: distro_name
-        run: |
-          CONTAINER_NAME=${{ matrix.distro }}
-          . /etc/os-release
-          TMP_OUTPUT=$(echo "name=$NAME" | sed "s/\// /g")
-          if [ "$CONTAINER_NAME" == "debian:unstable" ]; then
-            echo "$TMP_OUTPUT unstable" >> "$GITHUB_OUTPUT"
-          elif [ "$CONTAINER_NAME" == "debian:testing" ]; then
-            echo "$TMP_OUTPUT testing" >> "$GITHUB_OUTPUT"
-          else
-            echo $TMP_OUTPUT >> "$GITHUB_OUTPUT"
-          fi
-        shell: bash
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ steps.distro_name.outputs.name }}
-          path: |
-            Build/*.so
