@@ -10,7 +10,7 @@ struct GameSceneNode;
 struct CSPlayerPawnBase;
 
 struct BaseEntity {
-	VIRTUAL_METHOD(35, getSchemaType, SchemaClassInfo*, (), (this));
+	VIRTUAL_METHOD(39, getSchemaType, SchemaClassInfo*, (), (this));
 
 	CLASS_INFO("libclient.so", "C_BaseEntity");
 
