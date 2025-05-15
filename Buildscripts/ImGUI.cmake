@@ -18,9 +18,9 @@ list(APPEND IMGUI_SOURCE_FILES "${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.c
 list(APPEND IMGUI_SOURCE_FILES "${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp") # C++ stdlib
 
 # Remove unused components
-list(REMOVE_ITEM IMGUI_SOURCE_FILES "${imgui_SOURCE_DIR}/imgui_demo.cpp")
-target_compile_definitions(imgui PUBLIC IMGUI_DISABLE_DEMO_WINDOWS)
-target_compile_definitions(imgui PUBLIC IMGUI_DISABLE_DEBUG_TOOLS)
+# list(REMOVE_ITEM IMGUI_SOURCE_FILES "${imgui_SOURCE_DIR}/imgui_demo.cpp")
+# target_compile_definitions(imgui PUBLIC IMGUI_DISABLE_DEMO_WINDOWS)
+# target_compile_definitions(imgui PUBLIC IMGUI_DISABLE_DEBUG_TOOLS)
 
 target_sources(imgui PUBLIC ${IMGUI_SOURCE_FILES})
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})

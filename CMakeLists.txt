@@ -27,6 +27,9 @@ include("Buildscripts/ImGUI.cmake")
 include("Buildscripts/SDL3.cmake")
 include("Buildscripts/DetourHooking.cmake")
 
+add_subdirectory("${MemoryManager_SOURCE_DIR}/Modules/Linux" "LinuxMemoryManager")
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE LinuxMemoryManager)
+
 include("Buildscripts/Obfuscation.cmake")
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE dl ${Vulkan_LIBRARIES})
