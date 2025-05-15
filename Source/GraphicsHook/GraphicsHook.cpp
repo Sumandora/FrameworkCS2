@@ -219,10 +219,12 @@ void drawEventList() {
 
 void GraphicsHook::mainLoop()
 {
+	ImGui::ShowDemoWindow();
+	
 	drawViewMatrix();
 	drawEntityList();
 	drawConVars();
-	drawLocalPlayer();
+	// drawLocalPlayer();
 	drawEventList();
 
 	Features::ESP::imguiRender();

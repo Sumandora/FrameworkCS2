@@ -18,6 +18,7 @@ struct BaseEntity {
 	SCHEMA_VAR(CollisionProperty*, collision, "m_pCollision");
 
 	static CSPlayerPawnBase* /*TODO find actual type*/ getLocalPlayer(int index = -1 /*I think this is the splitscreenslot; -1 uses the engine interface to auto-detect*/) {
+		// TODO is this broken?
 		return RetAddrSpoofer::invoke<CSPlayerPawnBase*, int>(Memory::getLocalPlayer, index);
 	}
 };
