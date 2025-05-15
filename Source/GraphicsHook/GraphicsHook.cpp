@@ -11,7 +11,7 @@
 #include "../SDK/ConVar/EngineCvar.hpp"
 
 #include "../Features/Features.hpp"
-#include "BCRL.hpp"
+#include "BCRL/Session.hpp"
 #include "imgui.h"
 
 void drawViewMatrix()
@@ -153,7 +153,7 @@ void drawConVars() {
 				};
 				ImGui::Text("%s", bitsetToString(convar->flags).c_str());
 				ImGui::TableNextColumn();
-				if(BCRL::SafePointer(convar->value.string).isValid() /*:thumbsup:*/)
+				if(BCRL::SafePointer(Memory::mem_mgr, (std::uintptr_t)convar->value.string).is_valid() /*:thumbsup:*/)
 					ImGui::Text("%s", convar->value.string);
 				else
 					ImGui::Text("null");

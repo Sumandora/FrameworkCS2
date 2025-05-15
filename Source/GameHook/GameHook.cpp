@@ -1,16 +1,19 @@
 #include "GameHook.hpp"
 
-#include "ldisasm.h"
-
 #include "../Interfaces.hpp"
 #include "../Memory.hpp"
 
-#include "BCRL.hpp"
+#include "BCRL/Session.hpp"
+#include "DetourHooking.hpp"
+#include "LengthDisassembler/LengthDisassembler.hpp"
+
+#include <cstddef>
+#include <cstdint>
 
 namespace GameHook {
 	void hook()
 	{
-		FrameStageNotify::hook = new GameHook(BCRL::Session::arrayPointer(Interfaces::source2Client, 33).expect("Couldn't find FrameStageNotify"), reinterpret_cast<void*>(FrameStageNotify::hookFunc));
+		FrameStageNotify::hook = new GameHook(BCRL::pointer_array(Memory::mem_mgr, (std::uintptr_t)Interfaces::source2Client, 33).expect<void*>("Couldn't find FrameStageNotify"), reinterpret_cast<void*>(FrameStageNotify::hookFunc));
 		ShouldShowCrosshair::hook = new GameHook(Memory::shouldShowCrosshair, reinterpret_cast<void*>(ShouldShowCrosshair::hookFunc));
 		FireEvent::hook = new GameHook(Memory::fireEvent, reinterpret_cast<void*>(FireEvent::hookFunc));
 	}
@@ -25,11 +28,12 @@ namespace GameHook {
 	GameHook::GameHook(void* original, void* hook)
 	{
 		size_t len = 0;
-		while (len <= DetourHooking::minLength) {
-			len += ldisasm(reinterpret_cast<char*>(original) + len, true);
+		while (len <= DetourHooking::MIN_LENGTH) {
+			auto insn = LengthDisassembler::disassemble(reinterpret_cast<std::byte*>(original) + len);
+			len += insn.value().length;
 		}
-		backingHook = new DetourHooking::Hook(original, hook, len);
-		proxy = backingHook->getTrampoline();
+		backingHook = new DetourHooking::Hook<true, decltype(Memory::mem_mgr)>(Memory::emalloc, original, hook, len);
+		proxy = (void*)backingHook->get_trampoline();
 		backingHook->enable();
 	}
 

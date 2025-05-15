@@ -1,5 +1,8 @@
 #pragma once
 
+#include "MemoryManager/LinuxMemoryManager.hpp"
+#include "ExecutableMalloc/MemoryManagerAllocator.hpp"
+
 #include "SDK/Math/Matrix.hpp"
 struct ViewRender;
 struct GameEntitySystem;
@@ -19,6 +22,9 @@ namespace Memory {
 	inline void* getLocalPlayer;
 
 	inline void* fireEvent;
+
+	inline MemoryManager::LinuxMemoryManager<false, true, true> mem_mgr;
+	inline ExecutableMalloc::MemoryManagerAllocator emalloc{mem_mgr};
 
 	void Create();
 }

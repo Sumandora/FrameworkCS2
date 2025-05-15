@@ -1,5 +1,6 @@
 #include <thread>
 
+#include "ExecutableMalloc/MemoryManagerAllocator.hpp"
 #include "Interfaces.hpp"
 
 #include "Memory.hpp"
@@ -25,6 +26,8 @@
 #include "SDK/Math/Vector.hpp"
 #include "GameHook/GameHook.hpp"
 
+
+
 void printFields(SchemaClassInfo* classInfo)
 {
 	printf("Regular fields:\n");
@@ -43,6 +46,8 @@ void printFields(SchemaClassInfo* classInfo)
 void initializer()
 {
 	printf("Hello, world, again!\n");
+
+	Memory::mem_mgr.update();
 
 	Interfaces::getInterfaces();
 

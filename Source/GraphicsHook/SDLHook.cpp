@@ -1,14 +1,17 @@
 #include "GraphicsHook.hpp"
+
+#include <cstdint>
 #include <mutex>
 #include <thread>
 
 #include <iostream>
 #include <SDL3/SDL.h>
 
-#include "BCRL.hpp"
+#include "../Memory.hpp"
+#include "BCRL/Session.hpp"
 
 #include "backends/imgui_impl_sdl3.h"
-using SDL_PeepEventsFunc = int(*)(SDL_Event *events, int numevents, SDL_EventAction action, Uint32 minType, Uint32 maxType);
+using SDL_PeepEventsFunc = int (*)(SDL_Event* events, int numevents, SDL_EventAction action, Uint32 minType, Uint32 maxType);
 static SDL_PeepEventsFunc originalPeepEvents;
 static SDL_PeepEventsFunc* functionPtr;
 
@@ -46,11 +49,10 @@ static int peepEventsHook(SDL_Event* events, int numevents, SDL_EventAction acti
 
 bool GraphicsHook::hookSDL() // TODO Write something that works universally on SDL
 {
-	functionPtr = static_cast<SDL_PeepEventsFunc*>(
-		BCRL::Session::pointer(reinterpret_cast<void*>(SDL_PeepEvents))
-			.add(2)
-			.relativeToAbsolute()
-			.expect("Failed to find backend function pointer for SDL_PeepEvents"));
+	functionPtr = BCRL::pointer(Memory::mem_mgr, reinterpret_cast<std::uintptr_t>(SDL_PeepEvents))
+					  .add(2)
+					  .relative_to_absolute()
+					  .expect<SDL_PeepEventsFunc*>("Failed to find backend function pointer for SDL_PeepEvents");
 
 	originalPeepEvents = *functionPtr;
 	*functionPtr = peepEventsHook;

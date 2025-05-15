@@ -1,12 +1,15 @@
 #include "Interfaces.hpp"
 
+#include <cstdint>
 #include <cstring>
 #include <dlfcn.h>
 #include <format>
 
+#include "Memory.hpp"
 #include "SDK/InterfaceReg.hpp"
 
-#include "BCRL.hpp"
+#include "BCRL/Session.hpp"
+#include "SignatureScanner/PatternSignature.hpp"
 
 struct InterfacedLibrary {
 	void* handle = nullptr;
@@ -16,21 +19,21 @@ struct InterfacedLibrary {
 	explicit InterfacedLibrary(const char* path)
 	{
 		handle = dlmopen(LM_ID_BASE, path, RTLD_NOW | RTLD_NOLOAD | RTLD_LOCAL);
-		auto interfaceList = BCRL::Session::pointer(dlsym(handle, "CreateInterface"))
+		auto interfaceList = BCRL::pointer(Memory::mem_mgr, (std::uintptr_t)dlsym(handle, "CreateInterface"))
 						   .add(1)
-						   .relativeToAbsolute()
-						   .repeater([](BCRL::SafePointer& ptr) {
-							   if(ptr.doesMatch("48 8b 1d")) // mov %%rbx, %0
+						   .relative_to_absolute()
+						   .repeater([](auto& ptr) {
+							   if(ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8b 1d">())) // mov %%rbx, %0
 								   return false;
-							   ptr = ptr.nextInstruction();
+							   ptr.next_instruction();
 							   return true;
 						   })
 						   .add(3)
-						   .relativeToAbsolute()
-						   .expect(std::format("Couldn't find interface list for {}", path));
+						   .relative_to_absolute()
+						   .expect<InterfaceReg**>(std::format("Couldn't find interface list for {}", path));
 
 
-		for (InterfaceReg* interface = *reinterpret_cast<InterfaceReg**>(interfaceList); interface; interface = interface->m_pNext) {
+		for (InterfaceReg* interface = *interfaceList; interface; interface = interface->m_pNext) {
 			interfaces[interface->m_pName] = interface->m_CreateFn;
 		}
 	}
@@ -48,21 +51,21 @@ struct InterfacedLibrary {
 
 void* Interfaces::uncoverCreateFunction(void* createFunc)
 {
-	void* interfacePtr = nullptr;
-	(void)BCRL::Session::pointer(createFunc)
-		.repeater([&interfacePtr](BCRL::SafePointer& pointer) {
-			if (pointer.doesMatch("48 8d 05")) { // LEA rax, [rip + offset]
-				interfacePtr = pointer.add(3).relativeToAbsolute().getPointer();
-			} else if (pointer.doesMatch("48 8b 00")) { // MOV rax, [rax]
-				interfacePtr = *reinterpret_cast<void**>(interfacePtr);
-			} else if (pointer.doesMatch("c3")) { // RET
+	std::uintptr_t interfacePtr = 0;
+	(void)BCRL::pointer(Memory::mem_mgr, (std::uintptr_t)createFunc)
+		.repeater([&interfacePtr](auto& pointer) {
+			if (pointer.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 05">())) { // LEA rax, [rip + offset]
+				interfacePtr = pointer.clone().add(3).relative_to_absolute().get_pointer();
+			} else if (pointer.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8b 00">())) { // MOV rax, [rax]
+				interfacePtr = *reinterpret_cast<std::uintptr_t*>(interfacePtr);
+			} else if (pointer.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"c3">())) { // RET
 				return false;
 			}
 
-			pointer = pointer.nextInstruction();
+			pointer.next_instruction();
 			return true;
 		});
-	return interfacePtr;
+	return (void*)interfacePtr;
 }
 
 void Interfaces::getInterfaces()

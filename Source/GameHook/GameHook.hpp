@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Memory.hpp"
+
 #include "../SDK/GameClass/ClientFrameStage.hpp"
 #include "../SDK/GameClass/GameEvent.hpp"
 
@@ -10,7 +12,7 @@ namespace GameHook {
 	void unhook();
 
 	class GameHook {
-		DetourHooking::Hook* backingHook;
+		DetourHooking::Hook<true, decltype(Memory::mem_mgr)>* backingHook;
 
 	public:
 		void* proxy;

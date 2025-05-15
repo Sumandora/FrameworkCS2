@@ -4,19 +4,23 @@
 
 #include "GraphicsHook.hpp"
 
-#include "backends/imgui_impl_vulkan.h"
 #include "backends/imgui_impl_sdl3.h"
+#include "backends/imgui_impl_vulkan.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 
+#include <cstdint>
 #include <cstdio>
+#include <memory>
+#include <SDL3/SDL_video.h>
 #include <vector>
 #include <vulkan/vulkan.h>
 
 #include "DetourHooking.hpp"
-using namespace DetourHooking;
 
-#include "BCRL.hpp"
+#include "BCRL/Session.hpp"
+
+#include "../Memory.hpp"
 
 static constexpr uint32_t g_MinImageCount = 2;
 
@@ -46,6 +50,17 @@ static VkQueue GetGraphicQueue()
 	}
 
 	return VK_NULL_HANDLE;
+}
+
+bool is_using_wayland()
+{
+	static const char* driver = []() {
+		const char* driver = SDL_GetCurrentVideoDriver();
+		printf("SDL Video Driver: %s\n", driver);
+		return driver;
+	}();
+
+	return strcmp(driver, "wayland") == 0;
 }
 
 static void CreateDevice()
@@ -161,7 +176,7 @@ static void CreateRenderTarget(VkDevice device, VkSwapchainKHR swapchain)
 	// Create the Render Pass
 	{
 		VkAttachmentDescription attachment = {};
-		attachment.format = VK_FORMAT_B8G8R8A8_UNORM;
+		attachment.format = is_using_wayland() ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_B8G8R8A8_UNORM;
 		attachment.samples = VK_SAMPLE_COUNT_1_BIT;
 		attachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 		attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -194,7 +209,7 @@ static void CreateRenderTarget(VkDevice device, VkSwapchainKHR swapchain)
 		VkImageViewCreateInfo info = {};
 		info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		info.format = VK_FORMAT_B8G8R8A8_UNORM;
+		info.format = is_using_wayland() ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_B8G8R8A8_UNORM;
 
 		info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		info.subresourceRange.baseMipLevel = 0;
@@ -401,6 +416,8 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 	}
 }
 
+using Hook = DetourHooking::Hook<true, decltype(Memory::mem_mgr)>;
+
 using AcquireNextImageKHRFunc = VkResult (*)(VkDevice, VkSwapchainKHR, uint64_t, VkSemaphore, VkFence, uint32_t*);
 static std::unique_ptr<Hook> acquireNextImageKHRHook;
 
@@ -408,7 +425,7 @@ static VkResult VKAPI_CALL hkAcquireNextImageKHR(VkDevice device, VkSwapchainKHR
 {
 	g_Device = device;
 
-	return reinterpret_cast<AcquireNextImageKHRFunc>(acquireNextImageKHRHook->getTrampoline())(device, swapchain, timeout, semaphore, fence, pImageIndex);
+	return reinterpret_cast<AcquireNextImageKHRFunc>(acquireNextImageKHRHook->get_trampoline())(device, swapchain, timeout, semaphore, fence, pImageIndex);
 }
 
 using QueuePresentKHRFunc = VkResult (*)(VkQueue, const VkPresentInfoKHR*);
@@ -418,7 +435,7 @@ static VkResult VKAPI_CALL hkQueuePresentKHR(VkQueue queue, const VkPresentInfoK
 {
 	RenderImGui(queue, pPresentInfo);
 
-	return reinterpret_cast<QueuePresentKHRFunc>(queuePresentKHRHook->getTrampoline())(queue, pPresentInfo);
+	return reinterpret_cast<QueuePresentKHRFunc>(queuePresentKHRHook->get_trampoline())(queue, pPresentInfo);
 }
 
 using CreateSwapchainKHRFunc = VkResult (*)(VkDevice, const VkSwapchainCreateInfoKHR*, const VkAllocationCallbacks*, VkSwapchainKHR*);
@@ -428,7 +445,7 @@ static VkResult VKAPI_CALL hkCreateSwapchainKHR(VkDevice device, const VkSwapcha
 {
 	CleanupRenderTarget();
 
-	return reinterpret_cast<CreateSwapchainKHRFunc>(createSwapchainKHRHook->getTrampoline())(device, pCreateInfo, pAllocator, pSwapchain);
+	return reinterpret_cast<CreateSwapchainKHRFunc>(createSwapchainKHRHook->get_trampoline())(device, pCreateInfo, pAllocator, pSwapchain);
 }
 
 bool GraphicsHook::hookVulkan()
@@ -447,19 +464,19 @@ bool GraphicsHook::hookVulkan()
 	vkDestroyDevice(g_FakeDevice, g_Allocator);
 
 	auto hookLength = [](auto* start) {
-		char* cPointer = reinterpret_cast<char*>(start);
-		auto ptr = BCRL::Session::pointer(cPointer).repeater([cPointer](BCRL::SafePointer& safePointer) {
-													   safePointer = safePointer.nextInstruction();
-													   return reinterpret_cast<char*>(safePointer.getPointer()) - cPointer < minLength;
-												   })
-					   .getPointer();
+		std::uintptr_t cPointer = reinterpret_cast<std::uintptr_t>(start);
+		auto ptr = BCRL::pointer(Memory::mem_mgr, cPointer).repeater([cPointer](auto& safePointer) {
+															   safePointer = safePointer.next_instruction();
+															   return safePointer.get_pointer() - cPointer < DetourHooking::MIN_LENGTH;
+														   })
+					   .finalize();
 
-		return reinterpret_cast<char*>(ptr.value()) - cPointer;
+		return ptr.value() - cPointer;
 	};
 
-	acquireNextImageKHRHook = std::make_unique<Hook>(reinterpret_cast<void*>(acquireNextImageKHR), reinterpret_cast<void*>(hkAcquireNextImageKHR), hookLength(acquireNextImageKHR));
-	queuePresentKHRHook = std::make_unique<Hook>(reinterpret_cast<void*>(queuePresentKHR), reinterpret_cast<void*>(hkQueuePresentKHR), hookLength(queuePresentKHR));
-	createSwapchainKHRHook = std::make_unique<Hook>(reinterpret_cast<void*>(createSwapchainKHR), reinterpret_cast<void*>(hkCreateSwapchainKHR), hookLength(createSwapchainKHR));
+	acquireNextImageKHRHook = std::make_unique<Hook>(Memory::emalloc, reinterpret_cast<void*>(acquireNextImageKHR), reinterpret_cast<void*>(hkAcquireNextImageKHR), hookLength(acquireNextImageKHR));
+	queuePresentKHRHook = std::make_unique<Hook>(Memory::emalloc, reinterpret_cast<void*>(queuePresentKHR), reinterpret_cast<void*>(hkQueuePresentKHR), hookLength(queuePresentKHR));
+	createSwapchainKHRHook = std::make_unique<Hook>(Memory::emalloc, reinterpret_cast<void*>(createSwapchainKHR), reinterpret_cast<void*>(hkCreateSwapchainKHR), hookLength(createSwapchainKHR));
 
 	acquireNextImageKHRHook->enable();
 	queuePresentKHRHook->enable();
