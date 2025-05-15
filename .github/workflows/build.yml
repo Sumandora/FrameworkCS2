@@ -6,19 +6,11 @@ jobs:
   build:
     strategy:
       matrix:
-        distro: ["ubuntu:latest",  "debian:unstable", "debian:testing", "archlinux:latest", "fedora:latest"]
+        distro: ["debian:unstable", "debian:testing", "archlinux:latest", "fedora:latest"]
       fail-fast: false
     runs-on: ubuntu-latest
     container: ${{ matrix.distro }}
     steps:
-      - if: matrix.distro == 'ubuntu:latest'
-        name: Setup dependencies
-        run: |
-          apt update
-          apt install -y software-properties-common
-          add-apt-repository -y ppa:ubuntu-toolchain-r/test
-          apt update
-          apt install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev gcc-13 g++-13
       - if: matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing'
         name: Setup dependencies
         run: |
