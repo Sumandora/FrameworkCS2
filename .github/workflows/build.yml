@@ -46,18 +46,3 @@ jobs:
       - if: "!(matrix.distro == 'ubuntu:22.04' || matrix.distro == 'ubuntu:23.04' || matrix.distro == 'dockerscripts/linuxmint:mate' || matrix.distro == 'debian:latest')"
         name: Build
         run: ./Build.sh
-
-      - name: Distro name for artifact
-        id: distro_name
-        run: |
-          CONTAINER_NAME=${{ matrix.distro }}
-          . /etc/os-release
-          TMP_OUTPUT=$(echo "name=$NAME" | sed "s/\// /g")
-          if [ "$CONTAINER_NAME" == "debian:unstable" ]; then
-            echo "$TMP_OUTPUT unstable" >> "$GITHUB_OUTPUT"
-          elif [ "$CONTAINER_NAME" == "debian:testing" ]; then
-            echo "$TMP_OUTPUT testing" >> "$GITHUB_OUTPUT"
-          else
-            echo $TMP_OUTPUT >> "$GITHUB_OUTPUT"
-          fi
-        shell: bash

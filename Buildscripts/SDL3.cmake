@@ -9,10 +9,7 @@ if (NOT SDL3_POPULATED)
 endif ()
 
 add_library(SDL INTERFACE)
-target_include_directories(SDL INTERFACE "${SDL3_SOURCE_DIR}/include")
+target_include_directories(SDL INTERFACE "${sdl3_SOURCE_DIR}/include")
 
 target_link_libraries(imgui PRIVATE SDL)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SDL)
-
-target_include_directories(imgui PRIVATE ${SDL3_SOURCE_DIR}/include)
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${SDL3_SOURCE_DIR}/include)
