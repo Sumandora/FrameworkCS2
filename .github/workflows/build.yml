@@ -61,10 +61,3 @@ jobs:
             echo $TMP_OUTPUT >> "$GITHUB_OUTPUT"
           fi
         shell: bash
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ steps.distro_name.outputs.name }}
-          path: |
-            Build/*.so
