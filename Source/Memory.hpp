@@ -23,6 +23,8 @@ namespace Memory {
 
 	inline void* fireEvent;
 
+	inline void* csgo_input;
+
 	inline MemoryManager::LinuxMemoryManager<false, true, true> mem_mgr;
 	inline ExecutableMalloc::MemoryManagerAllocator emalloc{mem_mgr};
 

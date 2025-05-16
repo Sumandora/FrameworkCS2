@@ -104,4 +104,14 @@ void Memory::Create()
 					.find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 					.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 8d 87 ? ? ? ? 48 89 e5">()) // What is the lea in the middle of the prologue?
 					.expect<void*>("Couldn't find FireEvent");
+
+	csgo_input = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"cl_interp_ratio">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
+					 .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
+					 .sub(27)
+					 .filter([](const auto& ptr) {
+						 return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 35">());
+					 })
+					 .add(3)
+					 .relative_to_absolute()
+					 .expect<void*>("Couldn't find CCSGOInput");
 }
