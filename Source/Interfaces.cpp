@@ -12,13 +12,11 @@
 #include "SignatureScanner/PatternSignature.hpp"
 
 struct InterfacedLibrary {
-	void* handle = nullptr;
-
 	std::unordered_map<const char*, void*> interfaces{};
 
 	explicit InterfacedLibrary(const char* path)
 	{
-		handle = dlmopen(LM_ID_BASE, path, RTLD_NOW | RTLD_NOLOAD | RTLD_LOCAL);
+		void* handle = dlmopen(LM_ID_BASE, path, RTLD_NOW | RTLD_NOLOAD | RTLD_LOCAL);
 		auto interfaceList = BCRL::pointer(Memory::mem_mgr, (std::uintptr_t)dlsym(handle, "CreateInterface"))
 						   .add(1)
 						   .relative_to_absolute()
@@ -36,8 +34,9 @@ struct InterfacedLibrary {
 		for (InterfaceReg* interface = *interfaceList; interface; interface = interface->m_pNext) {
 			interfaces[interface->m_pName] = interface->m_CreateFn;
 		}
+
+		dlclose(handle);
 	}
-	~InterfacedLibrary() { dlclose(handle); }
 
 	template <typename T>
 	T* getInterface(const char* name) {
