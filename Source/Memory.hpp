@@ -4,9 +4,11 @@
 #include "ExecutableMalloc/MemoryManagerAllocator.hpp"
 
 #include "SDK/Math/Matrix.hpp"
+
 struct ViewRender;
 struct GameEntitySystem;
 struct BaseEntity;
+struct CSPlayerPawnBase;
 
 namespace Memory {
 	inline ViewRender* viewRender;
@@ -24,6 +26,8 @@ namespace Memory {
 	inline void* fireEvent;
 
 	inline void* csgo_input;
+
+	inline CSPlayerPawnBase* local_player;
 
 	inline MemoryManager::LinuxMemoryManager<false, true, true> mem_mgr;
 	inline ExecutableMalloc::MemoryManagerAllocator emalloc{mem_mgr};

@@ -191,7 +191,7 @@ void drawConVars() {
 
 void drawLocalPlayer() {
 	if (ImGui::Begin("Local player")) {
-		auto localPlayer = BaseEntity::getLocalPlayer();
+		auto localPlayer = Memory::local_player;
 		if (localPlayer != nullptr)
 			ImGui::Text("Local player: %p", localPlayer);
 		else
@@ -224,7 +224,7 @@ void GraphicsHook::mainLoop()
 	drawViewMatrix();
 	drawEntityList();
 	drawConVars();
-	// drawLocalPlayer();
+	drawLocalPlayer();
 	drawEventList();
 
 	Features::ESP::imguiRender();

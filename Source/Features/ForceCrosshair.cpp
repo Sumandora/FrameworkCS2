@@ -7,7 +7,7 @@ bool Features::ForceCrosshair::shouldForce()
 	if (!Features::ForceCrosshair::enabled)
 		return false;
 
-	auto player = BaseEntity::getLocalPlayer();
+	auto* player = Memory::local_player;
 	return player == nullptr || !player->isScoped();
 }
 

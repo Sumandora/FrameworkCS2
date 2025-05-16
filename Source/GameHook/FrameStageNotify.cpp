@@ -3,12 +3,18 @@
 #include "../Features/Features.hpp"
 #include "../GraphicsHook/GraphicsHook.hpp"
 
+#include "../SDK/Entities/CSPlayerPawnBase.hpp"
+
 #include "RetAddrSpoofer.hpp"
 
 void GameHook::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, ClientFrameStage stage)
 {
 	switch (stage) {
 		using enum ClientFrameStage;
+	case FRAME_SIMULATE_END:
+		Memory::local_player = BaseEntity::getLocalPlayer();
+		break;
+
 	case FRAME_NET_UPDATE_END:
 		const std::lock_guard<std::mutex> lock(GraphicsHook::espMutex);
 		if (GraphicsHook::espDrawList != nullptr) { // it was not yet initialized by the other thread
