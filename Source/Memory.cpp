@@ -11,7 +11,7 @@
 #include "SignatureScanner/XRefSignature.hpp"
 #include <cstdint>
 
-void* RetAddrSpoofer::leaveRet;
+const void* RetAddrSpoofer::leaveRet;
 
 static void FindEntitySystem()
 {
@@ -91,14 +91,22 @@ void Memory::Create()
 							  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 							  .expect<void*>("Couldn't find shouldShowCrosshair");
 
-	getLocalPlayer = BCRL::pointer(mem_mgr, (std::uintptr_t)shouldShowCrosshair)
+	getLocalPlayer = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"cl_sim_grenade_trajectory">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
+						 .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
+						 .sub(11)
+						 .relative_to_absolute()
 						 .repeater([](auto& ptr) {
-							 ptr = ptr.next_instruction();
-							 return !ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">());
+							 ptr.next_instruction();
+							 static int i = 0;
+							 if (ptr.does_match(
+									 SignatureScanner::PatternSignature::for_array_of_bytes<
+										 "e8">()))
+								 i++;
+							 return i != 2;
 						 })
 						 .add(1)
 						 .relative_to_absolute()
-						 .expect<void*>("Couldn't find getLocalPlayer");
+						 .expect<void*>("Couldnt find getLocalPlayer");
 
 	fireEvent = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"FireEvent: event '%s' not registered.\n">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
 					.find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))

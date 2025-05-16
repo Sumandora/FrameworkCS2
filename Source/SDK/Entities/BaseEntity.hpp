@@ -1,9 +1,13 @@
 #pragma once
 
-#include "../Schema/SchemaClassInfo.hpp"
 #include "../Schema/FieldOffset.hpp"
+#include "../Schema/SchemaClassInfo.hpp"
 
 #include "../../Memory.hpp"
+
+#include "../GameClass/EngineToClient.hpp"
+#include "CSPlayerPawn.hpp"
+#include "RetAddrSpoofer.hpp"
 
 struct CollisionProperty;
 struct GameSceneNode;
@@ -17,8 +21,8 @@ struct BaseEntity {
 	SCHEMA_VAR(GameSceneNode*, gameSceneNode, "m_pGameSceneNode");
 	SCHEMA_VAR(CollisionProperty*, collision, "m_pCollision");
 
-	static CSPlayerPawnBase* /*TODO find actual type*/ getLocalPlayer(int index = -1 /*I think this is the splitscreenslot; -1 uses the engine interface to auto-detect*/) {
-		// TODO is this broken?
-		return RetAddrSpoofer::invoke<CSPlayerPawnBase*, int>(Memory::getLocalPlayer, index);
+	static CSPlayerPawnBase* /*TODO find actual type*/ getLocalPlayer()
+	{
+		return RetAddrSpoofer::invoke<CSPlayerPawnBase*>(Memory::getLocalPlayer);
 	}
 };
