@@ -3,8 +3,7 @@ FetchContent_Declare(
 	imgui
 	GIT_REPOSITORY https://github.com/ocornut/imgui
 	GIT_PROGRESS TRUE
-	GIT_TAG v1.91.7
-	BUILD_COMMAND "" INSTALL_COMMAND "")
+	GIT_TAG v1.91.7)
 FetchContent_MakeAvailable(imgui)
 
 add_library(imgui STATIC)
