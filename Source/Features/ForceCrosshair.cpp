@@ -1,6 +1,6 @@
 #include "Features.hpp"
 
-#include "../SDK/Entities/CSPlayerPawnBase.hpp"
+#include "../SDK/Entities/CSPlayerPawn.hpp"
 
 bool Features::ForceCrosshair::shouldForce()
 {
@@ -8,7 +8,7 @@ bool Features::ForceCrosshair::shouldForce()
 		return false;
 
 	auto* player = Memory::local_player;
-	return player == nullptr || !player->isScoped();
+	return player != nullptr && player->health() > 0 && !player->isScoped();
 }
 
 void Features::ForceCrosshair::imguiRender()

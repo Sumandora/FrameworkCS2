@@ -8,7 +8,7 @@
 struct ViewRender;
 struct GameEntitySystem;
 struct BaseEntity;
-struct CSPlayerPawnBase;
+struct CSPlayerPawn;
 
 namespace Memory {
 	inline ViewRender* viewRender;
@@ -27,7 +27,7 @@ namespace Memory {
 
 	inline void* csgo_input;
 
-	inline CSPlayerPawnBase* local_player;
+	inline CSPlayerPawn* local_player;
 
 	inline MemoryManager::LinuxMemoryManager<false, true, true> mem_mgr;
 	inline ExecutableMalloc::MemoryManagerAllocator emalloc{mem_mgr};

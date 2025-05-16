@@ -6,12 +6,11 @@
 #include "../../Memory.hpp"
 
 #include "../GameClass/EngineToClient.hpp"
-#include "CSPlayerPawn.hpp"
 #include "RetAddrSpoofer.hpp"
 
 struct CollisionProperty;
 struct GameSceneNode;
-struct CSPlayerPawnBase;
+struct CSPlayerPawn;
 
 struct BaseEntity {
 	VIRTUAL_METHOD(39, getSchemaType, SchemaClassInfo*, (), (this));
@@ -21,8 +20,10 @@ struct BaseEntity {
 	SCHEMA_VAR(GameSceneNode*, gameSceneNode, "m_pGameSceneNode");
 	SCHEMA_VAR(CollisionProperty*, collision, "m_pCollision");
 
-	static CSPlayerPawnBase* /*TODO find actual type*/ getLocalPlayer()
+    SCHEMA_VAR(std::int32_t, health, "m_iHealth");
+
+	static CSPlayerPawn* /*TODO find actual type*/ getLocalPlayer()
 	{
-		return RetAddrSpoofer::invoke<CSPlayerPawnBase*>(Memory::getLocalPlayer);
+		return RetAddrSpoofer::invoke<CSPlayerPawn*>(Memory::getLocalPlayer);
 	}
 };

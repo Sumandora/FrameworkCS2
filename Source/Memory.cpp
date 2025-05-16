@@ -91,6 +91,7 @@ void Memory::Create()
 							  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 							  .expect<void*>("Couldn't find shouldShowCrosshair");
 
+	// TODO look into this function, one can extract the player controller itself, not just the pawn
 	getLocalPlayer = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"cl_sim_grenade_trajectory">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
 						 .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
 						 .sub(11)
