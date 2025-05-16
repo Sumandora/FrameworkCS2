@@ -1,2 +1,8 @@
 CompileFlags:
+  Add: [ "-Wall", "-Wextra", "-Wpedantic" ]
   Remove: ["--no-gnu-unique", "-fimplicit-constexpr"]
+Diagnostics:
+  ClangTidy:
+    FastCheckFilter: None
+  UnusedIncludes: Strict
+  MissingIncludes: Strict
