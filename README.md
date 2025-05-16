@@ -4,24 +4,17 @@ A fully-featured training software for Counter Strike: 2, made for Linux
 ## Installation
 ### Dependencies
 <details>
-  <summary> Ubuntu / Debian / Linux Mint </summary>
+  <summary> Debian and derivatives </summary>
   
-  If you're running Ubuntu 23.04 or below (or Mint), you need to add a PPA to get gcc 13:
   ```sh
-  add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  apt update
-  apt install gcc-13 g++-13
+  apt-get install gdb git cmake make build-essential libvulkan-dev libx11-dev libxext-dev gcc-14 g++-14
   ```
 
-  For debian stable, you're SOL - either build it from source or install it with e.g. homebrew.
-
-  ```sh
-  apt-get install gdb git cmake make build-essential libvulkan-dev libx11-dev libxext-dev gcc-13 g++-13
-  ```
+  Some older distros, like Ubuntu and Debian may need to specify GCC14 explicitly, by setting the `CC=gcc-14` and `CXX=g++-14` environment variables when invoking the build script
 </details>
 
 <details>
-  <summary> Arch Linux / Manjaro Linux </summary>
+  <summary> Arch Linux and derivatives </summary>
 
   ```sh
   pacman -S gdb base-devel cmake git vulkan-icd-loader vulkan-headers libX11 libxext
@@ -65,10 +58,6 @@ echo "MyCoolProjectName" > ProjectName
 # Rebuild here using Debug.sh or Build.sh
 ```
 
-### The situation with Clang
-Using Clang is inappropriate and should be avoided. Clang's machine code is too unpredictable, so it is necessary to disable security features. However, you can use clang by setting your `CC` and `CXX` environment variables to `clang` and `clang++` respectively.  
-`Clang doesn't work right now because std::ranges::views::reverse is unsupported`
-
 ## Usage
 A simple inject script using a debugger like GDB or LLDB is provided.  
 Make sure to run it as root user
@@ -97,10 +86,10 @@ Issues and Pull Requests can help improve the program
 #### Setting up a workspace (Example, your setup can differ)
 - Fork the repository
 ```sh
-git clone --recurse-submodules [URL] # Replace URL with your forked repository
+git clone --recurse-submodules [URL] # Replace URL with the repository, that you're forking
 ./Build.sh # Check for initial build errors
 ** Make changes **
-./Debug.sh # The debug script will build and load a debug build, which can also be analyzed using a debugger of your choice
+./Debug.sh # The debug script will build and load a debug build, which can also be analyzed using a debugger of your choice (run this as root)
 
 git add file1 file2 # If you added new files, you have to mark them to be tracked, if you didn't add any files, you can skip this step.
 git commit -a # Make a commit with all changed files. You may have to set the 'EDITOR' variable, because you have to write a commit message. Please write a small and compact message explaining what you have done.
