@@ -16,3 +16,6 @@ cmake-build-debug/
 
 # Clangd
 .cache/
+
+# Gdb
+.gdb_history
