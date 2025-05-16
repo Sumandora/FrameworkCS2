@@ -1,6 +1,6 @@
 # l8r
 A fully-featured training software for Counter Strike: 2, made for Linux
-### WARNING: This program is being detected by Valve. Usage on official, custom or private servers will most likely result in punishment from Valve!
+### WARNING: This program is being detected by Valve. Usage on official, custom, or private servers will most likely result in punishment from Valve!
 ## Installation
 ### Dependencies
 <details>
@@ -10,7 +10,7 @@ A fully-featured training software for Counter Strike: 2, made for Linux
   apt-get install gdb git cmake make build-essential libvulkan-dev libx11-dev libxext-dev gcc-14 g++-14
   ```
 
-  Some older distros, like Ubuntu and Debian may need to specify GCC14 explicitly, by setting the `CC=gcc-14` and `CXX=g++-14` environment variables when invoking the build script
+  Some older distributions, like Ubuntu and Debian may need to specify GCC14 explicitly, by setting the `CC=gcc-14` and `CXX=g++-14` environment variables when invoking the build script.
 </details>
 
 <details>
@@ -31,9 +31,8 @@ A fully-featured training software for Counter Strike: 2, made for Linux
 These might be outdated, in that case please open an issue or a pull request, which updates the package names.
 
 ### Download
-Make sure to download the submodules.
 ```sh
-git clone --recurse-submodules https://github.com/Sumandora/l8r.git
+git clone https://github.com/Sumandora/l8r.git
 ```
 
 The build script can be used to build the program.
@@ -41,13 +40,13 @@ The build script can be used to build the program.
 ./Build.sh
 ```
 
-If you want to supply additional compiler arguments use `CXXFLAGS`
+If you want to supply additional compiler arguments use `CXXFLAGS`.
 ```sh
 CXXFLAGS="-fstack-protector-strong" ./Build.sh
 ```
-Some of these might break the resulting binary, however.
+Some of these might break the resulting binary however.
 
-A ELF-Binary will be built in the "Build"-subdirectory, which will be created by the script.
+An ELF-Binary will be built in the "Build"-subdirectory, which will be created by the script.
 
 ### Custom library names
 
@@ -59,21 +58,16 @@ echo "MyCoolProjectName" > ProjectName
 ```
 
 ## Usage
-A simple inject script using a debugger like GDB or LLDB is provided.  
-Make sure to run it as root user
+A simple inject script using a debugger like GDB is provided.  
+Make sure to run it as root user.
 ```sh
 ./Load.sh
-```
-In case the default debugger (GDB) is not present, the script will error out.  
-Use the `DEBUGGER` variable to set it to something you have.  
-```sh
-DEBUGGER=lldb ./Load.sh
 ```
 
 After the script loaded the program into the game it will set the ptrace_scope to 3.  
 This means that you will not be able to use ptrace after loading.  
 To use ptrace again you will need to reboot.  
-Please note that the program is not the only software using ptrace, it may be used widely on your system.
+Please note that this project is not the only software using ptrace, it may be used widely on your system.
 
 Make sure to use the script in a state, where the game is not changing frequently.  
 - Don't inject before you can see the main menu
@@ -86,7 +80,7 @@ Issues and Pull Requests can help improve the program
 #### Setting up a workspace (Example, your setup can differ)
 - Fork the repository
 ```sh
-git clone --recurse-submodules [URL] # Replace URL with the repository, that you're forking
+git clone [URL] # Replace URL with your fork of the repository
 ./Build.sh # Check for initial build errors
 ** Make changes **
 ./Debug.sh # The debug script will build and load a debug build, which can also be analyzed using a debugger of your choice (run this as root)
@@ -95,6 +89,5 @@ git add file1 file2 # If you added new files, you have to mark them to be tracke
 git commit -a # Make a commit with all changed files. You may have to set the 'EDITOR' variable, because you have to write a commit message. Please write a small and compact message explaining what you have done.
 git push
 ```
-You should have pushed your changes to your fork  
-If you want to propose the changes in the mainline release,  
-you can open a pull request on GitHub
+You should have pushed your changes to your fork.  
+If you want to propose the changes in the mainline release, you can open a pull request on GitHub.

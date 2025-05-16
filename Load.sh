@@ -1,15 +1,5 @@
 #!/bin/sh
 
-# Set the DEBUGGER variable on the cmdline to use lldb or any debugger
-# Make sure it supports the following commands
-DEBUGGER="${DEBUGGER:=gdb}"
-echo "Using '$DEBUGGER' to inject"
-if ! [ -x "$(command -v $DEBUGGER)" ]; then
-	echo "$DEBUGGER does not exist"
-	echo "Install it or set the DEBUGGER variable to a replacement"
-	exit 1
-fi
-
 cs2_pid=$(pidof cs2)
 if [ -z "$cs2_pid" ]; then
 	echo "CS:2 can't be found, is the game running?"
@@ -31,11 +21,11 @@ sysctl -w kernel.yama.ptrace_scope=2 # Only allows root to inject code. This is 
 killall -19 steam
 killall -19 steamwebhelper
 
-$DEBUGGER -p "$cs2_pid" -n -q -batch \
-  -ex "call ((void*(*)(char*, int)) dlopen)(\"/usr/lib64/$lib_name\", 1)" \
-  -ex "call ((char*(*)(void)) dlerror)()" \
-  -ex "detach" \
-  -ex "quit" 2>&1 || {
+gdb -p "$cs2_pid" -n -q -batch \
+    -ex "call ((void*(*)(char*, int)) dlopen)(\"/usr/lib64/$lib_name\", 1)" \
+    -ex "call ((char*(*)(void)) dlerror)()" \
+    -ex "detach" \
+    -ex "quit" 2>&1 || {
 	echo "A error has appeared"
 	echo "$DEBUGGER has failed to dlopen the library"
 
