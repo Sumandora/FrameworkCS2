@@ -27,3 +27,4 @@ std::int32_t findOffset(SchemaClassInfo* classInfo, const char* fieldName);
 	{                                                                                    \
 		return *prettyName##Ptr();                                                       \
 	}
+	
