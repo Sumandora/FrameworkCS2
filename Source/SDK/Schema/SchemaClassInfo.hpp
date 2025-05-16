@@ -20,7 +20,7 @@ struct SchemaClassInfo {
 	std::uint16_t staticFieldsCount;
 
 private:
-	PADDING(7);
+	PADDING(8);
 public:
 
 	FieldData* fields;
