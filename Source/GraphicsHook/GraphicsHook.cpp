@@ -62,10 +62,8 @@ void drawEntityList()
 					ImGui::Text("%s", schemaType->className);
 					ImGui::TableNextColumn();
 					auto* gameSceneNode = entity->gameSceneNode();
-					auto* transform = gameSceneNode->transformPtr();
-					if (transform == nullptr)
-						continue;
-					Vector3 vec = transform->m_Position;
+					auto& transform = gameSceneNode->transform();
+					Vector3 vec = transform.m_Position;
 
 					auto* collision = entity->collision();
 					if (collision == nullptr)

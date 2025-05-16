@@ -3,9 +3,10 @@
 #include <cstring>
 
 #include "SchemaClassInfo.hpp"
+#include "SchemaSystem.hpp"
 #include "Types/FieldData.hpp"
 
-std::int32_t findOffset(SchemaClassInfo* classInfo, const char* fieldName)
+std::int32_t SchemaSystem::findOffset(SchemaClassInfo* classInfo, const char* fieldName)
 {
 	for (std::size_t i = 0; i < classInfo->fieldsCount; i++) {
 		FieldData& field = classInfo->fields[i];
