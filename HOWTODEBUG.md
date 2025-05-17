@@ -11,10 +11,7 @@ You can now start the game.
 
 ## Step 3: Building and attaching the debugger
 You should see a `Debug.sh` file in the project root.  
-You can run it using another terminal.  
-``
-Pro tip: If you want to save some time, you can run the script as root and skip entering your password later.
-``
+Run it using another terminal, as root user.  
 
 ## Step 4: Using the debugger
 After running the script you probably see a message like the following in your terminal:
