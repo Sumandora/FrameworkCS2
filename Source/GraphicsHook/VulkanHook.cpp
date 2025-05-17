@@ -22,6 +22,8 @@
 
 #include "../Memory.hpp"
 
+#include "../Utils/Logging.hpp"
+
 static constexpr uint32_t g_MinImageCount = 2;
 
 static VkAllocationCallbacks* g_Allocator = nullptr;
@@ -56,7 +58,7 @@ bool is_using_wayland()
 {
 	static const char* driver = []() {
 		const char* driver = SDL_GetCurrentVideoDriver();
-		printf("SDL Video Driver: %s\n", driver);
+		Logging::info("SDL Video Driver: {}", driver);
 		return driver;
 	}();
 
@@ -313,7 +315,8 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 
 	VkQueue graphicQueue = GetGraphicQueue();
 	if (!graphicQueue) {
-		printf("[vk] No queue that has VK_QUEUE_GRAPHICS_BIT has been found!");
+		Logging::error("No queue that has VK_QUEUE_GRAPHICS_BIT has been found!");
+		return;
 	}
 
 	for (uint32_t i = 0; i < pPresentInfo->swapchainCount; ++i) {
@@ -453,7 +456,7 @@ bool GraphicsHook::hookVulkan()
 	CreateDevice();
 
 	if (!g_FakeDevice) {
-		printf("Couldn't create device\n");
+		Logging::error("Couldn't create device");
 		return false;
 	}
 

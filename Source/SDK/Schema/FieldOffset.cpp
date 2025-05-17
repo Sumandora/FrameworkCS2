@@ -1,10 +1,11 @@
-#include "FieldOffset.hpp"
 #include <cstdio>
 #include <cstring>
 
 #include "SchemaClassInfo.hpp"
 #include "SchemaSystem.hpp"
 #include "Types/FieldData.hpp"
+
+#include "../../Utils/Logging.hpp"
 
 std::int32_t SchemaSystem::findOffset(SchemaClassInfo* classInfo, const char* fieldName)
 {
@@ -14,6 +15,6 @@ std::int32_t SchemaSystem::findOffset(SchemaClassInfo* classInfo, const char* fi
 			return field.offset;
 		}
 	}
-	printf("Failed to find offset for %s\n", fieldName);
+	Logging::error("Failed to find offset for {}", fieldName);
 	return 0;
 }

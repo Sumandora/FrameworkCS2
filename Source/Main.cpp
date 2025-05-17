@@ -8,10 +8,11 @@
 #include "GraphicsHook/GraphicsHook.hpp"
 
 #include "GameHook/GameHook.hpp"
+#include "Utils/Logging.hpp"
 
 static void initializer()
 {
-	printf("Hello, world, again!\n");
+	Logging::info("Hello, world, again!");
 
 	Memory::mem_mgr.update();
 
@@ -20,12 +21,12 @@ static void initializer()
 	Memory::Create();
 
 	if (!GraphicsHook::hookSDL()) {
-		printf("Failed to hook SDL\n");
+		Logging::error("Failed to hook SDL");
 		return;
 	}
 
 	if (!GraphicsHook::hookVulkan()) {
-		printf("Failed to hook vulkan\n");
+		Logging::error("Failed to hook vulkan");
 		return;
 	}
 
@@ -34,7 +35,7 @@ static void initializer()
 
 int __attribute((constructor, used)) startup()
 {
-	printf("Hello, world!\n");
+	Logging::info("Hello, world!");
 	std::thread t(initializer);
 	t.detach();
 

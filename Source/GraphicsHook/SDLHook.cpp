@@ -1,16 +1,15 @@
 #include "GraphicsHook.hpp"
 
+#include "../Memory.hpp"
+#include "../Utils/Logging.hpp"
+#include "backends/imgui_impl_sdl3.h"
+#include "BCRL/Session.hpp"
+#include "imgui.h"
+#include "SDL3/SDL_video.h"
+
 #include <cstdint>
 #include <mutex>
-#include <thread>
 
-#include <iostream>
-#include <SDL3/SDL.h>
-
-#include "../Memory.hpp"
-#include "BCRL/Session.hpp"
-
-#include "backends/imgui_impl_sdl3.h"
 using SDL_PeepEventsFunc = int (*)(SDL_Event* events, int numevents, SDL_EventAction action, Uint32 minType, Uint32 maxType);
 static SDL_PeepEventsFunc originalPeepEvents;
 static SDL_PeepEventsFunc* functionPtr;
@@ -36,9 +35,9 @@ static int peepEventsHook(SDL_Event* events, int numevents, SDL_EventAction acti
 
 			io.IniFilename = nullptr; // TODO Bring it back
 			io.LogFilename = nullptr;
-			printf("Initialized ImGui Context\n");
+			Logging::info("Initialized ImGui Context\n");
 		} else {
-			std::lock_guard<std::mutex> lock{ GraphicsHook::eventAccessMutex };
+			const std::lock_guard<std::mutex> lock{ GraphicsHook::eventAccessMutex };
 			GraphicsHook::eventQueue.push_back(event);
 			// TODO Discard events in case the menu is open
 		}

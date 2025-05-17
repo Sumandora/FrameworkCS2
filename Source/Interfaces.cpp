@@ -11,6 +11,7 @@
 
 #include "BCRL/Session.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
+#include "Utils/Logging.hpp"
 
 struct InterfacedLibrary {
 	std::unordered_map<const char*, void*> interfaces{};
@@ -77,22 +78,22 @@ void Interfaces::getInterfaces()
 
 	source2Client = client.getInterface<void>("Source2Client");
 	if (source2Client)
-		printf("Found Source2Client interface at %p\n", source2Client);
+		Logging::info("Found Source2Client interface at {}", source2Client);
 	else
-		printf("Couldn't find Source2Client\n");
+		Logging::error("Couldn't find Source2Client");
 	schemaSystem = schemasystem.getInterface<SchemaSystem>("SchemaSystem_");
 	if (schemaSystem)
-		printf("Found SchemaSystem interface at %p\n", schemaSystem);
+		Logging::info("Found SchemaSystem interface at {}", schemaSystem);
 	else
-		printf("Couldn't find SchemaSystem\n");
+		Logging::error("Couldn't find SchemaSystem");
 	engineCvar = tier0.getInterface<EngineCvar>("VEngineCvar");
 	if (engineCvar)
-		printf("Found EngineCvar interface at %p\n", engineCvar);
+		Logging::info("Found EngineCvar interface at {}", engineCvar);
 	else
-		printf("Couldn't find EngineCvar\n");
+		Logging::error("Couldn't find EngineCvar");
 	engine = engine2.getInterface<EngineToClient>("Source2EngineToClient");
 	if (engine)
-		printf("Found EngineToClient interface at %p\n", engine);
+		Logging::info("Found EngineToClient interface at {}", engine);
 	else
-		printf("Couldn't find EngineToClient\n");
+		Logging::error("Couldn't find EngineToClient");
 }

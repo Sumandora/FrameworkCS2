@@ -9,6 +9,8 @@
 #include "SDK/GameClass/ViewRender.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
+#include "Utils/Logging.hpp"
+
 #include <cstdint>
 
 const void* RetAddrSpoofer::leaveRet;
@@ -21,16 +23,16 @@ static void FindEntitySystem()
 													.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 83 ec ? 4c 8d 35">())
 													.add(7);
 
-	printf("ReinitPredictables at %p\n", reinitPredictables.expect("Can't find ReinitPredictables"));
+	Logging::info("ReinitPredictables at: {}", reinitPredictables.expect("Can't find ReinitPredictables"));
 
 	Memory::EntitySystem::gameEntitySystem = reinitPredictables.clone().relative_to_absolute().expect<GameEntitySystem**>("Couldn't find GameEntitySystem");
-	printf("Found GameEntitySystem at: %p\n", Memory::EntitySystem::gameEntitySystem);
+	Logging::info("Found GameEntitySystem at: {}", Memory::EntitySystem::gameEntitySystem);
 	reinitPredictables = reinitPredictables.add(4).next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"49 8b 3e e8">()).add(4);
 	Memory::EntitySystem::getHighestEntityIndex = reinitPredictables.clone().relative_to_absolute().expect<void*>("Couldn't find getHighestEntityIndex");
-	printf("Found getHighestEntityIndex at: %p\n", Memory::EntitySystem::getHighestEntityIndex);
+	Logging::info("Found getHighestEntityIndex at: {}", Memory::EntitySystem::getHighestEntityIndex);
 	reinitPredictables = reinitPredictables.add(4).next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"3e 44 89 fe e8">()).add(5);
 	Memory::EntitySystem::getBaseEntity = reinitPredictables.clone().relative_to_absolute().expect<void*>("Couldn't find getBaseEntity");
-	printf("Found getBaseEntity at: %p\n", Memory::EntitySystem::getBaseEntity);
+	Logging::info("Found getBaseEntity at: {}", Memory::EntitySystem::getBaseEntity);
 }
 
 void Memory::Create()
@@ -64,7 +66,7 @@ void Memory::Create()
 					 .relative_to_absolute()
 					 .expect<ViewRender*>("Couldn't find ViewRender structure");
 
-	printf("Found ViewRender at: %p\n", viewRender);
+	Logging::info("Found ViewRender at: {}", viewRender);
 
 	//  CRenderGameSystem::GetMatricesForView
 	//            (_g_pRenderGameSystem,(CViewSetup *)(CFrustum *)(this + 0x10),(VMatrix *)&g_WorldToView,
@@ -76,7 +78,7 @@ void Memory::Create()
 								  .relative_to_absolute()
 								  .expect<VMatrix*>("Couldn't find WorldToProjection matrix");
 
-	printf("Found WorldToProjection matrix at: %p\n", worldToProjectionMatrix);
+	Logging::info("Found WorldToProjection matrix at: {}", worldToProjectionMatrix);
 
 	FindEntitySystem();
 
