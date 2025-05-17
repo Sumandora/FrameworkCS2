@@ -1,10 +1,13 @@
 #include "GraphicsHook.hpp"
 
-#include "../Memory.hpp"
-#include "../Utils/Logging.hpp"
-#include "backends/imgui_impl_sdl3.h"
+#include "../../Memory.hpp"
+#include "../../Utils/Logging.hpp"
+
 #include "BCRL/Session.hpp"
+
+#include "backends/imgui_impl_sdl3.h"
 #include "imgui.h"
+
 #include "SDL3/SDL_video.h"
 
 #include <cstdint>

@@ -5,9 +5,7 @@
 
 #include "Memory.hpp"
 
-#include "GraphicsHook/GraphicsHook.hpp"
-
-#include "GameHook/GameHook.hpp"
+#include "Hooks/Hooks.hpp"
 #include "Utils/Logging.hpp"
 
 static void initializer()
@@ -20,17 +18,7 @@ static void initializer()
 
 	Memory::Create();
 
-	if (!GraphicsHook::hookSDL()) {
-		Logging::error("Failed to hook SDL");
-		return;
-	}
-
-	if (!GraphicsHook::hookVulkan()) {
-		Logging::error("Failed to hook vulkan");
-		return;
-	}
-
-	GameHook::hook();
+	Hooks::create();
 }
 
 int __attribute((constructor, used)) startup()
@@ -44,7 +32,5 @@ int __attribute((constructor, used)) startup()
 
 void __attribute((destructor)) shutdown()
 {
-	GraphicsHook::unhookSDL();
-	GraphicsHook::unhookVulkan();
-	GameHook::unhook();
+	Hooks::destroy();
 }

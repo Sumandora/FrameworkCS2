@@ -10,7 +10,6 @@
 #include "imgui_internal.h"
 
 #include <cstdint>
-#include <cstdio>
 #include <memory>
 #include <SDL3/SDL_video.h>
 #include <vector>
@@ -20,9 +19,9 @@
 
 #include "BCRL/Session.hpp"
 
-#include "../Memory.hpp"
+#include "../../Memory.hpp"
 
-#include "../Utils/Logging.hpp"
+#include "../../Utils/Logging.hpp"
 
 static constexpr uint32_t g_MinImageCount = 2;
 
