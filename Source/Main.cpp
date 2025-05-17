@@ -1,4 +1,3 @@
-#include <cstdio>
 #include <thread>
 
 #include "Interfaces.hpp"
