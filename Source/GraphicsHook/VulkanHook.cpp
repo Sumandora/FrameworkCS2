@@ -493,7 +493,7 @@ void GraphicsHook::unhookVulkan()
 	createSwapchainKHRHook = nullptr;
 
 	if (ImGui::GetCurrentContext()) {
-		ImGuiIO& io = ImGui::GetIO();
+		const ImGuiIO& io = ImGui::GetIO();
 
 		if (io.BackendRendererUserData) {
 			ImGui_ImplVulkan_Shutdown();
