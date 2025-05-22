@@ -12,7 +12,7 @@
 #include <utility>
 #include <vector>
 
-#include "../Hooks/Graphics/GraphicsHook.hpp"
+#include "Construction/Construction.hpp"
 
 class OwningSDLEvent {
 	SDL_Event event;
@@ -100,7 +100,7 @@ void GUI::render()
 {
 	ImGui::NewFrame();
 
-	GraphicsHook::mainLoop();
+	Construction::render();
 
 	ImGui::Render();
 }

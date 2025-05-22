@@ -1,4 +1,4 @@
-#include "GraphicsHook.hpp"
+#include "Construction.hpp"
 
 #include "../../Memory.hpp"
 #include "../../SDK/Entities/BaseEntity.hpp"
@@ -77,8 +77,8 @@ void drawEntityList()
 					Vector3 finalMaxs = { vec[0] + maxs[0], vec[1] + maxs[1], vec[2] + maxs[2] };
 
 					ImGui::Text("(%f %f %f) - (%f %f %f)",
-								finalMins[0], finalMins[1], finalMins[2],
-								finalMaxs[0], finalMaxs[1], finalMaxs[2]);
+						finalMins[0], finalMins[1], finalMins[2],
+						finalMaxs[0], finalMaxs[1], finalMaxs[2]);
 				}
 
 				ImGui::EndTable();
@@ -87,14 +87,15 @@ void drawEntityList()
 	ImGui::End();
 }
 
-void drawConVars() {
-	if(ImGui::Begin("Convars")) {
+void drawConVars()
+{
+	if (ImGui::Begin("Convars")) {
 		static char search[128] = "";
 		ImGui::InputText("Search", search, IM_ARRAYSIZE(search));
 		static bool searchBackend = false;
 		ImGui::Checkbox("Search backend", &searchBackend);
 
-		if(ImGui::Button("Remove dev protection")) {
+		if (ImGui::Button("Remove dev protection")) {
 			auto& list = Interfaces::engineCvar->convarList;
 			auto it = list.head;
 			while (it != list.INVALID_INDEX) {
@@ -107,7 +108,7 @@ void drawConVars() {
 
 		ImGui::SameLine();
 
-		if(ImGui::Button("Remove hidden state")) {
+		if (ImGui::Button("Remove hidden state")) {
 			auto& list = Interfaces::engineCvar->convarList;
 			auto it = list.head;
 			while (it != list.INVALID_INDEX) {
@@ -120,7 +121,7 @@ void drawConVars() {
 
 		ImGui::SameLine();
 
-		if(ImGui::Button("Remove cheat protection")) {
+		if (ImGui::Button("Remove cheat protection")) {
 			auto& list = Interfaces::engineCvar->convarList;
 			auto it = list.head;
 			while (it != list.INVALID_INDEX) {
@@ -133,10 +134,10 @@ void drawConVars() {
 
 		if (ImGui::BeginTable("List", 6)) {
 			auto process = [](ConVar* convar) {
-				if(convar == nullptr)
+				if (convar == nullptr)
 					return false;
 
-				if(search[0] != '\0' && strncmp(convar->name, search, strlen(search)) != 0)
+				if (search[0] != '\0' && strncmp(convar->name, search, strlen(search)) != 0)
 					return true;
 
 				ImGui::TableNextColumn();
@@ -153,7 +154,7 @@ void drawConVars() {
 				};
 				ImGui::Text("%s", bitsetToString(convar->flags).c_str());
 				ImGui::TableNextColumn();
-				if(BCRL::SafePointer(Memory::mem_mgr, (std::uintptr_t)convar->value.string).is_valid() /*:thumbsup:*/)
+				if (BCRL::SafePointer(Memory::mem_mgr, (std::uintptr_t)convar->value.string).is_valid() /*:thumbsup:*/)
 					ImGui::Text("%s", convar->value.string);
 				else
 					ImGui::Text("null");
@@ -165,31 +166,31 @@ void drawConVars() {
 				return true;
 			};
 
-			if(searchBackend) {
+			if (searchBackend) {
 				auto& list = Interfaces::engineCvar->convarList;
 				auto it = list.head;
 				while (it != list.INVALID_INDEX) {
 					auto& listElem = list.memory.memory[it];
-					if(!process(listElem.element))
+					if (!process(listElem.element))
 						break;
 
 					it = listElem.next;
 				}
 			} else {
-				for(auto it = Interfaces::engineCvar->getFirstCvarIterator(); it; it = Interfaces::engineCvar->getNextCvarIterator(it)) {
+				for (auto it = Interfaces::engineCvar->getFirstCvarIterator(); it; it = Interfaces::engineCvar->getNextCvarIterator(it)) {
 					auto* convar = Interfaces::engineCvar->getCvar(it);
-					if(!process(convar))
+					if (!process(convar))
 						break;
 				}
 			}
 			ImGui::EndTable();
 		}
-
 	}
 	ImGui::End();
 }
 
-void drawLocalPlayer() {
+void drawLocalPlayer()
+{
 	if (ImGui::Begin("Local player")) {
 		auto localPlayer = Memory::local_player;
 		if (localPlayer != nullptr)
@@ -202,10 +203,11 @@ void drawLocalPlayer() {
 
 extern std::unordered_map<std::string, std::size_t> eventCounters;
 
-void drawEventList() {
-	if(ImGui::Begin("Game events")) {
+void drawEventList()
+{
+	if (ImGui::Begin("Game events")) {
 		if (ImGui::BeginTable("Events", 2)) {
-			for(const auto& [eventName, count] : eventCounters) {
+			for (const auto& [eventName, count] : eventCounters) {
 				ImGui::TableNextColumn();
 				ImGui::Text("%s", eventName.c_str());
 				ImGui::TableNextColumn();
@@ -217,10 +219,10 @@ void drawEventList() {
 	ImGui::End();
 }
 
-void GraphicsHook::mainLoop()
+void GUI::Construction::render()
 {
 	ImGui::ShowDemoWindow();
-	
+
 	drawViewMatrix();
 	drawEntityList();
 	drawConVars();
