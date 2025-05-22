@@ -1,14 +1,17 @@
 #include "GUI.hpp"
 
-#include "SDL3/SDL_events.h"
 #include "backends/imgui_impl_sdl3.h"
 #include "imgui.h"
+#include "SDL3/SDL_events.h"
+#include "SDL3/SDL_video.h"
 
 #include "../Utils/Logging.hpp"
 
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <mutex>
+#include <unistd.h>
 #include <utility>
 #include <vector>
 
@@ -94,6 +97,44 @@ void GUI::init()
 void GUI::destroy()
 {
 	ImGui::DestroyContext();
+}
+
+void GUI::create_font(SDL_Window* window)
+{
+
+	// We are running straight into the multi monitor dpi issue here, but to my knowledge there is no appropriate solution to this when using ImGui
+	const SDL_DisplayID display_index = SDL_GetDisplayForWindow(window);
+	const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(display_index);
+
+	// I want the font size to be something around 12 on full hd screens.
+	// 4k screens get something around 24.
+	// Mathematically expressed:
+	// font_size(screen_height) = screen_height * x
+	// font_size(1080) = 12
+	// font_size(2160) = 24
+	// x = 1/90, also technically one pair of values is enough here to solve for x here.
+
+	const float font_size = floorf(static_cast<float>(mode->h) * (1.0F / 90.0F));
+
+	// Might not work on certain distros/configurations
+	bool loaded_font = false;
+
+	ImGuiIO& io = ImGui::GetIO();
+
+	for (const char* path : {
+			 "/usr/share/fonts/noto/NotoSans-Regular.ttf",
+			 "/usr/share/fonts/google-noto/NotoSans-Regular.ttf" }) {
+		if (access(path, F_OK) == 0 && io.Fonts->AddFontFromFileTTF(path, font_size)) {
+			loaded_font = true;
+			break;
+		}
+	}
+
+	if (!loaded_font) {
+		ImFontConfig config;
+		config.SizePixels = font_size;
+		io.Fonts->AddFontDefault(&config);
+	}
 }
 
 void GUI::render()

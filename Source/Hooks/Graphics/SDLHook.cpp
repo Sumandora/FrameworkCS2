@@ -31,7 +31,11 @@ static int peepEventsHook(SDL_Event* events, int numevents, SDL_EventAction acti
 			if (event.type < SDL_EVENT_WINDOW_FIRST || event.type > SDL_EVENT_WINDOW_LAST)
 				continue;
 
-			ImGui_ImplSDL3_InitForVulkan(SDL_GetWindowFromID(event.window.windowID));
+			SDL_Window* window = SDL_GetWindowFromID(event.window.windowID);
+
+			ImGui_ImplSDL3_InitForVulkan(window);
+
+			GUI::create_font(window);
 		} else {
 			GUI::queue_event(&event);
 			// TODO Discard events in case the menu is open
