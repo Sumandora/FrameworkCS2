@@ -1,5 +1,6 @@
 #include <thread>
 
+#include "GUI/GUI.hpp"
 #include "Interfaces.hpp"
 
 #include "Memory.hpp"
@@ -13,6 +14,8 @@ static void initializer()
 
 	Memory::mem_mgr.update();
 
+	GUI::init();
+
 	Interfaces::getInterfaces();
 
 	Memory::Create();
@@ -20,7 +23,7 @@ static void initializer()
 	Hooks::create();
 }
 
-int __attribute((constructor, used)) startup()
+static int __attribute((constructor)) startup()
 {
 	Logging::info("Hello, world!");
 	std::thread t(initializer);
@@ -29,7 +32,8 @@ int __attribute((constructor, used)) startup()
 	return 0;
 }
 
-void __attribute((destructor)) shutdown()
+static void __attribute((destructor)) shutdown()
 {
 	Hooks::destroy();
+	GUI::destroy();
 }

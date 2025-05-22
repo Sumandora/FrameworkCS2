@@ -1,5 +1,6 @@
 #include "GraphicsHook.hpp"
 
+#include "../../GUI/GUI.hpp"
 #include "../../Memory.hpp"
 #include "../../Utils/Logging.hpp"
 
@@ -24,24 +25,15 @@ static int peepEventsHook(SDL_Event* events, int numevents, SDL_EventAction acti
 		return rv;
 
 	for (int i = 0; i < numevents; ++i) {
-		SDL_Event& event = events[i];
+		const SDL_Event& event = events[i];
 
-		if (!ImGui::GetCurrentContext()) {
+		if (!ImGui::GetIO().BackendPlatformUserData) {
 			if (event.type < SDL_EVENT_WINDOW_FIRST || event.type > SDL_EVENT_WINDOW_LAST)
 				continue;
 
-			ImGui::CreateContext();
-
 			ImGui_ImplSDL3_InitForVulkan(SDL_GetWindowFromID(event.window.windowID));
-
-			ImGuiIO& io = ImGui::GetIO();
-
-			io.IniFilename = nullptr; // TODO Bring it back
-			io.LogFilename = nullptr;
-			Logging::info("Initialized ImGui Context\n");
 		} else {
-			const std::lock_guard<std::mutex> lock{ GraphicsHook::eventAccessMutex };
-			GraphicsHook::eventQueue.push_back(event);
+			GUI::queue_event(&event);
 			// TODO Discard events in case the menu is open
 		}
 	}
@@ -64,4 +56,10 @@ bool GraphicsHook::hookSDL() // TODO Write something that works universally on S
 void GraphicsHook::unhookSDL()
 {
 	*functionPtr = originalPeepEvents;
+
+	const ImGuiIO& io = ImGui::GetIO();
+
+	if (io.BackendPlatformUserData) {
+		ImGui_ImplSDL3_Shutdown();
+	}
 }

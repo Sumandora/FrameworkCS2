@@ -40,7 +40,7 @@ struct InterfacedLibrary {
 	}
 
 	template <typename T>
-	T* getInterface(const char* name)
+	T* getInterface(const char* name) const
 	{
 		for (const auto& [interfaceName, createFn] : interfaces) {
 			if (std::strncmp(name, interfaceName, std::strlen(interfaceName) - 3 /*Ignore the version*/) == 0)

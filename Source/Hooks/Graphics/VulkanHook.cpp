@@ -21,6 +21,8 @@
 
 #include "../../Memory.hpp"
 
+#include "../../GUI/GUI.hpp"
+
 #include "../../Utils/Logging.hpp"
 
 static constexpr uint32_t g_MinImageCount = 2;
@@ -311,6 +313,8 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 {
 	if (!ImGui::GetCurrentContext() || !g_Device)
 		return;
+	if (!ImGui::GetIO().BackendPlatformUserData)
+		return;
 
 	VkQueue graphicQueue = GetGraphicQueue();
 	if (!graphicQueue) {
@@ -366,22 +370,12 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 			ImGui_ImplVulkan_Init(&init_info);
 		}
 
-		{
-			std::lock_guard<std::mutex> lock{ GraphicsHook::eventAccessMutex };
-			std::erase_if(GraphicsHook::eventQueue, [](const SDL_Event& event) {
-				ImGui_ImplSDL3_ProcessEvent(&event);
-				return true;
-			});
-		}
+		GUI::flush_events();
 
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplSDL3_NewFrame();
 
-		ImGui::NewFrame();
-
-		GraphicsHook::mainLoop();
-
-		ImGui::Render();
+		GUI::render();
 
 		auto* drawData = ImGui::GetDrawData();
 		{
@@ -494,18 +488,10 @@ void GraphicsHook::unhookVulkan()
 	queuePresentKHRHook = nullptr;
 	createSwapchainKHRHook = nullptr;
 
-	if (ImGui::GetCurrentContext()) {
-		const ImGuiIO& io = ImGui::GetIO();
+	const ImGuiIO& io = ImGui::GetIO();
 
-		if (io.BackendRendererUserData) {
-			ImGui_ImplVulkan_Shutdown();
-		}
-
-		if (io.BackendPlatformUserData) {
-			ImGui_ImplSDL3_Shutdown();
-		}
-
-		ImGui::DestroyContext();
+	if (io.BackendRendererUserData) {
+		ImGui_ImplVulkan_Shutdown();
 	}
 
 	CleanupDevice();
