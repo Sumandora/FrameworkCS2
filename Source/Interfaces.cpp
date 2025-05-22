@@ -22,7 +22,7 @@ struct InterfacedLibrary {
 	{
 		void* handle = dlmopen(LM_ID_BASE, path, RTLD_NOW | RTLD_NOLOAD | RTLD_LOCAL);
 		void* create_interface_fn = dlsym(handle, "CreateInterface");
-		auto** interface_list = BCRL::pointer(Memory::mem_mgr, (std::uintptr_t)create_interface_fn)
+		auto** interface_list = BCRL::pointer(Memory::mem_mgr, create_interface_fn)
 									.add(1)
 									.relative_to_absolute()
 									.repeater([](auto& ptr) {
@@ -56,7 +56,7 @@ struct InterfacedLibrary {
 void* Interfaces::uncover_create_function(void* create_func)
 {
 	std::uintptr_t interface_ptr = 0;
-	BCRL::pointer(Memory::mem_mgr, (std::uintptr_t)create_func)
+	BCRL::pointer(Memory::mem_mgr, create_func)
 		.repeater([&interface_ptr](auto& pointer) {
 			if (pointer.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 05">())) { // lea offset(%rip), %rax
 				interface_ptr = pointer.clone().add(3).relative_to_absolute().get_pointer();
@@ -69,7 +69,7 @@ void* Interfaces::uncover_create_function(void* create_func)
 			pointer.next_instruction();
 			return true;
 		});
-	return (void*)interface_ptr;
+	return reinterpret_cast<void*>(interface_ptr);
 }
 
 void Interfaces::get_interfaces()
