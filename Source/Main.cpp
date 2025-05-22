@@ -12,7 +12,7 @@ static void initializer()
 {
 	Logging::info("Hello, world, again!");
 
-	Memory::mem_mgr.update();
+	Memory::mem_mgr.sync_layout();
 
 	GUI::init();
 
