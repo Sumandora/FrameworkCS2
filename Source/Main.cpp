@@ -16,7 +16,7 @@ static void initializer()
 
 	GUI::init();
 
-	Interfaces::getInterfaces();
+	Interfaces::get_interfaces();
 
 	Memory::Create();
 
