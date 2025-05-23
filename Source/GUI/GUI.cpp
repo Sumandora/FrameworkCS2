@@ -14,7 +14,6 @@
 #include <cstring>
 #include <mutex>
 #include <unistd.h>
-#include <utility>
 #include <vector>
 
 #include "Construction/Construction.hpp"
@@ -33,9 +32,15 @@ public:
 		case SDL_EVENT_TEXT_EDITING:
 			this->event.edit.text = strdup(event.edit.text);
 			break;
-		case SDL_EVENT_USER:
-			// we don't know what the data is, so we can't copy it :(
-			// let's just hope it's not deallocated before it's used
+		case SDL_EVENT_TEXT_EDITING_CANDIDATES:
+			if (!event.edit_candidates.num_candidates)
+				break;
+			// NOLINTNEXTLINE(hicpp-no-malloc, cppcoreguidelines-no-malloc)
+			this->event.edit_candidates.candidates = static_cast<char**>(calloc(event.edit_candidates.num_candidates, sizeof(char*)));
+			for (int i = 0; i < event.edit_candidates.num_candidates; i++) {
+				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+				const_cast<char**>(this->event.edit_candidates.candidates)[i] = strdup(event.edit_candidates.candidates[i]);
+			}
 			break;
 		case SDL_EVENT_DROP_FILE:
 		case SDL_EVENT_DROP_TEXT:
@@ -49,6 +54,9 @@ public:
 			break;
 		}
 	}
+	// OwningSDLEvent(const OwningSDLEvent&) = delete;
+	// OwningSDLEvent& operator=(const OwningSDLEvent&) = delete;
+	// OwningSDLEvent(OwningSDLEvent&&) = default;
 	~OwningSDLEvent()
 	{
 		switch (event.type) {
@@ -59,9 +67,13 @@ public:
 		case SDL_EVENT_TEXT_EDITING:
 			free((void*)event.edit.text);
 			break;
-		case SDL_EVENT_USER:
-			// we don't know what the data is, so we can't copy it :(
-			// let's just hope it's not deallocated before it's used
+		case SDL_EVENT_TEXT_EDITING_CANDIDATES:
+			if (!event.edit_candidates.num_candidates)
+				break;
+			for (int i = 0; i < event.edit_candidates.num_candidates; i++) {
+				free((void*)event.edit_candidates.candidates[i]);
+			}
+			free((void*)event.edit_candidates.candidates);
 			break;
 		case SDL_EVENT_DROP_FILE:
 		case SDL_EVENT_DROP_TEXT:
@@ -105,7 +117,8 @@ void GUI::destroy()
 	ImGui::DestroyContext();
 }
 
-static void create_font() {
+static void create_font()
+{
 	// We are running straight into the multi monitor dpi issue here, but to my knowledge there is no appropriate solution to this when using ImGui
 	const SDL_DisplayID display_index = SDL_GetDisplayForWindow(window);
 	const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(display_index);
@@ -170,29 +183,32 @@ void GUI::render()
 
 bool GUI::queue_event(const SDL_Event* event)
 {
-	const std::lock_guard lock{ event_queue_mutex };
-	event_queue.emplace_back(*event);
-
 	if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_INSERT)
 		is_open = !is_open;
 
 	if (event->type < SDL_EVENT_KEY_DOWN || event->type > SDL_EVENT_DROP_POSITION)
 		return false; // These kinds of events should probably not be swallowed
 
+	if (event->type == SDL_EVENT_USER)
+		return false; // The data in this thing is pretty much uncloneable. ImGui doesn't need it, I don't need it, don't save it.
+
+	const std::lock_guard lock{ event_queue_mutex };
+	event_queue.emplace_back(*event);
+
 	return is_open;
 }
 
 void GUI::flush_events()
 {
-	std::vector<OwningSDLEvent> events;
+	// std::vector<OwningSDLEvent> events;
 
-	{
-		// Move events into local variables and create new vector to reduce time spent in this lock.
-		const std::lock_guard<std::mutex> lock{ event_queue_mutex };
-		std::swap(events, event_queue);
-	}
+	// {
+	// 	// Move events into local variables and create new vector to reduce time spent in this lock.
+	const std::lock_guard<std::mutex> lock{ event_queue_mutex };
+	// 	std::swap(events, event_queue);
+	// }
 
-	std::erase_if(events, [](const OwningSDLEvent& event) {
+	std::erase_if(event_queue, [](const OwningSDLEvent& event) {
 		ImGui_ImplSDL3_ProcessEvent(event.get_event());
 		return true;
 	});

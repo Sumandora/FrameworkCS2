@@ -8,12 +8,13 @@
 
 #include "RetAddrSpoofer.hpp"
 
-#include "backends/imgui_impl_sdl3.h"
-#include "imgui.h"
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_stdinc.h"
+
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
+#include "backends/imgui_impl_sdl3.h"
+#include "imgui.h"
 
 #include "SDL3/SDL_video.h"
 
@@ -54,7 +55,7 @@ static int peep_events_hook(
 )
 {
 	if (action == SDL_ADDEVENT && numevents > 0) {
-		std::vector<SDL_Event> filtered_events;
+		[[gnu::aligned(16)]] std::vector<SDL_Event> filtered_events;
 		// This is wrong, it might be less, but I rather allocate a bit too much than doing a ton of allocations.
 		filtered_events.reserve(numevents);
 
@@ -65,7 +66,8 @@ static int peep_events_hook(
 
 			if (!ImGui::GetIO().BackendPlatformUserData) {
 				if (event.type < SDL_EVENT_WINDOW_FIRST || event.type > SDL_EVENT_WINDOW_LAST)
-					continue;
+					// NOLINTNEXTLINE(hicpp-avoid-goto, cppcoreguidelines-avoid-goto)
+					goto next_event;
 
 				SDL_Window* window = SDL_GetWindowFromID(event.window.windowID);
 
@@ -75,8 +77,9 @@ static int peep_events_hook(
 				swallowed = GUI::queue_event(&event);
 			}
 
+		next_event:
 			if (!swallowed) {
-				filtered_events.push_back(event);
+				filtered_events.emplace_back(event);
 			}
 		}
 
