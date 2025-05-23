@@ -1,3 +1,4 @@
+#include "BCRL/SearchConstraints.hpp"
 #include "GraphicsHook.hpp"
 
 #include "../../GUI/GUI.hpp"
@@ -11,6 +12,8 @@
 #include "imgui.h"
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_stdinc.h"
+#include "SignatureScanner/PatternSignature.hpp"
+#include "SignatureScanner/XRefSignature.hpp"
 
 #include "SDL3/SDL_video.h"
 
@@ -86,11 +89,10 @@ static int peep_events_hook(
 
 bool GraphicsHook::hookSDL()
 {
-	// TODO Find better signature
-	void* peep_events_internal_ptr = BCRL::signature(Memory::mem_mgr, SignatureScanner::PatternSignature::for_array_of_bytes<"41 89 F8 31 F6">(), BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libSDL3.so.0"))
-										 .add(13)
-										 .relative_to_absolute()
-										 .expect<void*>("Failed to find backend function pointer for SDL_PeepEvents");
+	void* peep_events_internal_ptr = BCRL::signature(Memory::mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"Event queue is full (%d events)">(), BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libSDL3.so.0"))
+										 .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libSDL3.so.0"))
+										 .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"41 57 41 89 f7">())
+										 .expect<void*>("Failed to find backend function pointer for SDL_PeepEventsInternal");
 
 	hook = std::make_unique<Hooks::Game::GameHook>(peep_events_internal_ptr, reinterpret_cast<void*>(peep_events_hook));
 	return true;
