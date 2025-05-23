@@ -6,6 +6,8 @@
 
 #include "DetourHooking.hpp"
 
+#include "../../Utils/UninitializedObject.hpp"
+
 struct GameEvent;
 
 namespace Hooks::Game {
@@ -24,7 +26,7 @@ namespace Hooks::Game {
 	};
 
 	namespace FrameStageNotify {
-		inline std::unique_ptr<GameHook> hook;
+		inline UninitializedObject<GameHook> hook;
 		void hookFunc([[maybe_unused]] void* thisptr, ClientFrameStage stage);
 	}
 

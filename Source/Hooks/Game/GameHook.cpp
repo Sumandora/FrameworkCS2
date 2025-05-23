@@ -14,7 +14,7 @@
 namespace Hooks::Game {
 	void create()
 	{
-		FrameStageNotify::hook = std::make_unique<GameHook>(BCRL::pointer_array(Memory::mem_mgr, Interfaces::source2Client, 36).expect<void*>("Couldn't find FrameStageNotify"), reinterpret_cast<void*>(FrameStageNotify::hookFunc));
+		FrameStageNotify::hook.emplace(BCRL::pointer_array(Memory::mem_mgr, Interfaces::source2Client, 36).expect<void*>("Couldn't find FrameStageNotify"), reinterpret_cast<void*>(FrameStageNotify::hookFunc));
 		ShouldShowCrosshair::hook = std::make_unique<GameHook>(Memory::shouldShowCrosshair, reinterpret_cast<void*>(ShouldShowCrosshair::hookFunc));
 		FireEvent::hook = std::make_unique<GameHook>(Memory::fireEvent, reinterpret_cast<void*>(FireEvent::hookFunc));
 	}
@@ -23,7 +23,7 @@ namespace Hooks::Game {
 	{
 		FireEvent::hook = nullptr;
 		ShouldShowCrosshair::hook = nullptr;
-		FrameStageNotify::hook = nullptr;
+		FrameStageNotify::hook.reset();
 	}
 
 	static std::size_t get_stolen_bytes_count(void* instruction)
