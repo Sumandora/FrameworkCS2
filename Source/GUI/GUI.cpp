@@ -8,6 +8,7 @@
 
 #include "../Utils/Logging.hpp"
 
+#include <cfloat>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
@@ -102,9 +103,8 @@ void GUI::destroy()
 	ImGui::DestroyContext();
 }
 
-void GUI::create_font(SDL_Window* window)
+static void create_font(SDL_Window* window)
 {
-
 	// We are running straight into the multi monitor dpi issue here, but to my knowledge there is no appropriate solution to this when using ImGui
 	const SDL_DisplayID display_index = SDL_GetDisplayForWindow(window);
 	const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(display_index);
@@ -142,6 +142,15 @@ void GUI::create_font(SDL_Window* window)
 
 void GUI::render()
 {
+	ImGuiIO& io = ImGui::GetIO();
+
+	static constexpr ImGuiConfigFlags INPUT_MASK = ImGuiConfigFlags_NoKeyboard | ImGuiConfigFlags_NoMouse;
+	if (is_open) {
+		io.ConfigFlags &= ~INPUT_MASK;
+	} else {
+		io.ConfigFlags |= INPUT_MASK;
+	}
+
 	ImGui::NewFrame();
 
 	if (is_open)
