@@ -46,8 +46,9 @@ static int peep_events_hook(
 	SDL_EventAction action,
 	Uint32 minType,
 	Uint32 maxType,
-	bool include_sentinel)
-// NOLINTEND(readability-identifier-naming)
+	bool include_sentinel
+	// NOLINTEND(readability-identifier-naming)
+)
 {
 	if (action == SDL_ADDEVENT && numevents > 0) {
 		std::vector<SDL_Event> filtered_events;
