@@ -158,7 +158,7 @@ bool GUI::queue_event(const SDL_Event* event)
 	if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_INSERT)
 		is_open = !is_open;
 
-	if (event->type >= SDL_EVENT_KEY_DOWN && event->type <= SDL_EVENT_DROP_POSITION)
+	if (event->type < SDL_EVENT_KEY_DOWN || event->type > SDL_EVENT_DROP_POSITION)
 		return false; // These kinds of events should probably not be swallowed
 
 	return is_open;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SDL3/SDL_video.h"
 #include "imgui.h"
 #include <mutex>
 #include <SDL3/SDL.h>
@@ -9,8 +10,6 @@ namespace GraphicsHook {
 	inline std::mutex espMutex;
 	inline ImDrawList* espDrawList;
 	inline ImDrawListSharedData* espDrawListSharedData;
-
-	void mainLoop();
 
 	bool hookSDL();
 	bool hookVulkan();
