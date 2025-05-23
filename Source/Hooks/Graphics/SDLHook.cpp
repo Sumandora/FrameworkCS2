@@ -37,8 +37,9 @@ static int peepEventsHook(SDL_Event* events, int numevents, SDL_EventAction acti
 
 			GUI::create_font(window);
 		} else {
-			GUI::queue_event(&event);
-			// TODO Discard events in case the menu is open
+			if (GUI::queue_event(&event))
+				// TODO Discard events in this case
+				(void)true;
 		}
 	}
 

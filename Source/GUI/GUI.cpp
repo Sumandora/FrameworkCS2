@@ -3,6 +3,7 @@
 #include "backends/imgui_impl_sdl3.h"
 #include "imgui.h"
 #include "SDL3/SDL_events.h"
+#include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_video.h"
 
 #include "../Utils/Logging.hpp"
@@ -82,6 +83,8 @@ public:
 static std::mutex event_queue_mutex; // https://github.com/ocornut/imgui/issues/6895
 static std::vector<OwningSDLEvent> event_queue{};
 
+static bool is_open = true;
+
 void GUI::init()
 {
 	ImGui::CreateContext();
@@ -141,15 +144,24 @@ void GUI::render()
 {
 	ImGui::NewFrame();
 
-	Construction::render();
+	if (is_open)
+		Construction::render();
 
 	ImGui::Render();
 }
 
-void GUI::queue_event(const SDL_Event* event)
+bool GUI::queue_event(const SDL_Event* event)
 {
 	const std::lock_guard lock{ event_queue_mutex };
 	event_queue.emplace_back(*event);
+
+	if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_INSERT)
+		is_open = !is_open;
+
+	if (event->type >= SDL_EVENT_KEY_DOWN && event->type <= SDL_EVENT_DROP_POSITION)
+		return false; // These kinds of events should probably not be swallowed
+
+	return is_open;
 }
 
 void GUI::flush_events()

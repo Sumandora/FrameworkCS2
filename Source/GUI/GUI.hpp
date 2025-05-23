@@ -11,6 +11,9 @@ namespace GUI {
 
 	void render();
 
-	void queue_event(const SDL_Event* event);
+	/**
+	 * @returns if the event should be swallowed
+	 */
+	bool queue_event(const SDL_Event* event);
 	void flush_events();
 }
