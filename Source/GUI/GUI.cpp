@@ -86,6 +86,8 @@ static std::vector<OwningSDLEvent> event_queue{};
 
 static bool is_open = true;
 
+static SDL_Window* window;
+
 void GUI::init()
 {
 	ImGui::CreateContext();
@@ -103,8 +105,7 @@ void GUI::destroy()
 	ImGui::DestroyContext();
 }
 
-static void create_font(SDL_Window* window)
-{
+static void create_font() {
 	// We are running straight into the multi monitor dpi issue here, but to my knowledge there is no appropriate solution to this when using ImGui
 	const SDL_DisplayID display_index = SDL_GetDisplayForWindow(window);
 	const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(display_index);
@@ -140,6 +141,13 @@ static void create_font(SDL_Window* window)
 	}
 }
 
+void GUI::provide_window(SDL_Window* window)
+{
+	::window = window;
+
+	create_font();
+}
+
 void GUI::render()
 {
 	ImGuiIO& io = ImGui::GetIO();
@@ -150,6 +158,7 @@ void GUI::render()
 	} else {
 		io.ConfigFlags |= INPUT_MASK;
 	}
+	io.MouseDrawCursor = is_open && SDL_GetWindowMouseGrab(window);
 
 	ImGui::NewFrame();
 

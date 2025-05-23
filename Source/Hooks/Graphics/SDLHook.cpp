@@ -67,8 +67,7 @@ static int peep_events_hook(
 				SDL_Window* window = SDL_GetWindowFromID(event.window.windowID);
 
 				ImGui_ImplSDL3_InitForVulkan(window);
-
-				GUI::create_font(window);
+				GUI::provide_window(window);
 			} else {
 				swallowed = GUI::queue_event(&event);
 			}

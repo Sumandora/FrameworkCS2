@@ -7,7 +7,7 @@ namespace GUI {
 	void init();
 	void destroy();
 
-	void create_font(SDL_Window* window);
+	void provide_window(SDL_Window* window);
 
 	void render();
 
