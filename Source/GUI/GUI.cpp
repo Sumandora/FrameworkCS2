@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_keycode.h"
+#include "SDL3/SDL_stdinc.h"
 #include "SDL3/SDL_video.h"
 
 #include "../Utils/Logging.hpp"
@@ -14,6 +15,7 @@
 #include <cstring>
 #include <mutex>
 #include <unistd.h>
+#include <utility>
 #include <vector>
 
 #include "Construction/Construction.hpp"
@@ -22,6 +24,7 @@ class OwningSDLEvent {
 	SDL_Event event;
 
 public:
+	OwningSDLEvent() = delete;
 	explicit OwningSDLEvent(const SDL_Event& event)
 		: event(event)
 	{
@@ -54,11 +57,38 @@ public:
 			break;
 		}
 	}
-	// OwningSDLEvent(const OwningSDLEvent&) = delete;
-	// OwningSDLEvent& operator=(const OwningSDLEvent&) = delete;
-	// OwningSDLEvent(OwningSDLEvent&&) = default;
+	OwningSDLEvent(const OwningSDLEvent&) = delete;
+	OwningSDLEvent& operator=(const OwningSDLEvent&) = delete;
+	OwningSDLEvent(OwningSDLEvent&& other) noexcept
+		: event(other.event)
+	{
+		// Delete other event to prevent double free
+		switch (event.type) {
+		case SDL_EVENT_TEXT_INPUT:
+			other.event.text.text = nullptr;
+			break;
+		case SDL_EVENT_TEXT_EDITING:
+			other.event.edit.text = nullptr;
+			break;
+		case SDL_EVENT_TEXT_EDITING_CANDIDATES:
+			other.event.edit_candidates.candidates = nullptr;
+			break;
+		case SDL_EVENT_DROP_FILE:
+		case SDL_EVENT_DROP_TEXT:
+		case SDL_EVENT_DROP_BEGIN:
+		case SDL_EVENT_DROP_COMPLETE:
+		case SDL_EVENT_DROP_POSITION:
+			other.event.drop.data = nullptr;
+			other.event.drop.source = nullptr;
+			break;
+		default:
+			break;
+		}
+	}
+	OwningSDLEvent& operator=(OwningSDLEvent&&) = delete;
 	~OwningSDLEvent()
 	{
+		// Free does not do anything when nullptr is provided.
 		switch (event.type) {
 			// NOLINTBEGIN(hicpp-no-malloc, cppcoreguidelines-no-malloc, google-readability-casting)
 		case SDL_EVENT_TEXT_INPUT:
@@ -183,14 +213,14 @@ void GUI::render()
 
 bool GUI::queue_event(const SDL_Event* event)
 {
-	if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_INSERT)
-		is_open = !is_open;
-
 	if (event->type < SDL_EVENT_KEY_DOWN || event->type > SDL_EVENT_DROP_POSITION)
 		return false; // These kinds of events should probably not be swallowed
 
 	if (event->type == SDL_EVENT_USER)
 		return false; // The data in this thing is pretty much uncloneable. ImGui doesn't need it, I don't need it, don't save it.
+
+	if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_INSERT)
+		is_open = !is_open;
 
 	const std::lock_guard lock{ event_queue_mutex };
 	event_queue.emplace_back(*event);
@@ -200,16 +230,15 @@ bool GUI::queue_event(const SDL_Event* event)
 
 void GUI::flush_events()
 {
-	// std::vector<OwningSDLEvent> events;
+	std::vector<OwningSDLEvent> events;
 
-	// {
-	// 	// Move events into local variables and create new vector to reduce time spent in this lock.
-	const std::lock_guard<std::mutex> lock{ event_queue_mutex };
-	// 	std::swap(events, event_queue);
-	// }
+	{
+		// Move events into local variables and create new vector to reduce time spent in this lock.
+		const std::lock_guard<std::mutex> lock{ event_queue_mutex };
+		std::swap(events, event_queue);
+	}
 
-	std::erase_if(event_queue, [](const OwningSDLEvent& event) {
+	for (const OwningSDLEvent& event : events) {
 		ImGui_ImplSDL3_ProcessEvent(event.get_event());
-		return true;
-	});
+	}
 }
