@@ -1,15 +1,15 @@
 #pragma once
 
-#include "SDL3/SDL_video.h"
 #include "imgui.h"
+#include "imgui_internal.h"
+
+#include <memory>
 #include <mutex>
-#include <SDL3/SDL.h>
-#include <vector>
 
 namespace GraphicsHook {
 	inline std::mutex espMutex;
-	inline ImDrawList* espDrawList;
-	inline ImDrawListSharedData* espDrawListSharedData;
+	inline std::unique_ptr<ImDrawList> espDrawList;
+	inline std::unique_ptr<ImDrawListSharedData> espDrawListSharedData;
 
 	bool hookSDL();
 	bool hookVulkan();
