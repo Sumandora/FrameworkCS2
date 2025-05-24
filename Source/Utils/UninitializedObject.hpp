@@ -9,7 +9,7 @@ class UninitializedObject {
 
 public:
 	template<typename... Args>
-	T* emplace(Args... args) {
+	T* emplace(Args&&... args) {
 		T* inner = new (&storage) T{std::forward<Args>(args)...};
 		return inner;
 	}

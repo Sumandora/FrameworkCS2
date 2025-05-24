@@ -24,6 +24,7 @@
 #include "../../GUI/GUI.hpp"
 
 #include "../../Utils/Logging.hpp"
+#include "../../Utils/UninitializedObject.hpp"
 
 static constexpr uint32_t g_MinImageCount = 2;
 
@@ -415,7 +416,7 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 using Hook = DetourHooking::Hook<true, decltype(Memory::mem_mgr)>;
 
 using AcquireNextImageKHRFunc = VkResult (*)(VkDevice, VkSwapchainKHR, uint64_t, VkSemaphore, VkFence, uint32_t*);
-static std::unique_ptr<Hook> acquireNextImageKHRHook;
+static UninitializedObject<Hook> acquireNextImageKHRHook;
 
 static VkResult VKAPI_CALL hkAcquireNextImageKHR(VkDevice device, VkSwapchainKHR swapchain, uint64_t timeout, VkSemaphore semaphore, VkFence fence, uint32_t* pImageIndex)
 {
@@ -425,7 +426,7 @@ static VkResult VKAPI_CALL hkAcquireNextImageKHR(VkDevice device, VkSwapchainKHR
 }
 
 using QueuePresentKHRFunc = VkResult (*)(VkQueue, const VkPresentInfoKHR*);
-static std::unique_ptr<Hook> queuePresentKHRHook;
+static UninitializedObject<Hook> queuePresentKHRHook;
 
 static VkResult VKAPI_CALL hkQueuePresentKHR(VkQueue queue, const VkPresentInfoKHR* pPresentInfo)
 {
@@ -435,7 +436,7 @@ static VkResult VKAPI_CALL hkQueuePresentKHR(VkQueue queue, const VkPresentInfoK
 }
 
 using CreateSwapchainKHRFunc = VkResult (*)(VkDevice, const VkSwapchainCreateInfoKHR*, const VkAllocationCallbacks*, VkSwapchainKHR*);
-static std::unique_ptr<Hook> createSwapchainKHRHook;
+static UninitializedObject<Hook> createSwapchainKHRHook;
 
 static VkResult VKAPI_CALL hkCreateSwapchainKHR(VkDevice device, const VkSwapchainCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSwapchainKHR* pSwapchain)
 {
@@ -470,9 +471,9 @@ bool GraphicsHook::hookVulkan()
 		return ptr.value() - cPointer;
 	};
 
-	acquireNextImageKHRHook = std::make_unique<Hook>(Memory::emalloc, reinterpret_cast<void*>(acquireNextImageKHR), reinterpret_cast<void*>(hkAcquireNextImageKHR), hookLength(acquireNextImageKHR));
-	queuePresentKHRHook = std::make_unique<Hook>(Memory::emalloc, reinterpret_cast<void*>(queuePresentKHR), reinterpret_cast<void*>(hkQueuePresentKHR), hookLength(queuePresentKHR));
-	createSwapchainKHRHook = std::make_unique<Hook>(Memory::emalloc, reinterpret_cast<void*>(createSwapchainKHR), reinterpret_cast<void*>(hkCreateSwapchainKHR), hookLength(createSwapchainKHR));
+	acquireNextImageKHRHook.emplace(Memory::emalloc, reinterpret_cast<void*>(acquireNextImageKHR), reinterpret_cast<void*>(hkAcquireNextImageKHR), hookLength(acquireNextImageKHR));
+	queuePresentKHRHook.emplace(Memory::emalloc, reinterpret_cast<void*>(queuePresentKHR), reinterpret_cast<void*>(hkQueuePresentKHR), hookLength(queuePresentKHR));
+	createSwapchainKHRHook.emplace(Memory::emalloc, reinterpret_cast<void*>(createSwapchainKHR), reinterpret_cast<void*>(hkCreateSwapchainKHR), hookLength(createSwapchainKHR));
 
 	acquireNextImageKHRHook->enable();
 	queuePresentKHRHook->enable();
@@ -484,9 +485,9 @@ bool GraphicsHook::hookVulkan()
 void GraphicsHook::unhookVulkan()
 {
 	// Destroy hooks
-	acquireNextImageKHRHook = nullptr;
-	queuePresentKHRHook = nullptr;
-	createSwapchainKHRHook = nullptr;
+	acquireNextImageKHRHook.reset();
+	queuePresentKHRHook.reset();
+	createSwapchainKHRHook.reset();
 
 	const ImGuiIO& io = ImGui::GetIO();
 

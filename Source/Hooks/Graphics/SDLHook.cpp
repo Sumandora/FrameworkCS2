@@ -1,9 +1,10 @@
-#include "BCRL/SearchConstraints.hpp"
 #include "GraphicsHook.hpp"
 
 #include "../../GUI/GUI.hpp"
 #include "../../Memory.hpp"
+#include "../../Utils/UninitializedObject.hpp"
 
+#include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
 
 #include "RetAddrSpoofer.hpp"
@@ -13,6 +14,7 @@
 
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
+
 #include "backends/imgui_impl_sdl3.h"
 #include "imgui.h"
 
@@ -41,7 +43,7 @@ using SDL_PeepEventsInternal = int (*)(
 	bool include_sentinel);
 // NOLINTEND(readability-identifier-naming)
 
-static std::unique_ptr<Hooks::Game::GameHook> hook;
+static UninitializedObject<Hooks::Game::GameHook> hook;
 
 static int peep_events_hook(
 	// NOLINTBEGIN(readability-identifier-naming)
@@ -97,13 +99,13 @@ bool GraphicsHook::hookSDL()
 										 .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"41 57 41 89 f7">())
 										 .expect<void*>("Failed to find backend function pointer for SDL_PeepEventsInternal");
 
-	hook = std::make_unique<Hooks::Game::GameHook>(peep_events_internal_ptr, reinterpret_cast<void*>(peep_events_hook));
+	hook.emplace(peep_events_internal_ptr, reinterpret_cast<void*>(peep_events_hook));
 	return true;
 }
 
 void GraphicsHook::unhookSDL()
 {
-	hook = nullptr;
+	hook.reset();
 
 	const ImGuiIO& io = ImGui::GetIO();
 
