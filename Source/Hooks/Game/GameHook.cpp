@@ -15,14 +15,14 @@ namespace Hooks::Game {
 	void create()
 	{
 		FrameStageNotify::hook.emplace(BCRL::pointer_array(Memory::mem_mgr, Interfaces::source2Client, 36).expect<void*>("Couldn't find FrameStageNotify"), reinterpret_cast<void*>(FrameStageNotify::hookFunc));
-		ShouldShowCrosshair::hook = std::make_unique<GameHook>(Memory::shouldShowCrosshair, reinterpret_cast<void*>(ShouldShowCrosshair::hookFunc));
-		FireEvent::hook = std::make_unique<GameHook>(Memory::fireEvent, reinterpret_cast<void*>(FireEvent::hookFunc));
+		ShouldShowCrosshair::hook.emplace(Memory::shouldShowCrosshair, reinterpret_cast<void*>(ShouldShowCrosshair::hookFunc));
+		FireEvent::hook.emplace(Memory::fireEvent, reinterpret_cast<void*>(FireEvent::hookFunc));
 	}
 
 	void destroy()
 	{
-		FireEvent::hook = nullptr;
-		ShouldShowCrosshair::hook = nullptr;
+		FireEvent::hook.reset();
+		ShouldShowCrosshair::hook.reset();
 		FrameStageNotify::hook.reset();
 	}
 

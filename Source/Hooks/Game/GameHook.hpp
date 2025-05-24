@@ -31,12 +31,12 @@ namespace Hooks::Game {
 	}
 
 	namespace ShouldShowCrosshair {
-		inline std::unique_ptr<GameHook> hook;
+		inline UninitializedObject<GameHook> hook;
 		bool hookFunc([[maybe_unused]] void* weapon);
 	}
 
 	namespace FireEvent {
-		inline std::unique_ptr<GameHook> hook;
+		inline UninitializedObject<GameHook> hook;
 		void* hookFunc([[maybe_unused]] void* gameEventManager, GameEvent* event, [[maybe_unused]] bool rdx, [[maybe_unused]] bool rcx);
 	}
 }
