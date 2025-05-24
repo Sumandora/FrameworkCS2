@@ -88,9 +88,9 @@ static void CreateDevice()
 		vkEnumeratePhysicalDevices(g_Instance, &gpu_count, nullptr);
 		IM_ASSERT(gpu_count > 0);
 
-		auto* gpus = new VkPhysicalDevice[sizeof(VkPhysicalDevice) * gpu_count];
-		vkEnumeratePhysicalDevices(g_Instance, &gpu_count, gpus);
-
+		std::unique_ptr<VkPhysicalDevice[]> gpus = std::make_unique<VkPhysicalDevice[]>(gpu_count);
+		vkEnumeratePhysicalDevices(g_Instance, &gpu_count, gpus.get());
+		
 		// If a number >1 of GPUs got reported, find discrete GPU if present, or
 		// use first one available. This covers most common cases
 		// (multi-gpu/integrated+dedicated graphics). Handling more complicated
@@ -106,7 +106,6 @@ static void CreateDevice()
 		}
 
 		g_PhysicalDevice = gpus[use_gpu];
-		delete[] gpus;
 	}
 
 	// Select graphics queue family
