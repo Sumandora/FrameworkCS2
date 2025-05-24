@@ -229,6 +229,12 @@ void GUI::Construction::render()
 	drawLocalPlayer();
 	drawEventList();
 
-	Features::ESP::imguiRender();
+	for(auto& feature : Features::features) {
+		if(ImGui::Begin(feature->get_name().c_str())) {
+			feature->render();
+		}
+		ImGui::End();
+	}
+
 	Features::ForceCrosshair::imguiRender();
 }

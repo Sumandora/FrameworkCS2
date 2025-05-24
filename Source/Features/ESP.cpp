@@ -1,3 +1,4 @@
+#include "Feature.hpp"
 #include "Features.hpp"
 
 #include <limits>
@@ -12,9 +13,14 @@
 #include "../SDK/GameClass/GameSceneNode.hpp"
 #include "../Utils/Projection.hpp"
 
-void Features::ESP::drawEsp(ImDrawList* drawList)
+ESP::ESP()
+	: Feature("ESP")
 {
-	if (!Features::ESP::enabled)
+}
+
+void ESP::draw(ImDrawList* drawList)
+{
+	if (!enabled.get())
 		return;
 	int highest = GameEntitySystem::the()->getHighestEntityIndex();
 	if (highest > -1)
@@ -76,12 +82,4 @@ void Features::ESP::drawEsp(ImDrawList* drawList)
 			drawList->AddRect(ImVec2{ rectangle[0], rectangle[1] }, ImVec2{ rectangle[2], rectangle[3] }, ImColor(255, 255, 255, 255), 2.0f, 0, 5.0f);
 		next_ent:;
 		}
-}
-
-void Features::ESP::imguiRender()
-{
-	if (ImGui::Begin("ESP")) {
-		ImGui::Checkbox("Enabled", &enabled);
-	}
-	ImGui::End();
 }

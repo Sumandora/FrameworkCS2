@@ -2,13 +2,37 @@
 
 #include "imgui.h"
 
-namespace Features {
-	namespace ESP {
-		inline bool enabled = false;
+#include <array>
+#include <memory>
+#include <tuple>
+#include <vector>
 
-		void drawEsp(ImDrawList* drawList);
-		void imguiRender();
-	}
+#include "Feature.hpp"
+#include "Setting.hpp"
+
+#include "../Utils/UninitializedObject.hpp"
+
+class ESP : public Feature {
+	Checkbox enabled = make_checkbox("Enabled");
+
+public:
+	ESP();
+
+	void draw(ImDrawList* draw_list);
+};
+
+namespace Features {
+	inline UninitializedObject<ESP> esp;
+
+	inline std::array features{
+		static_cast<Feature*>(esp.get()),
+	};
+
+	void create();
+	void destroy();
+}
+
+namespace Features {
 	namespace ForceCrosshair {
 		inline bool enabled = false;
 

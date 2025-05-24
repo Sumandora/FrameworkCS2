@@ -1,5 +1,6 @@
 #include <thread>
 
+#include "Features/Features.hpp"
 #include "GUI/GUI.hpp"
 #include "Interfaces.hpp"
 
@@ -15,11 +16,9 @@ static void initializer()
 	Memory::mem_mgr.sync_layout();
 
 	GUI::init();
-
 	Interfaces::get_interfaces();
-
 	Memory::Create();
-
+	Features::create();
 	Hooks::create();
 }
 
@@ -35,5 +34,6 @@ static int __attribute((constructor)) startup()
 static void __attribute((destructor)) shutdown()
 {
 	Hooks::destroy();
+	Features::destroy();
 	GUI::destroy();
 }
