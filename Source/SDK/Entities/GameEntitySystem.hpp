@@ -6,11 +6,21 @@
 #include "BaseEntity.hpp"
 
 struct GameEntitySystem { // TODO Reorganize the entire structure of this
-	inline int getHighestEntityIndex() {
-		return RetAddrSpoofer::invoke<int, void*>(Memory::EntitySystem::getHighestEntityIndex, this);
+private:
+	static void* get_highest_entity_index_ptr;
+	static void* get_base_entity_ptr;
+
+	static GameEntitySystem** find();
+public:
+	static GameEntitySystem* the();
+
+	int getHighestEntityIndex()
+	{
+		return RetAddrSpoofer::invoke<int, void*>(get_highest_entity_index_ptr, this);
 	}
 
-	inline BaseEntity* getBaseEntity(int index) {
-		return RetAddrSpoofer::invoke<BaseEntity*, void*, int>(Memory::EntitySystem::getBaseEntity, this, index);
+	BaseEntity* getBaseEntity(int index)
+	{
+		return RetAddrSpoofer::invoke<BaseEntity*, void*, int>(get_base_entity_ptr, this, index);
 	}
 };

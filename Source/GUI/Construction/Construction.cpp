@@ -34,7 +34,7 @@ void drawViewMatrix()
 
 void drawEntityList()
 {
-	int highest = (*Memory::EntitySystem::gameEntitySystem)->getHighestEntityIndex();
+	int highest = GameEntitySystem::the()->getHighestEntityIndex();
 	if (ImGui::Begin("Entities")) {
 		ImGui::Text("%d entities", highest);
 		static bool onlyPlayers = false;
@@ -42,7 +42,7 @@ void drawEntityList()
 		if (highest > -1)
 			if (ImGui::BeginTable("Entity List", 4, ImGuiTableFlags_SizingStretchProp)) {
 				for (int i = 0; i <= highest; i++) {
-					BaseEntity* entity = (*Memory::EntitySystem::gameEntitySystem)->getBaseEntity(i);
+					BaseEntity* entity = GameEntitySystem::the()->getBaseEntity(i);
 					if (entity == nullptr) {
 						if (!onlyPlayers) {
 							ImGui::TableNextColumn();

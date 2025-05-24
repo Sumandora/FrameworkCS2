@@ -11,29 +11,7 @@
 #include "SignatureScanner/XRefSignature.hpp"
 #include "Utils/Logging.hpp"
 
-#include <cstdint>
-
 const void* RetAddrSpoofer::leaveRet;
-
-static void FindEntitySystem()
-{
-	// To the valve employee, who wrote this function: Kuss auf Nuss!
-	auto /*CPrediction::*/ reinitPredictables = BCRL::signature(Memory::mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"CL:  reinitialized %i predictable entities\n">(), BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
-													.find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-													.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 83 ec ? 4c 8d 35">())
-													.add(7);
-
-	Logging::info("ReinitPredictables at: {}", reinitPredictables.expect("Can't find ReinitPredictables"));
-
-	Memory::EntitySystem::gameEntitySystem = reinitPredictables.clone().relative_to_absolute().expect<GameEntitySystem**>("Couldn't find GameEntitySystem");
-	Logging::info("Found GameEntitySystem at: {}", Memory::EntitySystem::gameEntitySystem);
-	reinitPredictables = reinitPredictables.add(4).next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"49 8b 3e e8">()).add(4);
-	Memory::EntitySystem::getHighestEntityIndex = reinitPredictables.clone().relative_to_absolute().expect<void*>("Couldn't find getHighestEntityIndex");
-	Logging::info("Found getHighestEntityIndex at: {}", Memory::EntitySystem::getHighestEntityIndex);
-	reinitPredictables = reinitPredictables.add(4).next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"3e 44 89 fe e8">()).add(5);
-	Memory::EntitySystem::getBaseEntity = reinitPredictables.clone().relative_to_absolute().expect<void*>("Couldn't find getBaseEntity");
-	Logging::info("Found getBaseEntity at: {}", Memory::EntitySystem::getBaseEntity);
-}
 
 void Memory::Create()
 {
@@ -80,7 +58,8 @@ void Memory::Create()
 
 	Logging::info("Found WorldToProjection matrix at: {}", worldToProjectionMatrix);
 
-	FindEntitySystem();
+	// Make classes run their searches
+	GameEntitySystem::the();
 
 	shouldShowCrosshair = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"weapon_reticle_knife_show">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
 							  .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
@@ -105,9 +84,7 @@ void Memory::Create()
 						 .repeater([](auto& ptr) {
 							 ptr.next_instruction();
 							 static int i = 0;
-							 if (ptr.does_match(
-									 SignatureScanner::PatternSignature::for_array_of_bytes<
-										 "e8">()))
+							 if (ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()))
 								 i++;
 							 return i != 2;
 						 })

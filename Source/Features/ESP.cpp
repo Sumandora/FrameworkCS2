@@ -16,10 +16,10 @@ void Features::ESP::drawEsp(ImDrawList* drawList)
 {
 	if (!Features::ESP::enabled)
 		return;
-	int highest = (*Memory::EntitySystem::gameEntitySystem)->getHighestEntityIndex();
+	int highest = GameEntitySystem::the()->getHighestEntityIndex();
 	if (highest > -1)
 		for (int i = 0; i <= highest; i++) {
-			BaseEntity* entity = (*Memory::EntitySystem::gameEntitySystem)->getBaseEntity(i);
+			BaseEntity* entity = GameEntitySystem::the()->getBaseEntity(i);
 			if (entity == nullptr)
 				continue;
 			auto schemaType = entity->getSchemaType();
