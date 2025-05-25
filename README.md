@@ -1,4 +1,4 @@
-# l8r
+# FrameworkCS2
 A fully-featured training software for Counter Strike: 2, made for Linux
 ### WARNING: This program is being detected by Valve. Usage on official, custom, or private servers will most likely result in punishment from Valve!
 ## Installation
@@ -32,7 +32,7 @@ These might be outdated, in that case please open an issue or a pull request, wh
 
 ### Download
 ```sh
-git clone https://github.com/Sumandora/l8r.git
+git clone https://github.com/Sumandora/FrameworkCS2.git
 ```
 
 The build script can be used to build the program.
