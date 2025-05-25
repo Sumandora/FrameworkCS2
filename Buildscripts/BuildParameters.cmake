@@ -2,7 +2,7 @@
 target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE "-march=native")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE "-Wall" "-ggdb" "-DDEBUG")
+    target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-ggdb" "-DDEBUG")
 else()
     target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE "-Os")
     set(CMAKE_CXX_FLAGS "-D'IM_ASSERT(_EXPR)=((void)(_EXPR))' ${CMAKE_CXX_FLAGS}") # TODO Can you do this without set?
