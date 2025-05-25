@@ -1,6 +1,11 @@
 # FrameworkCS2
-A fully-featured training software for Counter Strike: 2, made for Linux
+A fully-featured training software for Counter Strike: 2, made for Linux.
+
+> [!IMPORTANT]  
+> This project is very much a WIP, don't expect too much from it right now.
+
 ### WARNING: This program is being detected by Valve. Usage on official, custom, or private servers will most likely result in punishment from Valve!
+
 ## Installation
 ### Dependencies
 <details>
