@@ -14,11 +14,11 @@ public:
 		return inner;
 	}
 
-	T* get(this auto&& self) {
+	T* get(this auto&& self) noexcept {
 		return reinterpret_cast<T*>(&self.storage);
 	}
 
-	T* operator->(this auto&& self) {
+	T* operator->(this auto&& self) noexcept {
 		return self.get();
 	}
 

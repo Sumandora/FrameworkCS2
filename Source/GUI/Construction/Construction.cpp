@@ -235,6 +235,4 @@ void GUI::Construction::render()
 		}
 		ImGui::End();
 	}
-
-	Features::ForceCrosshair::imguiRender();
 }
