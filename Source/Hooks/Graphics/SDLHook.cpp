@@ -23,7 +23,7 @@
 #include <memory>
 #include <vector>
 
-#include "../Game/GameHook.hpp"
+#include "../Hooks.hpp"
 
 // int SDL_PeepEventsInternal(
 // 		SDL_Event *events,
@@ -43,7 +43,7 @@ using SDL_PeepEventsInternal = int (*)(
 	bool include_sentinel);
 // NOLINTEND(readability-identifier-naming)
 
-static UninitializedObject<Hooks::Game::GameHook> hook;
+static UninitializedObject<Hooks::DetourHook<true>> hook;
 
 static int peep_events_hook(
 	// NOLINTBEGIN(readability-identifier-naming)
@@ -86,10 +86,10 @@ static int peep_events_hook(
 		}
 
 		return RetAddrSpoofer::invoke<int, SDL_Event*, int, SDL_EventAction, Uint32, Uint32, bool>(
-			hook->get_proxy(), filtered_events.data(), static_cast<int>(filtered_events.size()), action, minType, maxType, include_sentinel);
+			reinterpret_cast<void*>(hook->get_trampoline()), filtered_events.data(), static_cast<int>(filtered_events.size()), action, minType, maxType, include_sentinel);
 	}
 	return RetAddrSpoofer::invoke<int, SDL_Event*, int, SDL_EventAction, Uint32, Uint32, bool>(
-		hook->get_proxy(), events, numevents, action, minType, maxType, include_sentinel);
+		reinterpret_cast<void*>(hook->get_trampoline()), events, numevents, action, minType, maxType, include_sentinel);
 }
 
 bool GraphicsHook::hookSDL()
@@ -99,7 +99,9 @@ bool GraphicsHook::hookSDL()
 										 .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"41 57 41 89 f7">())
 										 .expect<void*>("Failed to find backend function pointer for SDL_PeepEventsInternal");
 
-	hook.emplace(peep_events_internal_ptr, reinterpret_cast<void*>(peep_events_hook));
+	hook.emplace(Memory::emalloc, peep_events_internal_ptr, reinterpret_cast<void*>(peep_events_hook));
+
+	hook->enable();
 	return true;
 }
 

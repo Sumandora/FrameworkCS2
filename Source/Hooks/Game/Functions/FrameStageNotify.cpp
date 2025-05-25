@@ -37,5 +37,5 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		break;
 	}
 
-	RetAddrSpoofer::invoke<void>(hook->get_proxy(), thisptr, stage);
+	RetAddrSpoofer::invoke<void>(reinterpret_cast<void*>(hook->get_trampoline()), thisptr, stage);
 }

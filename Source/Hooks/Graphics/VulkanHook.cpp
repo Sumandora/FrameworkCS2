@@ -26,6 +26,8 @@
 #include "../../Utils/Logging.hpp"
 #include "../../Utils/UninitializedObject.hpp"
 
+#include "../Hooks.hpp"
+
 static constexpr uint32_t g_MinImageCount = 2;
 
 static VkAllocationCallbacks* g_Allocator = nullptr;
@@ -90,7 +92,7 @@ static void CreateDevice()
 
 		std::unique_ptr<VkPhysicalDevice[]> gpus = std::make_unique<VkPhysicalDevice[]>(gpu_count);
 		vkEnumeratePhysicalDevices(g_Instance, &gpu_count, gpus.get());
-		
+
 		// If a number >1 of GPUs got reported, find discrete GPU if present, or
 		// use first one available. This covers most common cases
 		// (multi-gpu/integrated+dedicated graphics). Handling more complicated
@@ -412,10 +414,8 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 	}
 }
 
-using Hook = DetourHooking::Hook<true, decltype(Memory::mem_mgr)>;
-
 using AcquireNextImageKHRFunc = VkResult (*)(VkDevice, VkSwapchainKHR, uint64_t, VkSemaphore, VkFence, uint32_t*);
-static UninitializedObject<Hook> acquireNextImageKHRHook;
+static UninitializedObject<Hooks::DetourHook<true>> acquireNextImageKHRHook;
 
 static VkResult VKAPI_CALL hkAcquireNextImageKHR(VkDevice device, VkSwapchainKHR swapchain, uint64_t timeout, VkSemaphore semaphore, VkFence fence, uint32_t* pImageIndex)
 {
@@ -425,7 +425,7 @@ static VkResult VKAPI_CALL hkAcquireNextImageKHR(VkDevice device, VkSwapchainKHR
 }
 
 using QueuePresentKHRFunc = VkResult (*)(VkQueue, const VkPresentInfoKHR*);
-static UninitializedObject<Hook> queuePresentKHRHook;
+static UninitializedObject<Hooks::DetourHook<true>> queuePresentKHRHook;
 
 static VkResult VKAPI_CALL hkQueuePresentKHR(VkQueue queue, const VkPresentInfoKHR* pPresentInfo)
 {
@@ -435,7 +435,7 @@ static VkResult VKAPI_CALL hkQueuePresentKHR(VkQueue queue, const VkPresentInfoK
 }
 
 using CreateSwapchainKHRFunc = VkResult (*)(VkDevice, const VkSwapchainCreateInfoKHR*, const VkAllocationCallbacks*, VkSwapchainKHR*);
-static UninitializedObject<Hook> createSwapchainKHRHook;
+static UninitializedObject<Hooks::DetourHook<true>> createSwapchainKHRHook;
 
 static VkResult VKAPI_CALL hkCreateSwapchainKHR(VkDevice device, const VkSwapchainCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSwapchainKHR* pSwapchain)
 {
@@ -459,20 +459,9 @@ bool GraphicsHook::hookVulkan()
 
 	vkDestroyDevice(g_FakeDevice, g_Allocator);
 
-	auto hookLength = [](auto* start) {
-		std::uintptr_t cPointer = reinterpret_cast<std::uintptr_t>(start);
-		auto ptr = BCRL::pointer(Memory::mem_mgr, cPointer).repeater([cPointer](auto& safePointer) {
-															   safePointer = safePointer.next_instruction();
-															   return safePointer.get_pointer() - cPointer < DetourHooking::MIN_LENGTH;
-														   })
-					   .finalize();
-
-		return ptr.value() - cPointer;
-	};
-
-	acquireNextImageKHRHook.emplace(Memory::emalloc, reinterpret_cast<void*>(acquireNextImageKHR), reinterpret_cast<void*>(hkAcquireNextImageKHR), hookLength(acquireNextImageKHR));
-	queuePresentKHRHook.emplace(Memory::emalloc, reinterpret_cast<void*>(queuePresentKHR), reinterpret_cast<void*>(hkQueuePresentKHR), hookLength(queuePresentKHR));
-	createSwapchainKHRHook.emplace(Memory::emalloc, reinterpret_cast<void*>(createSwapchainKHR), reinterpret_cast<void*>(hkCreateSwapchainKHR), hookLength(createSwapchainKHR));
+	acquireNextImageKHRHook.emplace(Memory::emalloc, reinterpret_cast<void*>(acquireNextImageKHR), reinterpret_cast<void*>(hkAcquireNextImageKHR));
+	queuePresentKHRHook.emplace(Memory::emalloc, reinterpret_cast<void*>(queuePresentKHR), reinterpret_cast<void*>(hkQueuePresentKHR));
+	createSwapchainKHRHook.emplace(Memory::emalloc, reinterpret_cast<void*>(createSwapchainKHR), reinterpret_cast<void*>(hkCreateSwapchainKHR));
 
 	acquireNextImageKHRHook->enable();
 	queuePresentKHRHook->enable();

@@ -1,12 +1,9 @@
 #pragma once
 
-#include "../../Memory.hpp"
-
 #include "../../SDK/GameClass/ClientFrameStage.hpp"
 
-#include "DetourHooking.hpp"
-
 #include "../../Utils/UninitializedObject.hpp"
+#include "../Hooks.hpp"
 
 struct GameEvent;
 
@@ -14,29 +11,18 @@ namespace Hooks::Game {
 	void create();
 	void destroy();
 
-	class GameHook {
-		DetourHooking::Hook<true, decltype(Memory::mem_mgr)> backingHook;
-
-	public:
-		GameHook() = delete;
-		GameHook(void* original, void* hook);
-		~GameHook();
-
-		[[nodiscard]] void* get_proxy() const noexcept;
-	};
-
 	namespace FrameStageNotify {
-		inline UninitializedObject<GameHook> hook;
+		inline UninitializedObject<DetourHook<true>> hook;
 		void hookFunc([[maybe_unused]] void* thisptr, ClientFrameStage stage);
 	}
 
 	namespace ShouldShowCrosshair {
-		inline UninitializedObject<GameHook> hook;
+		inline UninitializedObject<DetourHook<true>> hook;
 		bool hookFunc([[maybe_unused]] void* weapon);
 	}
 
 	namespace FireEvent {
-		inline UninitializedObject<GameHook> hook;
+		inline UninitializedObject<DetourHook<true>> hook;
 		void* hookFunc([[maybe_unused]] void* gameEventManager, GameEvent* event, [[maybe_unused]] bool rdx, [[maybe_unused]] bool rcx);
 	}
 }
