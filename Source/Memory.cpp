@@ -13,7 +13,7 @@
 
 const void* RetAddrSpoofer::leaveRet;
 
-void Memory::Create()
+void Memory::create()
 {
 	// Set the address for the return address spoofer
 	RetAddrSpoofer::leaveRet = BCRL::pointer_array(mem_mgr, Interfaces::source2Client, 0) // random code piece

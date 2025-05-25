@@ -26,5 +26,5 @@ namespace Memory {
 	inline MemoryManager::LinuxMemoryManager<false, true, true> mem_mgr;
 	inline ExecutableMalloc::MemoryManagerAllocator emalloc{mem_mgr};
 
-	void Create();
+	void create();
 }
