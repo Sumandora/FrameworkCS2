@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include "Construction/Construction.hpp"
+#include "Tabs/Tabs.hpp"
 
 class OwningSDLEvent {
 	SDL_Event event;
@@ -205,8 +205,11 @@ void GUI::render()
 
 	ImGui::NewFrame();
 
-	if (is_open)
-		Construction::render();
+	if (is_open) {
+		Tabs::render();
+
+		ImGui::ShowDemoWindow();
+	}
 
 	ImGui::Render();
 }
