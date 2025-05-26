@@ -1,6 +1,8 @@
 #pragma once
 
-#include <array>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "Feature.hpp"
 #include "Setting.hpp"
@@ -14,10 +16,7 @@ namespace Features {
 	inline UninitializedObject<ESP> esp;
 	inline UninitializedObject<ForceCrosshair> force_crosshair;
 
-	inline std::array features{
-		static_cast<Feature*>(esp.get()),
-		static_cast<Feature*>(force_crosshair.get()),
-	};
+	inline std::vector<std::pair<std::string /*category*/, std::vector<Feature*>>> features;
 
 	void create();
 	void destroy();

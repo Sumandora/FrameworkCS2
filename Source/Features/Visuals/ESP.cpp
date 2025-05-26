@@ -14,7 +14,7 @@
 #include "imgui.h"
 
 ESP::ESP()
-	: Feature("ESP")
+	: Feature("Visuals", "ESP")
 {
 }
 

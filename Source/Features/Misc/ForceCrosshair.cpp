@@ -6,7 +6,7 @@
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
 
 ForceCrosshair::ForceCrosshair()
-	: Feature("Force crosshair")
+	: Feature("Visuals", "Force crosshair")
 {
 }
 
