@@ -5,6 +5,10 @@
 #include "../../Utils/UninitializedObject.hpp"
 #include "../Hooks.hpp"
 
+#include <cstddef>
+#include <string>
+#include <unordered_map>
+
 struct GameEvent;
 
 namespace Hooks::Game {
@@ -24,5 +28,7 @@ namespace Hooks::Game {
 	namespace FireEvent {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void* hookFunc([[maybe_unused]] void* gameEventManager, GameEvent* event, [[maybe_unused]] bool rdx, [[maybe_unused]] bool rcx);
+
+		inline std::unordered_map<std::string, std::size_t> event_counters;
 	}
 }
