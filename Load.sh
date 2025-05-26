@@ -27,11 +27,7 @@ gdb -p "$cs2_pid" -n -q -batch \
     -ex "detach" \
     -ex "quit" 2>&1 || {
 	echo "A error has appeared"
-	echo "$DEBUGGER has failed to dlopen the library"
-
-	if [ $DEBUGGER != "gdb" ]; then
-		echo "- Make sure that $DEBUGGER supports the same usage as GDB"
-	fi
+	echo "gdb has failed to dlopen the library"
 }
 
 # You have to restart your kernel to reinject btw ^^
