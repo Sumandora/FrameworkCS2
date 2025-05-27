@@ -6,14 +6,22 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
-class Feature;
+class Setting;
+
+class SettingsHolder {
+protected:
+	std::vector<Setting*> settings;
+
+	friend Setting;
+};
 
 class Setting {
 	std::string name;
 
 public:
-	explicit Setting(Feature* parent, std::string name);
+	explicit Setting(SettingsHolder* parent, std::string name);
 	virtual ~Setting() = default;
 
 	const std::string& get_name() { return name; }
@@ -36,7 +44,7 @@ class Checkbox : public Setting {
 	bool value{};
 
 public:
-	Checkbox(Feature* parent, std::string name)
+	Checkbox(SettingsHolder* parent, std::string name)
 		: Setting(parent, std::move(name))
 	{
 	}
@@ -57,4 +65,46 @@ public:
 	{
 		value = input_json;
 	}
+};
+
+class Subgroup : public Setting, public SettingsHolder {
+public:
+	Subgroup(SettingsHolder* parent, std::string name)
+		: Setting(parent, std::move(name))
+	{
+	}
+
+	void render() override
+	{
+		static const std::string POPUP_LABEL = get_name() + "##Popup";
+
+		ImGui::Text("%s", get_name().c_str());
+
+		ImGui::SameLine();
+		
+		if (ImGui::Button("..."))
+			ImGui::OpenPopup(POPUP_LABEL.c_str());
+
+		if (ImGui::BeginPopup(POPUP_LABEL.c_str())) {
+			for (Setting* setting : settings)
+				setting->render();
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void serialize(nlohmann::json& output_json) const override
+	{
+		for (Setting* setting : settings)
+			setting->serialize(output_json[setting->get_name()]);
+	}
+
+	void deserialize(const nlohmann::json& input_json) override
+	{
+		for (Setting* setting : settings)
+			setting->deserialize(input_json[setting->get_name()]);
+	}
+
+	// NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+	operator SettingsHolder*() { return this; }
 };

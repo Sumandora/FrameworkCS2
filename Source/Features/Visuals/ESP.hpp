@@ -6,11 +6,12 @@
 #include "imgui.h"
 
 class ESP : public Feature {
-	Checkbox enabled = make_checkbox("Enabled");
+	Checkbox enabled{ this, "Enabled" };
+	Subgroup lotto{ this, "Lotto" };
+	Checkbox another_check{ lotto, "Another check" };
 
 public:
 	ESP();
 
 	void draw(ImDrawList* draw_list);
 };
-

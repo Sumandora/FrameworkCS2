@@ -4,11 +4,10 @@
 #include "../Setting.hpp"
 
 class ForceCrosshair : public Feature {
-	Checkbox enabled = make_checkbox("Enabled");
+	Checkbox enabled{ this, "Enabled" };
 
 public:
 	ForceCrosshair();
 
 	[[nodiscard]] bool should_force() const;
 };
-

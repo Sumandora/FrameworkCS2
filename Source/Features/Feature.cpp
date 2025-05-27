@@ -23,11 +23,6 @@ Feature::Feature(std::string category, std::string name)
 		it->second.emplace_back(this);
 }
 
-Checkbox Feature::make_checkbox(std::string name)
-{
-	return Checkbox{ this, std::move(name) };
-}
-
 void Feature::render()
 {
 	for (Setting* setting : settings)
