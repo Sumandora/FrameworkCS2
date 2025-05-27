@@ -163,6 +163,8 @@ static void create_font()
 
 	const float font_size = floorf(static_cast<float>(mode->h) * (1.0F / 90.0F));
 
+	Logging::info("Using font size {} for display {}x{}", font_size, mode->w, mode->h);
+
 	// Might not work on certain distros/configurations
 	bool loaded_font = false;
 
