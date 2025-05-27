@@ -102,16 +102,16 @@ public:
 
 	void render() override
 	{
-		static const std::string POPUP_LABEL = get_name() + "##Popup";
+		const std::string popup_label = get_name() + "##Popup";
 
 		ImGui::Text("%s", get_name().c_str());
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("..."))
-			ImGui::OpenPopup(POPUP_LABEL.c_str());
+			ImGui::OpenPopup(popup_label.c_str());
 
-		if (ImGui::BeginPopup(POPUP_LABEL.c_str())) {
+		if (ImGui::BeginPopup(popup_label.c_str())) {
 			for (Setting* setting : settings)
 				setting->render();
 
