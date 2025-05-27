@@ -4,6 +4,7 @@
 #include "nlohmann/json.hpp"
 #include "nlohmann/json_fwd.hpp"
 
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -67,6 +68,31 @@ public:
 	}
 };
 
+class Button : public Setting {
+	std::function<void()> action;
+
+public:
+	Button(SettingsHolder* parent, std::string name, std::function<void()> action)
+		: Setting(parent, std::move(name))
+		, action(std::move(action))
+	{
+	}
+
+	void render() override
+	{
+		if (ImGui::Button(get_name().c_str()))
+			action();
+	}
+
+	void serialize(nlohmann::json& /*output_json*/) const override
+	{
+	}
+
+	void deserialize(const nlohmann::json& /*input_json*/) override
+	{
+	}
+};
+
 class Subgroup : public Setting, public SettingsHolder {
 public:
 	Subgroup(SettingsHolder* parent, std::string name)
@@ -81,7 +107,7 @@ public:
 		ImGui::Text("%s", get_name().c_str());
 
 		ImGui::SameLine();
-		
+
 		if (ImGui::Button("..."))
 			ImGui::OpenPopup(POPUP_LABEL.c_str());
 
