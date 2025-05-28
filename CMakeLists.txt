@@ -27,6 +27,7 @@ include("Buildscripts/ImGUI.cmake")
 include("Buildscripts/SDL3.cmake")
 include("Buildscripts/DetourHooking.cmake")
 include("Buildscripts/NlohmannJson.cmake")
+include("Buildscripts/GenericESP.cmake")
 
 add_subdirectory("${MemoryManager_SOURCE_DIR}/Modules/Linux" "LinuxMemoryManager")
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE LinuxMemoryManager)
