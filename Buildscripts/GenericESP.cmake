@@ -1,4 +1,5 @@
 # Add GenericESP to the project
+set(IMGUI_DEPENDENCY_OVERRIDE imgui)
 FetchContent_Declare(GenericESP
         GIT_REPOSITORY https://github.com/Sumandora/GenericESP
         GIT_PROGRESS TRUE

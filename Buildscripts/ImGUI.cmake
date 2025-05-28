@@ -6,8 +6,6 @@ FetchContent_Declare(
 	GIT_TAG v1.91.7)
 FetchContent_MakeAvailable(imgui)
 
-add_library(imgui STATIC)
-
 file(GLOB IMGUI_SOURCE_FILES "${imgui_SOURCE_DIR}/*.cpp") # Base
 
 # Backends:
@@ -21,7 +19,7 @@ list(APPEND IMGUI_SOURCE_FILES "${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp") 
 # target_compile_definitions(imgui PUBLIC IMGUI_DISABLE_DEMO_WINDOWS)
 # target_compile_definitions(imgui PUBLIC IMGUI_DISABLE_DEBUG_TOOLS)
 
-target_sources(imgui PUBLIC ${IMGUI_SOURCE_FILES})
+add_library(imgui STATIC ${IMGUI_SOURCE_FILES})
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
 
 set_target_properties(imgui PROPERTIES LINKER_LANGUAGE CXX)
