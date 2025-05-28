@@ -6,4 +6,4 @@ FetchContent_Declare(
 	GIT_TAG v3.12.0)
 FetchContent_MakeAvailable(json)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC nlohmann_json)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE nlohmann_json)
