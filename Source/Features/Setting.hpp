@@ -68,6 +68,80 @@ public:
 	}
 };
 
+class FloatNumber : public Setting {
+	float value = 0.0F, min, max;
+
+public:
+	FloatNumber(SettingsHolder* parent, std::string name, float min, float max)
+		: Setting(parent, std::move(name))
+		, min(min)
+		, max(max)
+	{
+	}
+
+	[[nodiscard]] float get() const { return value; }
+
+	void render() override
+	{
+		ImGui::SliderFloat(get_name().c_str(), &value, min, max);
+	}
+
+	void serialize(nlohmann::json& output_json) const override
+	{
+		output_json = value;
+	}
+
+	void deserialize(const nlohmann::json& input_json) override
+	{
+		value = input_json;
+	}
+};
+
+class Color : public Setting {
+	ImColor value{ 1.0F, 1.0F, 1.0F, 1.0F };
+
+public:
+	Color(SettingsHolder* parent, std::string name)
+		: Setting(parent, std::move(name))
+	{
+	}
+
+	[[nodiscard]] ImColor get() const { return value; }
+
+	void render() override
+	{
+
+		const bool clicked = ImGui::ColorButton((get_name() + "##Button").c_str(), value, ImGuiColorEditFlags_None, ImVec2(0, 0));
+		ImGui::SameLine();
+		ImGui::Text("%s", get_name().c_str());
+
+		auto id = get_name() + "##Popup";
+		if (clicked)
+			ImGui::OpenPopup(id.c_str());
+
+		if (ImGui::BeginPopup(id.c_str())) {
+			float float_array[] = { value.Value.x, value.Value.y, value.Value.z, value.Value.w };
+			if (ImGui::ColorPicker4("##Picker", float_array, 0)) {
+				value.Value = ImVec4(float_array[0], float_array[1], float_array[2], float_array[3]);
+			}
+			ImGui::EndPopup();
+		}
+	}
+
+	void serialize(nlohmann::json& output_json) const override
+	{
+		output_json = { value.Value.x, value.Value.y, value.Value.z, value.Value.w };
+	}
+
+	void deserialize(const nlohmann::json& input_json) override
+	{
+		value.Value.x = input_json[0];
+		value.Value.y = input_json[1];
+		value.Value.z = input_json[2];
+		value.Value.w = input_json[3];
+	}
+};
+
 class Button : public Setting {
 	std::function<void()> action;
 
@@ -102,13 +176,12 @@ public:
 
 	void render() override
 	{
-		const std::string popup_label = get_name() + "##Popup";
-
 		ImGui::Text("%s", get_name().c_str());
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("..."))
+		const std::string popup_label = get_name() + "##Popup";
+		if (ImGui::Button(("...##" + get_name()).c_str()))
 			ImGui::OpenPopup(popup_label.c_str());
 
 		if (ImGui::BeginPopup(popup_label.c_str())) {
