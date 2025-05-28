@@ -11,6 +11,7 @@
 #include "../../SDK/GameClass/GameSceneNode.hpp"
 #include "../../Utils/Projection.hpp"
 
+#include "GenericESP/UnionedRect.hpp"
 #include "imgui.h"
 
 ESP::ESP()
@@ -79,7 +80,10 @@ void ESP::draw(ImDrawList* drawList)
 					rectangle[3] = point2D.y;
 			}
 
-			drawList->AddRect(ImVec2{ rectangle[0], rectangle[1] }, ImVec2{ rectangle[2], rectangle[3] }, ImColor(255, 255, 255, 255), 2.0f, 0, 5.0f);
+			{
+				GenericESP::UnionedRect unioned_rect{ ImRect{ rectangle[0], rectangle[1], rectangle[2], rectangle[3] } };
+				rect.draw(drawList, entity, unioned_rect);
+			}
 		next_ent:;
 		}
 }
