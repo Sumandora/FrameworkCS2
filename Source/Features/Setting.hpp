@@ -171,7 +171,7 @@ class Subgroup : public Setting, public SettingsHolder {
 	bool anonymous;
 
 public:
-	Subgroup(SettingsHolder* parent, std::string name, bool anonymous)
+	Subgroup(SettingsHolder* parent, std::string name, bool anonymous = false)
 		: Setting(parent, std::move(name))
 		, anonymous(anonymous)
 	{
