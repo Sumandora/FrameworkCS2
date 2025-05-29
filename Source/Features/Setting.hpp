@@ -168,23 +168,27 @@ public:
 };
 
 class Subgroup : public Setting, public SettingsHolder {
+	bool anonymous;
+
 public:
-	Subgroup(SettingsHolder* parent, std::string name)
+	Subgroup(SettingsHolder* parent, std::string name, bool anonymous)
 		: Setting(parent, std::move(name))
+		, anonymous(anonymous)
 	{
 	}
 
 	void render() override
 	{
-		ImGui::Text("%s", get_name().c_str());
+		if (!anonymous)
+			ImGui::Text("%s", get_name().c_str());
 
 		ImGui::SameLine();
 
-		const std::string popup_label = get_name() + "##Popup";
+		const std::string popup_id = get_name() + "##Popup";
 		if (ImGui::Button(("...##" + get_name()).c_str()))
-			ImGui::OpenPopup(popup_label.c_str());
+			ImGui::OpenPopup(popup_id.c_str());
 
-		if (ImGui::BeginPopup(popup_label.c_str())) {
+		if (ImGui::BeginPopup(popup_id.c_str())) {
 			for (Setting* setting : settings)
 				setting->render();
 
