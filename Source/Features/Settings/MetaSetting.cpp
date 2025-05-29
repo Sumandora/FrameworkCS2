@@ -1,5 +1,6 @@
 #include "../Setting.hpp"
 
+#include "nlohmann/json.hpp"
 #include "nlohmann/json_fwd.hpp"
 
 #include <string>
