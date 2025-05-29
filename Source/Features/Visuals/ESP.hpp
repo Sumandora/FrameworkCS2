@@ -13,16 +13,16 @@
 
 #include "../../SDK/Entities/BaseEntity.hpp"
 
+#include <string>
+#include <utility>
+
 struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 	Checkbox enabled{ this, "Enabled", false };
 
 	Checkbox health_based{ this, "Health-based color", false };
-	Color color = Color{ this, "Color" }
-					  .visible_condition([this] { return !health_based.get(); });
-	Color alive_color = Color{ this, "Alive color", { 0.0F, 1.0F, 0.0F, 1.0F } }
-							.visible_condition([this] { return health_based.get(); });
-	Color dead_color = Color{ this, "Dead color", { 1.0F, 0.0F, 0.0F, 1.0F } }
-						   .visible_condition([this] { return health_based.get(); });
+	Color color = Color{ this, "Color" };
+	Color alive_color = Color{ this, "Alive color", { 0.0F, 1.0F, 0.0F, 1.0F } };
+	Color dead_color = Color{ this, "Dead color", { 1.0F, 0.0F, 0.0F, 1.0F } };
 
 	FloatSlider rounding{ this, "Rounding", 0.0F, 10.0F };
 
@@ -42,6 +42,18 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 
 	using MetaSetting::MetaSetting;
 
+	PlayerRectangle(SettingsHolder* parent, std::string name)
+		: MetaSetting(parent, std::move(name))
+	{
+		color.add_visible_condition([this] { return !health_based.get(); });
+		alive_color.add_visible_condition([this] { return health_based.get(); });
+		dead_color.add_visible_condition([this] { return health_based.get(); });
+	}
+
+	PlayerRectangle(const PlayerRectangle&)
+		= delete;
+	PlayerRectangle& operator=(const PlayerRectangle&) = delete;
+
 	ImColor get_color(const GenericESP::EntityType* e) const override
 	{
 		if (health_based.get()) {
@@ -51,7 +63,7 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 
 			const auto health = static_cast<float>(entity->health());
 			const auto max = static_cast<float>(entity->max_health());
-			
+
 			return ImLerp(a.Value, b.Value, health / max);
 		}
 		return color.get();

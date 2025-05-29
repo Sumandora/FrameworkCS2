@@ -5,7 +5,6 @@
 
 #include <functional>
 #include <string>
-#include <utility>
 #include <vector>
 
 class Setting;
@@ -27,7 +26,7 @@ public:
 
 class Setting {
 	std::string name;
-	std::function<void()> visible;
+	std::function<bool()> visible;
 
 public:
 	explicit Setting(SettingsHolder* parent, std::string name);
@@ -42,11 +41,8 @@ public:
 	friend void to_json(nlohmann::json& json, const Setting& setting) { setting.serialize(json); }
 	friend void from_json(const nlohmann::json& json, Setting& setting) { setting.deserialize(json); }
 
-	auto visible_condition(this auto&& self, std::function<void()> visible)
-	{
-		self.visible = std::move(visible);
-		return self;
-	}
+	bool is_visible();
+	void add_visible_condition(std::function<bool()> visible) &;
 };
 
 class Checkbox : public Setting {

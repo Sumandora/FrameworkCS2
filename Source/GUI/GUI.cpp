@@ -2,9 +2,9 @@
 
 #include "backends/imgui_impl_sdl3.h"
 #include "imgui.h"
+
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_keycode.h"
-#include "SDL3/SDL_stdinc.h"
 #include "SDL3/SDL_video.h"
 
 #include "../Utils/Logging.hpp"
@@ -163,7 +163,7 @@ static void create_font()
 
 	const float font_size = floorf(static_cast<float>(mode->h) * (1.0F / 90.0F));
 
-	Logging::info("Using font size {} for display {}x{}", font_size, mode->w, mode->h);
+	Logging::info("Using font size {} for display {}x{} with {} density", font_size, mode->w, mode->h, mode->pixel_density);
 
 	// Might not work on certain distros/configurations
 	bool loaded_font = false;
