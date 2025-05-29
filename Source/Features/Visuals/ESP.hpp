@@ -24,7 +24,7 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 	Color dead_color = Color{ this, "Dead color", { 1.0F, 0.0F, 0.0F, 1.0F } }
 						   .visible_condition([this] { return health_based.get(); });
 
-	FloatNumber rounding{ this, "Rounding", 0.0F, 10.0F };
+	FloatSlider rounding{ this, "Rounding", 0.0F, 10.0F };
 
 	Subgroup rounded_edges{ this, "Rounded edges" };
 
@@ -33,10 +33,10 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 	Checkbox rounding_bottom_left{ rounded_edges, "Bottom left", true };
 	Checkbox rounding_bottom_right{ rounded_edges, "Bottom right", true };
 
-	FloatNumber thickness{ this, "Thickness", 1.0F, 10.0F };
+	FloatSlider thickness{ this, "Thickness", 1.0F, 10.0F };
 	Checkbox outlined{ this, "Outlined", true };
 	Color outline_color{ this, "Outline color" };
-	FloatNumber outline_thickness{ this, "Outline thickness", 1.0F, 10.0F };
+	FloatSlider outline_thickness{ this, "Outline thickness", 1.0F, 10.0F };
 	Checkbox fill{ this, "Fill", false };
 	Color fill_color{ this, "Fill color" };
 

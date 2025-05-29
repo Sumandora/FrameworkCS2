@@ -84,11 +84,11 @@ public:
 	}
 };
 
-class FloatNumber : public Setting {
+class FloatSlider : public Setting {
 	float value = 0.0F, min, max;
 
 public:
-	FloatNumber(SettingsHolder* parent, std::string name, float min, float max)
+	FloatSlider(SettingsHolder* parent, std::string name, float min, float max)
 		: Setting(parent, std::move(name))
 		, min(min)
 		, max(max)
