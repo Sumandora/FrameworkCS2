@@ -16,4 +16,6 @@ namespace GUI {
 	 */
 	bool queue_event(const SDL_Event* event);
 	void flush_events();
+
+	bool is_using_wayland();
 }

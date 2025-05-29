@@ -58,17 +58,6 @@ static VkQueue GetGraphicQueue()
 	return VK_NULL_HANDLE;
 }
 
-bool is_using_wayland()
-{
-	static const char* driver = []() {
-		const char* driver = SDL_GetCurrentVideoDriver();
-		Logging::info("SDL Video Driver: {}", driver);
-		return driver;
-	}();
-
-	return strcmp(driver, "wayland") == 0;
-}
-
 static void CreateDevice()
 {
 	// Create Vulkan Instance
@@ -181,7 +170,7 @@ static void CreateRenderTarget(VkDevice device, VkSwapchainKHR swapchain)
 	// Create the Render Pass
 	{
 		VkAttachmentDescription attachment = {};
-		attachment.format = is_using_wayland() ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_B8G8R8A8_UNORM;
+		attachment.format = GUI::is_using_wayland() ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_B8G8R8A8_UNORM;
 		attachment.samples = VK_SAMPLE_COUNT_1_BIT;
 		attachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 		attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -214,7 +203,7 @@ static void CreateRenderTarget(VkDevice device, VkSwapchainKHR swapchain)
 		VkImageViewCreateInfo info = {};
 		info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		info.format = is_using_wayland() ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_B8G8R8A8_UNORM;
+		info.format = GUI::is_using_wayland() ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_B8G8R8A8_UNORM;
 
 		info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		info.subresourceRange.baseMipLevel = 0;

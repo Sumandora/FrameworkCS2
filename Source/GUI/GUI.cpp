@@ -247,3 +247,14 @@ void GUI::flush_events()
 		ImGui_ImplSDL3_ProcessEvent(event.get_event());
 	}
 }
+
+bool GUI::is_using_wayland()
+{
+	static const char* driver = []() {
+		const char* driver = SDL_GetCurrentVideoDriver();
+		Logging::info("SDL Video Driver: {}", driver);
+		return driver;
+	}();
+
+	return strcmp(driver, "wayland") == 0;
+}
