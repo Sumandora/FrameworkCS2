@@ -6,3 +6,5 @@ Diagnostics:
     FastCheckFilter: None
   UnusedIncludes: Strict
   MissingIncludes: Strict
+  Includes:
+    IgnoreHeader: nlohmann/json.hpp
