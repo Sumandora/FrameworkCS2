@@ -13,13 +13,22 @@ class Setting;
 
 class SettingsHolder {
 protected:
+	// NOLINTNEXTLINE(cppcoreguidelines-non-private-member-variables-in-classes)
 	std::vector<Setting*> settings;
 
 	friend Setting;
+
+	void render_all_childs();
+
+public:
+	// This saves the &
+	// NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+	operator SettingsHolder*() { return this; }
 };
 
 class Setting {
 	std::string name;
+	std::function<void()> visible;
 
 public:
 	explicit Setting(SettingsHolder* parent, std::string name);
@@ -189,8 +198,7 @@ public:
 			ImGui::OpenPopup(popup_id.c_str());
 
 		if (ImGui::BeginPopup(popup_id.c_str())) {
-			for (Setting* setting : settings)
-				setting->render();
+			render_all_childs();
 
 			ImGui::EndPopup();
 		}
