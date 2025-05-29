@@ -4,33 +4,58 @@
 #include "../Setting.hpp"
 
 #include "GenericESP/Element/Element.hpp"
+#include "GenericESP/Element/Rectangle.hpp"
+
 #include "imgui.h"
+#include "imgui_internal.h"
 
 #include "../../Utils/Logging.hpp"
 
-#include "GenericESP/Element/Rectangle.hpp"
+#include "../../SDK/Entities/BaseEntity.hpp"
 
-struct PlayerRectangle : Subgroup, GenericESP::Rectangle {
-	Color color{ this, "Color" };
+struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
+	Checkbox enabled{ this, "Enabled", false };
+
+	Checkbox health_based{ this, "Health-based color", false };
+	Color color = Color{ this, "Color" }
+					  .visible_condition([this] { return !health_based.get(); });
+	Color alive_color = Color{ this, "Alive color", { 0.0F, 1.0F, 0.0F, 1.0F } }
+							.visible_condition([this] { return health_based.get(); });
+	Color dead_color = Color{ this, "Dead color", { 1.0F, 0.0F, 0.0F, 1.0F } }
+						   .visible_condition([this] { return health_based.get(); });
+
 	FloatNumber rounding{ this, "Rounding", 0.0F, 10.0F };
 
 	Subgroup rounded_edges{ this, "Rounded edges" };
 
-	Checkbox rounding_top_left{ rounded_edges, "Top left" };
-	Checkbox rounding_top_right{ rounded_edges, "Top right" };
-	Checkbox rounding_bottom_left{ rounded_edges, "Bottom left" };
-	Checkbox rounding_bottom_right{ rounded_edges, "Bottom right" };
+	Checkbox rounding_top_left{ rounded_edges, "Top left", true };
+	Checkbox rounding_top_right{ rounded_edges, "Top right", true };
+	Checkbox rounding_bottom_left{ rounded_edges, "Bottom left", true };
+	Checkbox rounding_bottom_right{ rounded_edges, "Bottom right", true };
 
 	FloatNumber thickness{ this, "Thickness", 1.0F, 10.0F };
-	Checkbox outlined{ this, "Outlined" };
+	Checkbox outlined{ this, "Outlined", true };
 	Color outline_color{ this, "Outline color" };
 	FloatNumber outline_thickness{ this, "Outline thickness", 1.0F, 10.0F };
-	Checkbox fill{ this, "Fill" };
+	Checkbox fill{ this, "Fill", false };
 	Color fill_color{ this, "Fill color" };
 
-	using Subgroup::Subgroup;
+	using MetaSetting::MetaSetting;
 
-	ImColor get_color(const GenericESP::EntityType* /*e*/) const override { return color.get(); }
+	ImColor get_color(const GenericESP::EntityType* e) const override
+	{
+		if (health_based.get()) {
+			const auto* entity = static_cast<const BaseEntity*>(e);
+			const ImColor a = dead_color.get();
+			const ImColor b = alive_color.get();
+
+			const auto health = static_cast<float>(entity->health());
+			const auto max = static_cast<float>(entity->max_health());
+			
+			return ImLerp(a.Value, b.Value, health / max);
+		}
+		return color.get();
+	}
 	float get_rounding(const GenericESP::EntityType* /*e*/) const override { return rounding.get(); }
 
 	bool get_rounding_top_left(const GenericESP::EntityType* /*e*/) const override { return rounding_top_left.get(); }
@@ -47,14 +72,15 @@ struct PlayerRectangle : Subgroup, GenericESP::Rectangle {
 };
 
 class ESP : public Feature {
-	Checkbox enabled{ this, "Enabled" };
+	Checkbox enabled{ this, "Enabled", false };
 	Subgroup lotto{ this, "Lotto" };
-	Checkbox another_check{ lotto, "Another check" };
+	Checkbox another_check{ lotto, "Another check", true };
 	Button btn{ lotto, "Click me", []() {
 				   Logging::info("heya");
 			   } };
 
-	PlayerRectangle rect{ this, "Player ESP" };
+	Tabs elements{ this, "Elements" };
+	PlayerRectangle box{ elements, "Box" };
 
 public:
 	ESP();

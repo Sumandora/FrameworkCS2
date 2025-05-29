@@ -82,7 +82,7 @@ void ESP::draw(ImDrawList* drawList)
 
 			{
 				GenericESP::UnionedRect unioned_rect{ ImRect{ rectangle[0], rectangle[1], rectangle[2], rectangle[3] } };
-				rect.draw(drawList, entity, unioned_rect);
+				box.draw(drawList, entity, unioned_rect);
 			}
 		next_ent:;
 		}

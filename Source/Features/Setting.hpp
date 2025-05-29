@@ -48,14 +48,21 @@ public:
 	{
 		setting.deserialize(json);
 	}
+
+	auto visible_condition(this auto&& self, std::function<void()> visible)
+	{
+		self.visible = std::move(visible);
+		return self;
+	}
 };
 
 class Checkbox : public Setting {
-	bool value{};
+	bool value;
 
 public:
-	Checkbox(SettingsHolder* parent, std::string name)
+	Checkbox(SettingsHolder* parent, std::string name, bool value)
 		: Setting(parent, std::move(name))
+		, value(value)
 	{
 	}
 
@@ -107,11 +114,12 @@ public:
 };
 
 class Color : public Setting {
-	ImColor value{ 1.0F, 1.0F, 1.0F, 1.0F };
+	ImColor value;
 
 public:
-	Color(SettingsHolder* parent, std::string name)
+	Color(SettingsHolder* parent, std::string name, ImColor value = { 1.0F, 1.0F, 1.0F, 1.0F })
 		: Setting(parent, std::move(name))
+		, value(value)
 	{
 	}
 
@@ -215,7 +223,62 @@ public:
 		for (Setting* setting : settings)
 			setting->deserialize(input_json[setting->get_name()]);
 	}
+};
 
-	// NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-	operator SettingsHolder*() { return this; }
+class MetaSetting : public Setting, public SettingsHolder {
+public:
+	MetaSetting(SettingsHolder* parent, std::string name)
+		: Setting(parent, std::move(name))
+	{
+	}
+
+	void render() override
+	{
+		render_all_childs();
+	}
+
+	void serialize(nlohmann::json& output_json) const override
+	{
+		for (Setting* setting : settings)
+			setting->serialize(output_json[setting->get_name()]);
+	}
+
+	void deserialize(const nlohmann::json& input_json) override
+	{
+		for (Setting* setting : settings)
+			setting->deserialize(input_json[setting->get_name()]);
+	}
+};
+
+class Tabs : public Setting, public SettingsHolder {
+public:
+	explicit Tabs(SettingsHolder* parent, std::string name)
+		: Setting(parent, std::move(name))
+	{
+	}
+
+	void render() override
+	{
+		if (ImGui::BeginTabBar(get_name().c_str(), ImGuiTabBarFlags_Reorderable)) {
+			for (Setting* tab : settings)
+				if (ImGui::BeginTabItem(tab->get_name().c_str())) {
+					tab->render();
+					ImGui::EndTabItem();
+				}
+
+			ImGui::EndTabBar();
+		}
+	}
+
+	void serialize(nlohmann::json& output_json) const override
+	{
+		for (Setting* setting : settings)
+			setting->serialize(output_json[setting->get_name()]);
+	}
+
+	void deserialize(const nlohmann::json& input_json) override
+	{
+		for (Setting* setting : settings)
+			setting->deserialize(input_json[setting->get_name()]);
+	}
 };

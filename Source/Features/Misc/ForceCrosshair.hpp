@@ -4,7 +4,7 @@
 #include "../Setting.hpp"
 
 class ForceCrosshair : public Feature {
-	Checkbox enabled{ this, "Enabled" };
+	Checkbox enabled{ this, "Enabled", false };
 
 public:
 	ForceCrosshair();
