@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <type_traits>
 
 #include "../../Interfaces.hpp"
 
@@ -16,9 +17,12 @@ struct SchemaClassInfo;
 		return info;                                                                                                               \
 	}
 
-#define SCHEMA_VAR(type, prettyName, name)                                            \
-	inline type& prettyName()                                                    \
-	{                                                                                 \
-		static std::int32_t offset = SchemaSystem::findOffset(classInfo(), name);     \
-		return *reinterpret_cast<type*>(reinterpret_cast<std::byte*>(this) + offset); \
+#define SCHEMA_VAR(type, prettyName, name)                                                                                     \
+	inline auto&& prettyName(this auto&& self)                                                                                 \
+	{                                                                                                                          \
+		static std::int32_t offset = SchemaSystem::findOffset(self.classInfo(), name);                                         \
+		if constexpr (std::is_const_v<std::remove_pointer_t<decltype(&self)>>)                                                 \
+			return *reinterpret_cast<const type*>(reinterpret_cast<const std::byte*>(&self) + offset); \
+		else                                                                                                                   \
+			return *reinterpret_cast<type*>(reinterpret_cast<std::byte*>(&self) + offset);                                     \
 	}
