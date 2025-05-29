@@ -21,6 +21,7 @@ list(APPEND IMGUI_SOURCE_FILES "${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp") 
 
 add_library(imgui STATIC ${IMGUI_SOURCE_FILES})
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
+target_compile_definitions(imgui PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
 
 set_target_properties(imgui PROPERTIES LINKER_LANGUAGE CXX)
 
