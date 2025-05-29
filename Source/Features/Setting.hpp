@@ -60,225 +60,77 @@ class Checkbox : public Setting {
 	bool value;
 
 public:
-	Checkbox(SettingsHolder* parent, std::string name, bool value)
-		: Setting(parent, std::move(name))
-		, value(value)
-	{
-	}
+	Checkbox(SettingsHolder* parent, std::string name, bool value);
 
 	[[nodiscard]] bool get() const { return value; }
 
-	void render() override
-	{
-		ImGui::Checkbox(get_name().c_str(), &value);
-	}
-
-	void serialize(nlohmann::json& output_json) const override
-	{
-		output_json = value;
-	}
-
-	void deserialize(const nlohmann::json& input_json) override
-	{
-		value = input_json;
-	}
+	void render() override;
+	void serialize(nlohmann::json& output_json) const override;
+	void deserialize(const nlohmann::json& input_json) override;
 };
 
 class FloatSlider : public Setting {
 	float value = 0.0F, min, max;
 
 public:
-	FloatSlider(SettingsHolder* parent, std::string name, float min, float max)
-		: Setting(parent, std::move(name))
-		, min(min)
-		, max(max)
-	{
-	}
+	FloatSlider(SettingsHolder* parent, std::string name, float min, float max);
 
 	[[nodiscard]] float get() const { return value; }
 
-	void render() override
-	{
-		ImGui::SliderFloat(get_name().c_str(), &value, min, max);
-	}
-
-	void serialize(nlohmann::json& output_json) const override
-	{
-		output_json = value;
-	}
-
-	void deserialize(const nlohmann::json& input_json) override
-	{
-		value = input_json;
-	}
+	void render() override;
+	void serialize(nlohmann::json& output_json) const override;
+	void deserialize(const nlohmann::json& input_json) override;
 };
 
 class Color : public Setting {
 	ImColor value;
 
 public:
-	Color(SettingsHolder* parent, std::string name, ImColor value = { 1.0F, 1.0F, 1.0F, 1.0F })
-		: Setting(parent, std::move(name))
-		, value(value)
-	{
-	}
+	Color(SettingsHolder* parent, std::string name, ImColor value = { 1.0F, 1.0F, 1.0F, 1.0F });
 
 	[[nodiscard]] ImColor get() const { return value; }
 
-	void render() override
-	{
-
-		const bool clicked = ImGui::ColorButton((get_name() + "##Button").c_str(), value, ImGuiColorEditFlags_None, ImVec2(0, 0));
-		ImGui::SameLine();
-		ImGui::Text("%s", get_name().c_str());
-
-		auto id = get_name() + "##Popup";
-		if (clicked)
-			ImGui::OpenPopup(id.c_str());
-
-		if (ImGui::BeginPopup(id.c_str())) {
-			float float_array[] = { value.Value.x, value.Value.y, value.Value.z, value.Value.w };
-			if (ImGui::ColorPicker4("##Picker", float_array, 0)) {
-				value.Value = ImVec4(float_array[0], float_array[1], float_array[2], float_array[3]);
-			}
-			ImGui::EndPopup();
-		}
-	}
-
-	void serialize(nlohmann::json& output_json) const override
-	{
-		output_json = { value.Value.x, value.Value.y, value.Value.z, value.Value.w };
-	}
-
-	void deserialize(const nlohmann::json& input_json) override
-	{
-		value.Value.x = input_json[0];
-		value.Value.y = input_json[1];
-		value.Value.z = input_json[2];
-		value.Value.w = input_json[3];
-	}
+	void render() override;
+	void serialize(nlohmann::json& output_json) const override;
+	void deserialize(const nlohmann::json& input_json) override;
 };
 
 class Button : public Setting {
 	std::function<void()> action;
 
 public:
-	Button(SettingsHolder* parent, std::string name, std::function<void()> action)
-		: Setting(parent, std::move(name))
-		, action(std::move(action))
-	{
-	}
+	Button(SettingsHolder* parent, std::string name, std::function<void()> action);
 
-	void render() override
-	{
-		if (ImGui::Button(get_name().c_str()))
-			action();
-	}
-
-	void serialize(nlohmann::json& /*output_json*/) const override
-	{
-	}
-
-	void deserialize(const nlohmann::json& /*input_json*/) override
-	{
-	}
+	void render() override;
+	void serialize(nlohmann::json& output_json) const override;
+	void deserialize(const nlohmann::json& input_json) override;
 };
 
 class Subgroup : public Setting, public SettingsHolder {
 	bool anonymous;
 
 public:
-	Subgroup(SettingsHolder* parent, std::string name, bool anonymous = false)
-		: Setting(parent, std::move(name))
-		, anonymous(anonymous)
-	{
-	}
+	Subgroup(SettingsHolder* parent, std::string name, bool anonymous = false);
 
-	void render() override
-	{
-		if (!anonymous)
-			ImGui::Text("%s", get_name().c_str());
-
-		ImGui::SameLine();
-
-		const std::string popup_id = get_name() + "##Popup";
-		if (ImGui::Button(("...##" + get_name()).c_str()))
-			ImGui::OpenPopup(popup_id.c_str());
-
-		if (ImGui::BeginPopup(popup_id.c_str())) {
-			render_all_childs();
-
-			ImGui::EndPopup();
-		}
-	}
-
-	void serialize(nlohmann::json& output_json) const override
-	{
-		for (Setting* setting : settings)
-			setting->serialize(output_json[setting->get_name()]);
-	}
-
-	void deserialize(const nlohmann::json& input_json) override
-	{
-		for (Setting* setting : settings)
-			setting->deserialize(input_json[setting->get_name()]);
-	}
+	void render() override;
+	void serialize(nlohmann::json& output_json) const override;
+	void deserialize(const nlohmann::json& input_json) override;
 };
 
 class MetaSetting : public Setting, public SettingsHolder {
 public:
-	MetaSetting(SettingsHolder* parent, std::string name)
-		: Setting(parent, std::move(name))
-	{
-	}
+	MetaSetting(SettingsHolder* parent, std::string name);
 
-	void render() override
-	{
-		render_all_childs();
-	}
-
-	void serialize(nlohmann::json& output_json) const override
-	{
-		for (Setting* setting : settings)
-			setting->serialize(output_json[setting->get_name()]);
-	}
-
-	void deserialize(const nlohmann::json& input_json) override
-	{
-		for (Setting* setting : settings)
-			setting->deserialize(input_json[setting->get_name()]);
-	}
+	void render() override;
+	void serialize(nlohmann::json& output_json) const override;
+	void deserialize(const nlohmann::json& input_json) override;
 };
 
 class Tabs : public Setting, public SettingsHolder {
 public:
-	explicit Tabs(SettingsHolder* parent, std::string name)
-		: Setting(parent, std::move(name))
-	{
-	}
+	explicit Tabs(SettingsHolder* parent, std::string name);
 
-	void render() override
-	{
-		if (ImGui::BeginTabBar(get_name().c_str(), ImGuiTabBarFlags_Reorderable)) {
-			for (Setting* tab : settings)
-				if (ImGui::BeginTabItem(tab->get_name().c_str())) {
-					tab->render();
-					ImGui::EndTabItem();
-				}
-
-			ImGui::EndTabBar();
-		}
-	}
-
-	void serialize(nlohmann::json& output_json) const override
-	{
-		for (Setting* setting : settings)
-			setting->serialize(output_json[setting->get_name()]);
-	}
-
-	void deserialize(const nlohmann::json& input_json) override
-	{
-		for (Setting* setting : settings)
-			setting->deserialize(input_json[setting->get_name()]);
-	}
+	void render() override;
+	void serialize(nlohmann::json& output_json) const override;
+	void deserialize(const nlohmann::json& input_json) override;
 };
