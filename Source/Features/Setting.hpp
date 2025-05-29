@@ -40,14 +40,8 @@ public:
 	virtual void serialize(nlohmann::json& output_json) const = 0;
 	virtual void deserialize(const nlohmann::json& input_json) = 0;
 
-	friend void to_json(nlohmann::json& json, const Setting& setting)
-	{
-		setting.serialize(json);
-	}
-	friend void from_json(const nlohmann::json& json, Setting& setting)
-	{
-		setting.deserialize(json);
-	}
+	friend void to_json(nlohmann::json& json, const Setting& setting) { setting.serialize(json); }
+	friend void from_json(const nlohmann::json& json, Setting& setting) { setting.deserialize(json); }
 
 	auto visible_condition(this auto&& self, std::function<void()> visible)
 	{
