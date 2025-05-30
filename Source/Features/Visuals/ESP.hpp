@@ -5,15 +5,17 @@
 
 #include "GenericESP/Element/Element.hpp"
 #include "GenericESP/Element/Rectangle.hpp"
-
 #include "GenericESP/Element/SidedElement.hpp"
 #include "GenericESP/Element/SidedText.hpp"
+
 #include "imgui.h"
 #include "imgui_internal.h"
 
 #include "../../Utils/Logging.hpp"
 
 #include "../../SDK/Entities/BaseEntity.hpp"
+
+#include "../../GUI/GUI.hpp"
 
 #include <cstdint>
 #include <string>
@@ -27,7 +29,7 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 	Color alive_color = Color{ this, "Alive color", { 0.0F, 1.0F, 0.0F, 1.0F } };
 	Color dead_color = Color{ this, "Dead color", { 1.0F, 0.0F, 0.0F, 1.0F } };
 
-	FloatSlider rounding{ this, "Rounding", 0.0F, 10.0F };
+	FloatSlider rounding{ this, "Rounding", 0.0F, 10.0F, 0.0F };
 
 	Subgroup rounded_edges{ this, "Rounded edges" };
 
@@ -36,10 +38,10 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 	Checkbox rounding_bottom_left{ rounded_edges, "Bottom left", true };
 	Checkbox rounding_bottom_right{ rounded_edges, "Bottom right", true };
 
-	FloatSlider thickness{ this, "Thickness", 1.0F, 10.0F };
+	FloatSlider thickness{ this, "Thickness", 1.0F, 10.0F, 1.0F };
 	Checkbox outlined{ this, "Outlined", true };
-	Color outline_color{ this, "Outline color" };
-	FloatSlider outline_thickness{ this, "Outline thickness", 1.0F, 10.0F };
+	Color outline_color{ this, "Outline color", { 0.0F, 0.0F, 0.0F, 1.0F } };
+	FloatSlider outline_thickness{ this, "Outline thickness", 1.0F, 10.0F, 1.0F };
 	Checkbox fill{ this, "Fill", false };
 	Color fill_color{ this, "Fill color" };
 
@@ -85,9 +87,9 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 struct PlayerSidedText : MetaSetting, GenericESP::SidedText {
 	Checkbox enabled{ this, "Enabled", false };
 
-	FloatSlider spacing{ this, "Spacing", 0.0F, 10.0F, 3.0F};
+	FloatSlider spacing{ this, "Spacing", 0.0F, 10.0F, 3.0F };
 	Combo<GenericESP::Side> side{ this, "Side", GenericESP::Side::TOP };
-	FloatSlider font_size{ this, "Font size", 0.0F, 12.0F, 24.0F };
+	FloatSlider font_scale{ this, "Font scale", 0.0F, 1.0F, 2.0F };
 	Color font_color{ this, "Font color" };
 	Checkbox shadow{ this, "Shadow", true };
 	FloatSlider shadow_offset{ this, "Shadow offset", 1.0F, 5.0F, 1.0F };
@@ -103,7 +105,7 @@ struct PlayerSidedText : MetaSetting, GenericESP::SidedText {
 	float get_spacing(const GenericESP::EntityType* /*e*/) const override { return spacing.get(); }
 	GenericESP::Side get_side(const GenericESP::EntityType* /*e*/) const override { return side.get(); }
 	ImFont* get_font(const GenericESP::EntityType* /*e*/) const override { return ImGui::GetFont(); }
-	float get_font_size(const GenericESP::EntityType* /*e*/) const override { return font_size.get(); }
+	float get_font_size(const GenericESP::EntityType* /*e*/) const override { return GUI::get_base_font_size() * font_scale.get(); }
 	ImColor get_font_color(const GenericESP::EntityType* /*e*/) const override { return font_color.get(); }
 	bool get_shadow(const GenericESP::EntityType* /*e*/) const override { return shadow.get(); }
 	float get_shadow_offset(const GenericESP::EntityType* /*e*/) const override { return shadow_offset.get(); }
