@@ -7,4 +7,4 @@ Diagnostics:
   UnusedIncludes: Strict
   MissingIncludes: Strict
   Includes:
-    IgnoreHeader: nlohmann/json.hpp
+    IgnoreHeader: nlohmann/json_fwd.hpp
