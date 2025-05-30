@@ -1,6 +1,7 @@
 #include "GUI.hpp"
 
 #include "backends/imgui_impl_sdl3.h"
+#include "backends/imgui_impl_vulkan.h"
 #include "imgui.h"
 
 #include "SDL3/SDL_events.h"
@@ -19,6 +20,8 @@
 #include <vector>
 
 #include "Tabs/Tabs.hpp"
+
+#include "../Hooks/Graphics/GraphicsHook.hpp"
 
 class OwningSDLEvent {
 	SDL_Event event;

@@ -112,8 +112,8 @@ class Combo : public Setting {
 public:
 	Combo(SettingsHolder* parent, std::string name, E value = magic_enum::enum_values<E>()[0], std::unordered_map<E, std::string> names = generate_names())
 		: Setting(parent, std::move(name))
-		, value(value)
 		, names(std::move(names))
+		, value(value)
 	{
 	}
 

@@ -84,7 +84,10 @@ void ESP::draw(ImDrawList* drawList)
 
 			{
 				GenericESP::UnionedRect unioned_rect{ ImRect{ rectangle[0], rectangle[1], rectangle[2], rectangle[3] } };
-				box.draw(drawList, entity, unioned_rect);
+				if (box.enabled.get())
+					box.draw(drawList, entity, unioned_rect);
+				if (name.enabled.get())
+					name.draw(drawList, entity, "Hello, world", unioned_rect);
 			}
 		next_ent:;
 		}

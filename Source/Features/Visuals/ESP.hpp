@@ -6,6 +6,8 @@
 #include "GenericESP/Element/Element.hpp"
 #include "GenericESP/Element/Rectangle.hpp"
 
+#include "GenericESP/Element/SidedElement.hpp"
+#include "GenericESP/Element/SidedText.hpp"
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -13,6 +15,7 @@
 
 #include "../../SDK/Entities/BaseEntity.hpp"
 
+#include <cstdint>
 #include <string>
 #include <utility>
 
@@ -50,10 +53,6 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 		dead_color.add_visible_condition([this] { return health_based.get(); });
 	}
 
-	PlayerRectangle(const PlayerRectangle&)
-		= delete;
-	PlayerRectangle& operator=(const PlayerRectangle&) = delete;
-
 	ImColor get_color(const GenericESP::EntityType* e) const override
 	{
 		if (health_based.get()) {
@@ -83,6 +82,34 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 	ImColor get_fill_color(const GenericESP::EntityType* /*e*/) const override { return fill_color.get(); }
 };
 
+struct PlayerSidedText : MetaSetting, GenericESP::SidedText {
+	Checkbox enabled{ this, "Enabled", false };
+
+	FloatSlider spacing{ this, "Spacing", 0.0F, 10.0F, 3.0F};
+	Combo<GenericESP::Side> side{ this, "Side", GenericESP::Side::TOP };
+	FloatSlider font_size{ this, "Font size", 0.0F, 12.0F, 24.0F };
+	Color font_color{ this, "Font color" };
+	Checkbox shadow{ this, "Shadow", true };
+	FloatSlider shadow_offset{ this, "Shadow offset", 1.0F, 5.0F, 1.0F };
+	Color shadow_color{ this, "Shadow color", { 0.0F, 0.0F, 0.0F, 1.0F } };
+
+	using MetaSetting::MetaSetting;
+
+	PlayerSidedText(SettingsHolder* parent, std::string name)
+		: MetaSetting(parent, std::move(name))
+	{
+	}
+
+	float get_spacing(const GenericESP::EntityType* /*e*/) const override { return spacing.get(); }
+	GenericESP::Side get_side(const GenericESP::EntityType* /*e*/) const override { return side.get(); }
+	ImFont* get_font(const GenericESP::EntityType* /*e*/) const override { return ImGui::GetFont(); }
+	float get_font_size(const GenericESP::EntityType* /*e*/) const override { return font_size.get(); }
+	ImColor get_font_color(const GenericESP::EntityType* /*e*/) const override { return font_color.get(); }
+	bool get_shadow(const GenericESP::EntityType* /*e*/) const override { return shadow.get(); }
+	float get_shadow_offset(const GenericESP::EntityType* /*e*/) const override { return shadow_offset.get(); }
+	ImColor get_shadow_color(const GenericESP::EntityType* /*e*/) const override { return shadow_color.get(); }
+};
+
 class ESP : public Feature {
 	Checkbox enabled{ this, "Enabled", false };
 	Subgroup lotto{ this, "Lotto" };
@@ -93,13 +120,14 @@ class ESP : public Feature {
 
 	Tabs elements{ this, "Elements" };
 	PlayerRectangle box{ elements, "Box" };
+	PlayerSidedText name{ elements, "Name" };
 
 	enum BabbysFirstEnum : std::uint8_t {
 		HELLO,
 		WORLD
 	};
 
-	Combo<BabbysFirstEnum> combo{this, "Le combo"};
+	Combo<BabbysFirstEnum> combo{ this, "Le combo" };
 
 public:
 	ESP();
