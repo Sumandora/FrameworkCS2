@@ -3,12 +3,15 @@
 #include "../../Features/Feature.hpp"
 #include "../../Features/Features.hpp"
 
+#include "../GUI.hpp"
+
 #include "imgui.h"
+
 #include <string>
 
 void GUI::Tabs::render()
 {
-	ImGui::SetNextWindowSize({ 800, 600 }, ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2{ 400, 300 } * GUI::get_scale(), ImGuiCond_Once);
 	if (ImGui::Begin("Framework CS2")) {
 		if (ImGui::BeginTabBar("#Top level tabs", ImGuiTabBarFlags_Reorderable)) {
 			for (auto& [category, vector] : Features::features) {
