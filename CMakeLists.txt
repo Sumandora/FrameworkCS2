@@ -29,6 +29,7 @@ include("Buildscripts/DetourHooking.cmake")
 include("Buildscripts/NlohmannJson.cmake")
 include("Buildscripts/GenericESP.cmake")
 include("Buildscripts/GLM.cmake")
+include("Buildscripts/MagicEnum.cmake")
 
 add_subdirectory("${MemoryManager_SOURCE_DIR}/Modules/Linux" "LinuxMemoryManager")
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE LinuxMemoryManager)
