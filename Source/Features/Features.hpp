@@ -10,11 +10,13 @@
 #include "../Utils/UninitializedObject.hpp"
 
 #include "Misc/ForceCrosshair.hpp"
+#include "Misc/LoadingTextChanger.hpp"
 #include "Visuals/ESP.hpp"
 
 namespace Features {
 	inline UninitializedObject<ESP> esp;
 	inline UninitializedObject<ForceCrosshair> force_crosshair;
+	inline UninitializedObject<LoadingTextChanger> loading_text_changer;
 
 	inline std::vector<std::pair<std::string /*category*/, std::vector<Feature*>>> features;
 

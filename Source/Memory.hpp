@@ -23,6 +23,8 @@ namespace Memory {
 
 	inline CSPlayerPawn* local_player;
 
+	inline void* get_fun_loading;
+
 	inline MemoryManager::LinuxMemoryManager<false, true, true> mem_mgr;
 	inline ExecutableMalloc::MemoryManagerAllocator emalloc{mem_mgr};
 

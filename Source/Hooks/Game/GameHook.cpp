@@ -5,11 +5,8 @@
 
 #include "BCRL/Session.hpp"
 #include "DetourHooking.hpp"
-#include "LengthDisassembler/LengthDisassembler.hpp"
 
 #include <cstddef>
-#include <cstdint>
-#include <memory>
 
 namespace Hooks::Game {
 	void create()
@@ -27,14 +24,20 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			Memory::fireEvent,
 			reinterpret_cast<void*>(FireEvent::hookFunc));
+		GetFunLoading::hook.emplace(
+			Memory::emalloc,
+			Memory::get_fun_loading,
+			reinterpret_cast<void*>(GetFunLoading::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
 		FireEvent::hook->enable();
+		GetFunLoading::hook->enable();
 	}
 
 	void destroy()
 	{
+		GetFunLoading::hook.reset();
 		FireEvent::hook.reset();
 		ShouldShowCrosshair::hook.reset();
 		FrameStageNotify::hook.reset();
