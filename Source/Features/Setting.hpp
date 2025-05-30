@@ -67,10 +67,11 @@ public:
 };
 
 class FloatSlider : public Setting {
-	float value = 0.0F, min, max;
+	float min, max, value;
 
 public:
 	FloatSlider(SettingsHolder* parent, std::string name, float min, float max);
+	FloatSlider(SettingsHolder* parent, std::string name, float min, float max, float value);
 
 	[[nodiscard]] float get() const { return value; }
 

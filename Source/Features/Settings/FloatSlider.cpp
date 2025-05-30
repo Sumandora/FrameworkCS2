@@ -5,13 +5,20 @@
 #include "nlohmann/json.hpp"
 #include "nlohmann/json_fwd.hpp"
 
+#include <numeric>
 #include <string>
 #include <utility>
 
 FloatSlider::FloatSlider(SettingsHolder* parent, std::string name, float min, float max)
+	: FloatSlider(parent, std::move(name), min, max, std::midpoint(min, max))
+{
+}
+
+FloatSlider::FloatSlider(SettingsHolder* parent, std::string name, float min, float max, float value)
 	: Setting(parent, std::move(name))
 	, min(min)
 	, max(max)
+	, value(value)
 {
 }
 
