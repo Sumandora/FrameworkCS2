@@ -54,7 +54,7 @@ void Memory::create()
 								  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"4c 8d 05">())
 								  .add(3)
 								  .relative_to_absolute()
-								  .expect<VMatrix*>("Couldn't find WorldToProjection matrix");
+								  .expect<glm::mat4x4*>("Couldn't find WorldToProjection matrix");
 
 	Logging::info("Found WorldToProjection matrix at: {}", worldToProjectionMatrix);
 

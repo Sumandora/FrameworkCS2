@@ -1,10 +1,12 @@
 #include "../Tabs.hpp"
 
+#include "../../../SDK/Entities/BaseEntity.hpp"
 #include "../../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../../SDK/Entities/GameEntitySystem.hpp"
 #include "../../../SDK/GameClass/CollisionProperty.hpp"
 #include "../../../SDK/GameClass/GameSceneNode.hpp"
-#include "../../../SDK/Math/Vector.hpp"
+
+#include "glm/ext/vector_float3.hpp"
 
 #include "imgui.h"
 
@@ -40,16 +42,16 @@ void GUI::Tabs::Debug::draw_entity_list()
 				ImGui::TableNextColumn();
 				auto* game_scene_node = entity->gameSceneNode();
 				auto& transform = game_scene_node->transform();
-				Vector3 vec = transform.m_Position;
+				glm::vec3 vec = transform.m_Position;
 
 				auto* collision = entity->collision();
 				if (collision == nullptr)
 					continue;
-				Vector3 mins = collision->mins();
-				Vector3 maxs = collision->maxs();
+				glm::vec3 mins = collision->mins();
+				glm::vec3 maxs = collision->maxs();
 
-				Vector3 final_mins = { vec[0] + mins[0], vec[1] + mins[1], vec[2] + mins[2] };
-				Vector3 final_maxs = { vec[0] + maxs[0], vec[1] + maxs[1], vec[2] + maxs[2] };
+				glm::vec3 final_mins = { vec[0] + mins[0], vec[1] + mins[1], vec[2] + mins[2] };
+				glm::vec3 final_maxs = { vec[0] + maxs[0], vec[1] + maxs[1], vec[2] + maxs[2] };
 
 				ImGui::Text("(%f %f %f) - (%f %f %f)",
 					final_mins[0], final_mins[1], final_mins[2],

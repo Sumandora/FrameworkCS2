@@ -1,18 +1,16 @@
 #include "../Tabs.hpp"
 
-#include "../../../Memory.hpp"
-
 #include "imgui.h"
 
-#include <array>
+#include "../../../Memory.hpp"
 
 void GUI::Tabs::Debug::draw_view_matrix()
 {
 	if (ImGui::BeginTable("View Matrix", 4)) {
-		for (const std::array<float, 4>& row : *Memory::worldToProjectionMatrix) {
-			for (const float cell : row) {
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
 				ImGui::TableNextColumn();
-				ImGui::Text("%f", cell);
+				ImGui::Text("%f", Memory::worldToProjectionMatrix[i][j]);
 			}
 		}
 		ImGui::EndTable();

@@ -1,11 +1,12 @@
 #include "Projection.hpp"
 
 #include "../Memory.hpp"
+#include "glm/fwd.hpp"
 #include "imgui.h"
 
-bool Projection::project(const Vector3& world, ImVec2& screen)
+bool Projection::project(const glm::vec3& world, ImVec2& screen)
 {
-	const VMatrix& matrix = *Memory::worldToProjectionMatrix;
+	const glm::mat4x4& matrix = *Memory::worldToProjectionMatrix;
 
 	const float z = matrix[2][0] * world[0] + matrix[2][1] * world[1] + matrix[2][2] * world[2] + matrix[2][3];
 	const float w = matrix[3][0] * world[0] + matrix[3][1] * world[1] + matrix[3][2] * world[2] + matrix[3][3];

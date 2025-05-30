@@ -12,6 +12,8 @@
 #include "../../Utils/Projection.hpp"
 
 #include "GenericESP/UnionedRect.hpp"
+#include "glm/ext/vector_float3.hpp"
+#include "glm/ext/vector_float4.hpp"
 #include "imgui.h"
 
 ESP::ESP()
@@ -35,31 +37,31 @@ void ESP::draw(ImDrawList* drawList)
 
 			auto* gameSceneNode = entity->gameSceneNode();
 			auto& transform = gameSceneNode->transform();
-			Vector3 vec = transform.m_Position;
+			glm::vec3 vec = transform.m_Position;
 
 			auto* collision = entity->collision();
 			if (collision == nullptr)
 				continue;
-			Vector3 mins = collision->mins();
-			Vector3 maxs = collision->maxs();
+			glm::vec3 mins = collision->mins();
+			glm::vec3 maxs = collision->maxs();
 
-			Vector3 finalMins = { vec[0] + mins[0], vec[1] + mins[1], vec[2] + mins[2] };
-			Vector3 finalMaxs = { vec[0] + maxs[0], vec[1] + maxs[1], vec[2] + maxs[2] };
+			glm::vec3 finalMins = { vec[0] + mins[0], vec[1] + mins[1], vec[2] + mins[2] };
+			glm::vec3 finalMaxs = { vec[0] + maxs[0], vec[1] + maxs[1], vec[2] + maxs[2] };
 
-			const Vector3 points[] = {
+			const glm::vec3 points[] = {
 				// Lower
-				Vector3{ finalMins[0], finalMins[1], finalMins[2] },
-				Vector3{ finalMaxs[0], finalMins[1], finalMins[2] },
-				Vector3{ finalMaxs[0], finalMins[1], finalMaxs[2] },
-				Vector3{ finalMins[0], finalMins[1], finalMaxs[2] },
+				glm::vec3{ finalMins[0], finalMins[1], finalMins[2] },
+				glm::vec3{ finalMaxs[0], finalMins[1], finalMins[2] },
+				glm::vec3{ finalMaxs[0], finalMins[1], finalMaxs[2] },
+				glm::vec3{ finalMins[0], finalMins[1], finalMaxs[2] },
 				// Higher
-				Vector3{ finalMins[0], finalMaxs[1], finalMins[2] },
-				Vector3{ finalMaxs[0], finalMaxs[1], finalMins[2] },
-				Vector3{ finalMaxs[0], finalMaxs[1], finalMaxs[2] },
-				Vector3{ finalMins[0], finalMaxs[1], finalMaxs[2] }
+				glm::vec3{ finalMins[0], finalMaxs[1], finalMins[2] },
+				glm::vec3{ finalMaxs[0], finalMaxs[1], finalMins[2] },
+				glm::vec3{ finalMaxs[0], finalMaxs[1], finalMaxs[2] },
+				glm::vec3{ finalMins[0], finalMaxs[1], finalMaxs[2] }
 			};
 
-			Vector4 rectangle{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+			glm::vec4 rectangle{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
 				std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest() };
 
 			for (const auto& point : points) {

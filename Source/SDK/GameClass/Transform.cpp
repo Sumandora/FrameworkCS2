@@ -1,8 +1,9 @@
 #include "Transform.hpp"
+#include "glm/ext/matrix_float3x4.hpp"
 
-Matrix<3, 4> Transform::toMatrix() const
+glm::mat3x4 Transform::toMatrix() const
 {
-	Matrix<3, 4> matrix{};
+	glm::mat3x4 matrix{};
 
 	const auto& rot = m_Orientation;
 	const auto& pos = m_Position;

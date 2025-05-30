@@ -3,7 +3,7 @@
 #include "MemoryManager/LinuxMemoryManager.hpp"
 #include "ExecutableMalloc/MemoryManagerAllocator.hpp"
 
-#include "SDK/Math/Matrix.hpp"
+#include "glm/ext/matrix_float4x4.hpp"
 
 struct ViewRender;
 struct GameEntitySystem;
@@ -12,7 +12,7 @@ struct CSPlayerPawn;
 
 namespace Memory {
 	inline ViewRender* viewRender;
-	inline VMatrix* worldToProjectionMatrix;
+	inline glm::mat4x4* worldToProjectionMatrix;
 
 	inline void* shouldShowCrosshair;
 	inline void* getLocalPlayer;
