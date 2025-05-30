@@ -94,6 +94,13 @@ class ESP : public Feature {
 	Tabs elements{ this, "Elements" };
 	PlayerRectangle box{ elements, "Box" };
 
+	enum BabbysFirstEnum : std::uint8_t {
+		HELLO,
+		WORLD
+	};
+
+	Combo<BabbysFirstEnum> combo{this, "Le combo"};
+
 public:
 	ESP();
 
