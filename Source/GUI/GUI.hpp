@@ -18,4 +18,7 @@ namespace GUI {
 	void flush_events();
 
 	bool is_using_wayland();
+
+	float get_scale();
+	float get_base_font_size();
 }

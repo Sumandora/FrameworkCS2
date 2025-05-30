@@ -133,6 +133,9 @@ static bool is_open = true;
 
 static SDL_Window* window;
 
+static float scale = 1.0F;
+static float font_size = 12.0F;
+
 void GUI::init()
 {
 	ImGui::CreateContext();
@@ -159,12 +162,16 @@ static void create_font()
 	// I want the font size to be something around 12 on full hd screens.
 	// 4k screens get something around 24.
 	// Mathematically expressed:
-	// font_size(screen_height) = screen_height * x
 	// font_size(1080) = 12
 	// font_size(2160) = 24
-	// x = 1/90, also technically one pair of values is enough here to solve for x here.
+	// Simplified
+	// font_size(x) = x / 1080 * 12
 
-	const float font_size = floorf(static_cast<float>(mode->h) * (1.0F / 90.0F));
+	// Assign global scale variable
+	scale = static_cast<float>(mode->h) / 1080;
+
+	// Floor to not get ugly subpixel values.
+	font_size = floorf(scale * 12.0F);
 
 	Logging::info("Using font size {} for display {}x{} with {} density", font_size, mode->w, mode->h, mode->pixel_density);
 
@@ -260,4 +267,14 @@ bool GUI::is_using_wayland()
 	}();
 
 	return strcmp(driver, "wayland") == 0;
+}
+
+float GUI::get_scale()
+{
+	return scale;
+}
+
+float GUI::get_base_font_size()
+{
+	return font_size;
 }
