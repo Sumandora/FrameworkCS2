@@ -89,7 +89,7 @@ struct PlayerSidedText : MetaSetting, GenericESP::SidedText {
 
 	FloatSlider spacing{ this, "Spacing", 0.0F, 10.0F, 3.0F };
 	Combo<GenericESP::Side> side{ this, "Side", GenericESP::Side::TOP };
-	FloatSlider font_scale{ this, "Font scale", 0.0F, 1.0F, 2.0F };
+	FloatSlider font_scale{ this, "Font scale", 0.0F, 2.0F, 1.0F };
 	Color font_color{ this, "Font color" };
 	Checkbox shadow{ this, "Shadow", true };
 	FloatSlider shadow_offset{ this, "Shadow offset", 1.0F, 5.0F, 1.0F };
