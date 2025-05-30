@@ -5,7 +5,7 @@
 #include <string>
 
 LoadingTextChanger::LoadingTextChanger()
-	: Feature("Misc", "Loading text changer")
+	: Feature("Visuals", "Loading text changer")
 {
 }
 

@@ -9,8 +9,8 @@
 
 #include "../Utils/UninitializedObject.hpp"
 
-#include "Misc/ForceCrosshair.hpp"
-#include "Misc/LoadingTextChanger.hpp"
+#include "Visuals/ForceCrosshair.hpp"
+#include "Visuals/LoadingTextChanger.hpp"
 #include "Visuals/ESP.hpp"
 
 namespace Features {
