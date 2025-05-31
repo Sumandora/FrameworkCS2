@@ -51,27 +51,14 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Get current and previous commit hash
-        run: |
-          git config --global --add safe.directory '*'
-          git fetch --depth 2
-          git pull --depth 2
-          echo "CURRENT_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
-          echo "PREVIOUS_COMMIT=$(git rev-parse HEAD~1)" >> $GITHUB_ENV
-
       - name: Restore cached build
-        id: cache-build-restore
-        uses: actions/cache/restore@v4
+        id: cache-build
+        uses: actions/cache@v4
         with:
           path: .ccache
-          key: ${{ matrix.distro }}-${{ env.PREVIOUS_COMMIT }}
+          key: ${{ matrix.distro }}-${{ github.sha }}
+          restore-keys: |
+            ${{ matrix.distro }}
 
       - name: Build
         run: CCACHE_DIR="$(pwd)/.ccache" ./Build.sh
-
-      - name: Save build caches
-        id: cache-build-save
-        uses: actions/cache/save@v4
-        with:
-          path: .ccache
-          key: ${{ matrix.distro }}-${{ env.CURRENT_COMMIT }}
