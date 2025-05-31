@@ -3,6 +3,12 @@ cmake_minimum_required(VERSION 3.20)
 file(STRINGS "ProjectName" CMAKE_PROJECT_NAME) # Custom project name using this file
 project(${CMAKE_PROJECT_NAME})
 
+find_program(CCACHE_FOUND ccache)
+if(CCACHE_FOUND)
+        message("Using ccache for build")
+        set(CMAKE_CXX_COMPILER_LAUNCHER "ccache")
+endif()
+
 set(CMAKE_CXX_STANDARD 23)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)

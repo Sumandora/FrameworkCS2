@@ -18,34 +18,34 @@ jobs:
         name: Setup dependencies
         run: |
           apt-get update
-          apt-get install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev gcc-14 g++-14
+          apt-get install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev gcc-14 g++-14 ccache
           update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 999
           update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 999
       - if: matrix.distro == 'ubuntu:rolling' || matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing'
         name: Setup dependencies
         run: |
           apt-get update
-          apt-get install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev
+          apt-get install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev ccache
       - if: matrix.distro == 'devuan/devuan:unstable'
         name: Setup dependencies
         run: |
           apt-get update
-          apt-get install --no-install-recommends -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev ca-certificates
+          apt-get install --no-install-recommends -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev ca-certificates ccache
       - if: matrix.distro == 'archlinux:latest' || matrix.distro == 'artixlinux/artixlinux' || matrix.distro == 'cachyos/cachyos'
         name: Setup dependencies
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm base-devel cmake git vulkan-icd-loader vulkan-headers libx11 libxext
+          pacman -S --noconfirm base-devel cmake git vulkan-icd-loader vulkan-headers libx11 libxext ccache
       - if: matrix.distro == 'fedora:latest'
         name: Setup dependencies
         run: |
           dnf update -y
-          dnf install -y git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel
+          dnf install -y git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel ccache
       - if: matrix.distro == 'opensuse/tumbleweed'
         name: Setup dependencies
         run: |
           zypper refresh
-          zypper install -y git cmake make gcc-c++ binutils-devel vulkan-devel libXext-devel freetype2-devel
+          zypper install -y git cmake make gcc-c++ binutils-devel vulkan-devel libXext-devel freetype2-devel ccache
 
       - uses: actions/checkout@v4
         with:
@@ -63,15 +63,15 @@ jobs:
         id: cache-build-restore
         uses: actions/cache/restore@v4
         with:
-          path: Build
+          path: .ccache
           key: ${{ matrix.distro }}-${{ env.PREVIOUS_COMMIT }}
 
       - name: Build
-        run: ./Build.sh
+        run: CCACHE_DIR="$(pwd)/.ccache" ./Build.sh
 
       - name: Save build caches
         id: cache-build-save
         uses: actions/cache/save@v4
         with:
-          path: Build
+          path: .ccache
           key: ${{ matrix.distro }}-${{ env.CURRENT_COMMIT }}
