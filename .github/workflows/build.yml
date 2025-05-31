@@ -48,12 +48,17 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Get current and previous commit hash
+        run: |
+          echo "CURRENT_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
+          echo "PREVIOUS_COMMIT=$(git rev-parse HEAD~1)" >> $GITHUB_ENV
+
       - name: Restore cached build
         id: cache-build-restore
         uses: actions/cache/restore@v4
         with:
           path: Build
-          key: ${{ matrix.distro }}-build
+          key: ${{ matrix.distro }}-${{ env.PREVIOUS_COMMIT }}
 
       - name: Build
         run: ./Build.sh
@@ -63,4 +68,4 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: Build
-          key: ${{ steps.cache-build-restore.outputs.cache-primary-key }}
+          key: ${{ matrix.distro }}-${{ env.CURRENT_COMMIT }}
