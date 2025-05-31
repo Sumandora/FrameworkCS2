@@ -32,7 +32,7 @@ namespace Interfaces {
 	inline EngineCvar* engineCvar;
 	inline EngineToClient* engine;
 
-	void get_interfaces();
+	void grab_interfaces();
 
 	void* uncover_create_function(void* create_func);
 }

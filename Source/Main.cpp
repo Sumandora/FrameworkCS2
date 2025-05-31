@@ -16,7 +16,7 @@ static void initializer()
 	Memory::mem_mgr.sync_layout();
 
 	GUI::init();
-	Interfaces::get_interfaces();
+	Interfaces::grab_interfaces();
 	Memory::create();
 	Features::create();
 	Hooks::create();

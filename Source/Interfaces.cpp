@@ -97,7 +97,7 @@ void* Interfaces::uncover_create_function(void* create_func)
 	return reinterpret_cast<void*>(interface_ptr);
 }
 
-void Interfaces::get_interfaces()
+void Interfaces::grab_interfaces()
 {
 	auto client = InterfacedLibrary::create("libclient.so").value();
 	auto schemasystem = InterfacedLibrary::create("libschemasystem.so").value();
