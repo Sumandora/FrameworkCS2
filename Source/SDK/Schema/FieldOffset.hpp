@@ -17,10 +17,11 @@ struct SchemaClassInfo;
 		return info;                                                                                                               \
 	}
 
+// FIXME, TODO: self.classInfo() can walk up the inheritance tree through its template like properties, fix this properly soon
 #define SCHEMA_VAR(type, prettyName, name)                                                             \
 	inline auto&& prettyName(this auto&& self)                                                         \
 	{                                                                                                  \
-		static std::int32_t offset = SchemaSystem::findOffset(self.classInfo(), name);                 \
+		static const std::int32_t offset = SchemaSystem::findOffset(self.classInfo(), name);           \
 		if constexpr (std::is_const_v<std::remove_pointer_t<decltype(&self)>>)                         \
 			return *reinterpret_cast<type const*>(reinterpret_cast<const std::byte*>(&self) + offset); \
 		else                                                                                           \
