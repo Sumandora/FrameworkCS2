@@ -12,7 +12,7 @@ jobs:
     container:
       image: ${{ matrix.distro }}
       env:
-        CI: "1"
+        CI: 1
     steps:
       - if: matrix.distro == 'ubuntu:latest'
         name: Setup dependencies

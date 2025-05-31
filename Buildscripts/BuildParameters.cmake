@@ -1,6 +1,8 @@
 # Compiler flags for build
 if(NOT DEFINED ENV{CI})
     target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE "-march=native")
+else()
+    message("Doing a CI build")
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
