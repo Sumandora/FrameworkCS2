@@ -11,7 +11,7 @@
 
 static void initializer()
 {
-	Logging::info("Hello, world, again!");
+	Logging::info("Hello, world, from inside the thread!");
 
 	Memory::mem_mgr.sync_layout();
 
