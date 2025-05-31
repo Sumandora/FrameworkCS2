@@ -48,12 +48,19 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Cache Build
-        id: cache-build
-        uses: actions/cache@v4
+      - name: Restore cached build
+        id: cache-build-restore
+        uses: actions/cache/restore@v4
         with:
           path: Build
           key: ${{ matrix.distro }}-build
 
       - name: Build
         run: ./Build.sh
+
+      - name: Save build caches
+        id: cache-build-save
+        uses: actions/cache/save@v4
+        with:
+          path: Build
+          key: ${{ steps.cache-build-restore.outputs.cache-primary-key }}
