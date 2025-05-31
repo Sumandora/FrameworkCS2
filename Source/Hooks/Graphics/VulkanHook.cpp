@@ -368,14 +368,16 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 
 		GUI::render();
 
-		auto* drawData = ImGui::GetDrawData();
+		auto* draw_data = ImGui::GetDrawData();
 		{
 			const std::lock_guard<std::mutex> lock(GraphicsHook::espMutex);
 			if (GraphicsHook::espDrawList != nullptr) {
-				drawData->AddDrawList(GraphicsHook::espDrawList.get());
-				ImGui_ImplVulkan_RenderDrawData(drawData, fd->CommandBuffer);
+				draw_data->AddDrawList(GraphicsHook::espDrawList.get());
 			}
 		}
+
+		ImGui_ImplVulkan_RenderDrawData(draw_data, fd->CommandBuffer);
+
 		// Record dear imgui primitives into command buffer
 
 		static std::once_flag espDrawListFlag;
