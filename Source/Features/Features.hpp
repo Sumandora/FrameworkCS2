@@ -11,7 +11,7 @@
 
 #include "Visuals/ForceCrosshair.hpp"
 #include "Visuals/LoadingTextChanger.hpp"
-#include "Visuals/ESP.hpp"
+#include "Visuals/ESP/ESP.hpp"
 
 namespace Features {
 	inline UninitializedObject<ESP> esp;

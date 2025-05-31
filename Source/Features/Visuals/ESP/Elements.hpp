@@ -1,23 +1,18 @@
 #pragma once
 
-#include "../Feature.hpp"
-#include "../Setting.hpp"
-
 #include "GenericESP/Element/Element.hpp"
 #include "GenericESP/Element/Rectangle.hpp"
 #include "GenericESP/Element/SidedElement.hpp"
 #include "GenericESP/Element/SidedText.hpp"
 
+#include "../../../GUI/GUI.hpp"
+#include "../../../SDK/Entities/BaseEntity.hpp"
+
+#include "../../Setting.hpp"
+
 #include "imgui.h"
 #include "imgui_internal.h"
 
-#include "../../Utils/Logging.hpp"
-
-#include "../../SDK/Entities/BaseEntity.hpp"
-
-#include "../../GUI/GUI.hpp"
-
-#include <cstdint>
 #include <string>
 #include <utility>
 
@@ -110,29 +105,4 @@ struct PlayerSidedText : MetaSetting, GenericESP::SidedText {
 	bool get_shadow(const GenericESP::EntityType* /*e*/) const override { return shadow.get(); }
 	float get_shadow_offset(const GenericESP::EntityType* /*e*/) const override { return shadow_offset.get(); }
 	ImColor get_shadow_color(const GenericESP::EntityType* /*e*/) const override { return shadow_color.get(); }
-};
-
-class ESP : public Feature {
-	Checkbox enabled{ this, "Enabled", false };
-	Subgroup lotto{ this, "Lotto" };
-	Checkbox another_check{ lotto, "Another check", true };
-	Button btn{ lotto, "Click me", []() {
-				   Logging::info("heya");
-			   } };
-
-	Tabs elements{ this, "Elements" };
-	PlayerRectangle box{ elements, "Box" };
-	PlayerSidedText name{ elements, "Name" };
-
-	enum BabbysFirstEnum : std::uint8_t {
-		HELLO,
-		WORLD
-	};
-
-	Combo<BabbysFirstEnum> combo{ this, "Le combo" };
-
-public:
-	ESP();
-
-	void draw(ImDrawList* draw_list);
 };
