@@ -1,5 +1,7 @@
 # Compiler flags for build
-target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE "-march=native")
+if(NOT DEFINED ENV{CI})
+    target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE "-march=native")
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-g" "-ggdb3" "-DDEBUG")

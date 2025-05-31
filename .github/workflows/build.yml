@@ -9,7 +9,10 @@ jobs:
         distro: ["ubuntu:latest", "ubuntu:rolling", "debian:unstable", "debian:testing", "devuan/devuan:unstable", "archlinux:latest", "artixlinux/artixlinux", "cachyos/cachyos", "fedora:latest", "opensuse/tumbleweed"]
       fail-fast: false
     runs-on: ubuntu-latest
-    container: ${{ matrix.distro }}
+    container:
+      image: ${{ matrix.distro }}
+      env:
+        CI: "1"
     steps:
       - if: matrix.distro == 'ubuntu:latest'
         name: Setup dependencies
