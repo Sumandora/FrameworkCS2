@@ -51,6 +51,7 @@ jobs:
       - name: Get current and previous commit hash
         run: |
           git config --global --add safe.directory '*'
+          git pull --depth 2
           echo "CURRENT_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
           echo "PREVIOUS_COMMIT=$(git log --pretty=%P -n 1 $(git rev-parse HEAD))" >> $GITHUB_ENV
 
