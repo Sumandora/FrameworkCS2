@@ -5,6 +5,7 @@
 #include "../../../Memory.hpp"
 
 #include "../../../SDK/Entities/BaseEntity.hpp"
+#include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../../SDK/Entities/GameEntitySystem.hpp"
 #include "../../../SDK/GameClass/CollisionProperty.hpp"
@@ -93,8 +94,11 @@ void ESP::draw(ImDrawList* draw_list)
 				GenericESP::UnionedRect unioned_rect{ ImRect{ rectangle[0], rectangle[1], rectangle[2], rectangle[3] } };
 				if (box.enabled.get())
 					box.draw(draw_list, entity, unioned_rect);
-				if (name.enabled.get())
-					name.draw(draw_list, entity, "Hello, world", unioned_rect);
+				if (name.enabled.get()) {
+					CSPlayerController* controller = static_cast<CSPlayerPawnBase*>(entity)->original_controller().get();
+					if (controller)
+						name.draw(draw_list, entity, controller->sanitizied_name(), unioned_rect);
+				}
 				if (healthbar.enabled.get())
 					healthbar.draw(draw_list, entity, unioned_rect);
 			}
