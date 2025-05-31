@@ -36,6 +36,10 @@ void GUI::Tabs::render()
 					// TODO Link maps/Shared libraries
 					// TODO Interfaces
 
+					if(ImGui::BeginTabItem("Interfaces")) {
+						Debug::draw_interfaces();
+						ImGui::EndTabItem();
+					}
 					if (ImGui::BeginTabItem("View matrix")) {
 						Debug::draw_view_matrix();
 						ImGui::EndTabItem();
