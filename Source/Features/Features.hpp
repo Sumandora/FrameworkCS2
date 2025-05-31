@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "Feature.hpp"
-#include "Setting.hpp"
 
 #include "../Utils/UninitializedObject.hpp"
 

@@ -5,6 +5,7 @@
 
 #include "imgui.h"
 
+#include "../../../SDK/Entities/BaseEntity.hpp"
 #include "../../../Utils/Logging.hpp"
 
 #include <cstdint>
@@ -23,6 +24,9 @@ class ESP : public Feature {
 	Tabs elements{ this, "Elements" };
 	PlayerRectangle box{ elements, "Box" };
 	PlayerSidedText name{ elements, "Name" };
+	PlayerBar healthbar{ elements, "Health bar",
+		[](const BaseEntity* e) { return static_cast<float>(e->health()) / static_cast<float>(e->max_health()); },
+		[](const BaseEntity* e) { return std::to_string(e->health()); } };
 
 	enum BabbysFirstEnum : std::uint8_t {
 		HELLO,

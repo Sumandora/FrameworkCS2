@@ -95,6 +95,8 @@ void ESP::draw(ImDrawList* draw_list)
 					box.draw(draw_list, entity, unioned_rect);
 				if (name.enabled.get())
 					name.draw(draw_list, entity, "Hello, world", unioned_rect);
+				if (healthbar.enabled.get())
+					healthbar.draw(draw_list, entity, unioned_rect);
 			}
 		next_ent:;
 		}
