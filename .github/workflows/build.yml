@@ -27,7 +27,7 @@ jobs:
         name: Setup dependencies
         run: |
           apt-get update
-          apt-get install --no-install-recommends -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev
+          apt-get install --no-install-recommends -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev ca-certificates
       - if: matrix.distro == 'archlinux:latest' || matrix.distro == 'cachyos/cachyos'
         name: Setup dependencies
         run: |
