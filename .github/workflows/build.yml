@@ -6,12 +6,19 @@ jobs:
   build:
     strategy:
       matrix:
-        distro: ["debian:unstable", "debian:testing", "archlinux:latest", "fedora:latest"]
+        distro: ["ubuntu:latest", "ubuntu:rolling", "debian:unstable", "debian:testing", "archlinux:latest", "fedora:latest"]
       fail-fast: false
     runs-on: ubuntu-latest
     container: ${{ matrix.distro }}
     steps:
-      - if: matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing'
+      - if: matrix.distro == 'ubuntu:latest'
+        name: Setup dependencies
+        run: |
+          apt-get update
+          apt-get install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev gcc-14 g++-14
+          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 999
+          update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 999
+      - if: matrix.distro == 'ubuntu:rolling' || matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing'
         name: Setup dependencies
         run: |
           apt-get update
