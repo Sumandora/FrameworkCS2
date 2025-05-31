@@ -20,6 +20,8 @@ static void initializer()
 	Memory::create();
 	Features::create();
 	Hooks::create();
+
+	Logging::info("Initialization complete");
 }
 
 static int __attribute((constructor)) startup()
