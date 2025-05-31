@@ -34,10 +34,13 @@ void GUI::Tabs::render()
 			if (ImGui::BeginTabItem("Debug")) {
 				if (ImGui::BeginTabBar("#Debug tabs", ImGuiTabBarFlags_Reorderable)) {
 					// TODO Link maps/Shared libraries
-					// TODO Interfaces
 
 					if(ImGui::BeginTabItem("Interfaces")) {
 						Debug::draw_interfaces();
+						ImGui::EndTabItem();
+					}
+					if(ImGui::BeginTabItem("Link maps")) {
+						Debug::draw_link_maps();
 						ImGui::EndTabItem();
 					}
 					if (ImGui::BeginTabItem("View matrix")) {
