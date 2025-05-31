@@ -53,7 +53,7 @@ jobs:
           git config --global --add safe.directory '*'
           git pull --depth 2
           echo "CURRENT_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
-          echo "PREVIOUS_COMMIT=$(git log --pretty=%P -n 1 $(git rev-parse HEAD))" >> $GITHUB_ENV
+          echo "PREVIOUS_COMMIT=$(git rev-parse HEAD~1)" >> $GITHUB_ENV
 
       - name: Restore cached build
         id: cache-build-restore
