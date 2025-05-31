@@ -16,6 +16,11 @@ jobs:
         run: |
           apt-get update
           apt-get install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev
+      - if: matrix.distro == 'ubuntu:latest'
+        name: Updating alternatives on Ubuntu
+        run: |
+          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 999
+          update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 999
       - if: matrix.distro == 'archlinux:latest'
         name: Setup dependencies
         run: |
