@@ -11,7 +11,7 @@
 
 static void initializer()
 {
-	Logging::info("Hello, world, from inside the thread!");
+	Logging::debug("Hello, world, from inside the thread!");
 
 	Memory::mem_mgr.sync_layout();
 
@@ -26,7 +26,7 @@ static void initializer()
 
 static int __attribute((constructor)) startup()
 {
-	Logging::info("Hello, world!");
+	Logging::debug("Hello, world!");
 	std::thread t(initializer);
 	t.detach();
 
