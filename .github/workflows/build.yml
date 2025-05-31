@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        distro: ["ubuntu:latest", "ubuntu:rolling", "debian:unstable", "debian:testing", "archlinux:latest", "fedora:latest"]
+        distro: ["ubuntu:latest", "ubuntu:rolling", "debian:unstable", "debian:testing", "archlinux:latest", "fedora:latest", "opensuse/tumbleweed"]
       fail-fast: false
     runs-on: ubuntu-latest
     container: ${{ matrix.distro }}
@@ -33,6 +33,11 @@ jobs:
         run: |
           dnf update -y
           dnf install -y git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel
+      - if: matrix.distro == 'opensuse/tumbleweed'
+        name: Setup dependencies
+        run: |
+          zypper refresh
+          zypper install -y git cmake make gcc-c++ binutils-devel vulkan-devel libXext-devel freetype2-devel
 
       - uses: actions/checkout@v4
         with:
