@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        distro: ["ubuntu:latest", "ubuntu:rolling", "debian:unstable", "debian:testing", "archlinux:latest", "fedora:latest"]
+        distro: ["ubuntu:latest", "ubuntu:rolling", "debian:unstable", "debian:testing", "archlinux:latest", "fedora:latest", "rockylinux:9"]
       fail-fast: false
     runs-on: ubuntu-latest
     container: ${{ matrix.distro }}
@@ -28,7 +28,7 @@ jobs:
         run: |
           pacman -Syu --noconfirm
           pacman -S --noconfirm base-devel cmake git vulkan-icd-loader vulkan-headers libx11 libxext
-      - if: matrix.distro == 'fedora:latest'
+      - if: matrix.distro == 'fedora:latest' || matrix.distro == 'rockylinux:9'
         name: Setup dependencies
         run: |
           dnf update -y
