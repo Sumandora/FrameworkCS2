@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        distro: ["ubuntu:latest", "ubuntu:rolling", "debian:unstable", "debian:testing", "archlinux:latest", "cachyos/cachyos", "fedora:latest", "opensuse/tumbleweed"]
+        distro: ["ubuntu:latest", "ubuntu:rolling", "debian:unstable", "debian:testing", "devuan/devuan:unstable", "archlinux:latest", "cachyos/cachyos", "fedora:latest", "opensuse/tumbleweed"]
       fail-fast: false
     runs-on: ubuntu-latest
     container: ${{ matrix.distro }}
@@ -23,6 +23,11 @@ jobs:
         run: |
           apt-get update
           apt-get install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev
+      - if: matrix.distro == 'devuan/devuan:unstable'
+        name: Setup dependencies
+        run: |
+          apt-get update
+          apt-get install --no-install-recommends -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev ca-certificates
       - if: matrix.distro == 'archlinux:latest' || matrix.distro == 'cachyos/cachyos'
         name: Setup dependencies
         run: |
