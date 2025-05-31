@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        distro: ["ubuntu:latest", "ubuntu:rolling", "debian:unstable", "debian:testing", "archlinux:latest", "cachyos/cachyos", "fedora:latest", "opensuse/tumbleweed"]
+        distro: ["ubuntu:latest", "ubuntu:rolling", "debian:unstable", "debian:testing", "devuan/devuan:unstable", "archlinux:latest", "cachyos/cachyos", "fedora:latest", "opensuse/tumbleweed"]
       fail-fast: false
     runs-on: ubuntu-latest
     container: ${{ matrix.distro }}
@@ -18,7 +18,7 @@ jobs:
           apt-get install -y git cmake make build-essential libvulkan-dev libx11-dev libxext-dev gcc-14 g++-14
           update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 999
           update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 999
-      - if: matrix.distro == 'ubuntu:rolling' || matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing'
+      - if: matrix.distro == 'ubuntu:rolling' || matrix.distro == 'debian:unstable' || matrix.distro == 'debian:testing' || matrix.distro == 'devuan/devuan:unstable'
         name: Setup dependencies
         run: |
           apt-get update
