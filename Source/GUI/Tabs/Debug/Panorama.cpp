@@ -12,8 +12,15 @@
 
 #include "../../../Hooks/Game/GameHook.hpp"
 
+#include "misc/cpp/imgui_stdlib.h"
+
 #include <mutex>
 #include <string>
+
+/** TODO Make this a feature:
+var obj = $.GetContextPanel().FindChildTraverse("JsLeftColumn");
+obj.visible = false;
+*/
 
 void GUI::Tabs::Debug::draw_panorama()
 {
@@ -25,18 +32,16 @@ void GUI::Tabs::Debug::draw_panorama()
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Execute Javascript")) {
-			static char panel[512] = "CSGOMainMenu";
-			ImGui::InputText("Panel", panel, IM_ARRAYSIZE(panel));
-			static char context[512] = "panorama/layout/base.xml";
-			ImGui::InputText("Context", context, IM_ARRAYSIZE(context));
-			static char source[4096] = "";
-			ImGui::InputTextMultiline("Source", source, IM_ARRAYSIZE(source));
+			static std::string panel = "CSGOMainMenu";
+			ImGui::InputText("Panel", &panel);
+			static std::string context = "panorama/layout/base.xml";
+			ImGui::InputText("Context", &context);
+			static std::string source;
+			ImGui::InputTextMultiline("Source", &source);
 
 			if (ImGui::Button("Execute!")) {
 				UIEngine* ui_engine = Interfaces::panorama_ui_engine->access_ui_engine();
-				Logging::info("Engine: {}", ui_engine);
 				UIPanel* ui_panel = ui_engine->find_panel(panel);
-				Logging::info("Panel: {}", ui_panel);
 				const std::lock_guard g{ Hooks::Game::FrameStageNotify::queued_tasks_lock };
 				Hooks::Game::FrameStageNotify::queued_tasks.emplace_back(
 					[ui_engine,
