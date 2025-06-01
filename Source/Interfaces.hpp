@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SDK/Panorama/PanoramaUIEngine.hpp"
 #include <concepts>
 #include <optional>
 #include <unordered_map>
@@ -7,6 +8,7 @@
 struct SchemaSystem;
 struct EngineCvar;
 struct EngineToClient;
+struct PanoramaUIEngine;
 
 namespace Interfaces {
 	class InterfacedLibrary {
@@ -31,6 +33,7 @@ namespace Interfaces {
 	inline SchemaSystem* schemaSystem;
 	inline EngineCvar* engineCvar;
 	inline EngineToClient* engine;
+	inline PanoramaUIEngine* panorama_ui_engine;
 
 	void grab_interfaces();
 

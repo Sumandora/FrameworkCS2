@@ -12,7 +12,6 @@
 
 #include "BCRL/SearchConstraints.hpp"
 #include "Memory.hpp"
-#include "SDK/GameClass/EngineToClient.hpp"
 #include "SDK/InterfaceReg.hpp"
 
 #include "BCRL/Session.hpp"
@@ -104,6 +103,8 @@ void Interfaces::grab_interfaces()
 	auto tier0 = InterfacedLibrary::create("libtier0.so").value();
 	auto engine2 = InterfacedLibrary::create("libengine2.so").value();
 
+	auto panorama = InterfacedLibrary::create("libpanorama.so").value();
+
 	constexpr static auto INFO = [](std::string_view name, void* ptr) {
 		if (ptr)
 			Logging::info("Found interface '{}' at {}", name, ptr);
@@ -119,4 +120,6 @@ void Interfaces::grab_interfaces()
 	INFO("EngineCvar", engineCvar);
 	engine = engine2.get_interface<EngineToClient>("Source2EngineToClient");
 	INFO("Source2Engine", engine);
+	panorama_ui_engine = panorama.get_interface<PanoramaUIEngine>("PanoramaUIEngine");
+	INFO("PanoramaUIEngine", panorama_ui_engine);
 }
