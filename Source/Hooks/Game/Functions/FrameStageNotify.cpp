@@ -11,8 +11,7 @@
 
 #include "RetAddrSpoofer.hpp"
 
-#include "backends/imgui_impl_vulkan.h"
-
+#include <functional>
 #include <mutex>
 
 void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, ClientFrameStage stage)

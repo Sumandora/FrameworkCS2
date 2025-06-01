@@ -16,6 +16,11 @@ A fully-featured training software for Counter Strike: 2, made for Linux.
   ```
 
   Some older distributions, like Ubuntu and Debian may need to specify GCC14 explicitly, by setting the `CC=gcc-14` and `CXX=g++-14` environment variables when invoking the build script.
+
+  Tested derivatives:
+  - Ubuntu (LTS and Latest)
+  - Debian Unstable and Testing
+  - Devuan
 </details>
 
 <details>
@@ -24,6 +29,10 @@ A fully-featured training software for Counter Strike: 2, made for Linux.
   ```sh
   pacman -S gdb base-devel cmake git vulkan-icd-loader vulkan-headers libX11 libxext
   ```
+
+  Tested derivatives:
+  - Artix Linux
+  - CachyOS
 </details>
 
 <details>
@@ -32,6 +41,16 @@ A fully-featured training software for Counter Strike: 2, made for Linux.
   ```sh
   dnf install gdb git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel
   ```
+</details>
+
+<details>
+  <summary> OpenSUSE </summary>
+
+  ```sh
+  zypper install -y git cmake make gcc-c++ binutils-devel vulkan-devel libXext-devel freetype2-devel ccache
+  ```
+
+  Only Tumbleweed is being tested, Leap installs a very outdated GCC version by default.
 </details>
 These might be outdated, in that case please open an issue or a pull request, which updates the package names.
 

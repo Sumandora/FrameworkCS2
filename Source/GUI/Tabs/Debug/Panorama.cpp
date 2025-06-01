@@ -8,8 +8,6 @@
 #include "../../../SDK/Panorama/UIEngine.hpp"
 #include "../../../SDK/Panorama/UIPanel.hpp"
 
-#include "../../../Utils/Logging.hpp"
-
 #include "../../../Hooks/Game/GameHook.hpp"
 
 #include "misc/cpp/imgui_stdlib.h"
