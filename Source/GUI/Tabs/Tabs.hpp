@@ -9,6 +9,7 @@ namespace GUI::Tabs {
 		void draw_convars();
 		void draw_local_player();
 		void draw_event_list();
+		void draw_panorama();
 	}
 	void render();
 }

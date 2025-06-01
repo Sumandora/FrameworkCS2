@@ -33,8 +33,6 @@ void GUI::Tabs::render()
 
 			if (ImGui::BeginTabItem("Debug")) {
 				if (ImGui::BeginTabBar("#Debug tabs", ImGuiTabBarFlags_Reorderable)) {
-					// TODO Link maps/Shared libraries
-
 					if(ImGui::BeginTabItem("Interfaces")) {
 						Debug::draw_interfaces();
 						ImGui::EndTabItem();
@@ -61,6 +59,10 @@ void GUI::Tabs::render()
 					}
 					if (ImGui::BeginTabItem("Game events")) {
 						Debug::draw_event_list();
+						ImGui::EndTabItem();
+					}
+					if (ImGui::BeginTabItem("Panorama")) {
+						Debug::draw_panorama();
 						ImGui::EndTabItem();
 					}
 
