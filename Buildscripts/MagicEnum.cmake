@@ -7,3 +7,5 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(magic_enum)
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE magic_enum)
+
+embed_license("Magic Enum" magic_enum "${magic_enum_SOURCE_DIR}/LICENSE")

@@ -7,3 +7,5 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(json)
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE nlohmann_json)
+
+embed_license("JSON for Modern C++ (nlohmann/json)" nlohmann_json "${json_SOURCE_DIR}/LICENSE.MIT")
