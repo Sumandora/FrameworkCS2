@@ -1,6 +1,5 @@
 # Add MagicEnum to the project
-FetchContent_Declare(
-	magic_enum
+FetchContent_Declare(magic_enum
 	GIT_REPOSITORY https://github.com/Neargye/magic_enum
 	GIT_PROGRESS TRUE
 	GIT_TAG v0.9.7)

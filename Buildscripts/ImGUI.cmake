@@ -1,6 +1,5 @@
 # Add ImGUI to the project
-FetchContent_Declare(
-	imgui
+FetchContent_Declare(imgui
 	GIT_REPOSITORY https://github.com/ocornut/imgui
 	GIT_PROGRESS TRUE
 	GIT_TAG v1.91.7)

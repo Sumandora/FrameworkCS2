@@ -5,8 +5,8 @@ project(${CMAKE_PROJECT_NAME})
 
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
-        message("Using ccache for build")
-        set(CMAKE_CXX_COMPILER_LAUNCHER "ccache")
+	message("Using ccache for build")
+	set(CMAKE_CXX_COMPILER_LAUNCHER "ccache")
 endif()
 
 set(CMAKE_CXX_STANDARD 23)
