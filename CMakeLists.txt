@@ -9,7 +9,7 @@ if(CCACHE_FOUND)
         set(CMAKE_CXX_COMPILER_LAUNCHER "ccache")
 endif()
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 26)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_SKIP_RPATH ON)
@@ -24,6 +24,8 @@ include("Buildscripts/BuildParameters.cmake")
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE PROJECT_NAME="${CMAKE_PROJECT_NAME}")
 
 include(FetchContent)
+
+include("Buildscripts/Licenses.cmake") # Macro to generate license headers
 
 # Dependencies
 include("Buildscripts/BCRL.cmake")
@@ -43,3 +45,5 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE LinuxMemoryManager)
 include("Buildscripts/Obfuscation.cmake")
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE dl ${Vulkan_LIBRARIES})
+
+define_licenses()
