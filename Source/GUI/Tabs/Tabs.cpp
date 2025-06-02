@@ -33,11 +33,11 @@ void GUI::Tabs::render()
 
 			if (ImGui::BeginTabItem("Debug")) {
 				if (ImGui::BeginTabBar("#Debug tabs", ImGuiTabBarFlags_Reorderable)) {
-					if(ImGui::BeginTabItem("Interfaces")) {
+					if (ImGui::BeginTabItem("Interfaces")) {
 						Debug::draw_interfaces();
 						ImGui::EndTabItem();
 					}
-					if(ImGui::BeginTabItem("Link maps")) {
+					if (ImGui::BeginTabItem("Link maps")) {
 						Debug::draw_link_maps();
 						ImGui::EndTabItem();
 					}
@@ -63,6 +63,18 @@ void GUI::Tabs::render()
 					}
 					if (ImGui::BeginTabItem("Panorama")) {
 						Debug::draw_panorama();
+						ImGui::EndTabItem();
+					}
+
+					ImGui::EndTabBar();
+				}
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem("About")) {
+				if (ImGui::BeginTabBar("#About tabs", ImGuiTabBarFlags_Reorderable)) {
+					if (ImGui::BeginTabItem("Licenses")) {
+						About::draw_licenses();
 						ImGui::EndTabItem();
 					}
 
