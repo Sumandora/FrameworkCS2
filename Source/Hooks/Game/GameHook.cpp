@@ -32,7 +32,7 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			BCRL::pointer_array(Memory::mem_mgr, Memory::csgo_input, 22)
 				.expect<void*>("Couldn't find CreateMove"),
-			reinterpret_cast<void*>(GetFunLoading::hook_func));
+			reinterpret_cast<void*>(CreateMove::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
