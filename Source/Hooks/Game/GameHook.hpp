@@ -2,15 +2,14 @@
 
 #include "../../SDK/GameClass/ClientFrameStage.hpp"
 
+#include "../../Utils/ThreadExecutor.hpp"
 #include "../../Utils/UninitializedObject.hpp"
+
 #include "../Hooks.hpp"
 
 #include <cstddef>
-#include <functional>
-#include <mutex>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 struct GameEvent;
 
@@ -19,9 +18,7 @@ namespace Hooks::Game {
 	void destroy();
 
 	namespace FrameStageNotify {
-		// TODO proper thread executor
-		inline std::vector<std::function<void()>> queued_tasks;
-		inline std::mutex queued_tasks_lock;
+		inline ThreadExecutor thread_executor;
 
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hookFunc([[maybe_unused]] void* thisptr, ClientFrameStage stage);

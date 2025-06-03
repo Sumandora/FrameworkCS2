@@ -20,13 +20,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		using enum ClientFrameStage;
 	case FRAME_SIMULATE_END: {
 		Memory::local_player = BaseEntity::getLocalPlayer();
-		{
-			const std::lock_guard g{ queued_tasks_lock };
-			std::erase_if(queued_tasks, [](const std::function<void()>& action) {
-				action();
-				return true;
-			});
-		}
+		thread_executor.run_all_queued_functions();
 		break;
 	}
 

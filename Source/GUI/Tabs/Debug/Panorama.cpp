@@ -40,14 +40,12 @@ void GUI::Tabs::Debug::draw_panorama()
 			if (ImGui::Button("Execute!")) {
 				UIEngine* ui_engine = Interfaces::panorama_ui_engine->access_ui_engine();
 				UIPanel* ui_panel = ui_engine->find_panel(panel);
-				const std::lock_guard g{ Hooks::Game::FrameStageNotify::queued_tasks_lock };
-				Hooks::Game::FrameStageNotify::queued_tasks.emplace_back(
-					[ui_engine,
-						ui_panel,
-						s = std::string{ source },
-						c = std::string{ context }]() {
-						ui_engine->run_script(ui_panel, s.c_str(), c.c_str());
-					});
+				Hooks::Game::FrameStageNotify::thread_executor.queue([ui_engine,
+																		 ui_panel,
+																		 s = std::string{ source },
+																		 c = std::string{ context }] {
+					ui_engine->run_script(ui_panel, s.c_str(), c.c_str());
+				});
 			}
 			ImGui::EndTabItem();
 		}
