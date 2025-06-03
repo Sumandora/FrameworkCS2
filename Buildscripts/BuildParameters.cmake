@@ -6,7 +6,8 @@ else()
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-g" "-ggdb3" "-DDEBUG")
+	target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-g" "-ggdb3")
+	target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE "DEBUG")
 else()
 	target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE "-Os")
 	set(CMAKE_CXX_FLAGS "-D'IM_ASSERT(_EXPR)=((void)(_EXPR))' ${CMAKE_CXX_FLAGS}") # TODO Can you do this without set?
