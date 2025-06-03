@@ -28,15 +28,22 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			Memory::get_fun_loading,
 			reinterpret_cast<void*>(GetFunLoading::hook_func));
+		CreateMove::hook.emplace(
+			Memory::emalloc,
+			BCRL::pointer_array(Memory::mem_mgr, Memory::csgo_input, 22)
+				.expect<void*>("Couldn't find CreateMove"),
+			reinterpret_cast<void*>(GetFunLoading::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
 		FireEvent::hook->enable();
 		GetFunLoading::hook->enable();
+		CreateMove::hook->enable();
 	}
 
 	void destroy()
 	{
+		CreateMove::hook.reset();
 		GetFunLoading::hook.reset();
 		FireEvent::hook.reset();
 		ShouldShowCrosshair::hook.reset();

@@ -40,4 +40,10 @@ namespace Hooks::Game {
 		inline UninitializedObject<DetourHook<true>> hook;
 		const char* hook_func(const char* fallback);
 	}
+
+	namespace CreateMove {
+		inline UninitializedObject<DetourHook<true>> hook;
+		// TODO does this actually return void? lets go with void* for now.
+		void* hook_func(void* csgo_input, int unk, void* usercmd);
+	}
 }
