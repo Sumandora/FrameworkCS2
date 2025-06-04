@@ -1,9 +1,8 @@
+#include "Checkbox.hpp"
+
 #include "../Setting.hpp"
 
 #include "imgui.h"
-
-#include "nlohmann/json.hpp"
-#include "nlohmann/json_fwd.hpp"
 
 #include <string>
 #include <utility>

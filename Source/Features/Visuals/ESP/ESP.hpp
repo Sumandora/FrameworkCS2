@@ -1,7 +1,12 @@
 #pragma once
 
 #include "../../Feature.hpp"
-#include "../../Setting.hpp"
+
+#include "../../Settings/Button.hpp"
+#include "../../Settings/Checkbox.hpp"
+#include "../../Settings/Combo.hpp"
+#include "../../Settings/Subgroup.hpp"
+#include "../../Settings/Tabs.hpp"
 
 #include "imgui.h"
 

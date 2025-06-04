@@ -10,6 +10,12 @@
 #include "../../../SDK/Entities/BaseEntity.hpp"
 
 #include "../../Setting.hpp"
+#include "../../Settings/Checkbox.hpp"
+#include "../../Settings/Color.hpp"
+#include "../../Settings/Combo.hpp"
+#include "../../Settings/FloatSlider.hpp"
+#include "../../Settings/MetaSetting.hpp"
+#include "../../Settings/Subgroup.hpp"
 
 #include "imgui.h"
 #include "imgui_internal.h"

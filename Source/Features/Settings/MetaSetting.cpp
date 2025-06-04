@@ -1,7 +1,6 @@
-#include "../Setting.hpp"
+#include "MetaSetting.hpp"
 
-#include "nlohmann/json.hpp"
-#include "nlohmann/json_fwd.hpp"
+#include "../Setting.hpp"
 
 #include <string>
 #include <utility>

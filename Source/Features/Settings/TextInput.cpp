@@ -1,9 +1,12 @@
+#include "TextInput.hpp"
+
 #include "../Setting.hpp"
+
+#include "imgui.h"
+#include "misc/cpp/imgui_stdlib.h"
 
 #include <string>
 #include <utility>
-
-#include "misc/cpp/imgui_stdlib.h"
 
 TextInput::TextInput(SettingsHolder* parent, std::string name, std::string default_value)
 	: Setting(parent, std::move(name))

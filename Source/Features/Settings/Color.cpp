@@ -1,9 +1,8 @@
+#include "Color.hpp"
+
 #include "../Setting.hpp"
 
 #include "imgui.h"
-
-#include "nlohmann/json_fwd.hpp"
-#include "nlohmann/json.hpp"
 
 #include <string>
 #include <utility>

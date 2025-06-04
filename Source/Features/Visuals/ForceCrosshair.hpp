@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../Feature.hpp"
-#include "../Setting.hpp"
+
+#include "../Settings/Checkbox.hpp"
 
 class ForceCrosshair : public Feature {
 	Checkbox enabled{ this, "Enabled", false };

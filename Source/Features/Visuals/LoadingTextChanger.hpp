@@ -1,7 +1,10 @@
 #pragma once
 
 #include "../Feature.hpp"
-#include "../Setting.hpp"
+
+#include "../Settings/Checkbox.hpp"
+#include "../Settings/TextInput.hpp"
+
 #include <string>
 
 class LoadingTextChanger : public Feature {
