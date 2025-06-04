@@ -16,6 +16,6 @@ mkdir -p Build
 LANG=en cmake -B Build -D CMAKE_BUILD_TYPE=Release -D CMAKE_CXX_FLAGS_RELEASE="$CXXFLAGS" || error
 LANG=en cmake --build Build -j "$(nproc)" || error
 
-strip -x -s Build/lib"$(cat ProjectName)".so || error
+strip -x -s "Build/lib$(cat ProjectName).so" || error
 
 echo "The ELF-Binary has been built in the \"Build\"-directory"
