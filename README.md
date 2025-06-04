@@ -78,7 +78,7 @@ An ELF-Binary will be built in the "Build"-subdirectory, which will be created b
 In case you want to build the project using a different name you can do something like this:
 ```sh
 echo "MyCoolProjectName" > ProjectName
-./Clean.sh
+git clean -fdx # Remove all uncommitted files, like the build outputs
 # Rebuild here using Debug.sh or Build.sh
 ```
 
