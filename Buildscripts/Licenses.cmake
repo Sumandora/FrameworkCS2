@@ -1,6 +1,10 @@
 # This function only writes to a file if the contents differs,
 # this is useful because it avoids updating the modification date and thus doesn't trigger a rebuild.
 function(write_file_if_changed file content)
+	if(NOT EXISTS "${file}")
+		file(WRITE "${file}" "${content}")
+		return()
+	endif()
 	file(READ "${file}" CURRENT_CONTENT)
 	string(COMPARE NOTEQUAL "${content}" "${CURRENT_CONTENT}" NEEDS_UPDATE)
 	if(NEEDS_UPDATE)
