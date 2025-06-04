@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+	message("No build type specified, assuming 'Debug'")
+	set(CMAKE_BUILD_TYPE Debug)
+endif()
+
 file(STRINGS "ProjectName" CMAKE_PROJECT_NAME) # Custom project name using this file
 project(${CMAKE_PROJECT_NAME})
 
