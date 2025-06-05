@@ -8,12 +8,12 @@
 #include <string>
 #include <utility>
 
-FloatSlider::FloatSlider(SettingsHolder* parent, std::string name, float min, float max)
-	: FloatSlider(parent, std::move(name), min, max, std::midpoint(min, max))
+RawFloatSlider::RawFloatSlider(SettingsHolder* parent, std::string name, float min, float max)
+	: RawFloatSlider(parent, std::move(name), min, max, std::midpoint(min, max))
 {
 }
 
-FloatSlider::FloatSlider(SettingsHolder* parent, std::string name, float min, float max, float value)
+RawFloatSlider::RawFloatSlider(SettingsHolder* parent, std::string name, float min, float max, float value)
 	: Setting(parent, std::move(name))
 	, min(min)
 	, max(max)
@@ -21,17 +21,17 @@ FloatSlider::FloatSlider(SettingsHolder* parent, std::string name, float min, fl
 {
 }
 
-void FloatSlider::render()
+void RawFloatSlider::render()
 {
 	ImGui::SliderFloat(get_name().c_str(), &value, min, max);
 }
 
-void FloatSlider::serialize(nlohmann::json& output_json) const
+void RawFloatSlider::serialize(nlohmann::json& output_json) const
 {
 	output_json = value;
 }
 
-void FloatSlider::deserialize(const nlohmann::json& input_json)
+void RawFloatSlider::deserialize(const nlohmann::json& input_json)
 {
 	value = input_json;
 }
