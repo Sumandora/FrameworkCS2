@@ -22,6 +22,7 @@
 #include "Tabs/Tabs.hpp"
 
 #include "../Hooks/Graphics/GraphicsHook.hpp"
+#include "imnodes.h"
 
 class OwningSDLEvent {
 	SDL_Event event;
@@ -139,7 +140,8 @@ static float font_size = 12.0F;
 void GUI::init()
 {
 	ImGui::CreateContext();
-
+	ImNodes::CreateContext();
+	
 	ImGuiIO& io = ImGui::GetIO();
 
 	io.IniFilename = nullptr; // TODO Bring it back
@@ -150,6 +152,7 @@ void GUI::init()
 
 void GUI::destroy()
 {
+	ImNodes::DestroyContext();
 	ImGui::DestroyContext();
 }
 
