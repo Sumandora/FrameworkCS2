@@ -11,4 +11,4 @@ target_link_libraries(imnodes PUBLIC imgui)
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE imnodes)
 
-# TODO LICENSE
+embed_license("ImNodes" imnodes "${imnodes_SOURCE_DIR}/LICENSE.md")
