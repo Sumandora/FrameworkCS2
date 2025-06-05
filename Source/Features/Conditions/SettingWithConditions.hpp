@@ -11,9 +11,6 @@
 
 #include "imgui.h"
 #include "imnodes.h"
-#include "imnodes_internal.h"
-
-#include "../../Utils/Logging.hpp"
 
 #include <concepts>
 #include <cstddef>
@@ -87,24 +84,13 @@ public:
 	void serialize(nlohmann::json& output_json) const override
 	{
 		setting.serialize(output_json["Main"]);
-		// auto& conditions = output_json["Conditions"];
-		// for (const auto& [cond, elem] : this->conditions) {
-		// 	nlohmann::json j;
-		// 	j["Condition"] = cond;
-		// 	j["Element"] = elem;
-		// 	conditions.push_back(j);
-		// }
+		if (node_circuit && !node_circuit->is_trivial())
+			node_circuit->serialize(output_json["Circuit"]);
 	}
 
 	void deserialize(const nlohmann::json& input_json) override
 	{
 		setting.deserialize(input_json["Main"]);
-		// if (input_json.contains("Conditions")) {
-		// 	const auto& conditions = input_json["Conditions"];
-		// 	for (const auto& j : conditions) {
-		// 		auto& p = this->conditions.emplace_back(j["Condition"].get<Condition>(), factory());
-		// 		p.second.deserialize(j["Element"]);
-		// 	}
-		// }
+		node_circuit->deserialize(input_json["Circuit"]);
 	}
 };

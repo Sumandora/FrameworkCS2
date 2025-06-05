@@ -13,6 +13,8 @@
 #include "Nodes/OriginalInputNode.hpp"
 #include "Nodes/OutputNode.hpp"
 
+#include "nlohmann/json.hpp"
+
 class NodeCircuit {
 	IdType id_counter = 1;
 
@@ -41,4 +43,7 @@ public:
 	[[nodiscard]] IdType next_id() { return id_counter++; }
 	[[nodiscard]] Node* from_id(IdType id) const;
 	[[nodiscard]] NodeResult get_output() const { return output_node.get_value(); }
+
+	void serialize(const nlohmann::json& input_json) const;
+	void deserialize(const nlohmann::json& input_json);
 };
