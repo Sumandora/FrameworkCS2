@@ -15,7 +15,10 @@
 
 #include "nlohmann/json.hpp"
 
+struct ImNodesContext;
+
 class NodeCircuit {
+	ImNodesContext* imnodes_context;
 	IdType id_counter = 1;
 
 	std::unordered_map<IdType, Node*> ids;
@@ -33,6 +36,7 @@ class NodeCircuit {
 
 public:
 	NodeCircuit(NodeType type, std::function<NodeResult()> get_original_value);
+	~NodeCircuit();
 
 	void push_node(IdType id, Node* node) { ids[id] = node; }
 	void render(bool newly_opened);

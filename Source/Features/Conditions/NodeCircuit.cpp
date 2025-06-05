@@ -27,7 +27,8 @@
 #include <vector>
 
 NodeCircuit::NodeCircuit(NodeType type, std::function<NodeResult()> get_original_value)
-	: original_input_node(this, type, std::move(get_original_value))
+	: imnodes_context(ImNodes::CreateContext())
+	, original_input_node(this, type, std::move(get_original_value))
 	, output_node(this, type)
 {
 	ImNodesIO& io = ImNodes::GetIO();
@@ -41,6 +42,10 @@ NodeCircuit::NodeCircuit(NodeType type, std::function<NodeResult()> get_original
 		.start_attribute = original_input_node.get_output(),
 		.end_node = output_node.get_id(),
 		.end_attribute = output_node.get_input() });
+}
+
+NodeCircuit::~NodeCircuit() {
+	ImNodes::DestroyContext(imnodes_context);
 }
 
 void NodeCircuit::render_new_menu()
@@ -82,6 +87,7 @@ void NodeCircuit::render_new_menu()
 
 void NodeCircuit::render(bool newly_opened)
 {
+	ImNodes::SetCurrentContext(imnodes_context);
 	ImNodes::BeginNodeEditor();
 
 	render_new_menu();
@@ -140,6 +146,7 @@ void NodeCircuit::render(bool newly_opened)
 
 	if (num_selected == 0 && ImGui::IsKeyReleased(ImGuiKey_Delete) && ImNodes::IsLinkHovered(&link_id))
 		std::erase_if(links, [link_id](const Link& link) { return link.start_attribute == link_id || link.end_attribute == link_id; });
+	ImNodes::SetCurrentContext(nullptr);
 }
 
 inline ImVec2 ScreenSpaceToGridSpace(const ImNodesEditorContext& editor, const ImVec2& v)

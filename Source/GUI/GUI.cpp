@@ -140,7 +140,6 @@ static float font_size = 12.0F;
 void GUI::init()
 {
 	ImGui::CreateContext();
-	ImNodes::CreateContext();
 	
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -152,7 +151,6 @@ void GUI::init()
 
 void GUI::destroy()
 {
-	ImNodes::DestroyContext();
 	ImGui::DestroyContext();
 }
 
