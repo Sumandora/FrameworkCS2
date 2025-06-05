@@ -20,4 +20,4 @@ public:
 	void deserialize(const nlohmann::json& input_json) override;
 };
 
-using FloatSlider = SettingWithConditions<RawFloatSlider>;
+using FloatSlider = InstrumentableSetting<RawFloatSlider>;

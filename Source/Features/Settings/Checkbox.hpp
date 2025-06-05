@@ -19,4 +19,4 @@ public:
 	void deserialize(const nlohmann::json& input_json) override;
 };
 
-using Checkbox = SettingWithConditions<RawCheckbox>;
+using Checkbox = InstrumentableSetting<RawCheckbox>;

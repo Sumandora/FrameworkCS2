@@ -21,7 +21,7 @@
 
 template <typename T>
 	requires std::is_base_of_v<Setting, T>
-class SettingWithConditions : public MetaSetting {
+class InstrumentableSetting : public MetaSetting {
 	T setting;
 	mutable std::mutex circuit_access;
 	std::unique_ptr<NodeCircuit> node_circuit = nullptr;
@@ -29,8 +29,8 @@ class SettingWithConditions : public MetaSetting {
 
 public:
 	template <typename... Args>
-	explicit SettingWithConditions(SettingsHolder* parent, std::string name, Args... args)
-		: MetaSetting(parent, "##Conditions_" + name)
+	explicit InstrumentableSetting(SettingsHolder* parent, std::string name, Args... args)
+		: MetaSetting(parent, "##Instrumentable_" + name)
 		, setting(this, name, args...)
 	{
 	}
