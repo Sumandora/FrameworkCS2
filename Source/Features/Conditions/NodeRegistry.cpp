@@ -1,5 +1,6 @@
 #include "NodeRegistry.hpp"
 
+#include "IdType.hpp"
 #include "NodeCircuit.hpp"
 
 #include "Nodes/ArithmeticNode.hpp"
@@ -71,8 +72,11 @@ void NodeRegistry::render_menu() const
 				ImGui::EndMenu();
 		}
 
-		if (node)
-			ImNodes::SetNodeScreenSpacePos(node->get_id(), click_pos);
+		if (node) {
+			const IdType id = parent->next_id();
+			ImNodes::SetNodeScreenSpacePos(id, click_pos);
+			parent->push_node(id, node);
+		}
 		ImGui::EndPopup();
 	}
 }

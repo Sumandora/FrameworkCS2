@@ -2,45 +2,71 @@
 
 #include "IdType.hpp"
 #include "Node.hpp"
+#include "NodeRegistry.hpp"
 #include "NodeResult.hpp"
+#include "Nodes.hpp"
 #include "NodeType.hpp"
+
+#include "Nodes/OriginalInputNode.hpp"
+#include "Nodes/OutputNode.hpp"
 
 #include "../../Utils/Logging.hpp"
 
-#include "imgui_internal.h"
-#include "imnodes_internal.h"
 #include "magic_enum/magic_enum.hpp"
 
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "imnodes.h"
+#include "imnodes_internal.h"
+#include "nlohmann/json_fwd.hpp"
 
 #include <algorithm>
 #include <cstddef>
 #include <functional>
-#include <string>
 #include <utility>
 #include <vector>
+
+bool NodeCircuit::is_dynamic_node(Node* node) const
+{
+	return node != &original_input_node && node != &output_node;
+}
 
 NodeCircuit::NodeCircuit(NodeType type, std::function<NodeResult()> get_original_value)
 	: imnodes_context(ImNodes::CreateContext())
 	, original_input_node(this, type, std::move(get_original_value))
+	, original_input_node_id(next_id())
 	, output_node(this, type)
+	, output_node_id(next_id())
 {
 	ImNodesIO& io = ImNodes::GetIO();
 	io.LinkDetachWithModifierClick.Modifier = &ImGui::GetIO().KeyCtrl;
 
-	ImNodes::SetNodeScreenSpacePos(original_input_node.get_id(), ImVec2{ 100, 100 });
-	ImNodes::SetNodeScreenSpacePos(output_node.get_id(), ImVec2{ 300, 100 });
+	ImNodes::SetNodeScreenSpacePos(original_input_node_id, ImVec2{ 100, 100 });
+	ImNodes::SetNodeScreenSpacePos(output_node_id, ImVec2{ 300, 100 });
+
+	push_node(original_input_node_id, &original_input_node);
+	push_node(output_node_id, &output_node);
 
 	links.emplace_back(Link{
-		.start_node = original_input_node.get_id(),
+		.start_node = original_input_node_id,
 		.start_attribute = original_input_node.get_output(),
-		.end_node = output_node.get_id(),
+		.end_node = output_node_id,
 		.end_attribute = output_node.get_input() });
 }
 
-NodeCircuit::~NodeCircuit() {
+NodeCircuit::~NodeCircuit()
+{
 	ImNodes::DestroyContext(imnodes_context);
+	for (const auto& [id, node] : ids) {
+		if (is_dynamic_node(node))
+			delete node;
+	}
+}
+
+void NodeCircuit::push_node(IdType id, Node* node)
+{
+	Logging::debug("Adding {} to ids with id {}: ptr {}", node->get_name(), id, this);
+	ids[id] = node;
 }
 
 void NodeCircuit::render(bool newly_opened)
@@ -51,7 +77,7 @@ void NodeCircuit::render(bool newly_opened)
 	registry.render_menu();
 
 	for (auto& [id, node] : ids)
-		node->render_node();
+		node->render_node(id);
 
 	for (std::size_t i = 0; i < links.size(); i++) {
 		const Link& p = links[i];
@@ -93,9 +119,9 @@ void NodeCircuit::render(bool newly_opened)
 		selected_nodes.resize(static_cast<size_t>(num_selected));
 		ImNodes::GetSelectedNodes(selected_nodes.data());
 		for (const IdType node_id : selected_nodes) {
-			if (node_id == output_node.get_id())
+			if (node_id == output_node_id)
 				continue;
-			if (node_id == original_input_node.get_id())
+			if (node_id == original_input_node_id)
 				continue;
 			std::erase_if(ids, [node_id](const auto& pair) { return pair.first == node_id; });
 			std::erase_if(links, [node_id](const Link& link) { return link.start_node == node_id || link.end_node == node_id; });
@@ -153,4 +179,69 @@ Node* NodeCircuit::from_id(IdType id) const
 	if (it != links.end())
 		return ids.at(it->start_node);
 	return nullptr;
+}
+
+void NodeCircuit::serialize(nlohmann::json& output_json) const
+{
+	ImNodes::SetCurrentContext(imnodes_context);
+	output_json["Id counter"] = id_counter;
+
+	auto& nodes = output_json["Nodes"];
+	for (const auto& [id, node] : ids) {
+		auto& node_json = nodes.emplace_back();
+		ImVec2 v = ImNodes::GetNodeGridSpacePos(id);
+		node_json["Position"] = { v.x, v.y };
+		node_json["Node Id"] = node->node_id();
+		node_json["Id"] = id;
+		if (!is_dynamic_node(node))
+			continue;
+		node->serialize(node_json["Inner"]);
+	}
+
+	output_json["Links"] = links;
+	ImNodes::SetCurrentContext(nullptr);
+}
+
+void NodeCircuit::deserialize(const nlohmann::json& input_json)
+{
+	std::erase_if(ids, [this](const std::pair<IdType, Node*>& pair) {
+		if (is_dynamic_node(pair.second)) {
+			delete pair.second;
+			return true;
+		}
+		return false;
+	});
+
+	links.clear();
+
+	const auto& nodes = input_json["Nodes"];
+	for (const auto& node : nodes) {
+		if (!node.contains("Inner")) // Don't try to load static nodes.
+			continue;
+
+		const IdType node_id = node["Node Id"];
+		const IdType id = node["Id"];
+		Node* new_node = instantiate_node_by_id(this, node["Inner"], node_id);
+		push_node(id, new_node);
+	}
+
+	links = input_json["Links"];
+
+	id_counter = input_json["Id counter"];
+
+	ImNodes::DestroyContext(imnodes_context);
+	ImNodes::CreateContext();
+	imnodes_context = ImNodes::GetCurrentContext();
+
+	for (const auto& node : nodes) {
+		const IdType id = node["Id"];
+		const ImVec2 v = {
+			node["Position"][0],
+			node["Position"][1],
+		};
+		Logging::debug("Positioning {} at {}x{}", id, v.x, v.y);
+		ids[id]->queue_position(v);
+	}
+
+	ImNodes::SetCurrentContext(nullptr);
 }

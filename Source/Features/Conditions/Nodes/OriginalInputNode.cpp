@@ -3,11 +3,13 @@
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
 #include "../NodeResult.hpp"
+#include "../Nodes.hpp"
 #include "../NodeType.hpp"
 
 #include "imgui.h"
 #include "imnodes.h"
 
+#include <cstddef>
 #include <functional>
 #include <utility>
 
@@ -22,7 +24,7 @@ OriginalInputNode::OriginalInputNode(NodeCircuit* parent, NodeType type, std::fu
 void OriginalInputNode::render_io()
 {
 	ImGui::Spacing();
-	
+
 	ImNodes::BeginOutputAttribute(output);
 	ImGui::TextUnformatted("output");
 	ImNodes::EndOutputAttribute();
@@ -33,3 +35,12 @@ NodeResult OriginalInputNode::get_value() const
 	return get_original_value();
 }
 
+std::size_t OriginalInputNode::node_id() const
+{
+	return NODE_ID<OriginalInputNode>;
+}
+
+void OriginalInputNode::serialize(nlohmann::json& /*output_json*/) const
+{
+	std::unreachable();
+}

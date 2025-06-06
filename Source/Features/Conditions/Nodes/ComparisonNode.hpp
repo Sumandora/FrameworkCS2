@@ -2,11 +2,13 @@
 
 #include "../IdType.hpp"
 #include "../Node.hpp"
+#include "../NodeRegistry.hpp"
 #include "../NodeResult.hpp"
 #include "../NodeType.hpp"
 
 #include <algorithm>
 #include <cctype>
+#include <cstddef>
 #include <cstdint>
 #include <string>
 
@@ -21,14 +23,18 @@ enum class ComparisonOp : std::uint8_t {
 	// NOLINTEND(readability-identifier-naming)
 };
 
-constexpr std::string replace_underscores_with_spaces(std::string underscores) {
+constexpr std::string replace_underscores_with_spaces(std::string underscores)
+{
 	std::ranges::replace(underscores, '_', ' ');
 	return underscores;
 }
 
 class ComparisonNode : public Node {
-	IdType lhs{}, rhs{}, output{};
 	ComparisonOp operation;
+
+	IdType lhs{}, rhs{}, output{};
+
+	explicit ComparisonNode(NodeCircuit* parent, ComparisonOp operation, IdType lhs, IdType rhs, IdType output);
 
 public:
 	explicit ComparisonNode(NodeCircuit* parent, ComparisonOp operation);
@@ -42,4 +48,9 @@ public:
 	{
 		return NodeType::FLOAT;
 	}
+
+	[[nodiscard]] std::size_t node_id() const override;
+
+	void serialize(nlohmann::json& output_json) const override;
+	static ComparisonNode* deserialize(NodeCircuit* parent, const nlohmann::json& input_json);
 };

@@ -1,9 +1,16 @@
 #pragma once
 
-#include "NodeType.hpp"
 #include "IdType.hpp"
+#include "NodeRegistry.hpp"
 #include "NodeResult.hpp"
+#include "NodeType.hpp"
 
+#include "imgui.h"
+
+#include "nlohmann/json_fwd.hpp"
+
+#include <cstddef>
+#include <optional>
 #include <string>
 
 class NodeCircuit;
@@ -11,8 +18,9 @@ class NodeCircuit;
 class Node {
 	std::string name;
 	NodeCircuit* parent;
-	IdType id;
 	NodeType output_type;
+
+	std::optional<ImVec2> queued_position;
 
 public:
 	explicit Node(NodeCircuit* parent, std::string name, NodeType output_type);
@@ -20,13 +28,18 @@ public:
 
 	virtual void render_io() = 0;
 
-	void render_node();
+	void render_node(IdType id);
 
 	[[nodiscard]] virtual NodeResult get_value() const = 0;
 	[[nodiscard]] virtual NodeType get_input_type(IdType id) const = 0;
 
 	[[nodiscard]] const std::string& get_name() const { return name; }
 	[[nodiscard]] NodeCircuit* get_parent() const { return parent; }
-	[[nodiscard]] IdType get_id() const { return id; }
 	[[nodiscard]] NodeType get_output_type() const { return output_type; }
+
+	[[nodiscard]] virtual std::size_t node_id() const = 0;
+
+	virtual void serialize(nlohmann::json& output_json) const = 0;
+
+	void queue_position(ImVec2 position) { queued_position = position; }
 };

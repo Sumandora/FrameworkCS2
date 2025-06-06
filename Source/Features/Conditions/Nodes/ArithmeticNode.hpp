@@ -2,10 +2,14 @@
 
 #include "../IdType.hpp"
 #include "../Node.hpp"
+#include "../NodeRegistry.hpp"
 #include "../NodeResult.hpp"
 #include "../NodeType.hpp"
 
+#include "nlohmann/json_fwd.hpp"
+
 #include <cctype>
+#include <cstddef>
 #include <cstdint>
 
 enum class ArithmeticOp : std::uint8_t {
@@ -19,8 +23,11 @@ enum class ArithmeticOp : std::uint8_t {
 };
 
 class ArithmeticNode : public Node {
-	IdType lhs{}, rhs{}, output{};
 	ArithmeticOp operation;
+
+	IdType lhs{}, rhs{}, output{};
+
+	explicit ArithmeticNode(NodeCircuit* parent, ArithmeticOp operation, IdType lhs, IdType rhs, IdType output);
 
 public:
 	explicit ArithmeticNode(NodeCircuit* parent, ArithmeticOp operation);
@@ -34,4 +41,9 @@ public:
 	{
 		return NodeType::FLOAT;
 	}
+
+	[[nodiscard]] std::size_t node_id() const override;
+
+	void serialize(nlohmann::json& output_json) const override;
+	static ArithmeticNode* deserialize(NodeCircuit* parent, const nlohmann::json& input_json);
 };

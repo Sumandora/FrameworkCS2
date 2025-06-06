@@ -1,10 +1,12 @@
 #pragma once
 
-#include "../Node.hpp"
 #include "../IdType.hpp"
+#include "../Node.hpp"
+#include "../NodeRegistry.hpp"
 #include "../NodeResult.hpp"
 #include "../NodeType.hpp"
 
+#include <cstddef>
 #include <functional>
 
 class OriginalInputNode : public Node {
@@ -26,5 +28,8 @@ public:
 	[[nodiscard]] NodeResult get_value() const override;
 
 	[[nodiscard]] IdType get_output() const { return output; }
-};
 
+	[[nodiscard]] std::size_t node_id() const override;
+
+	void serialize(nlohmann::json& output_json) const override;
+};

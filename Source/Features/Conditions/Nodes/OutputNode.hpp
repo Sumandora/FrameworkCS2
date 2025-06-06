@@ -2,8 +2,11 @@
 
 #include "../IdType.hpp"
 #include "../Node.hpp"
+#include "../NodeRegistry.hpp"
 #include "../NodeResult.hpp"
 #include "../NodeType.hpp"
+
+#include <cstddef>
 
 class NodeCircuit;
 
@@ -24,4 +27,8 @@ public:
 	[[nodiscard]] NodeResult get_value() const override;
 
 	[[nodiscard]] IdType get_input() const { return input; }
+
+	[[nodiscard]] std::size_t node_id() const override;
+
+	void serialize(nlohmann::json& output_json) const override;
 };

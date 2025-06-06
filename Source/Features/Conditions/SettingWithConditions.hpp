@@ -43,6 +43,18 @@ public:
 		return setting.get();
 	}
 
+	void make_node_circuit()
+	{
+		node_circuit = std::make_unique<NodeCircuit>(NodeTypeFor<decltype(setting.get())>::TYPE, [&s = this->setting] {
+			if constexpr (std::same_as<decltype(s.get()), bool>) {
+				return NodeResult{ .b = s.get() };
+			} else if constexpr (std::same_as<decltype(s.get()), float>) {
+				return NodeResult{ .f = s.get() };
+			}
+			std::unreachable();
+		});
+	}
+
 	void render() override
 	{
 		setting.render();
@@ -56,14 +68,7 @@ public:
 			// `get` will be called while in game, so they shouldn't intersect that much.
 			const std::lock_guard<std::mutex> guard{ circuit_access };
 			if (!node_circuit)
-				node_circuit = std::make_unique<NodeCircuit>(NodeTypeFor<decltype(setting.get())>::TYPE, [&s = this->setting] {
-					if constexpr (std::same_as<decltype(s.get()), bool>) {
-						return NodeResult{ .b = s.get() };
-					} else if constexpr (std::same_as<decltype(s.get()), float>) {
-						return NodeResult{ .f = s.get() };
-					}
-					std::unreachable();
-				});
+				make_node_circuit();
 			bool newly_opened = !was_open;
 			was_open = true;
 
@@ -80,10 +85,10 @@ public:
 		ImGui::PopID();
 	}
 
-	// TODO x2
 	void serialize(nlohmann::json& output_json) const override
 	{
 		setting.serialize(output_json["Main"]);
+		const std::lock_guard<std::mutex> guard{ circuit_access };
 		if (node_circuit && !node_circuit->is_trivial())
 			node_circuit->serialize(output_json["Circuit"]);
 	}
@@ -91,6 +96,12 @@ public:
 	void deserialize(const nlohmann::json& input_json) override
 	{
 		setting.deserialize(input_json["Main"]);
-		node_circuit->deserialize(input_json["Circuit"]);
+		if (input_json.contains("Circuit")) {
+			const std::lock_guard<std::mutex> guard{ circuit_access };
+			if (!node_circuit)
+				make_node_circuit();
+
+			node_circuit->deserialize(input_json["Circuit"]);
+		}
 	}
 };

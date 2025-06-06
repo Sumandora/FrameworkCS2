@@ -1,9 +1,11 @@
 #include "ArithmeticNode.hpp"
 
+#include "../IdType.hpp"
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
 #include "../NodeResult.hpp"
 #include "../NodeType.hpp"
+#include "../Nodes.hpp"
 
 #include "imgui.h"
 #include "imnodes.h"
@@ -12,15 +14,21 @@
 
 #include <cctype>
 #include <cmath>
+#include <cstddef>
 #include <string>
 #include <utility>
 
-ArithmeticNode::ArithmeticNode(NodeCircuit* parent, ArithmeticOp operation)
+ArithmeticNode::ArithmeticNode(NodeCircuit* parent, ArithmeticOp operation, IdType lhs, IdType rhs, IdType output)
 	: Node(parent, std::string{ magic_enum::enum_name(operation) }, NodeType::FLOAT)
-	, lhs(parent->next_id())
-	, rhs(parent->next_id())
-	, output(parent->next_id())
 	, operation(operation)
+	, lhs(lhs)
+	, rhs(rhs)
+	, output(output)
+{
+}
+
+ArithmeticNode::ArithmeticNode(NodeCircuit* parent, ArithmeticOp operation)
+	: ArithmeticNode(parent, operation, parent->next_id(), parent->next_id(), parent->next_id())
 {
 }
 
@@ -64,4 +72,29 @@ NodeResult ArithmeticNode::get_value() const
 	}
 
 	std::unreachable();
+}
+
+std::size_t ArithmeticNode::node_id() const {
+	return NODE_ID<ArithmeticNode>;
+}
+
+void ArithmeticNode::serialize(nlohmann::json& output_json) const
+{
+	output_json["operation"] = operation;
+
+	output_json["lhs"] = lhs;
+	output_json["rhs"] = rhs;
+	output_json["output"] = output;
+}
+
+ArithmeticNode* ArithmeticNode::deserialize(NodeCircuit* parent, const nlohmann::json& input_json)
+{
+	return new ArithmeticNode{
+		parent,
+		input_json["operation"],
+
+		input_json["lhs"],
+		input_json["rhs"],
+		input_json["output"]
+	};
 }
