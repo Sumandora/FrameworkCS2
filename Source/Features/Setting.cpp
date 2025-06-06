@@ -11,6 +11,18 @@ void SettingsHolder::render_all_childs()
 			setting->render();
 }
 
+void SettingsHolder::serialize(nlohmann::json& output_json) const
+{
+	for (Setting* setting : settings)
+		setting->serialize(output_json[setting->get_name()]);
+}
+
+void SettingsHolder::deserialize(const nlohmann::json& input_json)
+{
+	for (Setting* setting : settings)
+		setting->deserialize(input_json[setting->get_name()]);
+}
+
 Setting::Setting(SettingsHolder* parent, std::string name)
 	: name(std::move(name))
 	, visible([] { return true; })
