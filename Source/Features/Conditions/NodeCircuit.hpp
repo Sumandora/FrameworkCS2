@@ -48,6 +48,6 @@ public:
 	[[nodiscard]] Node* from_id(IdType id) const;
 	[[nodiscard]] NodeResult get_output() const { return output_node.get_value(); }
 
-	void serialize(const nlohmann::json& output_json) const { }
-	void deserialize(const nlohmann::json& input_json) { }
+	void serialize(const nlohmann::json& /*output_json*/) const { }
+	void deserialize(const nlohmann::json& /*input_json*/) { }
 };
