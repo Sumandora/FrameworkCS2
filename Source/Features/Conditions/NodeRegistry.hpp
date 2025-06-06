@@ -11,13 +11,20 @@ class NodeCircuit;
 class NodeRegistry {
 	NodeCircuit* parent;
 
-	std::unordered_map<std::string, std::function<Node*(NodeCircuit*)>> menu;
+	struct FactoryPair {
+		std::function<Node*(NodeCircuit*)> create_initialized;
+		std::function<Node*(NodeCircuit*)> create_uninitialized; // Used during serialization
+	};
+
+	std::unordered_map<std::string, FactoryPair> menu;
 
 public:
 	explicit NodeRegistry(NodeCircuit* parent);
 
 	void render_menu() const;
 
+	[[nodiscard]] Node* create_by_name(const std::string& name) const;
+
 	// @arg name slash separated set of strings making up the path taken through the menu
-	void add_node_type(std::string name, std::function<Node*(NodeCircuit*)> factory);
+	void add_node_type(std::string name, FactoryPair factory);
 };

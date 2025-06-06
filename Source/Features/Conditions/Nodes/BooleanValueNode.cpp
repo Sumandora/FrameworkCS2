@@ -12,14 +12,19 @@
 #include <cstddef>
 
 BooleanValueNode::BooleanValueNode(NodeCircuit* parent, IdType output)
-	: Node(parent, "Boolean value", NodeType::BOOLEAN)
+	: Node(parent, NodeType::BOOLEAN)
 	, output(output)
 {
 }
 
-BooleanValueNode::BooleanValueNode(NodeCircuit* parent)
-	: BooleanValueNode(parent, parent->next_id())
+BooleanValueNode* BooleanValueNode::initialized(NodeCircuit* parent)
 {
+	return new BooleanValueNode{ parent, parent->next_id() };
+}
+
+BooleanValueNode* BooleanValueNode::uninitialized(NodeCircuit* parent)
+{
+	return new BooleanValueNode{ parent, 0 };
 }
 
 void BooleanValueNode::render_io()
@@ -48,12 +53,8 @@ void BooleanValueNode::serialize(nlohmann::json& output_json) const
 	output_json["output"] = output;
 }
 
-BooleanValueNode* BooleanValueNode::deserialize(NodeCircuit* parent, const nlohmann::json& input_json)
+void BooleanValueNode::deserialize(const nlohmann::json& input_json)
 {
-	auto* node = new BooleanValueNode{
-		parent,
-		input_json["output"]
-	};
-	node->value = input_json["value"];
-	return node;
+	value = input_json["value"];
+	output = input_json["output"];
 }

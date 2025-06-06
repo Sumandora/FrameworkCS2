@@ -8,13 +8,13 @@
 
 #include "imgui.h"
 #include "imnodes.h"
+#include "nlohmann/json_fwd.hpp"
 
 #include <cstddef>
-#include <iterator>
 #include <utility>
 
 OutputNode::OutputNode(NodeCircuit* parent, NodeType type)
-	: Node(parent, "Output", NodeType::NOTHING)
+	: Node(parent, NodeType::NOTHING)
 	, input(parent->next_id())
 	, type(type)
 {
@@ -40,6 +40,12 @@ std::size_t OutputNode::node_id() const
 	return NODE_ID<OutputNode>;
 }
 
-void OutputNode::serialize(nlohmann::json& /*output_json*/) const {
+void OutputNode::serialize(nlohmann::json& /*output_json*/) const
+{
+	std::unreachable();
+}
+
+void OutputNode::deserialize(const nlohmann::json& /*input_json*/)
+{
 	std::unreachable();
 }

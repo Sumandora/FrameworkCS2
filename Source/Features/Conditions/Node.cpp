@@ -8,11 +8,9 @@
 #include "NodeType.hpp"
 
 #include <string>
-#include <utility>
 
-Node::Node(NodeCircuit* parent, std::string name, NodeType output_type)
-	: name(std::move(name))
-	, parent(parent)
+Node::Node(NodeCircuit* parent, NodeType output_type)
+	: parent(parent)
 	, output_type(output_type)
 {
 }
@@ -27,7 +25,9 @@ void Node::render_node(IdType id)
 	}
 
 	ImNodes::BeginNodeTitleBar();
-	ImGui::TextUnformatted(name.c_str());
+	std::string top_level_name = name;
+	top_level_name = top_level_name.substr(top_level_name.find_last_of('/') + 1);
+	ImGui::TextUnformatted(top_level_name.c_str());
 	ImNodes::EndNodeTitleBar();
 
 	render_io();

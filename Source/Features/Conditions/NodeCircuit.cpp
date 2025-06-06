@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -43,6 +44,9 @@ NodeCircuit::NodeCircuit(NodeType type, std::function<NodeResult()> get_original
 
 	ImNodes::SetNodeScreenSpacePos(original_input_node_id, ImVec2{ 100, 100 });
 	ImNodes::SetNodeScreenSpacePos(output_node_id, ImVec2{ 300, 100 });
+
+	original_input_node.set_name("Original input");
+	output_node.set_name("Output");
 
 	push_node(original_input_node_id, &original_input_node);
 	push_node(output_node_id, &output_node);
@@ -191,7 +195,7 @@ void NodeCircuit::serialize(nlohmann::json& output_json) const
 		auto& node_json = nodes.emplace_back();
 		ImVec2 v = ImNodes::GetNodeGridSpacePos(id);
 		node_json["Position"] = { v.x, v.y };
-		node_json["Node Id"] = node->node_id();
+		node_json["Node name"] = node->get_name();
 		node_json["Id"] = id;
 		if (!is_dynamic_node(node))
 			continue;
@@ -219,9 +223,10 @@ void NodeCircuit::deserialize(const nlohmann::json& input_json)
 		if (!node.contains("Inner")) // Don't try to load static nodes.
 			continue;
 
-		const IdType node_id = node["Node Id"];
+		const std::string node_name = node["Node name"];
 		const IdType id = node["Id"];
-		Node* new_node = instantiate_node_by_id(this, node["Inner"], node_id);
+		Node* new_node = registry.create_by_name(node_name);
+		new_node->deserialize(node["Inner"]);
 		push_node(id, new_node);
 	}
 

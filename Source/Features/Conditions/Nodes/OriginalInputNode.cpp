@@ -14,7 +14,7 @@
 #include <utility>
 
 OriginalInputNode::OriginalInputNode(NodeCircuit* parent, NodeType type, std::function<NodeResult()> get_original_value)
-	: Node(parent, "Original input", type)
+	: Node(parent, type)
 	, get_original_value(std::move(get_original_value))
 	, output(parent->next_id())
 	, type(type)
@@ -41,6 +41,11 @@ std::size_t OriginalInputNode::node_id() const
 }
 
 void OriginalInputNode::serialize(nlohmann::json& /*output_json*/) const
+{
+	std::unreachable();
+}
+
+void OriginalInputNode::deserialize(const nlohmann::json& /*input_json*/)
 {
 	std::unreachable();
 }

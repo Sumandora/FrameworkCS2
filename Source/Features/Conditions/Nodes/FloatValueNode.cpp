@@ -11,14 +11,19 @@
 #include <cstddef>
 
 FloatValueNode::FloatValueNode(NodeCircuit* parent, IdType output)
-	: Node(parent, "Float value", NodeType::FLOAT)
+	: Node(parent, NodeType::FLOAT)
 	, output(output)
 {
 }
 
-FloatValueNode::FloatValueNode(NodeCircuit* parent)
-	: FloatValueNode(parent, parent->next_id())
+FloatValueNode* FloatValueNode::initialized(NodeCircuit* parent)
 {
+	return new FloatValueNode{ parent, parent->next_id() };
+}
+
+FloatValueNode* FloatValueNode::uninitialized(NodeCircuit* parent)
+{
+	return new FloatValueNode{ parent, 0 };
 }
 
 void FloatValueNode::render_io()
@@ -45,12 +50,8 @@ void FloatValueNode::serialize(nlohmann::json& output_json) const
 	output_json["output"] = output;
 }
 
-FloatValueNode* FloatValueNode::deserialize(NodeCircuit* parent, const nlohmann::json& input_json)
+void FloatValueNode::deserialize(const nlohmann::json& input_json)
 {
-	auto* node = new FloatValueNode{
-		parent,
-		input_json["output"]
-	};
-	node->value = input_json["value"];
-	return node;
+	value = input_json["value"];
+	output = input_json["output"];
 }

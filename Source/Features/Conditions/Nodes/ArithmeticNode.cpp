@@ -4,8 +4,8 @@
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
 #include "../NodeResult.hpp"
-#include "../NodeType.hpp"
 #include "../Nodes.hpp"
+#include "../NodeType.hpp"
 
 #include "imgui.h"
 #include "imnodes.h"
@@ -15,11 +15,10 @@
 #include <cctype>
 #include <cmath>
 #include <cstddef>
-#include <string>
 #include <utility>
 
 ArithmeticNode::ArithmeticNode(NodeCircuit* parent, ArithmeticOp operation, IdType lhs, IdType rhs, IdType output)
-	: Node(parent, std::string{ magic_enum::enum_name(operation) }, NodeType::FLOAT)
+	: Node(parent, NodeType::FLOAT)
 	, operation(operation)
 	, lhs(lhs)
 	, rhs(rhs)
@@ -27,9 +26,14 @@ ArithmeticNode::ArithmeticNode(NodeCircuit* parent, ArithmeticOp operation, IdTy
 {
 }
 
-ArithmeticNode::ArithmeticNode(NodeCircuit* parent, ArithmeticOp operation)
-	: ArithmeticNode(parent, operation, parent->next_id(), parent->next_id(), parent->next_id())
+ArithmeticNode* ArithmeticNode::initialized(NodeCircuit* parent, ArithmeticOp operation)
 {
+	return new ArithmeticNode{ parent, operation, parent->next_id(), parent->next_id(), parent->next_id() };
+}
+
+ArithmeticNode* ArithmeticNode::uninitialized(NodeCircuit* parent)
+{
+	return new ArithmeticNode{ parent, magic_enum::enum_values<ArithmeticOp>()[0], 0, 0, 0 };
 }
 
 void ArithmeticNode::render_io()
@@ -74,7 +78,8 @@ NodeResult ArithmeticNode::get_value() const
 	std::unreachable();
 }
 
-std::size_t ArithmeticNode::node_id() const {
+std::size_t ArithmeticNode::node_id() const
+{
 	return NODE_ID<ArithmeticNode>;
 }
 
@@ -87,14 +92,11 @@ void ArithmeticNode::serialize(nlohmann::json& output_json) const
 	output_json["output"] = output;
 }
 
-ArithmeticNode* ArithmeticNode::deserialize(NodeCircuit* parent, const nlohmann::json& input_json)
+void ArithmeticNode::deserialize(const nlohmann::json& input_json)
 {
-	return new ArithmeticNode{
-		parent,
-		input_json["operation"],
+	operation = input_json["operation"];
 
-		input_json["lhs"],
-		input_json["rhs"],
-		input_json["output"]
-	};
+	lhs = input_json["lhs"];
+	rhs = input_json["rhs"];
+	output = input_json["output"];
 }

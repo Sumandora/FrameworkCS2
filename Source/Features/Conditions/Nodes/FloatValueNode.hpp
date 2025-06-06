@@ -15,7 +15,8 @@ class FloatValueNode : public Node {
 	explicit FloatValueNode(NodeCircuit* parent, IdType output);
 
 public:
-	explicit FloatValueNode(NodeCircuit* parent);
+	static FloatValueNode* initialized(NodeCircuit* parent);
+	static FloatValueNode* uninitialized(NodeCircuit* parent);
 	~FloatValueNode() override = default;
 
 	void render_io() override;
@@ -33,5 +34,5 @@ public:
 	[[nodiscard]] std::size_t node_id() const override;
 
 	void serialize(nlohmann::json& output_json) const override;
-	static FloatValueNode* deserialize(NodeCircuit* parent, const nlohmann::json& input_json);
+	void deserialize(const nlohmann::json& input_json) override;
 };

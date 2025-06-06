@@ -4,21 +4,19 @@
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
 #include "../NodeResult.hpp"
-#include "../NodeType.hpp"
 #include "../Nodes.hpp"
+#include "../NodeType.hpp"
 
 #include "imgui.h"
 #include "imnodes.h"
-
 #include "magic_enum/magic_enum.hpp"
 
 #include <cctype>
 #include <cstddef>
-#include <string>
 #include <utility>
 
 ComparisonNode::ComparisonNode(NodeCircuit* parent, ComparisonOp operation, IdType lhs, IdType rhs, IdType output)
-	: Node(parent, replace_underscores_with_spaces(std::string{ magic_enum::enum_name(operation) }), NodeType::BOOLEAN)
+	: Node(parent, NodeType::BOOLEAN)
 	, operation(operation)
 	, lhs(lhs)
 	, rhs(rhs)
@@ -26,9 +24,14 @@ ComparisonNode::ComparisonNode(NodeCircuit* parent, ComparisonOp operation, IdTy
 {
 }
 
-ComparisonNode::ComparisonNode(NodeCircuit* parent, ComparisonOp operation)
-	: ComparisonNode(parent, operation, parent->next_id(), parent->next_id(), parent->next_id())
+ComparisonNode* ComparisonNode::initialized(NodeCircuit* parent, ComparisonOp operation)
 {
+	return new ComparisonNode(parent, operation, parent->next_id(), parent->next_id(), parent->next_id());
+}
+
+ComparisonNode* ComparisonNode::uninitialized(NodeCircuit* parent)
+{
+	return new ComparisonNode(parent, magic_enum::enum_values<ComparisonOp>()[0], 0, 0, 0);
 }
 
 void ComparisonNode::render_io()
@@ -89,13 +92,11 @@ void ComparisonNode::serialize(nlohmann::json& output_json) const
 	output_json["output"] = output;
 }
 
-ComparisonNode* ComparisonNode::deserialize(NodeCircuit* parent, const nlohmann::json& input_json)
+void ComparisonNode::deserialize(const nlohmann::json& input_json)
 {
-	return new ComparisonNode{
-		parent,
-		input_json["operation"],
-		input_json["lhs"],
-		input_json["rhs"],
-		input_json["output"]
-	};
+	operation = input_json["operation"];
+
+	lhs = input_json["lhs"];
+	rhs = input_json["rhs"];
+	output = input_json["output"];
 }

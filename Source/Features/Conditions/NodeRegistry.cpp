@@ -22,16 +22,26 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 	: parent(parent)
 {
 
-	menu["Primitives/Boolean value"] = [](NodeCircuit* parent) { return new BooleanValueNode{ parent }; };
-	menu["Primitives/Float value"] = [](NodeCircuit* parent) { return new FloatValueNode{ parent }; };
+	menu["Primitives/Boolean value"] = {
+		.create_initialized = BooleanValueNode::initialized,
+		.create_uninitialized = BooleanValueNode::uninitialized,
+	};
+	menu["Primitives/Float value"] = {
+		.create_initialized = FloatValueNode::initialized,
+		.create_uninitialized = FloatValueNode::uninitialized,
+	};
 
 	for (const ArithmeticOp op : magic_enum::enum_values<ArithmeticOp>())
-		menu["Arithmetic/" + std::string{ magic_enum::enum_name(op) }]
-			= [op](NodeCircuit* parent) { return new ArithmeticNode{ parent, op }; };
+		menu["Arithmetic/" + std::string{ magic_enum::enum_name(op) }] = {
+			.create_initialized = [op](NodeCircuit* parent) { return ArithmeticNode::initialized(parent, op); },
+			.create_uninitialized = ArithmeticNode::uninitialized,
+		};
 
 	for (const ComparisonOp op : magic_enum::enum_values<ComparisonOp>())
-		menu["Comparison/" + replace_underscores_with_spaces(std::string{ magic_enum::enum_name(op) })]
-			= [op](NodeCircuit* parent) { return new ComparisonNode{ parent, op }; };
+		menu["Comparison/" + replace_underscores_with_spaces(std::string{ magic_enum::enum_name(op) })] = {
+			.create_initialized = [op](NodeCircuit* parent) { return ComparisonNode::initialized(parent, op); },
+			.create_uninitialized = ComparisonNode::uninitialized
+		};
 }
 
 void NodeRegistry::render_menu() const
@@ -64,9 +74,10 @@ void NodeRegistry::render_menu() const
 				// NOLINTNEXTLINE(hicpp-avoid-goto, cppcoreguidelines-avoid-goto)
 				goto next_elem;
 			}
-			if (ImGui::MenuItem(item_name.substr(p).c_str()))
-				node = factory(parent);
-
+			if (ImGui::MenuItem(item_name.substr(p).c_str())) {
+				node = factory.create_initialized(parent);
+				node->set_name(item_name);
+			}
 		next_elem:
 			for (std::size_t i = 0; i < depth; i++)
 				ImGui::EndMenu();
@@ -81,7 +92,14 @@ void NodeRegistry::render_menu() const
 	}
 }
 
-void NodeRegistry::add_node_type(std::string name, std::function<Node*(NodeCircuit*)> factory)
+Node* NodeRegistry::create_by_name(const std::string& name) const
+{
+	Node* node = menu.at(name).create_uninitialized(parent);
+	node->set_name(name);
+	return node;
+}
+
+void NodeRegistry::add_node_type(std::string name, FactoryPair factory)
 {
 	menu[std::move(name)] = std::move(factory);
 }

@@ -37,7 +37,8 @@ class ComparisonNode : public Node {
 	explicit ComparisonNode(NodeCircuit* parent, ComparisonOp operation, IdType lhs, IdType rhs, IdType output);
 
 public:
-	explicit ComparisonNode(NodeCircuit* parent, ComparisonOp operation);
+	static ComparisonNode* initialized(NodeCircuit* parent, ComparisonOp operation);
+	static ComparisonNode* uninitialized(NodeCircuit* parent);
 	~ComparisonNode() override = default;
 
 	void render_io() override;
@@ -52,5 +53,5 @@ public:
 	[[nodiscard]] std::size_t node_id() const override;
 
 	void serialize(nlohmann::json& output_json) const override;
-	static ComparisonNode* deserialize(NodeCircuit* parent, const nlohmann::json& input_json);
+	void deserialize(const nlohmann::json& input_json) override;
 };

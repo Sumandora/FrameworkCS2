@@ -13,9 +13,9 @@ class BooleanValueNode : public Node {
 	IdType output{};
 
 	explicit BooleanValueNode(NodeCircuit* parent, IdType output);
-
 public:
-	explicit BooleanValueNode(NodeCircuit* parent);
+	static BooleanValueNode* initialized(NodeCircuit* parent);
+	static BooleanValueNode* uninitialized(NodeCircuit* parent);
 	~BooleanValueNode() override = default;
 
 	void render_io() override;
@@ -33,5 +33,5 @@ public:
 	[[nodiscard]] std::size_t node_id() const override;
 
 	void serialize(nlohmann::json& output_json) const override;
-	static BooleanValueNode* deserialize(NodeCircuit* parent, const nlohmann::json& input_json);
+	void deserialize(const nlohmann::json& input_json) override;
 };
