@@ -22,6 +22,7 @@ void Button::render()
 
 void Button::serialize(nlohmann::json& /*output_json*/) const
 {
+	// TODO don't save a null value.
 }
 
 void Button::deserialize(const nlohmann::json& /*input_json*/)
