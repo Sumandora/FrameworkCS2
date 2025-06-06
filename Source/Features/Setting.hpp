@@ -23,6 +23,9 @@ protected:
 	void render_all_childs();
 
 public:
+	void serialize(nlohmann::json& output_json) const;
+	void deserialize(const nlohmann::json& input_json);
+
 	// This saves the &
 	// NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
 	operator SettingsHolder*() { return this; }

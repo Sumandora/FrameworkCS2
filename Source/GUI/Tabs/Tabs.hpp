@@ -12,6 +12,7 @@ namespace GUI::Tabs {
 		void draw_panorama();
 	}
 	namespace About {
+		void draw_configs();
 		void draw_licenses();
 	}
 	void render();

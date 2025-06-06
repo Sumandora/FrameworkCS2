@@ -7,6 +7,7 @@
 #include "Memory.hpp"
 
 #include "Hooks/Hooks.hpp"
+#include "Serialization/Serialization.hpp"
 #include "Utils/Logging.hpp"
 
 static void initializer()
@@ -19,6 +20,7 @@ static void initializer()
 	Interfaces::grab_interfaces();
 	Memory::create();
 	Features::create();
+	Serialization::create_config_directory();
 	Hooks::create();
 
 	Logging::info("Initialization complete");
@@ -35,6 +37,7 @@ static int __attribute((constructor)) startup()
 
 static void __attribute((destructor)) shutdown()
 {
+	Serialization::shutdown();
 	Hooks::destroy();
 	Features::destroy();
 	GUI::destroy();

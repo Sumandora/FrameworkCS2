@@ -25,3 +25,5 @@ target_compile_definitions(imgui PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
 set_target_properties(imgui PROPERTIES LINKER_LANGUAGE CXX)
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE imgui)
+
+embed_license("Dear ImGui" imgui "${imgui_SOURCE_DIR}/LICENSE.txt")

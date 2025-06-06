@@ -73,6 +73,10 @@ void GUI::Tabs::render()
 
 			if (ImGui::BeginTabItem("About")) {
 				if (ImGui::BeginTabBar("#About tabs", ImGuiTabBarFlags_Reorderable)) {
+					if (ImGui::BeginTabItem("Configs")) {
+						About::draw_configs();
+						ImGui::EndTabItem();
+					}
 					if (ImGui::BeginTabItem("Licenses")) {
 						About::draw_licenses();
 						ImGui::EndTabItem();
