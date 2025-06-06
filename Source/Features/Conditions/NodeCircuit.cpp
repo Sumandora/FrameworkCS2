@@ -5,11 +5,6 @@
 #include "NodeResult.hpp"
 #include "NodeType.hpp"
 
-#include "Nodes/ArithmeticNode.hpp"
-#include "Nodes/BooleanValueNode.hpp"
-#include "Nodes/ComparisonNode.hpp"
-#include "Nodes/FloatValueNode.hpp"
-
 #include "../../Utils/Logging.hpp"
 
 #include "imgui_internal.h"
@@ -48,49 +43,12 @@ NodeCircuit::~NodeCircuit() {
 	ImNodes::DestroyContext(imnodes_context);
 }
 
-void NodeCircuit::render_new_menu()
-{
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-		ImGui::OpenPopup("New nodes");
-
-	if (ImGui::BeginPopup("New nodes")) {
-		const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
-		Node* node = nullptr;
-
-		if (ImGui::BeginMenu("Primitives")) {
-			if (ImGui::MenuItem("Boolean value"))
-				node = new BooleanValueNode{ this };
-			if (ImGui::MenuItem("Float value"))
-				node = new FloatValueNode{ this };
-			ImGui::EndMenu();
-		}
-
-		if (ImGui::BeginMenu("Arithmetic")) {
-			for (const ArithmeticOp op : magic_enum::enum_values<ArithmeticOp>())
-				if (ImGui::MenuItem(std::string{ magic_enum::enum_name(op) }.c_str()))
-					node = new ArithmeticNode{ this, op };
-			ImGui::EndMenu();
-		}
-
-		if (ImGui::BeginMenu("Comparison")) {
-			for (const ComparisonOp op : magic_enum::enum_values<ComparisonOp>())
-				if (ImGui::MenuItem(replace_underscores_with_spaces(std::string{ magic_enum::enum_name(op) }).c_str()))
-					node = new ComparisonNode{ this, op };
-			ImGui::EndMenu();
-		}
-
-		if (node)
-			ImNodes::SetNodeScreenSpacePos(node->get_id(), click_pos);
-		ImGui::EndPopup();
-	}
-}
-
 void NodeCircuit::render(bool newly_opened)
 {
 	ImNodes::SetCurrentContext(imnodes_context);
 	ImNodes::BeginNodeEditor();
 
-	render_new_menu();
+	registry.render_menu();
 
 	for (auto& [id, node] : ids)
 		node->render_node();

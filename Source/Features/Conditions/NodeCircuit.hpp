@@ -7,6 +7,7 @@
 
 #include "IdType.hpp"
 #include "Node.hpp"
+#include "NodeRegistry.hpp"
 #include "NodeResult.hpp"
 #include "NodeType.hpp"
 
@@ -31,7 +32,8 @@ class NodeCircuit {
 	OriginalInputNode original_input_node;
 	OutputNode output_node;
 
-	void render_new_menu();
+	NodeRegistry registry{ this };
+
 	void center_editor();
 
 public:
