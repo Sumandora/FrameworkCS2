@@ -29,9 +29,9 @@ class InstrumentableSetting : public MetaSetting {
 
 public:
 	template <typename... Args>
-	explicit InstrumentableSetting(SettingsHolder* parent, std::string name, Args... args)
+	explicit InstrumentableSetting(SettingsHolder* parent, std::string name, Args&&... args)
 		: MetaSetting(parent, name)
-		, setting(this, name, args...)
+		, setting(this, name, std::forward<Args>(args)...)
 	{
 	}
 
@@ -45,7 +45,7 @@ public:
 
 	void make_node_circuit()
 	{
-		node_circuit = std::make_unique<NodeCircuit>(NodeTypeFor<decltype(setting.get())>::TYPE, [&s = this->setting] {
+		node_circuit = std::make_unique<NodeCircuit>(nodetype_for<decltype(setting.get())>(), [&s = this->setting] {
 			return NodeResult::create(s.get());
 		});
 	}
