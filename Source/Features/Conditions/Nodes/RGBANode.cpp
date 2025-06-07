@@ -80,7 +80,7 @@ void RGBANode::render_io()
 	}
 }
 
-NodeResult RGBANode::get_value(IdType /*id*/) const
+NodeResult RGBANode::get_value(IdType id) const
 {
 	switch (direction) {
 	case RGBADirection::FLOATS_TO_RGBA: {
@@ -96,8 +96,18 @@ NodeResult RGBANode::get_value(IdType /*id*/) const
 					 a ? a->f : 0.0F) };
 	}
 	case RGBADirection::RGBA_TO_FLOATS:
-		std::unreachable(); // TODO
-		return {};
+		const std::optional<NodeResult> color = get_parent()->value_from_attribute(this->color);
+
+		if (id == r)
+			return { .f = color->color.Value.x };
+		if (id == g)
+			return { .f = color->color.Value.y };
+		if (id == b)
+			return { .f = color->color.Value.z };
+		if (id == a)
+			return { .f = color->color.Value.w };
+
+		std::unreachable();
 	}
 }
 
