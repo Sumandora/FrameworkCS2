@@ -46,12 +46,7 @@ public:
 	void make_node_circuit()
 	{
 		node_circuit = std::make_unique<NodeCircuit>(NodeTypeFor<decltype(setting.get())>::TYPE, [&s = this->setting] {
-			if constexpr (std::same_as<decltype(s.get()), bool>) {
-				return NodeResult{ .b = s.get() };
-			} else if constexpr (std::same_as<decltype(s.get()), float>) {
-				return NodeResult{ .f = s.get() };
-			}
-			std::unreachable();
+			return NodeResult::create(s.get());
 		});
 	}
 
