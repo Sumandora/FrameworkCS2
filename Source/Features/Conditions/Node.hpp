@@ -40,8 +40,6 @@ public:
 	[[nodiscard]] NodeCircuit* get_parent() const { return parent; }
 	[[nodiscard]] NodeType get_output_type() const { return output_type; }
 
-	[[nodiscard]] virtual std::size_t node_id() const = 0;
-
 	virtual void serialize(nlohmann::json& output_json) const = 0;
 	virtual void deserialize(const nlohmann::json& input_json) = 0;
 

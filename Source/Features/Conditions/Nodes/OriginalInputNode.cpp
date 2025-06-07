@@ -3,7 +3,6 @@
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
 #include "../NodeResult.hpp"
-#include "../Nodes.hpp"
 #include "../NodeType.hpp"
 
 #include "imgui.h"
@@ -33,11 +32,6 @@ void OriginalInputNode::render_io()
 NodeResult OriginalInputNode::get_value() const
 {
 	return get_original_value();
-}
-
-std::size_t OriginalInputNode::node_id() const
-{
-	return NODE_ID<OriginalInputNode>;
 }
 
 void OriginalInputNode::serialize(nlohmann::json& /*output_json*/) const

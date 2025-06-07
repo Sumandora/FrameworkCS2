@@ -29,8 +29,6 @@ public:
 
 	[[nodiscard]] IdType get_output() const { return output; }
 
-	[[nodiscard]] std::size_t node_id() const override;
-
 	void serialize(nlohmann::json& output_json) const override;
 	void deserialize(const nlohmann::json& input_json) override;
 };

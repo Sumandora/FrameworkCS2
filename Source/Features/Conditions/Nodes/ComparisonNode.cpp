@@ -4,7 +4,6 @@
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
 #include "../NodeResult.hpp"
-#include "../Nodes.hpp"
 #include "../NodeType.hpp"
 
 #include "imgui.h"
@@ -76,11 +75,6 @@ NodeResult ComparisonNode::get_value() const
 	}
 
 	std::unreachable();
-}
-
-std::size_t ComparisonNode::node_id() const
-{
-	return NODE_ID<ComparisonNode>;
 }
 
 void ComparisonNode::serialize(nlohmann::json& output_json) const

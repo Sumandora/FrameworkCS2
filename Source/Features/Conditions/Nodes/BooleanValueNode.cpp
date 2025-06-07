@@ -3,7 +3,6 @@
 #include "../IdType.hpp"
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
-#include "../Nodes.hpp"
 #include "../NodeType.hpp"
 
 #include "imgui.h"
@@ -40,11 +39,6 @@ void BooleanValueNode::render_io()
 	ImNodes::BeginOutputAttribute(output);
 	ImGui::TextUnformatted("output");
 	ImNodes::EndOutputAttribute();
-}
-
-std::size_t BooleanValueNode::node_id() const
-{
-	return NODE_ID<BooleanValueNode>;
 }
 
 void BooleanValueNode::serialize(nlohmann::json& output_json) const

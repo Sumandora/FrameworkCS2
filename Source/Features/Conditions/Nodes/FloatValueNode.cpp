@@ -2,7 +2,6 @@
 
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
-#include "../Nodes.hpp"
 #include "../NodeType.hpp"
 
 #include "imgui.h"
@@ -37,11 +36,6 @@ void FloatValueNode::render_io()
 	ImNodes::BeginOutputAttribute(output);
 	ImGui::TextUnformatted("output");
 	ImNodes::EndOutputAttribute();
-}
-
-std::size_t FloatValueNode::node_id() const
-{
-	return NODE_ID<FloatValueNode>;
 }
 
 void FloatValueNode::serialize(nlohmann::json& output_json) const

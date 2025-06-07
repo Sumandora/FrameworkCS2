@@ -4,7 +4,6 @@
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
 #include "../NodeResult.hpp"
-#include "../Nodes.hpp"
 #include "../NodeType.hpp"
 
 #include "imgui.h"
@@ -76,11 +75,6 @@ NodeResult ArithmeticNode::get_value() const
 	}
 
 	std::unreachable();
-}
-
-std::size_t ArithmeticNode::node_id() const
-{
-	return NODE_ID<ArithmeticNode>;
 }
 
 void ArithmeticNode::serialize(nlohmann::json& output_json) const
