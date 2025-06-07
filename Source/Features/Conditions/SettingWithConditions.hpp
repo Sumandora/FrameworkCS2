@@ -30,7 +30,7 @@ class InstrumentableSetting : public MetaSetting {
 public:
 	template <typename... Args>
 	explicit InstrumentableSetting(SettingsHolder* parent, std::string name, Args... args)
-		: MetaSetting(parent, "##Instrumentable_" + name)
+		: MetaSetting(parent, name)
 		, setting(this, name, args...)
 	{
 	}
