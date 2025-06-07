@@ -7,7 +7,8 @@ enum class NodeType : std::uint8_t {
 	NOTHING, // eh, hacky
 	FLOAT,
 	BOOLEAN,
-	COLOR,
+	COLOR_RGBA,
+	COLOR_HSV,
 };
 
 template <typename T>
@@ -18,7 +19,7 @@ constexpr NodeType nodetype_for()
 	else if constexpr (std::same_as<bool, T>)
 		return NodeType::BOOLEAN;
 	else if constexpr (std::same_as<struct ImColor, T>)
-		return NodeType::COLOR;
+		return NodeType::COLOR_RGBA;
 	else
 		static_assert(false);
 }

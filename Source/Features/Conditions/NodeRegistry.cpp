@@ -7,6 +7,7 @@
 #include "Nodes/BooleanValueNode.hpp"
 #include "Nodes/ComparisonNode.hpp"
 #include "Nodes/FloatValueNode.hpp"
+#include "Nodes/RGBANode.hpp"
 
 #include "imgui.h"
 #include "imnodes.h"
@@ -42,6 +43,15 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 			.create_initialized = [op](NodeCircuit* parent) { return ComparisonNode::initialized(parent, op); },
 			.create_uninitialized = ComparisonNode::uninitialized
 		};
+
+	menu["Color conversion/Floats to RGBA"] = {
+		.create_initialized = [](NodeCircuit* parent) { return RGBANode::initialized(parent, RGBADirection::FLOATS_TO_RGBA); },
+		.create_uninitialized = RGBANode::uninitialized
+	};
+	menu["Color conversion/RGBA to floats"] = {
+		.create_initialized = [](NodeCircuit* parent) { return RGBANode::initialized(parent, RGBADirection::RGBA_TO_FLOATS); },
+		.create_uninitialized = RGBANode::uninitialized
+	};
 }
 
 void NodeRegistry::render_menu() const
