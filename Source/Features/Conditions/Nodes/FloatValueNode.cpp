@@ -2,7 +2,7 @@
 
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
-#include "../NodeType.hpp"
+#include "../IdType.hpp"
 
 #include "imgui.h"
 #include "imnodes.h"
@@ -10,7 +10,7 @@
 #include <cstddef>
 
 FloatValueNode::FloatValueNode(NodeCircuit* parent, IdType output)
-	: Node(parent, NodeType::FLOAT)
+	: Node(parent)
 	, output(output)
 {
 }

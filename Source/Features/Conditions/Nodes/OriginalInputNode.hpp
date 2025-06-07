@@ -19,14 +19,12 @@ public:
 	explicit OriginalInputNode(NodeCircuit* parent, NodeType type, std::function<NodeResult()> get_original_value);
 	~OriginalInputNode() override = default;
 
-	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override
-	{
-		return NodeType::NOTHING;
-	}
-
 	void render_io() override;
+
 	[[nodiscard]] NodeResult get_value() const override;
 
+	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override { return NodeType::NOTHING; }
+	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override { return type; }
 	[[nodiscard]] IdType get_output() const { return output; }
 
 	void serialize(nlohmann::json& output_json) const override;

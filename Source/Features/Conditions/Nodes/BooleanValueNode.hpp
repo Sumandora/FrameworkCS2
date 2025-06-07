@@ -13,6 +13,7 @@ class BooleanValueNode : public Node {
 	IdType output{};
 
 	explicit BooleanValueNode(NodeCircuit* parent, IdType output);
+
 public:
 	static BooleanValueNode* initialized(NodeCircuit* parent);
 	static BooleanValueNode* uninitialized(NodeCircuit* parent);
@@ -20,15 +21,10 @@ public:
 
 	void render_io() override;
 
-	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override
-	{
-		return NodeType::NOTHING;
-	}
+	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override { return NodeType::NOTHING; }
+	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override { return NodeType::BOOLEAN; }
 
-	[[nodiscard]] NodeResult get_value() const override
-	{
-		return NodeResult{ .b = value };
-	}
+	[[nodiscard]] NodeResult get_value() const override { return { .b = value }; }
 
 	void serialize(nlohmann::json& output_json) const override;
 	void deserialize(const nlohmann::json& input_json) override;

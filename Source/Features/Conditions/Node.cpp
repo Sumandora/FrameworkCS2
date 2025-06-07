@@ -5,13 +5,11 @@
 #include "imnodes.h"
 
 #include "NodeCircuit.hpp"
-#include "NodeType.hpp"
 
 #include <string>
 
-Node::Node(NodeCircuit* parent, NodeType output_type)
+Node::Node(NodeCircuit* parent)
 	: parent(parent)
-	, output_type(output_type)
 {
 }
 

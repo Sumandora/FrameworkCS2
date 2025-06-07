@@ -45,10 +45,8 @@ public:
 
 	[[nodiscard]] NodeResult get_value() const override;
 
-	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override
-	{
-		return NodeType::FLOAT;
-	}
+	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override { return NodeType::FLOAT; }
+	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override { return NodeType::BOOLEAN; }
 
 	void serialize(nlohmann::json& output_json) const override;
 	void deserialize(const nlohmann::json& input_json) override;

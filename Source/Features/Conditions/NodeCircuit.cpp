@@ -99,7 +99,7 @@ void NodeCircuit::render(bool newly_opened)
 		Node* start = ids[link.start_node];
 		Node* end = ids[link.end_node];
 
-		const NodeType from_type = start->get_output_type();
+		const NodeType from_type = start->get_output_type(link.start_attribute);
 		const NodeType to_type = end->get_input_type(link.end_attribute);
 
 		if (std::ranges::any_of(links, [link](const Link& other_link) { return link.end_attribute == other_link.end_attribute; }))

@@ -4,7 +4,6 @@
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
 #include "../NodeResult.hpp"
-#include "../NodeType.hpp"
 
 #include "imgui.h"
 #include "imnodes.h"
@@ -17,7 +16,7 @@
 #include <utility>
 
 ArithmeticNode::ArithmeticNode(NodeCircuit* parent, ArithmeticOp operation, IdType lhs, IdType rhs, IdType output)
-	: Node(parent, NodeType::FLOAT)
+	: Node(parent)
 	, operation(operation)
 	, lhs(lhs)
 	, rhs(rhs)

@@ -13,7 +13,7 @@
 #include <utility>
 
 OutputNode::OutputNode(NodeCircuit* parent, NodeType type)
-	: Node(parent, NodeType::NOTHING)
+	: Node(parent)
 	, input(parent->next_id())
 	, type(type)
 {

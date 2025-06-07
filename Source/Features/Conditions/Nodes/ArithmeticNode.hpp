@@ -30,7 +30,7 @@ class ArithmeticNode : public Node {
 	explicit ArithmeticNode(NodeCircuit* parent, ArithmeticOp operation, IdType lhs, IdType rhs, IdType output);
 
 public:
-	static ArithmeticNode* initialized(NodeCircuit* parent,ArithmeticOp operation);
+	static ArithmeticNode* initialized(NodeCircuit* parent, ArithmeticOp operation);
 	static ArithmeticNode* uninitialized(NodeCircuit* parent);
 	~ArithmeticNode() override = default;
 
@@ -38,10 +38,8 @@ public:
 
 	[[nodiscard]] NodeResult get_value() const override;
 
-	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override
-	{
-		return NodeType::FLOAT;
-	}
+	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override { return NodeType::FLOAT; }
+	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override { return NodeType::FLOAT; }
 
 	void serialize(nlohmann::json& output_json) const override;
 	void deserialize(const nlohmann::json& input_json) override;

@@ -13,7 +13,7 @@
 #include <utility>
 
 OriginalInputNode::OriginalInputNode(NodeCircuit* parent, NodeType type, std::function<NodeResult()> get_original_value)
-	: Node(parent, type)
+	: Node(parent)
 	, get_original_value(std::move(get_original_value))
 	, output(parent->next_id())
 	, type(type)

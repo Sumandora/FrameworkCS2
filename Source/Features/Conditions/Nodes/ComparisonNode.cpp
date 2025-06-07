@@ -4,7 +4,6 @@
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
 #include "../NodeResult.hpp"
-#include "../NodeType.hpp"
 
 #include "imgui.h"
 #include "imnodes.h"
@@ -15,7 +14,7 @@
 #include <utility>
 
 ComparisonNode::ComparisonNode(NodeCircuit* parent, ComparisonOp operation, IdType lhs, IdType rhs, IdType output)
-	: Node(parent, NodeType::BOOLEAN)
+	: Node(parent)
 	, operation(operation)
 	, lhs(lhs)
 	, rhs(rhs)
@@ -25,12 +24,12 @@ ComparisonNode::ComparisonNode(NodeCircuit* parent, ComparisonOp operation, IdTy
 
 ComparisonNode* ComparisonNode::initialized(NodeCircuit* parent, ComparisonOp operation)
 {
-	return new ComparisonNode(parent, operation, parent->next_id(), parent->next_id(), parent->next_id());
+	return new ComparisonNode{ parent, operation, parent->next_id(), parent->next_id(), parent->next_id() };
 }
 
 ComparisonNode* ComparisonNode::uninitialized(NodeCircuit* parent)
 {
-	return new ComparisonNode(parent, magic_enum::enum_values<ComparisonOp>()[0], 0, 0, 0);
+	return new ComparisonNode{ parent, magic_enum::enum_values<ComparisonOp>()[0], 0, 0, 0 };
 }
 
 void ComparisonNode::render_io()

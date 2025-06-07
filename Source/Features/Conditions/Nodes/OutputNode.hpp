@@ -18,13 +18,11 @@ public:
 	explicit OutputNode(NodeCircuit* parent, NodeType type);
 	~OutputNode() override = default;
 
-	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override
-	{
-		return type;
-	}
-
 	void render_io() override;
 	[[nodiscard]] NodeResult get_value() const override;
+
+	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override { return type; }
+	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override { return NodeType::NOTHING; }
 
 	[[nodiscard]] IdType get_input() const { return input; }
 

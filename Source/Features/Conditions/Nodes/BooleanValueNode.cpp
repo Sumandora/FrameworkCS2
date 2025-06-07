@@ -3,7 +3,6 @@
 #include "../IdType.hpp"
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
-#include "../NodeType.hpp"
 
 #include "imgui.h"
 #include "imnodes.h"
@@ -11,7 +10,7 @@
 #include <cstddef>
 
 BooleanValueNode::BooleanValueNode(NodeCircuit* parent, IdType output)
-	: Node(parent, NodeType::BOOLEAN)
+	: Node(parent)
 	, output(output)
 {
 }
