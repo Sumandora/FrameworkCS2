@@ -13,6 +13,7 @@
 #include <cctype>
 #include <cmath>
 #include <cstddef>
+#include <optional>
 #include <utility>
 
 ArithmeticNode::ArithmeticNode(NodeCircuit* parent, ArithmeticOp operation, IdType lhs, IdType rhs, IdType output)
@@ -52,25 +53,25 @@ void ArithmeticNode::render_io()
 	ImNodes::EndOutputAttribute();
 }
 
-NodeResult ArithmeticNode::get_value() const
+NodeResult ArithmeticNode::get_value(IdType /*id*/) const
 {
-	const Node* l = get_parent()->from_id(lhs);
-	const Node* r = get_parent()->from_id(rhs);
+	const std::optional<NodeResult> l = get_parent()->value_from_attribute(lhs);
+	const std::optional<NodeResult> r = get_parent()->value_from_attribute(rhs);
 
-	if (!l || !r)
-		return NodeResult{ .f = 0.0F };
+	const float lhs = l.has_value() ? l.value().f : 0.0F;
+	const float rhs = r.has_value() ? r.value().f : 0.0F;
 
 	switch (operation) {
 	case ArithmeticOp::Addition:
-		return NodeResult{ .f = l->get_value().f + r->get_value().f };
+		return NodeResult{ .f = lhs + rhs };
 	case ArithmeticOp::Subtraction:
-		return NodeResult{ .f = l->get_value().f - r->get_value().f };
+		return NodeResult{ .f = lhs - rhs };
 	case ArithmeticOp::Multiplication:
-		return NodeResult{ .f = l->get_value().f * r->get_value().f };
+		return NodeResult{ .f = lhs * rhs };
 	case ArithmeticOp::Division:
-		return NodeResult{ .f = l->get_value().f / r->get_value().f };
+		return NodeResult{ .f = lhs / rhs };
 	case ArithmeticOp::Power:
-		return NodeResult{ .f = std::pow(l->get_value().f, r->get_value().f) };
+		return NodeResult{ .f = std::pow(lhs, rhs) };
 	}
 
 	std::unreachable();

@@ -1,5 +1,6 @@
 #include "OutputNode.hpp"
 
+#include "../IdType.hpp"
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
 #include "../NodeResult.hpp"
@@ -10,6 +11,7 @@
 #include "nlohmann/json_fwd.hpp"
 
 #include <cstddef>
+#include <optional>
 #include <utility>
 
 OutputNode::OutputNode(NodeCircuit* parent, NodeType type)
@@ -26,12 +28,10 @@ void OutputNode::render_io()
 	ImNodes::EndInputAttribute();
 };
 
-NodeResult OutputNode::get_value() const
+NodeResult OutputNode::get_value(IdType /*id*/) const
 {
-	Node* node = get_parent()->from_id(input);
-	if (!node)
-		return {};
-	return node->get_value();
+	std::optional<NodeResult> value = get_parent()->value_from_attribute(input);
+	return value.has_value() ? value.value() : NodeResult{};
 }
 
 void OutputNode::serialize(nlohmann::json& /*output_json*/) const

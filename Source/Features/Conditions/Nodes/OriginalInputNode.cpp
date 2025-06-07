@@ -1,5 +1,6 @@
 #include "OriginalInputNode.hpp"
 
+#include "../IdType.hpp"
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
 #include "../NodeResult.hpp"
@@ -29,7 +30,7 @@ void OriginalInputNode::render_io()
 	ImNodes::EndOutputAttribute();
 };
 
-NodeResult OriginalInputNode::get_value() const
+NodeResult OriginalInputNode::get_value(IdType /*id*/) const
 {
 	return get_original_value();
 }

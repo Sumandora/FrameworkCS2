@@ -11,6 +11,7 @@
 #include "magic_enum/magic_enum.hpp"
 #include "nlohmann/json.hpp"
 
+#include <optional>
 #include <utility>
 
 RGBANode::RGBANode(NodeCircuit* parent, RGBADirection direction, IdType r, IdType g, IdType b, IdType a, IdType color)
@@ -79,20 +80,20 @@ void RGBANode::render_io()
 	}
 }
 
-NodeResult RGBANode::get_value() const
+NodeResult RGBANode::get_value(IdType /*id*/) const
 {
 	switch (direction) {
 	case RGBADirection::FLOATS_TO_RGBA: {
-		const Node* r = get_parent()->from_id(this->r);
-		const Node* g = get_parent()->from_id(this->g);
-		const Node* b = get_parent()->from_id(this->b);
-		const Node* a = get_parent()->from_id(this->a);
+		const std::optional<NodeResult> r = get_parent()->value_from_attribute(this->r);
+		const std::optional<NodeResult> g = get_parent()->value_from_attribute(this->g);
+		const std::optional<NodeResult> b = get_parent()->value_from_attribute(this->b);
+		const std::optional<NodeResult> a = get_parent()->value_from_attribute(this->a);
 
 		return { .color = ImColor(
-					 r ? r->get_value().f : 0.0F,
-					 g ? g->get_value().f : 0.0F,
-					 b ? b->get_value().f : 0.0F,
-					 a ? a->get_value().f : 0.0F) };
+					 r ? r->f : 0.0F,
+					 g ? g->f : 0.0F,
+					 b ? b->f : 0.0F,
+					 a ? a->f : 0.0F) };
 	}
 	case RGBADirection::RGBA_TO_FLOATS:
 		std::unreachable(); // TODO

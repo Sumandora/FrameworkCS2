@@ -36,7 +36,7 @@ public:
 
 	void render_io() override;
 
-	[[nodiscard]] NodeResult get_value() const override;
+	[[nodiscard]] NodeResult get_value(IdType id) const override;
 
 	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override { return NodeType::FLOAT; }
 	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override { return NodeType::FLOAT; }

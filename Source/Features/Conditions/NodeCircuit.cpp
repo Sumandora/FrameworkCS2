@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -182,6 +183,14 @@ Node* NodeCircuit::from_id(IdType id) const
 	if (it != links.end())
 		return ids.at(it->start_node);
 	return nullptr;
+}
+
+std::optional<NodeResult> NodeCircuit::value_from_attribute(IdType id) const
+{
+	auto it = std::ranges::find_if(links, [id](const Link& link) { return link.end_attribute == id; });
+	if (it != links.end())
+		return ids.at(it->start_node)->get_value(it->start_attribute);
+	return std::nullopt;
 }
 
 void NodeCircuit::serialize(nlohmann::json& output_json) const

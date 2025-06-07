@@ -30,7 +30,7 @@ public:
 
 	void render_node(IdType id);
 
-	[[nodiscard]] virtual NodeResult get_value() const = 0;
+	[[nodiscard]] virtual NodeResult get_value(IdType id /* Can be ignored for single outputs */) const = 0;
 
 	[[nodiscard]] virtual NodeType get_input_type(IdType id) const = 0;
 	[[nodiscard]] virtual NodeType get_output_type(IdType id) const = 0;

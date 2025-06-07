@@ -11,6 +11,7 @@
 
 #include <cctype>
 #include <cstddef>
+#include <optional>
 #include <utility>
 
 ComparisonNode::ComparisonNode(NodeCircuit* parent, ComparisonOp operation, IdType lhs, IdType rhs, IdType output)
@@ -50,27 +51,27 @@ void ComparisonNode::render_io()
 	ImNodes::EndOutputAttribute();
 }
 
-NodeResult ComparisonNode::get_value() const
+NodeResult ComparisonNode::get_value(IdType /*id*/) const
 {
-	const Node* l = get_parent()->from_id(lhs);
-	const Node* r = get_parent()->from_id(rhs);
+	const std::optional<NodeResult> l = get_parent()->value_from_attribute(lhs);
+	const std::optional<NodeResult> r = get_parent()->value_from_attribute(rhs);
 
-	if (!l || !r)
-		return NodeResult{ .b = false };
+	const bool lhs = l.has_value() ? l.value().b : false;
+	const bool rhs = r.has_value() ? r.value().b : false;
 
 	switch (operation) {
 	case ComparisonOp::Equals:
-		return NodeResult{ .b = l->get_value().f == r->get_value().f };
+		return NodeResult{ .b = lhs == rhs };
 	case ComparisonOp::Not_equals:
-		return NodeResult{ .b = l->get_value().f != r->get_value().f };
+		return NodeResult{ .b = lhs != rhs };
 	case ComparisonOp::Lower_than:
-		return NodeResult{ .b = l->get_value().f < r->get_value().f };
+		return NodeResult{ .b = lhs < rhs };
 	case ComparisonOp::Greater_than:
-		return NodeResult{ .b = l->get_value().f > r->get_value().f };
+		return NodeResult{ .b = lhs > rhs };
 	case ComparisonOp::Lower_or_equal_than:
-		return NodeResult{ .b = l->get_value().f <= r->get_value().f };
+		return NodeResult{ .b = lhs <= rhs };
 	case ComparisonOp::Greater_or_equal_than:
-		return NodeResult{ .b = l->get_value().f >= r->get_value().f };
+		return NodeResult{ .b = lhs >= rhs };
 	}
 
 	std::unreachable();

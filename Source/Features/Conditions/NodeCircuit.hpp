@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <optional>
 #include <unordered_map>
 #include <vector>
 
@@ -56,7 +57,8 @@ public:
 
 	[[nodiscard]] IdType next_id() { return id_counter++; }
 	[[nodiscard]] Node* from_id(IdType id) const;
-	[[nodiscard]] NodeResult get_output() const { return output_node.get_value(); }
+	[[nodiscard]] std::optional<NodeResult> value_from_attribute(IdType id) const;
+	[[nodiscard]] NodeResult get_output() const { return output_node.get_value(output_node.get_input()); }
 
 	void serialize(nlohmann::json& output_json) const;
 	void deserialize(const nlohmann::json& input_json);

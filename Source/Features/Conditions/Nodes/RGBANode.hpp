@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <utility>
 
 enum class RGBADirection : std::uint8_t {
 	FLOATS_TO_RGBA,
@@ -29,24 +30,31 @@ public:
 
 	void render_io() override;
 
-	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override {
-		switch(direction) {
+	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override
+	{
+		switch (direction) {
 		case RGBADirection::FLOATS_TO_RGBA:
 			return NodeType::FLOAT;
 		case RGBADirection::RGBA_TO_FLOATS:
 			return NodeType::COLOR_RGBA;
 		}
-	}
-	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override {
-		switch(direction) {
-		case RGBADirection::FLOATS_TO_RGBA:
-			return NodeType::COLOR_RGBA;
-		case RGBADirection::RGBA_TO_FLOATS:
-			return NodeType::FLOAT;
-		}
+
+		std::unreachable();
 	}
 
-	[[nodiscard]] NodeResult get_value() const override;
+	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override
+	{
+		switch (direction) {
+		case RGBADirection::FLOATS_TO_RGBA:
+			return NodeType::COLOR_RGBA;
+		case RGBADirection::RGBA_TO_FLOATS:
+			return NodeType::FLOAT;
+		}
+
+		std::unreachable();
+	}
+
+	[[nodiscard]] NodeResult get_value(IdType /*id*/) const override;
 
 	void serialize(nlohmann::json& output_json) const override;
 	void deserialize(const nlohmann::json& input_json) override;
