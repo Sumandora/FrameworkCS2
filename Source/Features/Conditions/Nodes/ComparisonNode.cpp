@@ -56,8 +56,8 @@ NodeResult ComparisonNode::get_value(IdType /*id*/) const
 	const std::optional<NodeResult> l = get_parent()->value_from_attribute(lhs);
 	const std::optional<NodeResult> r = get_parent()->value_from_attribute(rhs);
 
-	const bool lhs = l.has_value() ? l.value().b : false;
-	const bool rhs = r.has_value() ? r.value().b : false;
+	const float lhs = l.has_value() ? l->f : false;
+	const float rhs = r.has_value() ? r->f : false;
 
 	switch (operation) {
 	case ComparisonOp::Equals:

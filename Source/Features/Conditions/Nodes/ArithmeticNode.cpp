@@ -58,8 +58,8 @@ NodeResult ArithmeticNode::get_value(IdType /*id*/) const
 	const std::optional<NodeResult> l = get_parent()->value_from_attribute(lhs);
 	const std::optional<NodeResult> r = get_parent()->value_from_attribute(rhs);
 
-	const float lhs = l.has_value() ? l.value().f : 0.0F;
-	const float rhs = r.has_value() ? r.value().f : 0.0F;
+	const float lhs = l.has_value() ? l->f : 0.0F;
+	const float rhs = r.has_value() ? r->f : 0.0F;
 
 	switch (operation) {
 	case ArithmeticOp::Addition:
