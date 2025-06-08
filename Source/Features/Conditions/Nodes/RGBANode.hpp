@@ -11,8 +11,8 @@
 #include <utility>
 
 enum class RGBADirection : std::uint8_t {
-	FLOATS_TO_RGBA,
-	RGBA_TO_FLOATS
+	RGBA_TO_COLOR,
+	COLOR_TO_RGBA,
 };
 
 class RGBANode : public Node {
@@ -33,9 +33,9 @@ public:
 	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override
 	{
 		switch (direction) {
-		case RGBADirection::FLOATS_TO_RGBA:
+		case RGBADirection::RGBA_TO_COLOR:
 			return NodeType::FLOAT;
-		case RGBADirection::RGBA_TO_FLOATS:
+		case RGBADirection::COLOR_TO_RGBA:
 			return NodeType::COLOR;
 		}
 
@@ -45,9 +45,9 @@ public:
 	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override
 	{
 		switch (direction) {
-		case RGBADirection::FLOATS_TO_RGBA:
+		case RGBADirection::RGBA_TO_COLOR:
 			return NodeType::COLOR;
-		case RGBADirection::RGBA_TO_FLOATS:
+		case RGBADirection::COLOR_TO_RGBA:
 			return NodeType::FLOAT;
 		}
 

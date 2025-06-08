@@ -11,8 +11,8 @@
 #include <utility>
 
 enum class HSVDirection : std::uint8_t {
-	FLOATS_TO_HSV,
-	HSV_TO_FLOATS
+	HSVA_TO_COLOR,
+	COLOR_TO_HSVA,
 };
 
 class HSVNode : public Node {
@@ -33,9 +33,9 @@ public:
 	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override
 	{
 		switch (direction) {
-		case HSVDirection::FLOATS_TO_HSV:
+		case HSVDirection::HSVA_TO_COLOR:
 			return NodeType::FLOAT;
-		case HSVDirection::HSV_TO_FLOATS:
+		case HSVDirection::COLOR_TO_HSVA:
 			return NodeType::COLOR;
 		}
 
@@ -45,9 +45,9 @@ public:
 	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override
 	{
 		switch (direction) {
-		case HSVDirection::FLOATS_TO_HSV:
+		case HSVDirection::HSVA_TO_COLOR:
 			return NodeType::COLOR;
-		case HSVDirection::HSV_TO_FLOATS:
+		case HSVDirection::COLOR_TO_HSVA:
 			return NodeType::FLOAT;
 		}
 

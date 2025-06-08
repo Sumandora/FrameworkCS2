@@ -37,7 +37,7 @@ RGBANode* RGBANode::uninitialized(NodeCircuit* parent)
 void RGBANode::render_io()
 {
 	switch (direction) {
-	case RGBADirection::FLOATS_TO_RGBA:
+	case RGBADirection::RGBA_TO_COLOR:
 		ImNodes::BeginInputAttribute(r);
 		ImGui::TextUnformatted("red");
 		ImNodes::EndInputAttribute();
@@ -57,7 +57,7 @@ void RGBANode::render_io()
 		ImGui::TextUnformatted("color");
 		ImNodes::EndOutputAttribute();
 		return;
-	case RGBADirection::RGBA_TO_FLOATS:
+	case RGBADirection::COLOR_TO_RGBA:
 		ImNodes::BeginInputAttribute(color);
 		ImGui::TextUnformatted("color");
 		ImNodes::EndInputAttribute();
@@ -83,7 +83,7 @@ void RGBANode::render_io()
 NodeResult RGBANode::get_value(IdType id) const
 {
 	switch (direction) {
-	case RGBADirection::FLOATS_TO_RGBA: {
+	case RGBADirection::RGBA_TO_COLOR: {
 		const std::optional<NodeResult> r = get_parent()->value_from_attribute(this->r);
 		const std::optional<NodeResult> g = get_parent()->value_from_attribute(this->g);
 		const std::optional<NodeResult> b = get_parent()->value_from_attribute(this->b);
@@ -95,7 +95,7 @@ NodeResult RGBANode::get_value(IdType id) const
 					 b ? b->f : 0.0F,
 					 a ? a->f : 0.0F) };
 	}
-	case RGBADirection::RGBA_TO_FLOATS:
+	case RGBADirection::COLOR_TO_RGBA:
 		const std::optional<NodeResult> color = get_parent()->value_from_attribute(this->color);
 
 		if (id == r)

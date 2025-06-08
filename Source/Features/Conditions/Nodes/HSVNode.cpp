@@ -41,7 +41,7 @@ HSVNode* HSVNode::uninitialized(NodeCircuit* parent)
 void HSVNode::render_io()
 {
 	switch (direction) {
-	case HSVDirection::FLOATS_TO_HSV:
+	case HSVDirection::HSVA_TO_COLOR:
 		ImNodes::BeginInputAttribute(h);
 		ImGui::TextUnformatted("hue");
 		ImNodes::EndInputAttribute();
@@ -61,7 +61,7 @@ void HSVNode::render_io()
 		ImGui::TextUnformatted("color");
 		ImNodes::EndOutputAttribute();
 		return;
-	case HSVDirection::HSV_TO_FLOATS:
+	case HSVDirection::COLOR_TO_HSVA:
 		ImNodes::BeginInputAttribute(color);
 		ImGui::TextUnformatted("color");
 		ImNodes::EndInputAttribute();
@@ -87,7 +87,7 @@ void HSVNode::render_io()
 NodeResult HSVNode::get_value(IdType id) const
 {
 	switch (direction) {
-	case HSVDirection::FLOATS_TO_HSV: {
+	case HSVDirection::HSVA_TO_COLOR: {
 		const std::optional<NodeResult> h = get_parent()->value_from_attribute(this->h);
 		const std::optional<NodeResult> s = get_parent()->value_from_attribute(this->s);
 		const std::optional<NodeResult> v = get_parent()->value_from_attribute(this->v);
@@ -111,7 +111,7 @@ NodeResult HSVNode::get_value(IdType id) const
 					 b,
 					 a ? a->f : 0.0F) };
 	}
-	case HSVDirection::HSV_TO_FLOATS:
+	case HSVDirection::COLOR_TO_HSVA:
 		const std::optional<NodeResult> color = get_parent()->value_from_attribute(this->color);
 
 		if (id == a)

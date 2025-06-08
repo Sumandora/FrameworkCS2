@@ -45,21 +45,21 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 			.create_uninitialized = ComparisonNode::uninitialized
 		};
 
-	menu["Color conversion/Floats to RGBA"] = {
-		.create_initialized = [](NodeCircuit* parent) { return RGBANode::initialized(parent, RGBADirection::FLOATS_TO_RGBA); },
+	menu["Color conversion/RGBA to Color"] = {
+		.create_initialized = [](NodeCircuit* parent) { return RGBANode::initialized(parent, RGBADirection::RGBA_TO_COLOR); },
 		.create_uninitialized = RGBANode::uninitialized
 	};
-	menu["Color conversion/RGBA to floats"] = {
-		.create_initialized = [](NodeCircuit* parent) { return RGBANode::initialized(parent, RGBADirection::RGBA_TO_FLOATS); },
+	menu["Color conversion/Color to RGBA"] = {
+		.create_initialized = [](NodeCircuit* parent) { return RGBANode::initialized(parent, RGBADirection::COLOR_TO_RGBA); },
 		.create_uninitialized = RGBANode::uninitialized
 	};
 
-	menu["Color conversion/Floats to HSV"] = {
-		.create_initialized = [](NodeCircuit* parent) { return HSVNode::initialized(parent, HSVDirection::FLOATS_TO_HSV); },
+	menu["Color conversion/HSVA to Color"] = {
+		.create_initialized = [](NodeCircuit* parent) { return HSVNode::initialized(parent, HSVDirection::HSVA_TO_COLOR); },
 		.create_uninitialized = HSVNode::uninitialized
 	};
-	menu["Color conversion/HSV to floats"] = {
-		.create_initialized = [](NodeCircuit* parent) { return HSVNode::initialized(parent, HSVDirection::HSV_TO_FLOATS); },
+	menu["Color conversion/Color to HSVA"] = {
+		.create_initialized = [](NodeCircuit* parent) { return HSVNode::initialized(parent, HSVDirection::COLOR_TO_HSVA); },
 		.create_uninitialized = HSVNode::uninitialized
 	};
 }
