@@ -7,6 +7,7 @@
 #include "Nodes/BooleanValueNode.hpp"
 #include "Nodes/ComparisonNode.hpp"
 #include "Nodes/FloatValueNode.hpp"
+#include "Nodes/HSVNode.hpp"
 #include "Nodes/RGBANode.hpp"
 
 #include "imgui.h"
@@ -51,6 +52,15 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 	menu["Color conversion/RGBA to floats"] = {
 		.create_initialized = [](NodeCircuit* parent) { return RGBANode::initialized(parent, RGBADirection::RGBA_TO_FLOATS); },
 		.create_uninitialized = RGBANode::uninitialized
+	};
+
+	menu["Color conversion/Floats to HSV"] = {
+		.create_initialized = [](NodeCircuit* parent) { return HSVNode::initialized(parent, HSVDirection::FLOATS_TO_HSV); },
+		.create_uninitialized = HSVNode::uninitialized
+	};
+	menu["Color conversion/HSV to floats"] = {
+		.create_initialized = [](NodeCircuit* parent) { return HSVNode::initialized(parent, HSVDirection::HSV_TO_FLOATS); },
+		.create_uninitialized = HSVNode::uninitialized
 	};
 }
 

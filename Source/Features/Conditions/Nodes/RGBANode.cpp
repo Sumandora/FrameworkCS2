@@ -106,9 +106,9 @@ NodeResult RGBANode::get_value(IdType id) const
 			return { .f = color->color.Value.z };
 		if (id == a)
 			return { .f = color->color.Value.w };
-
-		std::unreachable();
 	}
+
+	std::unreachable();
 }
 
 void RGBANode::serialize(nlohmann::json& output_json) const

@@ -10,32 +10,32 @@
 #include <cstdint>
 #include <utility>
 
-enum class RGBADirection : std::uint8_t {
-	FLOATS_TO_RGBA,
-	RGBA_TO_FLOATS
+enum class HSVDirection : std::uint8_t {
+	FLOATS_TO_HSV,
+	HSV_TO_FLOATS
 };
 
-class RGBANode : public Node {
-	RGBADirection direction;
+class HSVNode : public Node {
+	HSVDirection direction;
 
-	IdType r, g, b, a;
+	IdType h, s, v, a;
 	IdType color;
 
-	explicit RGBANode(NodeCircuit* parent, RGBADirection direction, IdType r, IdType g, IdType b, IdType a, IdType color);
+	explicit HSVNode(NodeCircuit* parent, HSVDirection direction, IdType h, IdType s, IdType v, IdType a, IdType color);
 
 public:
-	static RGBANode* initialized(NodeCircuit* parent, RGBADirection direction);
-	static RGBANode* uninitialized(NodeCircuit* parent);
-	~RGBANode() override = default;
+	static HSVNode* initialized(NodeCircuit* parent, HSVDirection direction);
+	static HSVNode* uninitialized(NodeCircuit* parent);
+	~HSVNode() override = default;
 
 	void render_io() override;
 
 	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override
 	{
 		switch (direction) {
-		case RGBADirection::FLOATS_TO_RGBA:
+		case HSVDirection::FLOATS_TO_HSV:
 			return NodeType::FLOAT;
-		case RGBADirection::RGBA_TO_FLOATS:
+		case HSVDirection::HSV_TO_FLOATS:
 			return NodeType::COLOR;
 		}
 
@@ -45,9 +45,9 @@ public:
 	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override
 	{
 		switch (direction) {
-		case RGBADirection::FLOATS_TO_RGBA:
+		case HSVDirection::FLOATS_TO_HSV:
 			return NodeType::COLOR;
-		case RGBADirection::RGBA_TO_FLOATS:
+		case HSVDirection::HSV_TO_FLOATS:
 			return NodeType::FLOAT;
 		}
 
