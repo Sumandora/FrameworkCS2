@@ -2,12 +2,14 @@
 
 #include <concepts>
 #include <cstdint>
+#include <type_traits>
 
 enum class NodeType : std::uint8_t {
 	NOTHING, // eh, hacky
 	FLOAT,
 	BOOLEAN,
 	COLOR,
+	ENUM,
 };
 
 template <typename T>
@@ -19,6 +21,8 @@ constexpr NodeType nodetype_for()
 		return NodeType::BOOLEAN;
 	else if constexpr (std::same_as<struct ImColor, T>)
 		return NodeType::COLOR;
+	else if constexpr (std::is_enum_v<T>)
+		return NodeType::ENUM;
 	else
 		static_assert(false);
 }

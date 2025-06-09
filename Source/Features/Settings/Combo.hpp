@@ -1,18 +1,18 @@
 #pragma once
 
 #include "../Setting.hpp"
+#include "../Conditions/SettingWithConditions.hpp"
 
 #include "imgui.h"
 
 #include "magic_enum/magic_enum.hpp"
 
 #include <string>
-#include <unordered_map>
 #include <utility>
 
 template <typename E>
 	requires std::is_enum_v<E>
-class Combo : public Setting {
+class RawCombo : public Setting {
 	std::unordered_map<E, std::string> names;
 	E value;
 
@@ -27,7 +27,7 @@ class Combo : public Setting {
 	}
 
 public:
-	Combo(SettingsHolder* parent, std::string name, E value = magic_enum::enum_values<E>()[0], std::unordered_map<E, std::string> names = generate_names())
+	RawCombo(SettingsHolder* parent, std::string name, E value = magic_enum::enum_values<E>()[0], std::unordered_map<E, std::string> names = generate_names())
 		: Setting(parent, std::move(name))
 		, names(std::move(names))
 		, value(value)
@@ -60,3 +60,6 @@ public:
 		value = static_cast<E>(input_json);
 	}
 };
+
+template<typename E>
+using Combo = InstrumentableSetting<RawCombo<E>>;

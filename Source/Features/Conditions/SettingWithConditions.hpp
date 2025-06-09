@@ -12,7 +12,6 @@
 #include "imgui.h"
 #include "imnodes.h"
 
-#include <concepts>
 #include <cstddef>
 #include <memory>
 #include <mutex>
