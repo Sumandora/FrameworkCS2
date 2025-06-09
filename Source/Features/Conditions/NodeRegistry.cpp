@@ -9,6 +9,7 @@
 #include "Nodes/FloatValueNode.hpp"
 #include "Nodes/HSVNode.hpp"
 #include "Nodes/LogicGateNode.hpp"
+#include "Nodes/NotGateNode.hpp"
 #include "Nodes/RGBANode.hpp"
 
 #include "imgui.h"
@@ -66,11 +67,15 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 
 	menu["Logic Gate/And gate"] = {
 		.create_initialized = [](NodeCircuit* parent) { return LogicGateNode::initialized(parent, LogicGateType::And); },
-		.create_uninitialized = HSVNode::uninitialized
+		.create_uninitialized = LogicGateNode::uninitialized
 	};
 	menu["Logic Gate/Or gate"] = {
-		.create_initialized = [](NodeCircuit* parent) { return LogicGateNode::initialized(parent,LogicGateType::Or); },
-		.create_uninitialized = HSVNode::uninitialized
+		.create_initialized = [](NodeCircuit* parent) { return LogicGateNode::initialized(parent, LogicGateType::Or); },
+		.create_uninitialized = LogicGateNode::uninitialized
+	};
+	menu["Logic Gate/Not gate"] = {
+		.create_initialized = NotGateNode::initialized,
+		.create_uninitialized = NotGateNode::uninitialized
 	};
 }
 
