@@ -37,7 +37,6 @@ ArithmeticNode* ArithmeticNode::uninitialized(NodeCircuit* parent)
 
 void ArithmeticNode::render_io()
 {
-
 	ImNodes::BeginInputAttribute(lhs);
 	ImGui::TextUnformatted("lhs");
 	ImNodes::EndInputAttribute();

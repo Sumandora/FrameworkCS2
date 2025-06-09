@@ -8,6 +8,7 @@
 #include "Nodes/ComparisonNode.hpp"
 #include "Nodes/FloatValueNode.hpp"
 #include "Nodes/HSVNode.hpp"
+#include "Nodes/LogicGateNode.hpp"
 #include "Nodes/RGBANode.hpp"
 
 #include "imgui.h"
@@ -60,6 +61,15 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 	};
 	menu["Color conversion/Color to HSVA"] = {
 		.create_initialized = [](NodeCircuit* parent) { return HSVNode::initialized(parent, HSVDirection::COLOR_TO_HSVA); },
+		.create_uninitialized = HSVNode::uninitialized
+	};
+
+	menu["Logic Gate/And gate"] = {
+		.create_initialized = [](NodeCircuit* parent) { return LogicGateNode::initialized(parent, LogicGateType::And); },
+		.create_uninitialized = HSVNode::uninitialized
+	};
+	menu["Logic Gate/Or gate"] = {
+		.create_initialized = [](NodeCircuit* parent) { return LogicGateNode::initialized(parent,LogicGateType::Or); },
 		.create_uninitialized = HSVNode::uninitialized
 	};
 }
