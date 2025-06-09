@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <functional>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 
 class Node;
@@ -27,4 +28,16 @@ public:
 
 	// @arg name slash separated set of strings making up the path taken through the menu
 	void add_node_type(std::string name, FactoryPair factory);
+
+	template <typename NewNode>
+		requires std::is_base_of_v<Node, NewNode>
+	void add_node_by_type()
+	{
+		return add_node_type(
+			std::string{ NewNode::NAME },
+			{
+				.create_initialized = NewNode::initialized,
+				.create_uninitialized = NewNode::uninitialized,
+			});
+	}
 };

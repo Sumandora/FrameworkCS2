@@ -62,4 +62,6 @@ public:
 
 	void serialize(nlohmann::json& output_json) const;
 	void deserialize(const nlohmann::json& input_json);
+
+	NodeRegistry& get_node_registry(this auto&& self) { return self.registry; };
 };

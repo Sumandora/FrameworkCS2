@@ -16,9 +16,10 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <type_traits>
 #include <utility>
 
-template <typename T>
+template <typename T, typename... AdditionalNodes>
 	requires std::is_base_of_v<Setting, T>
 class InstrumentableSetting : public MetaSetting {
 	T setting;
@@ -47,6 +48,7 @@ public:
 		node_circuit = std::make_unique<NodeCircuit>(nodetype_for<decltype(setting.get())>(), [&s = this->setting] {
 			return NodeResult::create(s.get());
 		});
+		(node_circuit->get_node_registry().add_node_by_type<AdditionalNodes>(), ...);
 	}
 
 	void render() override
