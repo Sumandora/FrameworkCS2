@@ -44,7 +44,7 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 	for (const ComparisonOp op : magic_enum::enum_values<ComparisonOp>())
 		menu["Comparison/" + replace_underscores_with_spaces(std::string{ magic_enum::enum_name(op) })] = {
 			.create_initialized = [op](NodeCircuit* parent) { return ComparisonNode::initialized(parent, op); },
-			.create_uninitialized = ComparisonNode::uninitialized
+			.create_uninitialized = [op](NodeCircuit* parent) { return ComparisonNode::uninitialized(parent, op); },
 		};
 
 	menu["Color conversion/RGBA to Color"] = {

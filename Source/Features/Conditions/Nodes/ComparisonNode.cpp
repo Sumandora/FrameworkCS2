@@ -7,7 +7,6 @@
 
 #include "imgui.h"
 #include "imnodes.h"
-#include "magic_enum/magic_enum.hpp"
 
 #include <cctype>
 #include <cstddef>
@@ -28,9 +27,9 @@ ComparisonNode* ComparisonNode::initialized(NodeCircuit* parent, ComparisonOp op
 	return new ComparisonNode{ parent, operation, parent->next_id(), parent->next_id(), parent->next_id() };
 }
 
-ComparisonNode* ComparisonNode::uninitialized(NodeCircuit* parent)
+ComparisonNode* ComparisonNode::uninitialized(NodeCircuit* parent, ComparisonOp operation)
 {
-	return new ComparisonNode{ parent, magic_enum::enum_values<ComparisonOp>()[0], 0, 0, 0 };
+	return new ComparisonNode{ parent, operation, 0, 0, 0 };
 }
 
 void ComparisonNode::render_io()
@@ -79,8 +78,6 @@ NodeResult ComparisonNode::get_value(IdType /*id*/) const
 
 void ComparisonNode::serialize(nlohmann::json& output_json) const
 {
-	output_json["operation"] = operation;
-
 	output_json["lhs"] = lhs;
 	output_json["rhs"] = rhs;
 	output_json["output"] = output;
@@ -88,8 +85,6 @@ void ComparisonNode::serialize(nlohmann::json& output_json) const
 
 void ComparisonNode::deserialize(const nlohmann::json& input_json)
 {
-	operation = input_json["operation"];
-
 	lhs = input_json["lhs"];
 	rhs = input_json["rhs"];
 	output = input_json["output"];

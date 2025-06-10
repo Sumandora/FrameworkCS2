@@ -38,7 +38,7 @@ class ComparisonNode : public Node {
 
 public:
 	static ComparisonNode* initialized(NodeCircuit* parent, ComparisonOp operation);
-	static ComparisonNode* uninitialized(NodeCircuit* parent);
+	static ComparisonNode* uninitialized(NodeCircuit* parent, ComparisonOp operation);
 	~ComparisonNode() override = default;
 
 	void render_io() override;
