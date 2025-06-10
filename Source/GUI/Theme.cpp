@@ -2,10 +2,9 @@
 
 #include "imgui.h"
 
-static constexpr ImVec4 with_alpha(ImVec4 col, int a)
+static constexpr ImColor with_alpha(ImColor color, int a)
 {
-	ImVec4 color = col;
-	color.w = static_cast<float>(a) / 255.0F;
+	color.Value.w = static_cast<float>(a) / 255.0F;
 	return color;
 };
 
@@ -14,24 +13,19 @@ void GUI::Theme::anti_purple_theme()
 	auto& style = ImGui::GetStyle();
 	auto& colors = style.Colors;
 
-	auto rgb = [](int r, int g, int b, int a) {
-		return ImVec4(static_cast<float>(r) / 255.0F, static_cast<float>(g) / 255.0F, static_cast<float>(b) / 255.0F, static_cast<float>(a) / 255.0F);
-	};
+	const ImColor background = IM_COL32(10, 10, 10, 255);
+	const ImColor background2 = IM_COL32(18, 18, 18, 255);
+	const ImColor background3 = IM_COL32(23, 23, 23, 255);
 
-	const ImVec4 background = rgb(10, 10, 10, 255);
-	const ImVec4 background2 = rgb(18, 18, 18, 255);
-	const ImVec4 background3 = rgb(23, 23, 23, 255);
-	const ImVec4 background31 = rgb(200, 206, 164, 255); // bg4 - 22
+	const ImColor accent = IM_COL32(200, 206, 164, 255);
 
-	// ImVec4 border = rgb(195, 204, 162, 255);
-	// ImVec4 border2 = rgb(146, 155, 105, 255);
-	const ImVec4 border = rgb(56, 56, 56, 255);
-	const ImVec4 border2 = rgb(56, 56, 56, 255);
+	const ImColor border = IM_COL32(56, 56, 56, 255);
+	const ImColor border2 = IM_COL32(56, 56, 56, 255);
 
-	const ImVec4 black = rgb(255, 255, 255, 255);
-	const ImVec4 trans = rgb(0, 0, 0, 0); // :3
+	const ImColor white = IM_COL32_WHITE;
+	const ImColor trans = IM_COL32_BLACK_TRANS; // :3
 
-	colors[ImGuiCol_Text] = black;
+	colors[ImGuiCol_Text] = white;
 	colors[ImGuiCol_TextDisabled] = border2;
 
 	colors[ImGuiCol_WindowBg] = with_alpha(background, 240);
@@ -42,8 +36,8 @@ void GUI::Theme::anti_purple_theme()
 	colors[ImGuiCol_BorderShadow] = trans;
 
 	colors[ImGuiCol_FrameBg] = background3;
-	colors[ImGuiCol_FrameBgHovered] = with_alpha(background31, 180);
-	colors[ImGuiCol_FrameBgActive] = background31;
+	colors[ImGuiCol_FrameBgHovered] = with_alpha(accent, 180);
+	colors[ImGuiCol_FrameBgActive] = accent;
 
 	colors[ImGuiCol_TitleBg] = background2;
 	colors[ImGuiCol_TitleBgActive] = background2;
@@ -53,10 +47,10 @@ void GUI::Theme::anti_purple_theme()
 
 	colors[ImGuiCol_ScrollbarBg] = with_alpha(background3, 100);
 	colors[ImGuiCol_ScrollbarGrab] = border;
-	colors[ImGuiCol_ScrollbarGrabHovered] = with_alpha(background31, 200);
-	colors[ImGuiCol_ScrollbarGrabActive] = background31;
+	colors[ImGuiCol_ScrollbarGrabHovered] = with_alpha(accent, 200);
+	colors[ImGuiCol_ScrollbarGrabActive] = accent;
 
-	colors[ImGuiCol_CheckMark] = background31;
+	colors[ImGuiCol_CheckMark] = accent;
 
 	colors[ImGuiCol_SliderGrab] = border2;
 	colors[ImGuiCol_SliderGrabActive] = border2;
@@ -66,8 +60,8 @@ void GUI::Theme::anti_purple_theme()
 	colors[ImGuiCol_ButtonActive] = background2;
 
 	colors[ImGuiCol_Header] = background2;
-	colors[ImGuiCol_HeaderHovered] = with_alpha(background31, 180);
-	colors[ImGuiCol_HeaderActive] = background31;
+	colors[ImGuiCol_HeaderHovered] = with_alpha(accent, 180);
+	colors[ImGuiCol_HeaderActive] = accent;
 
 	colors[ImGuiCol_Separator] = border;
 	colors[ImGuiCol_SeparatorHovered] = border;
@@ -78,8 +72,8 @@ void GUI::Theme::anti_purple_theme()
 	colors[ImGuiCol_ResizeGripActive] = border2;
 
 	colors[ImGuiCol_Tab] = with_alpha(background3, 140);
-	colors[ImGuiCol_TabHovered] = background31;
-	colors[ImGuiCol_TabActive] = with_alpha(background31, 180);
+	colors[ImGuiCol_TabHovered] = accent;
+	colors[ImGuiCol_TabActive] = with_alpha(accent, 180);
 	colors[ImGuiCol_TabUnfocused] = background3;
 	colors[ImGuiCol_TabUnfocusedActive] = background3;
 
