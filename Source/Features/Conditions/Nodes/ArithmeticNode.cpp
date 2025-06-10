@@ -8,8 +8,6 @@
 #include "imgui.h"
 #include "imnodes.h"
 
-#include "magic_enum/magic_enum.hpp"
-
 #include <cctype>
 #include <cmath>
 #include <cstddef>
@@ -30,9 +28,9 @@ ArithmeticNode* ArithmeticNode::initialized(NodeCircuit* parent, ArithmeticOp op
 	return new ArithmeticNode{ parent, operation, parent->next_id(), parent->next_id(), parent->next_id() };
 }
 
-ArithmeticNode* ArithmeticNode::uninitialized(NodeCircuit* parent)
+ArithmeticNode* ArithmeticNode::uninitialized(NodeCircuit* parent, ArithmeticOp operation)
 {
-	return new ArithmeticNode{ parent, magic_enum::enum_values<ArithmeticOp>()[0], 0, 0, 0 };
+	return new ArithmeticNode{ parent, operation, 0, 0, 0 };
 }
 
 void ArithmeticNode::render_io()
@@ -78,8 +76,6 @@ NodeResult ArithmeticNode::get_value(IdType /*id*/) const
 
 void ArithmeticNode::serialize(nlohmann::json& output_json) const
 {
-	output_json["operation"] = operation;
-
 	output_json["lhs"] = lhs;
 	output_json["rhs"] = rhs;
 	output_json["output"] = output;
@@ -87,8 +83,6 @@ void ArithmeticNode::serialize(nlohmann::json& output_json) const
 
 void ArithmeticNode::deserialize(const nlohmann::json& input_json)
 {
-	operation = input_json["operation"];
-
 	lhs = input_json["lhs"];
 	rhs = input_json["rhs"];
 	output = input_json["output"];

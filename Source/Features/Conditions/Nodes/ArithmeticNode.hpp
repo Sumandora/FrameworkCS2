@@ -31,7 +31,7 @@ class ArithmeticNode : public Node {
 
 public:
 	static ArithmeticNode* initialized(NodeCircuit* parent, ArithmeticOp operation);
-	static ArithmeticNode* uninitialized(NodeCircuit* parent);
+	static ArithmeticNode* uninitialized(NodeCircuit* parent, ArithmeticOp operation);
 	~ArithmeticNode() override = default;
 
 	void render_io() override;

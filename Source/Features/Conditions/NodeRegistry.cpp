@@ -38,7 +38,7 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 	for (const ArithmeticOp op : magic_enum::enum_values<ArithmeticOp>())
 		menu["Arithmetic/" + std::string{ magic_enum::enum_name(op) }] = {
 			.create_initialized = [op](NodeCircuit* parent) { return ArithmeticNode::initialized(parent, op); },
-			.create_uninitialized = ArithmeticNode::uninitialized,
+			.create_uninitialized = [op](NodeCircuit* parent) { return ArithmeticNode::uninitialized(parent, op); },
 		};
 
 	for (const ComparisonOp op : magic_enum::enum_values<ComparisonOp>())
