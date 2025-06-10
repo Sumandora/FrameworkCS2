@@ -1,9 +1,5 @@
 #include "HSVNode.hpp"
 
-#include <math.h>
-
-#include <math.h>
-
 #include "../IdType.hpp"
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
@@ -12,7 +8,6 @@
 #include "imgui.h"
 #include "imnodes.h"
 
-#include "magic_enum/magic_enum.hpp"
 #include "nlohmann/json.hpp"
 
 #include <optional>
@@ -33,9 +28,9 @@ HSVNode* HSVNode::initialized(NodeCircuit* parent, HSVDirection direction)
 {
 	return new HSVNode{ parent, direction, parent->next_id(), parent->next_id(), parent->next_id(), parent->next_id(), parent->next_id() };
 }
-HSVNode* HSVNode::uninitialized(NodeCircuit* parent)
+HSVNode* HSVNode::uninitialized(NodeCircuit* parent, HSVDirection direction)
 {
-	return new HSVNode{ parent, magic_enum::enum_values<HSVDirection>()[0], 0, 0, 0, 0, 0 };
+	return new HSVNode{ parent, direction, 0, 0, 0, 0, 0 };
 }
 
 void HSVNode::render_io()
@@ -150,8 +145,6 @@ void HSVNode::serialize(nlohmann::json& output_json) const
 	output_json["v"] = v;
 	output_json["a"] = a;
 	output_json["color"] = color;
-
-	output_json["direction"] = direction;
 }
 
 void HSVNode::deserialize(const nlohmann::json& input_json)
@@ -161,6 +154,4 @@ void HSVNode::deserialize(const nlohmann::json& input_json)
 	v = input_json["v"];
 	a = input_json["a"];
 	color = input_json["color"];
-
-	direction = input_json["direction"];
 }

@@ -25,7 +25,7 @@ class HSVNode : public Node {
 
 public:
 	static HSVNode* initialized(NodeCircuit* parent, HSVDirection direction);
-	static HSVNode* uninitialized(NodeCircuit* parent);
+	static HSVNode* uninitialized(NodeCircuit* parent, HSVDirection direction);
 	~HSVNode() override = default;
 
 	void render_io() override;

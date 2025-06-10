@@ -58,11 +58,11 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 
 	menu["Color conversion/HSVA to Color"] = {
 		.create_initialized = [](NodeCircuit* parent) { return HSVNode::initialized(parent, HSVDirection::HSVA_TO_COLOR); },
-		.create_uninitialized = HSVNode::uninitialized
+		.create_uninitialized = [](NodeCircuit* parent) { return HSVNode::uninitialized(parent, HSVDirection::HSVA_TO_COLOR); },
 	};
 	menu["Color conversion/Color to HSVA"] = {
 		.create_initialized = [](NodeCircuit* parent) { return HSVNode::initialized(parent, HSVDirection::COLOR_TO_HSVA); },
-		.create_uninitialized = HSVNode::uninitialized
+		.create_uninitialized = [](NodeCircuit* parent) { return HSVNode::uninitialized(parent, HSVDirection::COLOR_TO_HSVA); },
 	};
 
 	menu["Logic Gate/And gate"] = {
