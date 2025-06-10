@@ -28,7 +28,7 @@ class LogicGateNode : public Node {
 
 public:
 	static LogicGateNode* initialized(NodeCircuit* parent, LogicGateType type);
-	static LogicGateNode* uninitialized(NodeCircuit* parent);
+	static LogicGateNode* uninitialized(NodeCircuit* parent,LogicGateType type);
 	~LogicGateNode() override = default;
 
 	void render_io() override;

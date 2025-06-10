@@ -67,11 +67,11 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 
 	menu["Logic Gate/And gate"] = {
 		.create_initialized = [](NodeCircuit* parent) { return LogicGateNode::initialized(parent, LogicGateType::And); },
-		.create_uninitialized = LogicGateNode::uninitialized
+		.create_uninitialized = [](NodeCircuit* parent) { return LogicGateNode::uninitialized(parent, LogicGateType::And); },
 	};
 	menu["Logic Gate/Or gate"] = {
 		.create_initialized = [](NodeCircuit* parent) { return LogicGateNode::initialized(parent, LogicGateType::Or); },
-		.create_uninitialized = LogicGateNode::uninitialized
+		.create_uninitialized = [](NodeCircuit* parent) { return LogicGateNode::uninitialized(parent, LogicGateType::Or); },
 	};
 	menu["Logic Gate/Not gate"] = {
 		.create_initialized = NotGateNode::initialized,

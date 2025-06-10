@@ -8,7 +8,6 @@
 #include "imgui.h"
 #include "imnodes.h"
 
-#include "magic_enum/magic_enum.hpp"
 #include <optional>
 #include <utility>
 
@@ -25,9 +24,9 @@ LogicGateNode* LogicGateNode::initialized(NodeCircuit* parent, LogicGateType typ
 {
 	return new LogicGateNode{ parent, type, parent->next_id(), parent->next_id(), parent->next_id() };
 }
-LogicGateNode* LogicGateNode::uninitialized(NodeCircuit* parent)
+LogicGateNode* LogicGateNode::uninitialized(NodeCircuit* parent, LogicGateType type)
 {
-	return new LogicGateNode{ parent, magic_enum::enum_values<LogicGateType>()[0], 0, 0, 0 };
+	return new LogicGateNode{ parent, type, 0, 0, 0 };
 }
 
 void LogicGateNode::render_io()
@@ -67,8 +66,6 @@ NodeResult LogicGateNode::get_value(IdType /*id*/) const
 
 void LogicGateNode::serialize(nlohmann::json& output_json) const
 {
-	output_json["type"] = type;
-
 	output_json["input_a"] = input_a;
 	output_json["input_b"] = input_b;
 	output_json["output"] = output;	
@@ -76,8 +73,6 @@ void LogicGateNode::serialize(nlohmann::json& output_json) const
 
 void LogicGateNode::deserialize(const nlohmann::json& input_json)
 {
-	type = input_json["type"];
-
 	input_a = input_json["input_a"];
 	input_b = input_json["input_b"];
 	output = input_json["output"];
