@@ -8,7 +8,6 @@
 #include "imgui.h"
 #include "imnodes.h"
 
-#include "magic_enum/magic_enum.hpp"
 #include "nlohmann/json.hpp"
 
 #include <optional>
@@ -29,9 +28,9 @@ RGBANode* RGBANode::initialized(NodeCircuit* parent, RGBADirection direction)
 {
 	return new RGBANode{ parent, direction, parent->next_id(), parent->next_id(), parent->next_id(), parent->next_id(), parent->next_id() };
 }
-RGBANode* RGBANode::uninitialized(NodeCircuit* parent)
+RGBANode* RGBANode::uninitialized(NodeCircuit* parent, RGBADirection direction)
 {
-	return new RGBANode{ parent, magic_enum::enum_values<RGBADirection>()[0], 0, 0, 0, 0, 0 };
+	return new RGBANode{ parent, direction, 0, 0, 0, 0, 0 };
 }
 
 void RGBANode::render_io()
@@ -118,8 +117,6 @@ void RGBANode::serialize(nlohmann::json& output_json) const
 	output_json["b"] = b;
 	output_json["a"] = a;
 	output_json["color"] = color;
-
-	output_json["direction"] = direction;
 }
 
 void RGBANode::deserialize(const nlohmann::json& input_json)
@@ -129,6 +126,4 @@ void RGBANode::deserialize(const nlohmann::json& input_json)
 	b = input_json["b"];
 	a = input_json["a"];
 	color = input_json["color"];
-
-	direction = input_json["direction"];
 }

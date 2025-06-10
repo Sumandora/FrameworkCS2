@@ -49,11 +49,11 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 
 	menu["Color conversion/RGBA to Color"] = {
 		.create_initialized = [](NodeCircuit* parent) { return RGBANode::initialized(parent, RGBADirection::RGBA_TO_COLOR); },
-		.create_uninitialized = RGBANode::uninitialized
+		.create_uninitialized = [](NodeCircuit* parent) { return RGBANode::uninitialized(parent, RGBADirection::RGBA_TO_COLOR); },
 	};
 	menu["Color conversion/Color to RGBA"] = {
 		.create_initialized = [](NodeCircuit* parent) { return RGBANode::initialized(parent, RGBADirection::COLOR_TO_RGBA); },
-		.create_uninitialized = RGBANode::uninitialized
+		.create_uninitialized = [](NodeCircuit* parent) { return RGBANode::uninitialized(parent, RGBADirection::COLOR_TO_RGBA); },
 	};
 
 	menu["Color conversion/HSVA to Color"] = {

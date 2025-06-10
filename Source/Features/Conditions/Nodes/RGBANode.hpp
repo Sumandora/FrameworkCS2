@@ -25,7 +25,7 @@ class RGBANode : public Node {
 
 public:
 	static RGBANode* initialized(NodeCircuit* parent, RGBADirection direction);
-	static RGBANode* uninitialized(NodeCircuit* parent);
+	static RGBANode* uninitialized(NodeCircuit* parent, RGBADirection direction);
 	~RGBANode() override = default;
 
 	void render_io() override;
