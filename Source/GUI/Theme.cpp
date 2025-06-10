@@ -83,7 +83,7 @@ void GUI::Theme::anti_purple_theme()
 	colors[ImGuiCol_TabUnfocused] = background3;
 	colors[ImGuiCol_TabUnfocusedActive] = background3;
 
-	style.WindowBorderSize = style.ChildBorderSize = style.PopupBorderSize = style.FrameBorderSize = style.TabBorderSize = 1;
+	style.WindowBorderSize = style.ChildBorderSize = style.PopupBorderSize = style.FrameBorderSize = style.TabBorderSize = 2;
 
 	style.WindowRounding = style.ChildRounding = style.FrameRounding = style.PopupRounding = style.ScrollbarRounding = style.GrabRounding = style.TabRounding = 6;
 
@@ -91,4 +91,6 @@ void GUI::Theme::anti_purple_theme()
 	style.WindowMenuButtonPosition = ImGuiDir_None;
 
 	style.TabBarBorderSize = style.TabBarOverlineSize = 0;
+
+	style.FramePadding.x = 10;
 }
