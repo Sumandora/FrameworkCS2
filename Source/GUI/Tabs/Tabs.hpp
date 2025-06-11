@@ -10,6 +10,7 @@ namespace GUI::Tabs {
 		void draw_local_player();
 		void draw_event_list();
 		void draw_panorama();
+		void draw_notifications();
 	}
 	namespace About {
 		void draw_configs();
