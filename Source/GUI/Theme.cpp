@@ -2,7 +2,6 @@
 
 #include "imgui.h"
 #include "imnodes.h"
-#include "imnodes_internal.h"
 
 static constexpr ImColor with_alpha(ImColor color, int a)
 {
@@ -32,7 +31,7 @@ void GUI::Theme::anti_purple_theme()
 
 	colors[ImGuiCol_WindowBg] = with_alpha(BACKGROUND, 240);
 	colors[ImGuiCol_ChildBg] = TRANS;
-	colors[ImGuiCol_PopupBg] = with_alpha(BACKGROUND2, 240);
+	colors[ImGuiCol_PopupBg] = with_alpha(BACKGROUND, 240);
 
 	colors[ImGuiCol_Border] = with_alpha(BORDER, 128);
 	colors[ImGuiCol_BorderShadow] = TRANS;
@@ -93,7 +92,7 @@ void GUI::Theme::anti_purple_theme()
 
 void GUI::Theme::anti_purple_imnodes_theme()
 {
-	auto& colors = GImNodes->Style.Colors;
+	auto& colors = ImNodes::GetStyle().Colors;
 
 	colors[ImNodesCol_TitleBar] = with_alpha(ACCENT, 140);
 	colors[ImNodesCol_TitleBarHovered] = with_alpha(ACCENT, 180);
@@ -109,6 +108,9 @@ void GUI::Theme::anti_purple_imnodes_theme()
 	colors[ImNodesCol_BoxSelector] = with_alpha(ACCENT, 30);
 	colors[ImNodesCol_BoxSelectorOutline] = with_alpha(ACCENT, 150);
 
-	colors[ImNodesCol_MiniMapLink] = GImNodes->Style.Colors[ImNodesCol_Link];
-	colors[ImNodesCol_MiniMapLinkSelected] = GImNodes->Style.Colors[ImNodesCol_LinkSelected];
+	colors[ImNodesCol_GridBackground] = TRANS;
+	colors[ImNodesCol_GridLine] = with_alpha(WHITE, 40);
+
+	colors[ImNodesCol_MiniMapLink] = colors[ImNodesCol_Link];
+	colors[ImNodesCol_MiniMapLinkSelected] = colors[ImNodesCol_LinkSelected];
 }
