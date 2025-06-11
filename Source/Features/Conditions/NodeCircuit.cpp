@@ -11,12 +11,15 @@
 
 #include "../../Utils/Logging.hpp"
 
+#include "../../GUI/Theme.hpp"
+
 #include "magic_enum/magic_enum.hpp"
 
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "imnodes.h"
 #include "imnodes_internal.h"
+
 #include "nlohmann/json_fwd.hpp"
 
 #include <algorithm>
@@ -39,6 +42,8 @@ NodeCircuit::NodeCircuit(NodeType type, std::function<NodeResult()> get_original
 	, output_node(this, type)
 	, output_node_id(next_id())
 {
+	GUI::Theme::anti_purple_imnodes_theme();
+
 	ImNodesIO& io = ImNodes::GetIO();
 	io.LinkDetachWithModifierClick.Modifier = &ImGui::GetIO().KeyCtrl;
 

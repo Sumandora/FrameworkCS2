@@ -1,6 +1,8 @@
 #include "Theme.hpp"
 
 #include "imgui.h"
+#include "imnodes.h"
+#include "imnodes_internal.h"
 
 static constexpr ImColor with_alpha(ImColor color, int a)
 {
@@ -8,74 +10,74 @@ static constexpr ImColor with_alpha(ImColor color, int a)
 	return color;
 };
 
+static constexpr ImColor BACKGROUND = IM_COL32(10, 10, 10, 255);
+static constexpr ImColor BACKGROUND2 = IM_COL32(18, 18, 18, 255);
+static constexpr ImColor BACKGROUND3 = IM_COL32(23, 23, 23, 255);
+
+static constexpr ImColor ACCENT = IM_COL32(200, 206, 164, 255);
+
+static constexpr ImColor BORDER = IM_COL32(56, 56, 56, 255);
+static constexpr ImColor BORDER2 = IM_COL32(56, 56, 56, 255);
+
+static constexpr ImColor WHITE = IM_COL32_WHITE;
+static constexpr ImColor TRANS = IM_COL32_BLACK_TRANS; // :3
+
 void GUI::Theme::anti_purple_theme()
 {
 	auto& style = ImGui::GetStyle();
 	auto& colors = style.Colors;
 
-	const ImColor background = IM_COL32(10, 10, 10, 255);
-	const ImColor background2 = IM_COL32(18, 18, 18, 255);
-	const ImColor background3 = IM_COL32(23, 23, 23, 255);
+	colors[ImGuiCol_Text] = WHITE;
+	colors[ImGuiCol_TextDisabled] = BORDER2;
 
-	const ImColor accent = IM_COL32(200, 206, 164, 255);
+	colors[ImGuiCol_WindowBg] = with_alpha(BACKGROUND, 240);
+	colors[ImGuiCol_ChildBg] = TRANS;
+	colors[ImGuiCol_PopupBg] = with_alpha(BACKGROUND2, 240);
 
-	const ImColor border = IM_COL32(56, 56, 56, 255);
-	const ImColor border2 = IM_COL32(56, 56, 56, 255);
+	colors[ImGuiCol_Border] = with_alpha(BORDER, 128);
+	colors[ImGuiCol_BorderShadow] = TRANS;
 
-	const ImColor white = IM_COL32_WHITE;
-	const ImColor trans = IM_COL32_BLACK_TRANS; // :3
+	colors[ImGuiCol_FrameBg] = BACKGROUND3;
+	colors[ImGuiCol_FrameBgHovered] = with_alpha(ACCENT, 180);
+	colors[ImGuiCol_FrameBgActive] = ACCENT;
 
-	colors[ImGuiCol_Text] = white;
-	colors[ImGuiCol_TextDisabled] = border2;
+	colors[ImGuiCol_TitleBg] = BACKGROUND2;
+	colors[ImGuiCol_TitleBgActive] = BACKGROUND2;
+	colors[ImGuiCol_TitleBgCollapsed] = BACKGROUND2;
 
-	colors[ImGuiCol_WindowBg] = with_alpha(background, 240);
-	colors[ImGuiCol_ChildBg] = trans;
-	colors[ImGuiCol_PopupBg] = with_alpha(background2, 240);
+	colors[ImGuiCol_MenuBarBg] = BACKGROUND3;
 
-	colors[ImGuiCol_Border] = with_alpha(border, 128);
-	colors[ImGuiCol_BorderShadow] = trans;
+	colors[ImGuiCol_ScrollbarBg] = with_alpha(BACKGROUND3, 100);
+	colors[ImGuiCol_ScrollbarGrab] = BORDER;
+	colors[ImGuiCol_ScrollbarGrabHovered] = with_alpha(ACCENT, 200);
+	colors[ImGuiCol_ScrollbarGrabActive] = ACCENT;
 
-	colors[ImGuiCol_FrameBg] = background3;
-	colors[ImGuiCol_FrameBgHovered] = with_alpha(accent, 180);
-	colors[ImGuiCol_FrameBgActive] = accent;
+	colors[ImGuiCol_CheckMark] = ACCENT;
 
-	colors[ImGuiCol_TitleBg] = background2;
-	colors[ImGuiCol_TitleBgActive] = background2;
-	colors[ImGuiCol_TitleBgCollapsed] = background2;
+	colors[ImGuiCol_SliderGrab] = BORDER2;
+	colors[ImGuiCol_SliderGrabActive] = BORDER2;
 
-	colors[ImGuiCol_MenuBarBg] = background3;
+	colors[ImGuiCol_Button] = BACKGROUND2;
+	colors[ImGuiCol_ButtonHovered] = BACKGROUND3;
+	colors[ImGuiCol_ButtonActive] = BACKGROUND2;
 
-	colors[ImGuiCol_ScrollbarBg] = with_alpha(background3, 100);
-	colors[ImGuiCol_ScrollbarGrab] = border;
-	colors[ImGuiCol_ScrollbarGrabHovered] = with_alpha(accent, 200);
-	colors[ImGuiCol_ScrollbarGrabActive] = accent;
+	colors[ImGuiCol_Header] = BACKGROUND2;
+	colors[ImGuiCol_HeaderHovered] = with_alpha(ACCENT, 180);
+	colors[ImGuiCol_HeaderActive] = ACCENT;
 
-	colors[ImGuiCol_CheckMark] = accent;
+	colors[ImGuiCol_Separator] = BORDER;
+	colors[ImGuiCol_SeparatorHovered] = BORDER;
+	colors[ImGuiCol_SeparatorActive] = BORDER;
 
-	colors[ImGuiCol_SliderGrab] = border2;
-	colors[ImGuiCol_SliderGrabActive] = border2;
+	colors[ImGuiCol_ResizeGrip] = TRANS;
+	colors[ImGuiCol_ResizeGripHovered] = BORDER2;
+	colors[ImGuiCol_ResizeGripActive] = BORDER2;
 
-	colors[ImGuiCol_Button] = background2;
-	colors[ImGuiCol_ButtonHovered] = background3;
-	colors[ImGuiCol_ButtonActive] = background2;
-
-	colors[ImGuiCol_Header] = background2;
-	colors[ImGuiCol_HeaderHovered] = with_alpha(accent, 180);
-	colors[ImGuiCol_HeaderActive] = accent;
-
-	colors[ImGuiCol_Separator] = border;
-	colors[ImGuiCol_SeparatorHovered] = border;
-	colors[ImGuiCol_SeparatorActive] = border;
-
-	colors[ImGuiCol_ResizeGrip] = trans;
-	colors[ImGuiCol_ResizeGripHovered] = border2;
-	colors[ImGuiCol_ResizeGripActive] = border2;
-
-	colors[ImGuiCol_Tab] = with_alpha(background3, 140);
-	colors[ImGuiCol_TabHovered] = accent;
-	colors[ImGuiCol_TabActive] = with_alpha(accent, 180);
-	colors[ImGuiCol_TabUnfocused] = background3;
-	colors[ImGuiCol_TabUnfocusedActive] = background3;
+	colors[ImGuiCol_Tab] = with_alpha(BACKGROUND3, 140);
+	colors[ImGuiCol_TabHovered] = ACCENT;
+	colors[ImGuiCol_TabActive] = with_alpha(ACCENT, 180);
+	colors[ImGuiCol_TabUnfocused] = BACKGROUND3;
+	colors[ImGuiCol_TabUnfocusedActive] = BACKGROUND3;
 
 	style.WindowBorderSize = style.ChildBorderSize = style.PopupBorderSize = style.FrameBorderSize = style.TabBorderSize = 2;
 
@@ -87,4 +89,26 @@ void GUI::Theme::anti_purple_theme()
 	style.TabBarBorderSize = style.TabBarOverlineSize = 0;
 
 	style.FramePadding.x = 10;
+}
+
+void GUI::Theme::anti_purple_imnodes_theme()
+{
+	auto& colors = GImNodes->Style.Colors;
+
+	colors[ImNodesCol_TitleBar] = with_alpha(ACCENT, 140);
+	colors[ImNodesCol_TitleBarHovered] = with_alpha(ACCENT, 180);
+	colors[ImNodesCol_TitleBarSelected] = ACCENT;
+
+	colors[ImNodesCol_Link] = with_alpha(ACCENT, 140);
+	colors[ImNodesCol_LinkHovered] = with_alpha(ACCENT, 180);
+	colors[ImNodesCol_LinkSelected] = ACCENT;
+
+	colors[ImNodesCol_Pin] = with_alpha(ACCENT, 180);
+	colors[ImNodesCol_PinHovered] = ACCENT;
+
+	colors[ImNodesCol_BoxSelector] = with_alpha(ACCENT, 30);
+	colors[ImNodesCol_BoxSelectorOutline] = with_alpha(ACCENT, 150);
+
+	colors[ImNodesCol_MiniMapLink] = GImNodes->Style.Colors[ImNodesCol_Link];
+	colors[ImNodesCol_MiniMapLinkSelected] = GImNodes->Style.Colors[ImNodesCol_LinkSelected];
 }
