@@ -17,7 +17,7 @@ namespace Notifications {
 	};
 
 
-	void create(std::string title, std::string message, Severity severity, std::chrono::milliseconds max_age = std::chrono::seconds(1));
+	void create(std::string title, std::string message, Severity severity, std::chrono::milliseconds max_age = std::chrono::seconds(3));
 
 	void render();
 }
