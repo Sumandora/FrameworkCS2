@@ -70,6 +70,10 @@ void GUI::Tabs::render()
 						Debug::draw_panorama();
 						ImGuiExt::EndBoxedTabItem();
 					}
+					if (ImGuiExt::BeginBoxedTabItem("Notifications", ImGui::GetContentRegionAvail())) {
+						Debug::draw_notifications();
+						ImGuiExt::EndBoxedTabItem();
+					}
 
 					ImGui::EndTabBar();
 				}
