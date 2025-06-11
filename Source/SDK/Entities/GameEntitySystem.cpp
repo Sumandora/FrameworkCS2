@@ -17,6 +17,10 @@ GameEntitySystem** GameEntitySystem::find()
 	// To the valve employee, who wrote this function: Kuss auf Nuss!
 	auto reinit_predictables = BCRL::signature(Memory::mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"CL:  reinitialized %i predictable entities\n">(), BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
 								   .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+								   .sub(3)
+								   .filter([](const auto& ptr) {
+									   return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 15">());
+								   })
 								   .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 83 ec ? 4c 8d 35">())
 								   .add(7);
 

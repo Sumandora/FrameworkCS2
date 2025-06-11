@@ -94,6 +94,10 @@ void Memory::create()
 
 	fireEvent = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"FireEvent: event '%s' not registered.\n">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
 					.find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+					.sub(3)
+					.filter([](const auto& ptr) {
+						return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 3d">());
+					})
 					.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 8d 87 ? ? ? ? 48 89 e5">()) // What is the lea in the middle of the prologue?
 					.expect<void*>("Couldn't find FireEvent");
 
@@ -108,7 +112,7 @@ void Memory::create()
 					 .expect<void*>("Couldn't find CCSGOInput");
 
 	get_fun_loading = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"#LoadingProgress_CSFunLoading%d">(), BCRL::everything(mem_mgr).thats_readable().thats_not_executable().with_name("libclient.so"))
-						.find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-						.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
-						.expect<void*>("Couldn't find get_fun_loading");
+						  .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+						  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+						  .expect<void*>("Couldn't find get_fun_loading");
 }
