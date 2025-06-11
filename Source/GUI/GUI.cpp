@@ -1,6 +1,7 @@
 #include "GUI.hpp"
 
 #include "Theme.hpp"
+
 #include "backends/imgui_impl_sdl3.h"
 #include "backends/imgui_impl_vulkan.h"
 #include "imgui.h"
@@ -23,6 +24,8 @@
 #include "Tabs/Tabs.hpp"
 
 #include "../Hooks/Graphics/GraphicsHook.hpp"
+
+#include "../Notifications/Notifications.hpp"
 
 class OwningSDLEvent {
 	SDL_Event event;
@@ -225,6 +228,8 @@ void GUI::render()
 
 		ImGui::ShowDemoWindow();
 	}
+
+	Notifications::render();
 
 	ImGui::Render();
 }
