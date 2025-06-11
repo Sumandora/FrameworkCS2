@@ -4,6 +4,8 @@
 
 #include "imgui.h"
 
+#include "../../GUI/Elements/BoxedTabItem.hpp"
+
 #include <string>
 #include <utility>
 
@@ -16,9 +18,9 @@ void Tabs::render()
 {
 	if (ImGui::BeginTabBar(get_name().c_str(), ImGuiTabBarFlags_Reorderable)) {
 		for (Setting* tab : settings)
-			if (ImGui::BeginTabItem(tab->get_name().c_str())) {
+			if (ImGuiExt::BeginBoxedTabItem(tab->get_name().c_str())) {
 				tab->render();
-				ImGui::EndTabItem();
+				ImGuiExt::EndBoxedTabItem();
 			}
 
 		ImGui::EndTabBar();

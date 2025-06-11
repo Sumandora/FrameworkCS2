@@ -1,5 +1,6 @@
 #include "GUI.hpp"
 
+#include "Theme.hpp"
 #include "backends/imgui_impl_sdl3.h"
 #include "backends/imgui_impl_vulkan.h"
 #include "imgui.h"
@@ -147,6 +148,8 @@ void GUI::init()
 	io.LogFilename = nullptr;
 
 	Logging::info("Initialized ImGui Context");
+
+	Theme::anti_purple_theme();
 }
 
 void GUI::destroy()
@@ -160,19 +163,19 @@ static void create_font()
 	const SDL_DisplayID display_index = SDL_GetDisplayForWindow(window);
 	const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(display_index);
 
-	// I want the font size to be something around 12 on full hd screens.
-	// 4k screens get something around 24.
+	// I want the font size to be something around 16 on full hd screens.
+	// 4k screens get something around 32.
 	// Mathematically expressed:
-	// font_size(1080) = 12
-	// font_size(2160) = 24
+	// font_size(1080) = 16
+	// font_size(2160) = 32
 	// Simplified
-	// font_size(x) = x / 1080 * 12
+	// font_size(x) = x / 1080 * 16
 
 	// Assign global scale variable
 	scale = static_cast<float>(mode->h) / 1080;
 
 	// Floor to not get ugly subpixel values.
-	font_size = floorf(scale * 12.0F);
+	font_size = floorf(scale * 16.0F);
 
 	Logging::info("Using font size {} for display {}x{} with {} density", font_size, mode->w, mode->h, mode->pixel_density);
 

@@ -10,9 +10,10 @@
 
 #include "../../../Hooks/Game/GameHook.hpp"
 
+#include "../../../GUI/Elements/BoxedTabItem.hpp"
+
 #include "misc/cpp/imgui_stdlib.h"
 
-#include <mutex>
 #include <string>
 
 /** TODO Make this a feature:
@@ -23,13 +24,13 @@ obj.visible = false;
 void GUI::Tabs::Debug::draw_panorama()
 {
 	if (ImGui::BeginTabBar("#Panorama debug tabs", ImGuiTabBarFlags_Reorderable)) {
-		if (ImGui::BeginTabItem("Panels")) {
+		if (ImGuiExt::BeginBoxedTabItem("Panels")) {
 			Interfaces::panorama_ui_engine->access_ui_engine()->for_each_panel([&](UIPanel* panel) {
 				ImGui::Text("%p -> %s", static_cast<void*>(panel), panel->id);
 			});
-			ImGui::EndTabItem();
+			ImGuiExt::EndBoxedTabItem();
 		}
-		if (ImGui::BeginTabItem("Execute Javascript")) {
+		if (ImGuiExt::BeginBoxedTabItem("Execute Javascript")) {
 			static std::string panel = "CSGOMainMenu";
 			ImGui::InputText("Panel", &panel);
 			static std::string context = "panorama/layout/base.xml";
@@ -47,7 +48,7 @@ void GUI::Tabs::Debug::draw_panorama()
 					ui_engine->run_script(ui_panel, s.c_str(), c.c_str());
 				});
 			}
-			ImGui::EndTabItem();
+			ImGuiExt::EndBoxedTabItem();
 		}
 		ImGui::EndTabBar();
 	}

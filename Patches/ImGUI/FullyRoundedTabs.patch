@@ -1,0 +1,26 @@
+diff -Naur a/imgui_widgets.cpp b/imgui_widgets.cpp
+--- a/imgui_widgets.cpp	2025-06-10 19:38:53.838214229 +0200
++++ b/imgui_widgets.cpp	2025-06-10 19:40:50.236859648 +0200
+@@ -10239,20 +10239,10 @@
+     IM_UNUSED(flags);
+     IM_ASSERT(width > 0.0f);
+     const float rounding = ImMax(0.0f, ImMin((flags & ImGuiTabItemFlags_Button) ? g.Style.FrameRounding : g.Style.TabRounding, width * 0.5f - 1.0f));
+-    const float y1 = bb.Min.y + 1.0f;
+-    const float y2 = bb.Max.y - g.Style.TabBarBorderSize;
+-    draw_list->PathLineTo(ImVec2(bb.Min.x, y2));
+-    draw_list->PathArcToFast(ImVec2(bb.Min.x + rounding, y1 + rounding), rounding, 6, 9);
+-    draw_list->PathArcToFast(ImVec2(bb.Max.x - rounding, y1 + rounding), rounding, 9, 12);
+-    draw_list->PathLineTo(ImVec2(bb.Max.x, y2));
+-    draw_list->PathFillConvex(col);
++    draw_list->AddRectFilled(bb.Min, bb.Max, col, rounding);
+     if (g.Style.TabBorderSize > 0.0f)
+     {
+-        draw_list->PathLineTo(ImVec2(bb.Min.x + 0.5f, y2));
+-        draw_list->PathArcToFast(ImVec2(bb.Min.x + rounding + 0.5f, y1 + rounding + 0.5f), rounding, 6, 9);
+-        draw_list->PathArcToFast(ImVec2(bb.Max.x - rounding - 0.5f, y1 + rounding + 0.5f), rounding, 9, 12);
+-        draw_list->PathLineTo(ImVec2(bb.Max.x - 0.5f, y2));
+-        draw_list->PathStroke(GetColorU32(ImGuiCol_Border), 0, g.Style.TabBorderSize);
++        draw_list->AddRect(bb.Min, bb.Max, GetColorU32(ImGuiCol_Border), rounding, 0, g.Style.TabBorderSize);
+     }
+ }
+ 

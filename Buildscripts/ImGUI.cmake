@@ -2,7 +2,9 @@
 FetchContent_Declare(imgui
 	GIT_REPOSITORY https://github.com/ocornut/imgui
 	GIT_PROGRESS TRUE
-	GIT_TAG v1.91.7)
+	GIT_TAG v1.91.7
+	PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/Patches/ImGUI/FullyRoundedTabs.patch
+	UPDATE_DISCONNECTED TRUE)
 FetchContent_MakeAvailable(imgui)
 
 file(GLOB IMGUI_SOURCE_FILES "${imgui_SOURCE_DIR}/*.cpp") # Base

@@ -3,92 +3,110 @@
 #include "../../Features/Feature.hpp"
 #include "../../Features/Features.hpp"
 
+#include "../Elements/BoxedTabItem.hpp"
 #include "../GUI.hpp"
 
 #include "imgui.h"
 
+#include <ranges>
 #include <string>
 
 void GUI::Tabs::render()
 {
-	ImGui::SetNextWindowSize(ImVec2{ 400, 300 } * GUI::get_scale(), ImGuiCond_Once);
-	if (ImGui::Begin("Framework CS2")) {
+	ImGui::SetNextWindowSizeConstraints(ImVec2{ 400, 300 } * GUI::get_scale(), ImVec2(FLT_MAX, FLT_MAX));
+	ImGui::SetNextWindowSize(ImVec2{ 600, 450 } * GUI::get_scale(), ImGuiCond_Once);
+	if (ImGui::Begin("Framework CS2", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar)) {
+		const ImVec2 remaining_size{ 0.0F, -ImGui::GetFontSize() };
+
 		if (ImGui::BeginTabBar("#Top level tabs", ImGuiTabBarFlags_Reorderable)) {
 			for (auto& [category, vector] : Features::features) {
-				if (ImGui::BeginTabItem(category.c_str())) {
+				if (ImGuiExt::BeginBoxedTabItem(category.c_str(), remaining_size)) {
 					std::string tag = category;
 					tag.insert(0, 1, '#');
 					if (ImGui::BeginTabBar(tag.c_str(), ImGuiTabBarFlags_Reorderable)) {
 						for (Feature* feature : vector) {
-							if (ImGui::BeginTabItem(feature->get_name().c_str())) {
+							if (ImGuiExt::BeginBoxedTabItem(feature->get_name().c_str(), ImGui::GetContentRegionAvail())) {
 								feature->render();
-								ImGui::EndTabItem();
+								ImGuiExt::EndBoxedTabItem();
 							}
 						}
 						ImGui::EndTabBar();
 					}
-					ImGui::EndTabItem();
+					ImGuiExt::EndBoxedTabItem();
 				}
 			}
 
-			if (ImGui::BeginTabItem("Debug")) {
+			if (ImGuiExt::BeginBoxedTabItem("Debug", remaining_size)) {
 				if (ImGui::BeginTabBar("#Debug tabs", ImGuiTabBarFlags_Reorderable)) {
-					if (ImGui::BeginTabItem("Interfaces")) {
+					if (ImGuiExt::BeginBoxedTabItem("Interfaces", ImGui::GetContentRegionAvail())) {
 						Debug::draw_interfaces();
-						ImGui::EndTabItem();
+						ImGuiExt::EndBoxedTabItem();
 					}
-					if (ImGui::BeginTabItem("Link maps")) {
+					if (ImGuiExt::BeginBoxedTabItem("Link maps", ImGui::GetContentRegionAvail())) {
 						Debug::draw_link_maps();
-						ImGui::EndTabItem();
+						ImGuiExt::EndBoxedTabItem();
 					}
-					if (ImGui::BeginTabItem("View matrix")) {
+					if (ImGuiExt::BeginBoxedTabItem("View matrix", ImGui::GetContentRegionAvail())) {
 						Debug::draw_view_matrix();
-						ImGui::EndTabItem();
+						ImGuiExt::EndBoxedTabItem();
 					}
-					if (ImGui::BeginTabItem("Entities")) {
+					if (ImGuiExt::BeginBoxedTabItem("Entities", ImGui::GetContentRegionAvail())) {
 						Debug::draw_entity_list();
-						ImGui::EndTabItem();
+						ImGuiExt::EndBoxedTabItem();
 					}
-					if (ImGui::BeginTabItem("Convars")) {
+					if (ImGuiExt::BeginBoxedTabItem("Convars", ImGui::GetContentRegionAvail())) {
 						Debug::draw_convars();
-						ImGui::EndTabItem();
+						ImGuiExt::EndBoxedTabItem();
 					}
-					if (ImGui::BeginTabItem("Local player")) {
+					if (ImGuiExt::BeginBoxedTabItem("Local player", ImGui::GetContentRegionAvail())) {
 						Debug::draw_local_player();
-						ImGui::EndTabItem();
+						ImGuiExt::EndBoxedTabItem();
 					}
-					if (ImGui::BeginTabItem("Game events")) {
+					if (ImGuiExt::BeginBoxedTabItem("Game events", ImGui::GetContentRegionAvail())) {
 						Debug::draw_event_list();
-						ImGui::EndTabItem();
+						ImGuiExt::EndBoxedTabItem();
 					}
-					if (ImGui::BeginTabItem("Panorama")) {
+					if (ImGuiExt::BeginBoxedTabItem("Panorama", ImGui::GetContentRegionAvail())) {
 						Debug::draw_panorama();
-						ImGui::EndTabItem();
+						ImGuiExt::EndBoxedTabItem();
 					}
 
 					ImGui::EndTabBar();
 				}
-				ImGui::EndTabItem();
+				ImGuiExt::EndBoxedTabItem();
 			}
 
-			if (ImGui::BeginTabItem("About")) {
+			if (ImGuiExt::BeginBoxedTabItem("About", remaining_size)) {
 				if (ImGui::BeginTabBar("#About tabs", ImGuiTabBarFlags_Reorderable)) {
-					if (ImGui::BeginTabItem("Configs")) {
+					if (ImGuiExt::BeginBoxedTabItem("Configs", ImGui::GetContentRegionAvail())) {
 						About::draw_configs();
-						ImGui::EndTabItem();
+						ImGuiExt::EndBoxedTabItem();
 					}
-					if (ImGui::BeginTabItem("Licenses")) {
+					if (ImGuiExt::BeginBoxedTabItem("Licenses", ImGui::GetContentRegionAvail())) {
 						About::draw_licenses();
-						ImGui::EndTabItem();
+						ImGuiExt::EndBoxedTabItem();
 					}
 
 					ImGui::EndTabBar();
 				}
-				ImGui::EndTabItem();
+				ImGuiExt::EndBoxedTabItem();
 			}
 
 			ImGui::EndTabBar();
 		}
+
+		auto prev_y = ImGui::GetCursorPosY();
+		ImGui::Text("FrameworkCS2"
+#ifdef DEBUG
+					" (debug build)"
+#endif
+
+		);
+
+		ImGui::SetCursorPosY(prev_y);
+		const char* build_time_string = "Built on " __TIME__ " " __DATE__;
+		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize(build_time_string).x - ImGui::GetStyle().WindowPadding.x);
+		ImGui::TextUnformatted(build_time_string);
 	}
 	ImGui::End();
 }
