@@ -13,6 +13,8 @@
 
 #include "../../GUI/Theme.hpp"
 
+#include "../../Notifications/Notifications.hpp"
+
 #include "magic_enum/magic_enum.hpp"
 
 #include "imgui.h"
@@ -24,6 +26,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <format>
 #include <functional>
 #include <optional>
 #include <string>
@@ -109,11 +112,15 @@ void NodeCircuit::render(bool newly_opened)
 		const NodeType to_type = end->get_input_type(link.end_attribute);
 
 		if (std::ranges::any_of(links, [link](const Link& other_link) { return link.end_attribute == other_link.end_attribute; }))
-			Logging::error("Attempted to connect 2 values to a single input");
+			Notifications::create("Node circuit", "Attempted to connect 2 values to a single input.", Notifications::Severity::ERROR);
 		else if (from_type == to_type)
 			links.emplace_back(link);
 		else
-			Logging::error("Attempted to connect nodes of different types. ('{}' != '{}')", magic_enum::enum_name(from_type), magic_enum::enum_name(to_type));
+			Notifications::create("Node circuit",
+				std::format("Type mismatch! Attempted to connect node of type '{}' to node of type '{}'.",
+					magic_enum::enum_name(from_type),
+					magic_enum::enum_name(to_type)),
+				Notifications::Severity::ERROR);
 	}
 
 	IdType link_id = 0;
