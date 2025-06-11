@@ -90,14 +90,17 @@ void Notifications::render()
 					| ImGuiWindowFlags_NoMove
 					| ImGuiWindowFlags_NoNav
 					| ImGuiWindowFlags_NoCollapse
-					| ImGuiWindowFlags_NoScrollWithMouse)) {
+					| ImGuiWindowFlags_NoScrollWithMouse
+					| ImGuiWindowFlags_NoFocusOnAppearing
+					| ImGuiWindowFlags_NoSavedSettings)) {
 			if (notification.severity != Severity::INFO)
 				ImGui::PopStyleColor();
 
 			ImGui::Text(" %s", notification.title.c_str()); // The space is separation from the circle.
 			ImGui::Separator();
 			ImGui::TextWrapped("%s", notification.message.c_str());
-		}
+		} else if (notification.severity != Severity::INFO)
+			ImGui::PopStyleColor();
 
 		ImGui::BringWindowToDisplayFront(ImGui::GetCurrentWindow());
 
