@@ -58,7 +58,7 @@ void Notifications::render()
 		const float progress = static_cast<float>(elapsed.count()) / static_cast<float>(notification.max_age.count());
 
 		// The following animation is taken from the FrameworkCSGO EventLog, more information about it can be found there.
-		float animation = 1.0F - std::pow(progress / 2.0F + 0.5F, 10.0F);
+		float animation = 1.0F - std::pow(progress * 2.0F - 1.0F, 10.0F);
 		animation = std::min(animation + 0.01F, 1.0F);
 
 		const ImVec2 display_size = ImGui::GetIO().DisplaySize;
@@ -67,7 +67,7 @@ void Notifications::render()
 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, animation);
 		ImGui::SetNextWindowPos({ display_size.x - NOTIFICATION_PADDING - NOTIFICATION_WIDTH, y });
-		ImGui::SetNextWindowSize({ NOTIFICATION_WIDTH, 0.0F }, ImGuiCond_Once);
+		ImGui::SetNextWindowSize({ NOTIFICATION_WIDTH, 0.0F });
 
 		switch (notification.severity) {
 		case Severity::SUCESS:
@@ -92,7 +92,8 @@ void Notifications::render()
 					| ImGuiWindowFlags_NoCollapse
 					| ImGuiWindowFlags_NoScrollWithMouse
 					| ImGuiWindowFlags_NoFocusOnAppearing
-					| ImGuiWindowFlags_NoSavedSettings)) {
+					| ImGuiWindowFlags_NoSavedSettings
+					| ImGuiWindowFlags_AlwaysAutoResize)) {
 			if (notification.severity != Severity::INFO)
 				ImGui::PopStyleColor();
 
