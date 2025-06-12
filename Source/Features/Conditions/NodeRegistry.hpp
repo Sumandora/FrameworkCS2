@@ -1,10 +1,11 @@
 #pragma once
 
+#include "tsl/ordered_map.h"
+
 #include <cstddef>
 #include <functional>
 #include <string>
 #include <type_traits>
-#include <unordered_map>
 
 class Node;
 class NodeCircuit;
@@ -17,7 +18,7 @@ class NodeRegistry {
 		std::function<Node*(NodeCircuit*)> create_uninitialized; // Used during serialization
 	};
 
-	std::unordered_map<std::string, FactoryPair> menu;
+	tsl::ordered_map<std::string, FactoryPair> menu;
 
 public:
 	explicit NodeRegistry(NodeCircuit* parent);
