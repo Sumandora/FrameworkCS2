@@ -6,6 +6,8 @@
 
 enum class NodeType : std::uint8_t {
 	NOTHING, // eh, hacky
+	ANYTHING,
+	
 	FLOAT,
 	BOOLEAN,
 	COLOR,

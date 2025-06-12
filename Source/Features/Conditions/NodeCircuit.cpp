@@ -113,7 +113,7 @@ void NodeCircuit::render(bool newly_opened)
 
 		if (std::ranges::any_of(links, [link](const Link& other_link) { return link.end_attribute == other_link.end_attribute; }))
 			Notifications::create("Node circuit", "Attempted to connect 2 values to a single input.", Notifications::Severity::ERROR);
-		else if (from_type == to_type)
+		else if (from_type == NodeType::ANYTHING || to_type == NodeType::ANYTHING || from_type == to_type)
 			links.emplace_back(link);
 		else
 			Notifications::create("Node circuit",
