@@ -31,7 +31,7 @@ static constexpr T unwrap_node_result(NodeResult nr)
 		return nr.b;
 	else if constexpr (std::same_as<T, ImColor>)
 		return nr.color;
-	else if constexpr (std::is_enum_v<T> && sizeof(std::underlying_type_t<T>) <= sizeof(std::declval<NodeResult>().any))
+	else if constexpr (std::is_enum_v<T> && sizeof(std::underlying_type_t<T>) <= sizeof(NodeResult::any))
 		return magic_enum::enum_cast<T>(nr.any).value(); // Force unwrap here is unsafe, but if the optional is empty, then the node tree contains a mistake.
 	else
 		static_assert(false);
