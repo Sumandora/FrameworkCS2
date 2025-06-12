@@ -11,6 +11,7 @@
 #include "Nodes/LogicGateNode.hpp"
 #include "Nodes/NotGateNode.hpp"
 #include "Nodes/RGBANode.hpp"
+#include "Nodes/BranchNode.hpp"
 
 #include "imgui.h"
 #include "imnodes.h"
@@ -76,6 +77,10 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 	menu["Logic Gate/Not gate"] = {
 		.create_initialized = NotGateNode::initialized,
 		.create_uninitialized = NotGateNode::uninitialized
+	};
+	menu["Branch"] = {
+		.create_initialized = BranchNode::initialized,
+		.create_uninitialized = BranchNode::uninitialized
 	};
 }
 
