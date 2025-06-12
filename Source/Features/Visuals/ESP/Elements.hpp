@@ -27,9 +27,9 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 	Checkbox enabled{ this, "Enabled", false };
 
 	Checkbox health_based{ this, "Health-based color", false };
-	Color color = Color{ this, "Color" };
-	Color alive_color = Color{ this, "Alive color", ImColor{ 0.0F, 1.0F, 0.0F, 1.0F } };
-	Color dead_color = Color{ this, "Dead color", ImColor{ 1.0F, 0.0F, 0.0F, 1.0F } };
+	Color color{ this, "Color" };
+	Color alive_color{ this, "Alive color", ImColor{ 0.0F, 1.0F, 0.0F, 1.0F } };
+	Color dead_color{ this, "Dead color", ImColor{ 1.0F, 0.0F, 0.0F, 1.0F } };
 
 	FloatSlider rounding{ this, "Rounding", 0.0F, 10.0F, 0.0F };
 
