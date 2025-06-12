@@ -1,13 +1,13 @@
 #pragma once
 
 #include "glm/ext/vector_float3.hpp"
+
 #include <cerrno>
 #include <concepts>
 #include <cstring>
 #include <format>
 #include <iostream>
 #include <iterator>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -19,7 +19,7 @@ template <typename T>
 struct std::formatter<T*> : public std::formatter<void*> {
 	constexpr auto format(T* ptr, std::format_context& ctx) const
 	{
-		return std::formatter<void*>::format((void*)ptr, ctx);
+		return std::formatter<void*>::format(static_cast<void*>(ptr), ctx);
 	}
 };
 
