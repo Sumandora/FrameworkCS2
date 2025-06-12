@@ -8,21 +8,25 @@ class UninitializedObject {
 	alignas(T) std::byte storage[sizeof(T)];
 
 public:
-	template<typename... Args>
-	T* emplace(Args&&... args) {
-		T* inner = new (&storage) T{std::forward<Args>(args)...};
+	template <typename... Args>
+	T* emplace(Args&&... args)
+	{
+		T* inner = new (&storage) T{ std::forward<Args>(args)... };
 		return inner;
 	}
 
-	T* get(this auto&& self) noexcept {
+	T* get(this auto&& self) noexcept
+	{
 		return reinterpret_cast<T*>(&self.storage);
 	}
 
-	T* operator->(this auto&& self) noexcept {
+	T* operator->(this auto&& self) noexcept
+	{
 		return self.get();
 	}
 
-	void reset() {
+	void reset()
+	{
 		get()->~T();
 	}
 };
