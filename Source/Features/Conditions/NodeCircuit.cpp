@@ -189,7 +189,15 @@ bool NodeCircuit::is_trivial() const
 	return ids.size() <= 2 && links.size() <= 1;
 }
 
-Node* NodeCircuit::from_id(IdType id) const
+Node* NodeCircuit::node_from_start_attrib(IdType id) const
+{
+	auto it = std::ranges::find_if(links, [id](const Link& link) { return link.start_attribute == id; });
+	if (it != links.end())
+		return ids.at(it->end_node);
+	return nullptr;
+}
+
+Node* NodeCircuit::node_from_end_attrib(IdType id) const
 {
 	auto it = std::ranges::find_if(links, [id](const Link& link) { return link.end_attribute == id; });
 	if (it != links.end())

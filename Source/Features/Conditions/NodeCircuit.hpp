@@ -56,7 +56,8 @@ public:
 	[[nodiscard]] bool is_trivial() const;
 
 	[[nodiscard]] IdType next_id() { return id_counter++; }
-	[[nodiscard]] Node* from_id(IdType id) const;
+	[[nodiscard]] Node* node_from_start_attrib(IdType id) const;
+	[[nodiscard]] Node* node_from_end_attrib(IdType id) const;
 	[[nodiscard]] std::optional<NodeResult> value_from_attribute(IdType id) const;
 	[[nodiscard]] NodeResult get_output() const { return output_node.get_value(output_node.get_input()); }
 
