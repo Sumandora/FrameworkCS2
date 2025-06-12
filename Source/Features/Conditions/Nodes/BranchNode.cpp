@@ -12,11 +12,11 @@
 #include <cassert>
 #include <optional>
 
-BranchNode::BranchNode(NodeCircuit* parent, IdType truthy, IdType condition, IdType falsy, IdType output)
+BranchNode::BranchNode(NodeCircuit* parent, IdType falsy, IdType condition, IdType truthy, IdType output)
 	: Node(parent)
-	, truthy(truthy)
-	, condition(condition)
 	, falsy(falsy)
+	, condition(condition)
+	, truthy(truthy)
 	, output(output)
 {
 }
@@ -32,16 +32,16 @@ BranchNode* BranchNode::uninitialized(NodeCircuit* parent)
 
 void BranchNode::render_io()
 {
-	ImNodes::BeginInputAttribute(truthy);
-	ImGui::TextUnformatted("truthy");
+	ImNodes::BeginInputAttribute(falsy);
+	ImGui::TextUnformatted("falsy");
 	ImNodes::EndInputAttribute();
 
 	ImNodes::BeginInputAttribute(condition);
 	ImGui::TextUnformatted("condition");
 	ImNodes::EndInputAttribute();
 
-	ImNodes::BeginInputAttribute(falsy);
-	ImGui::TextUnformatted("falsy");
+	ImNodes::BeginInputAttribute(truthy);
+	ImGui::TextUnformatted("truthy");
 	ImNodes::EndInputAttribute();
 
 	ImGui::Spacing();
@@ -58,10 +58,10 @@ NodeResult BranchNode::get_value(IdType /*id*/) const
 	if (!l_or_r.has_value())
 		return {};
 
-	const std::optional<NodeResult> truthy = get_parent()->value_from_attribute(this->truthy);
 	const std::optional<NodeResult> falsy = get_parent()->value_from_attribute(this->falsy);
+	const std::optional<NodeResult> truthy = get_parent()->value_from_attribute(this->truthy);
 
-	if (!truthy.has_value() || !falsy.has_value())
+	if (!falsy.has_value() || !truthy.has_value())
 		return {};
 
 	return l_or_r->b ? truthy.value() : falsy.value();
@@ -72,14 +72,14 @@ NodeType BranchNode::get_input_type(IdType id) const
 	if (id == condition)
 		return NodeType::BOOLEAN;
 
-	const Node* truthy = get_parent()->node_from_end_attrib(this->truthy);
 	const Node* falsy = get_parent()->node_from_end_attrib(this->falsy);
+	const Node* truthy = get_parent()->node_from_end_attrib(this->truthy);
 	const Node* output = get_parent()->node_from_start_attrib(this->output);
 
-	if (truthy)
-		return truthy->get_output_type(this->truthy);
 	if (falsy)
 		return falsy->get_output_type(this->falsy);
+	if (truthy)
+		return truthy->get_output_type(this->truthy);
 	if (output)
 		return output->get_input_type(this->output);
 
@@ -88,30 +88,30 @@ NodeType BranchNode::get_input_type(IdType id) const
 
 NodeType BranchNode::get_output_type(IdType /*id*/) const
 {
-	const Node* truthy = get_parent()->node_from_end_attrib(this->truthy);
 	const Node* falsy = get_parent()->node_from_end_attrib(this->falsy);
+	const Node* truthy = get_parent()->node_from_end_attrib(this->truthy);
 	// No need to check the output here, since output_type only matters when currently connecting something to the output
 
-	if (truthy)
-		return truthy->get_output_type(this->truthy);
 	if (falsy)
 		return falsy->get_output_type(this->falsy);
+	if (truthy)
+		return truthy->get_output_type(this->truthy);
 
 	return NodeType::ANYTHING;
 }
 
 void BranchNode::serialize(nlohmann::json& output_json) const
 {
-	output_json["truthy"] = truthy;
-	output_json["condition"] = condition;
 	output_json["falsy"] = falsy;
+	output_json["condition"] = condition;
+	output_json["truthy"] = truthy;
 	output_json["output"] = output;
 }
 
 void BranchNode::deserialize(const nlohmann::json& input_json)
 {
-	truthy = input_json["truthy"];
-	condition = input_json["condition"];
 	falsy = input_json["falsy"];
+	condition = input_json["condition"];
+	truthy = input_json["truthy"];
 	output = input_json["output"];
 }

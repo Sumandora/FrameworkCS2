@@ -12,9 +12,9 @@
 #include <cstddef>
 
 class BranchNode : public Node {
-	IdType truthy, condition, falsy, output;
+	IdType falsy, condition, truthy, output;
 
-	explicit BranchNode(NodeCircuit* parent, IdType truthy, IdType condition, IdType falsy, IdType output);
+	explicit BranchNode(NodeCircuit* parent, IdType falsy, IdType condition, IdType truthy, IdType output);
 
 public:
 	static BranchNode* initialized(NodeCircuit* parent);
