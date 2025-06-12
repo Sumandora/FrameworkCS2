@@ -2,7 +2,9 @@
 FetchContent_Declare(imnodes
 	GIT_REPOSITORY https://github.com/Nelarius/imnodes
 	GIT_PROGRESS TRUE
-	GIT_TAG v0.5)
+	GIT_TAG v0.5
+	PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/Patches/ImNodes/DontRedefineMacros.patch
+	UPDATE_DISCONNECTED TRUE)
 FetchContent_MakeAvailable(imnodes)
 
 add_library(imnodes STATIC "${imnodes_SOURCE_DIR}/imnodes.cpp")
