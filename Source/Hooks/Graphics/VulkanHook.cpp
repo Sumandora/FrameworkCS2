@@ -380,11 +380,10 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 
 		// Record dear imgui primitives into command buffer
 
-		static std::once_flag espDrawListFlag;
-		std::call_once(espDrawListFlag, [&]() {
+		if (GraphicsHook::espDrawList == nullptr) {
 			GraphicsHook::espDrawListSharedData = std::make_unique<ImDrawListSharedData>(*ImGui::GetDrawListSharedData());
 			GraphicsHook::espDrawList = std::make_unique<ImDrawList>(GraphicsHook::espDrawListSharedData.get());
-		});
+		}
 
 		// Submit command buffer
 		vkCmdEndRenderPass(fd->CommandBuffer);
