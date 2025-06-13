@@ -60,6 +60,7 @@ public:
 	{
 		return std::holds_alternative<std::monostate>(variant);
 	}
+
 	[[nodiscard]] bool full() const
 	{
 		return !std::holds_alternative<std::monostate>(variant);
