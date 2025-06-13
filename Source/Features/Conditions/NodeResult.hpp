@@ -34,13 +34,6 @@ class NodeResult {
 	std::variant<std::monostate, float, bool, ImColor, AnyEnum> variant;
 	static_assert(magic_enum::enum_count<NodeType>() - 1 == std::variant_size_v<decltype(variant)>);
 
-	template <typename...>
-	struct Fst;
-	template <typename First, typename... Args>
-	struct Fst<First, Args...> {
-		using T = First;
-	};
-
 public:
 	/**
 	 * Note for the uninformed:
@@ -49,7 +42,6 @@ public:
 	 */
 
 	template <typename... Ts>
-		requires(!std::is_enum_v<Fst<Ts...>>)
 	// NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
 	NodeResult(Ts&&... args)
 		: variant(std::forward<Ts>(args)...)
