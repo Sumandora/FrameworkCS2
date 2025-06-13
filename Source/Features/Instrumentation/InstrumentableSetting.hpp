@@ -73,10 +73,10 @@ public:
 		setting.render();
 
 		ImGui::PushID(this);
-		ImGui::OpenPopupOnItemClick("Conditions");
+		ImGui::OpenPopupOnItemClick("Instrumentation");
 
 		ImGui::SetNextWindowSize(ImVec2{ 400, 300 }, ImGuiCond_Once);
-		if (ImGuiExt::BeginResizablePopup("Conditions")) {
+		if (ImGuiExt::BeginResizablePopup("Instrumentation")) {
 			// This lock is being held for an extended amount of time here, however it is only while rendering.
 			// `get` will be called while in game, so they shouldn't intersect that much.
 			const std::lock_guard<std::mutex> guard{ circuit_access };

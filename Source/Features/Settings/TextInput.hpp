@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Setting.hpp"
-#include "../Conditions/SettingWithConditions.hpp"
+#include "../Instrumentation/InstrumentableSetting.hpp"
 
 #include <string>
 

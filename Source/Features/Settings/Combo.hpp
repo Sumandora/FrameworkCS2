@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../Conditions/IdType.hpp"
-#include "../Conditions/Node.hpp"
-#include "../Conditions/NodeResult.hpp"
-#include "../Conditions/NodeType.hpp"
-#include "../Conditions/SettingWithConditions.hpp"
+#include "../Instrumentation/IdType.hpp"
+#include "../Instrumentation/InstrumentableSetting.hpp"
+#include "../Instrumentation/Node.hpp"
+#include "../Instrumentation/NodeResult.hpp"
+#include "../Instrumentation/NodeType.hpp"
 #include "../Setting.hpp"
 
 #include "imgui.h"
