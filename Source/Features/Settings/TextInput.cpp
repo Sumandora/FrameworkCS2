@@ -2,29 +2,29 @@
 
 #include "../Setting.hpp"
 
-#include "imgui.h"
+#include "imgui.h" // IWYU pragma: keep
 #include "misc/cpp/imgui_stdlib.h"
 
 #include <string>
 #include <utility>
 
-TextInput::TextInput(SettingsHolder* parent, std::string name, std::string default_value)
+RawTextInput::RawTextInput(SettingsHolder* parent, std::string name, std::string default_value)
 	: Setting(parent, std::move(name))
 	, value(std::move(default_value))
 {
 }
 
-void TextInput::render()
+void RawTextInput::render()
 {
 	ImGui::InputText(get_name().c_str(), &value);
 }
 
-void TextInput::serialize(nlohmann::json& output_json) const
+void RawTextInput::serialize(nlohmann::json& output_json) const
 {
 	output_json = value;
 }
 
-void TextInput::deserialize(const nlohmann::json& input_json)
+void RawTextInput::deserialize(const nlohmann::json& input_json)
 {
 	value = input_json;
 }

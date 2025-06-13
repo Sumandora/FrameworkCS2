@@ -5,13 +5,14 @@
 
 #include "Nodes/ArithmeticNode.hpp"
 #include "Nodes/BooleanValueNode.hpp"
+#include "Nodes/BranchNode.hpp"
 #include "Nodes/ComparisonNode.hpp"
 #include "Nodes/FloatValueNode.hpp"
 #include "Nodes/HSVNode.hpp"
 #include "Nodes/LogicGateNode.hpp"
 #include "Nodes/NotGateNode.hpp"
 #include "Nodes/RGBANode.hpp"
-#include "Nodes/BranchNode.hpp"
+#include "Nodes/StringValueNode.hpp"
 
 #include "imgui.h"
 #include "imnodes.h"
@@ -34,6 +35,10 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 	menu["Primitives/Float value"] = {
 		.create_initialized = FloatValueNode::initialized,
 		.create_uninitialized = FloatValueNode::uninitialized,
+	};
+	menu["Primitives/String value"] = {
+		.create_initialized = StringValueNode::initialized,
+		.create_uninitialized = StringValueNode::uninitialized,
 	};
 
 	for (const ArithmeticOp op : magic_enum::enum_values<ArithmeticOp>())

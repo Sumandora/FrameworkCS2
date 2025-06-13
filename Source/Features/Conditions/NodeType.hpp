@@ -2,6 +2,7 @@
 
 #include <concepts>
 #include <cstdint>
+#include <string>
 #include <type_traits>
 
 enum class NodeType : std::uint8_t {
@@ -12,6 +13,7 @@ enum class NodeType : std::uint8_t {
 	BOOLEAN,
 	COLOR,
 	ENUM,
+	STRING,
 };
 
 template <typename T>
@@ -25,6 +27,8 @@ constexpr NodeType nodetype_for()
 		return NodeType::COLOR;
 	else if constexpr (std::is_enum_v<T>)
 		return NodeType::ENUM;
+	else if constexpr (std::same_as<std::string, T>)
+		return NodeType::STRING;
 	else
 		static_assert(false);
 }

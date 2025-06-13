@@ -1,8 +1,8 @@
 #include "FloatValueNode.hpp"
 
+#include "../IdType.hpp"
 #include "../Node.hpp"
 #include "../NodeCircuit.hpp"
-#include "../IdType.hpp"
 
 #include "imgui.h"
 #include "imnodes.h"

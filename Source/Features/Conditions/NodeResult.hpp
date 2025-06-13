@@ -7,6 +7,7 @@
 #include "magic_enum/magic_enum.hpp"
 
 #include <cstddef>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <variant>
@@ -31,7 +32,7 @@ public:
 };
 
 class NodeResult {
-	std::variant<std::monostate, float, bool, ImColor, AnyEnum> variant;
+	std::variant<std::monostate, float, bool, ImColor, AnyEnum, std::string> variant;
 	static_assert(magic_enum::enum_count<NodeType>() - 1 == std::variant_size_v<decltype(variant)>);
 
 public:
