@@ -31,6 +31,7 @@
 #include <optional>
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
 
 bool NodeCircuit::is_dynamic_node(Node* node) const
@@ -205,12 +206,12 @@ Node* NodeCircuit::node_from_end_attrib(IdType id) const
 	return nullptr;
 }
 
-std::optional<NodeResult> NodeCircuit::value_from_attribute(IdType id) const
+NodeResult NodeCircuit::value_from_attribute(IdType id) const
 {
 	auto it = std::ranges::find_if(links, [id](const Link& link) { return link.end_attribute == id; });
 	if (it != links.end())
 		return ids.at(it->start_node)->get_value(it->start_attribute);
-	return std::nullopt;
+	return {};
 }
 
 void NodeCircuit::serialize(nlohmann::json& output_json) const

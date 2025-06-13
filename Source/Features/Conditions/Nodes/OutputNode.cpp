@@ -30,8 +30,7 @@ void OutputNode::render_io()
 
 NodeResult OutputNode::get_value(IdType /*id*/) const
 {
-	std::optional<NodeResult> value = get_parent()->value_from_attribute(input);
-	return value.has_value() ? value.value() : NodeResult{};
+	return get_parent()->value_from_attribute(input);
 }
 
 void OutputNode::serialize(nlohmann::json& /*output_json*/) const

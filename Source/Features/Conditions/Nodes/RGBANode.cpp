@@ -10,6 +10,8 @@
 
 #include "nlohmann/json.hpp"
 
+#include <algorithm>
+#include <initializer_list>
 #include <optional>
 #include <utility>
 
@@ -83,28 +85,33 @@ NodeResult RGBANode::get_value(IdType id) const
 {
 	switch (direction) {
 	case RGBADirection::RGBA_TO_COLOR: {
-		const std::optional<NodeResult> r = get_parent()->value_from_attribute(this->r);
-		const std::optional<NodeResult> g = get_parent()->value_from_attribute(this->g);
-		const std::optional<NodeResult> b = get_parent()->value_from_attribute(this->b);
-		const std::optional<NodeResult> a = get_parent()->value_from_attribute(this->a);
+		const NodeResult r = get_parent()->value_from_attribute(this->r);
+		const NodeResult g = get_parent()->value_from_attribute(this->g);
+		const NodeResult b = get_parent()->value_from_attribute(this->b);
+		const NodeResult a = get_parent()->value_from_attribute(this->a);
 
-		return { .color = ImColor(
-					 r ? r->f : 0.0F,
-					 g ? g->f : 0.0F,
-					 b ? b->f : 0.0F,
-					 a ? a->f : 0.0F) };
+		if (std::ranges::any_of(std::initializer_list{ r, g, b, a }, [](const NodeResult& nr) { return nr.empty(); }))
+			return {};
+
+		return ImColor(
+			r.get<float>(),
+			g.get<float>(),
+			b.get<float>(),
+			a.get<float>());
 	}
 	case RGBADirection::COLOR_TO_RGBA:
-		const std::optional<NodeResult> color = get_parent()->value_from_attribute(this->color);
+		const NodeResult color = get_parent()->value_from_attribute(this->color);
+
+		const auto col = color.get<ImColor>();
 
 		if (id == r)
-			return { .f = color->color.Value.x };
+			return col.Value.x;
 		if (id == g)
-			return { .f = color->color.Value.y };
+			return col.Value.y;
 		if (id == b)
-			return { .f = color->color.Value.z };
+			return col.Value.z;
 		if (id == a)
-			return { .f = color->color.Value.w };
+			return col.Value.w;
 	}
 
 	std::unreachable();

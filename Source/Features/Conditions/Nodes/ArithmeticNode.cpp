@@ -52,23 +52,26 @@ void ArithmeticNode::render_io()
 
 NodeResult ArithmeticNode::get_value(IdType /*id*/) const
 {
-	const std::optional<NodeResult> l = get_parent()->value_from_attribute(lhs);
-	const std::optional<NodeResult> r = get_parent()->value_from_attribute(rhs);
+	const NodeResult l = get_parent()->value_from_attribute(lhs);
+	const NodeResult r = get_parent()->value_from_attribute(rhs);
 
-	const float lhs = l.has_value() ? l->f : 0.0F;
-	const float rhs = r.has_value() ? r->f : 0.0F;
+	if (l.empty() || r.empty())
+		return {};
+
+	const auto lhs = l.get<float>();
+	const auto rhs = r.get<float>();
 
 	switch (operation) {
 	case ArithmeticOp::Addition:
-		return NodeResult{ .f = lhs + rhs };
+		return lhs + rhs;
 	case ArithmeticOp::Subtraction:
-		return NodeResult{ .f = lhs - rhs };
+		return lhs - rhs;
 	case ArithmeticOp::Multiplication:
-		return NodeResult{ .f = lhs * rhs };
+		return lhs * rhs;
 	case ArithmeticOp::Division:
-		return NodeResult{ .f = lhs / rhs };
+		return lhs / rhs;
 	case ArithmeticOp::Power:
-		return NodeResult{ .f = std::pow(lhs, rhs) };
+		return std::pow(lhs, rhs);
 	}
 
 	std::unreachable();

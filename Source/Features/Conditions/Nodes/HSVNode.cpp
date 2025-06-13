@@ -10,7 +10,8 @@
 
 #include "nlohmann/json.hpp"
 
-#include <optional>
+#include <algorithm>
+#include <initializer_list>
 #include <utility>
 
 HSVNode::HSVNode(NodeCircuit* parent, HSVDirection direction, IdType h, IdType s, IdType v, IdType a, IdType color)
@@ -83,56 +84,57 @@ NodeResult HSVNode::get_value(IdType id) const
 {
 	switch (direction) {
 	case HSVDirection::HSVA_TO_COLOR: {
-		const std::optional<NodeResult> h = get_parent()->value_from_attribute(this->h);
-		const std::optional<NodeResult> s = get_parent()->value_from_attribute(this->s);
-		const std::optional<NodeResult> v = get_parent()->value_from_attribute(this->v);
-		const std::optional<NodeResult> a = get_parent()->value_from_attribute(this->a);
+		const NodeResult h = get_parent()->value_from_attribute(this->h);
+		const NodeResult s = get_parent()->value_from_attribute(this->s);
+		const NodeResult v = get_parent()->value_from_attribute(this->v);
+		const NodeResult a = get_parent()->value_from_attribute(this->a);
+
+		if (std::ranges::any_of(std::initializer_list{ h, s, v, a }, [](const NodeResult& nr) { return nr.empty(); }))
+			return {};
 
 		float r = 0.0F;
 		float g = 0.0F;
 		float b = 0.0F;
 
 		ImGui::ColorConvertHSVtoRGB(
-			h ? h->f : 0.0F,
-			s ? s->f : 0.0F,
-			v ? v->f : 0.0F,
+			h.get<float>(),
+			s.get<float>(),
+			v.get<float>(),
 			r,
 			g,
 			b);
 
-		return { .color = ImColor(
-					 r,
-					 g,
-					 b,
-					 a ? a->f : 0.0F) };
+		return ImColor(r, g, b, a.get<float>());
 	}
 	case HSVDirection::COLOR_TO_HSVA:
-		const std::optional<NodeResult> color = get_parent()->value_from_attribute(this->color);
+		const NodeResult color = get_parent()->value_from_attribute(this->color);
+
+		if (color.empty())
+			return {};
+
+		const auto col = color.get<ImColor>();
 
 		if (id == a)
-			return { .f = color->color.Value.w };
-
-		if (!color.has_value())
-			return { .f = 0.0F };
+			return col.Value.w;
 
 		float h = 0.0F;
 		float s = 0.0F;
 		float v = 0.0F;
 
 		ImGui::ColorConvertRGBtoHSV(
-			color ? color->color.Value.x : 0.0F,
-			color ? color->color.Value.y : 0.0F,
-			color ? color->color.Value.z : 0.0F,
+			col.Value.x,
+			col.Value.y,
+			col.Value.z,
 			h,
 			s,
 			v);
 
 		if (id == this->h)
-			return { .f = h };
+			return h;
 		if (id == this->s)
-			return { .f = s };
+			return s;
 		if (id == this->v)
-			return { .f = v };
+			return v;
 	}
 
 	std::unreachable();

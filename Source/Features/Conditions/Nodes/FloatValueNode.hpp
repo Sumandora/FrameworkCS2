@@ -24,7 +24,7 @@ public:
 	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override { return NodeType::NOTHING; }
 	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override { return NodeType::FLOAT; }
 
-	[[nodiscard]] NodeResult get_value(IdType /*id*/) const override { return { .f = value }; }
+	[[nodiscard]] NodeResult get_value(IdType /*id*/) const override { return value; }
 
 	void serialize(nlohmann::json& output_json) const override;
 	void deserialize(const nlohmann::json& input_json) override;

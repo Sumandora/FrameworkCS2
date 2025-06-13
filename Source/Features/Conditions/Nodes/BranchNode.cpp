@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <optional>
+#include <variant>
 
 BranchNode::BranchNode(NodeCircuit* parent, IdType falsy, IdType condition, IdType truthy, IdType output)
 	: Node(parent)
@@ -53,18 +54,18 @@ void BranchNode::render_io()
 
 NodeResult BranchNode::get_value(IdType /*id*/) const
 {
-	const std::optional<NodeResult> l_or_r = get_parent()->value_from_attribute(condition);
+	const NodeResult l_or_r = get_parent()->value_from_attribute(condition);
 
-	if (!l_or_r.has_value())
+	if (l_or_r.empty())
 		return {};
 
-	const std::optional<NodeResult> falsy = get_parent()->value_from_attribute(this->falsy);
-	const std::optional<NodeResult> truthy = get_parent()->value_from_attribute(this->truthy);
+	const NodeResult falsy = get_parent()->value_from_attribute(this->falsy);
+	const NodeResult truthy = get_parent()->value_from_attribute(this->truthy);
 
-	if (!falsy.has_value() || !truthy.has_value())
+	if (falsy.empty() || truthy.empty())
 		return {};
 
-	return l_or_r->b ? truthy.value() : falsy.value();
+	return l_or_r.get<bool>() ? truthy : falsy;
 }
 
 NodeType BranchNode::get_input_type(IdType id) const

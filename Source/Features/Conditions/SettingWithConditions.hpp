@@ -38,15 +38,19 @@ public:
 	auto get() const
 	{
 		const std::lock_guard<std::mutex> guard{ circuit_access };
-		if (node_circuit)
-			return unwrap_node_result<decltype(setting.get())>(node_circuit->get_output());
+		if (node_circuit) {
+			NodeResult node_result = node_circuit->get_output();
+			if (node_result.full())
+				return node_result.get<decltype(setting.get())>();
+			// TODO inform the user that the node circuit didn't evaluate.
+		}
 		return setting.get();
 	}
 
 	void make_node_circuit()
 	{
 		node_circuit = std::make_unique<NodeCircuit>(nodetype_for<decltype(setting.get())>(), [&s = this->setting] {
-			return NodeResult::create(s.get());
+			return s.get();
 		});
 		(node_circuit->get_node_registry().add_node_by_type<AdditionalNodes>(), ...);
 	}

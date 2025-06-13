@@ -85,7 +85,7 @@ public:
 	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override { return NodeType::NOTHING; }
 	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override { return NodeType::ENUM; }
 
-	[[nodiscard]] NodeResult get_value(IdType /*id*/) const override { return { .any = std::to_underlying(value) }; }
+	[[nodiscard]] NodeResult get_value(IdType /*id*/) const override { return value; }
 
 	void serialize(nlohmann::json& output_json) const override
 	{

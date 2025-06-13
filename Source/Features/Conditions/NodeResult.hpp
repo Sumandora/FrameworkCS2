@@ -1,38 +1,84 @@
 #pragma once
 
+#include "NodeType.hpp"
+
 #include "imgui.h"
+
 #include "magic_enum/magic_enum.hpp"
 
-#include <concepts>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-union NodeResult {
-	float f;
-	bool b;
-	ImColor color;
-	std::size_t any; // mainly used for enums
+class AnyEnum {
+	std::size_t underlying;
 
-	static NodeResult create(float f) { return { .f = f }; }
-	static NodeResult create(bool b) { return { .b = b }; }
-	static NodeResult create(ImColor color) { return { .color = color }; }
-	template<typename E> requires std::is_enum_v<E>
-	static NodeResult create(E value) { return { .any = std::to_underlying(value) }; }
+public:
+	template <typename E>
+		requires std::is_enum_v<E> && (sizeof(E) < sizeof(underlying))
+	explicit AnyEnum(E e)
+		: underlying(std::to_underlying(e))
+	{
+	}
+
+	template <typename E>
+		requires std::is_enum_v<E> && (sizeof(E) < sizeof(underlying))
+	E get() const
+	{
+		return magic_enum::enum_cast<E>(underlying).value();
+	}
 };
 
-template <typename T>
-static constexpr T unwrap_node_result(NodeResult nr)
-{
-	if constexpr (std::same_as<T, float>)
-		return nr.f;
-	else if constexpr (std::same_as<T, bool>)
-		return nr.b;
-	else if constexpr (std::same_as<T, ImColor>)
-		return nr.color;
-	else if constexpr (std::is_enum_v<T> && sizeof(std::underlying_type_t<T>) <= sizeof(NodeResult::any))
-		return magic_enum::enum_cast<T>(nr.any).value(); // Force unwrap here is unsafe, but if the optional is empty, then the node tree contains a mistake.
-	else
-		static_assert(false);
-}
+class NodeResult {
+	std::variant<std::monostate, float, bool, ImColor, AnyEnum> variant;
+	static_assert(magic_enum::enum_count<NodeType>() - 1 == std::variant_size_v<decltype(variant)>);
+
+	template <typename...>
+	struct Fst;
+	template <typename First, typename... Args>
+	struct Fst<First, Args...> {
+		using T = First;
+	};
+
+public:
+	/**
+	 * Note for the uninformed:
+	 * There are several usages of the default constructor, basically NodeResult{}, or returning {}
+	 * This constructor constructs a variant with the first type default initialized, basically creating an "empty" NodeResult
+	 */
+
+	template <typename... Ts>
+		requires(!std::is_enum_v<Fst<Ts...>>)
+	// NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+	NodeResult(Ts&&... args)
+		: variant(std::forward<Ts>(args)...)
+	{
+	}
+
+	template <typename E>
+		requires std::is_enum_v<E>
+	// NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+	NodeResult(E e)
+		: variant(AnyEnum(e))
+	{
+	}
+
+	[[nodiscard]] bool empty() const
+	{
+		return std::holds_alternative<std::monostate>(variant);
+	}
+	[[nodiscard]] bool full() const
+	{
+		return !std::holds_alternative<std::monostate>(variant);
+	}
+
+	template <typename T>
+	T get() const
+	{
+		if constexpr (std::is_enum_v<T>)
+			return std::get<AnyEnum>(variant).get<T>();
+		else
+			return std::get<T>(variant);
+	}
+};

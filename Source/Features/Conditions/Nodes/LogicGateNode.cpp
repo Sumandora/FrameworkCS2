@@ -8,7 +8,6 @@
 #include "imgui.h"
 #include "imnodes.h"
 
-#include <optional>
 #include <utility>
 
 LogicGateNode::LogicGateNode(NodeCircuit* parent, LogicGateType type, IdType input_a, IdType input_b, IdType output)
@@ -48,17 +47,20 @@ void LogicGateNode::render_io()
 
 NodeResult LogicGateNode::get_value(IdType /*id*/) const
 {
-	const std::optional<NodeResult> a = get_parent()->value_from_attribute(input_a);
-	const std::optional<NodeResult> b = get_parent()->value_from_attribute(input_b);
+	const NodeResult a = get_parent()->value_from_attribute(input_a);
+	const NodeResult b = get_parent()->value_from_attribute(input_b);
 
-	const bool input_a = a.has_value() ? a->b : false;
-	const bool input_b = b.has_value() ? b->b : false;
+	if(a.empty() || b.empty())
+		return {};
+
+	const auto input_a = a.get<bool>();
+	const auto input_b = b.get<bool>();
 
 	switch (type) {
 	case LogicGateType::And:
-		return { .b = input_a && input_b };
+		return input_a && input_b;
 	case LogicGateType::Or:
-		return { .b = input_a || input_b };
+		return input_a || input_b;
 	}
 
 	std::unreachable();

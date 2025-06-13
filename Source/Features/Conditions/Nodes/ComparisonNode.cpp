@@ -52,25 +52,28 @@ void ComparisonNode::render_io()
 
 NodeResult ComparisonNode::get_value(IdType /*id*/) const
 {
-	const std::optional<NodeResult> l = get_parent()->value_from_attribute(lhs);
-	const std::optional<NodeResult> r = get_parent()->value_from_attribute(rhs);
+	const NodeResult l = get_parent()->value_from_attribute(lhs);
+	const NodeResult r = get_parent()->value_from_attribute(rhs);
 
-	const float lhs = l.has_value() ? l->f : false;
-	const float rhs = r.has_value() ? r->f : false;
+	if (l.empty() || r.empty())
+		return {};
+
+	const auto lhs = l.get<float>();
+	const auto rhs = r.get<float>();
 
 	switch (operation) {
 	case ComparisonOp::Equals:
-		return NodeResult{ .b = lhs == rhs };
+		return lhs == rhs;
 	case ComparisonOp::Not_equals:
-		return NodeResult{ .b = lhs != rhs };
+		return lhs != rhs;
 	case ComparisonOp::Lower_than:
-		return NodeResult{ .b = lhs < rhs };
+		return lhs < rhs;
 	case ComparisonOp::Greater_than:
-		return NodeResult{ .b = lhs > rhs };
+		return lhs > rhs;
 	case ComparisonOp::Lower_or_equal_than:
-		return NodeResult{ .b = lhs <= rhs };
+		return lhs <= rhs;
 	case ComparisonOp::Greater_or_equal_than:
-		return NodeResult{ .b = lhs >= rhs };
+		return lhs >= rhs;
 	}
 
 	std::unreachable();

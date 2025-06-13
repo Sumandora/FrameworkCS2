@@ -41,9 +41,12 @@ void NotGateNode::render_io()
 
 NodeResult NotGateNode::get_value(IdType /*id*/) const
 {
-	const std::optional<NodeResult> input = get_parent()->value_from_attribute(this->input);
+	const NodeResult input = get_parent()->value_from_attribute(this->input);
 
-	return { .b = input.has_value() ? !input->b : false };
+	if (input.empty())
+		return {};
+
+	return !input.get<bool>();
 }
 
 void NotGateNode::serialize(nlohmann::json& output_json) const
