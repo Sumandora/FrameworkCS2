@@ -28,10 +28,8 @@
 #include <cstddef>
 #include <format>
 #include <functional>
-#include <optional>
 #include <string>
 #include <utility>
-#include <variant>
 #include <vector>
 
 bool NodeCircuit::is_dynamic_node(Node* node) const

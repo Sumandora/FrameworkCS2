@@ -1,3 +1,5 @@
 #pragma once
 
-using IdType = int;
+#include "imnodes_internal.h"
+
+using IdType = decltype(ImNodesContext::CurrentNodeIdx);
