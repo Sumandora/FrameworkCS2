@@ -31,7 +31,7 @@ GrenadePrediction::GrenadePrediction()
 
 static std::vector<glm::vec3> points;
 
-void GrenadePrediction::cache_initial_state()
+void GrenadePrediction::calculate_grenade_prediction()
 {
 	points.clear();
 	if (!enabled.get())
@@ -48,6 +48,11 @@ void GrenadePrediction::cache_initial_state()
 	auto* weapon = static_cast<BasePlayerWeapon*>(get_weapon(player));
 	if (!weapon)
 		return;
+
+	auto* grenade = weapon->entity_cast<BaseCSGrenade*>();
+	if(!grenade || !grenade->pin_pulled())
+		return;
+
 	static auto* calculate_initial_state = BCRL::signature(
 		Memory::mem_mgr,
 		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 49 89 FF 41 56 4C 8D 8D">(),
@@ -70,7 +75,8 @@ void GrenadePrediction::cache_initial_state()
 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 									 .expect<void (*)(void* entity)>("");
 
-	const int grenade_type = static_cast<BaseCSGrenade*>(weapon)->get_grenade_type();
+	const int grenade_type = grenade->get_grenade_type();
+
 	struct GrenadePredictor {
 		struct Element {
 			int count;

@@ -22,7 +22,7 @@ class GrenadePrediction : public Feature {
 public:
 	GrenadePrediction();
 
-	void cache_initial_state();
+	void calculate_grenade_prediction();
 	void draw(ImDrawList* draw_list) const;
 };
 
