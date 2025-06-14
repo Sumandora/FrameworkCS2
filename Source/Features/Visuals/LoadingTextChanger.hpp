@@ -5,6 +5,8 @@
 #include "../Settings/Checkbox.hpp"
 #include "../Settings/TextInput.hpp"
 
+#include "../../Utils/UninitializedObject.hpp"
+
 #include <string>
 
 class LoadingTextChanger : public Feature {
@@ -17,3 +19,5 @@ public:
 	[[nodiscard]] bool is_enabled() const;
 	[[nodiscard]] const std::string& get_replacement() const;
 };
+
+inline UninitializedObject<LoadingTextChanger> loading_text_changer;

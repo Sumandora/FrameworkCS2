@@ -10,6 +10,7 @@
 
 #include "imgui.h"
 
+#include "../../../Utils/UninitializedObject.hpp"
 #include "../../../Utils/Logging.hpp"
 
 #include <cstdint>
@@ -42,3 +43,5 @@ public:
 
 	void draw(ImDrawList* draw_list);
 };
+
+inline UninitializedObject<ESP> esp;

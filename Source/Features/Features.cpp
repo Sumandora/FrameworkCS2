@@ -1,5 +1,9 @@
 #include "Features.hpp"
 
+#include "Visuals/ESP/ESP.hpp"
+#include "Visuals/ForceCrosshair.hpp"
+#include "Visuals/LoadingTextChanger.hpp"
+
 void Features::create()
 {
 	esp.emplace();

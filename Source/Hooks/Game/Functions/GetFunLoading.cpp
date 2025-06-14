@@ -1,12 +1,11 @@
 #include "../GameHook.hpp"
 
-#include "../../../Features/Features.hpp"
-
 #include "RetAddrSpoofer.hpp"
+
+#include "../../../Features/Visuals/LoadingTextChanger.hpp"
 
 const char* Hooks::Game::GetFunLoading::hook_func(const char* fallback)
 {
-	using namespace Features;
 	if (loading_text_changer->is_enabled())
 		// TODO I'm reasonably sure this can be a const char*, but I'm not sure if they might write to it...
 		return loading_text_changer->get_replacement().c_str();

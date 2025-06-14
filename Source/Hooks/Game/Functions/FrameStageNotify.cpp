@@ -2,8 +2,6 @@
 
 #include "../../Graphics/GraphicsHook.hpp"
 
-#include "../../../Features/Features.hpp"
-
 #include "../../../SDK/Entities/BaseEntity.hpp"
 #include "../../../SDK/GameClass/ClientFrameStage.hpp"
 
@@ -11,7 +9,8 @@
 
 #include "RetAddrSpoofer.hpp"
 
-#include <functional>
+#include "../../../Features/Visuals/ESP/ESP.hpp"
+
 #include <mutex>
 
 void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, ClientFrameStage stage)
@@ -30,7 +29,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 			GraphicsHook::espDrawList->_ResetForNewFrame();
 			GraphicsHook::espDrawList->PushClipRectFullScreen();
 			GraphicsHook::espDrawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
-			Features::esp->draw(GraphicsHook::espDrawList.get());
+			esp->draw(GraphicsHook::espDrawList.get());
 		}
 		break;
 	}
