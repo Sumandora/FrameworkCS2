@@ -34,12 +34,7 @@ void GrenadePrediction::cache_initial_state()
 	if (!enabled.get())
 		return;
 
-	static auto* get_player = BCRL::signature(
-		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"55 31 FF 48 89 E5 41 54 48 83 EC 08 E8 ? ? ? ? 48 85 C0 74 ? 49 89 C4 48 8B 00 4C 89 E7 FF 90 ? ? ? ? 84 C0 74 ? 4C 89 E0">(),
-		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-								  .expect<void* (*)()>("");
-	auto* player = static_cast<CSPlayerPawn*>(get_player());
+	auto* player = Memory::local_player;
 	if (!player)
 		return;
 	static auto* get_weapon = BCRL::signature(
