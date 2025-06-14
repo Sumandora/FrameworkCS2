@@ -7,23 +7,23 @@
 #include <string>
 #include <utility>
 
-Checkbox::Checkbox(SettingsHolder* parent, std::string name, bool value)
+RawCheckbox::RawCheckbox(SettingsHolder* parent, std::string name, bool value)
 	: Setting(parent, std::move(name))
 	, value(value)
 {
 }
 
-void Checkbox::render()
+void RawCheckbox::render()
 {
 	ImGui::Checkbox(get_name().c_str(), &value);
 }
 
-void Checkbox::serialize(nlohmann::json& output_json) const
+void RawCheckbox::serialize(nlohmann::json& output_json) const
 {
 	output_json = value;
 }
 
-void Checkbox::deserialize(const nlohmann::json& input_json)
+void RawCheckbox::deserialize(const nlohmann::json& input_json)
 {
 	value = input_json;
 }

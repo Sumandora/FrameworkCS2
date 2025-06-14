@@ -9,15 +9,15 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
+#include <SDL3/SDL_video.h>
+
 #include <cstdint>
 #include <memory>
-#include <SDL3/SDL_video.h>
 #include <vector>
+
 #include <vulkan/vulkan.h>
 
 #include "DetourHooking.hpp"
-
-#include "BCRL/Session.hpp"
 
 #include "../../Memory.hpp"
 

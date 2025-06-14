@@ -1,0 +1,26 @@
+diff '--unified=10' -Nar a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2025-06-12 22:09:18.384205223 +0200
++++ b/CMakeLists.txt	2025-06-13 14:24:13.335692292 +0200
+@@ -16,21 +16,21 @@
+                     "${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/ordered_map.h"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/ordered_set.h")
+ target_sources(ordered_map INTERFACE "$<BUILD_INTERFACE:${headers}>")
+ 
+ if(MSVC)
+     target_sources(ordered_map INTERFACE
+                    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/tsl-ordered-map.natvis>"
+                    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_DATAROOTDIR}/tsl-ordered-map.natvis>")
+ endif()
+ 
+-
++return()
+ 
+ 
+ # Installation (only compatible with CMake version >= 3.3)
+ if(${CMAKE_VERSION} VERSION_GREATER "3.2")
+     include(CMakePackageConfigHelpers)
+ 
+     ## Install include directory and potential natvis file
+     install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/tsl"
+             DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+ 

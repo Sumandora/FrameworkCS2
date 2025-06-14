@@ -24,6 +24,7 @@
 #include "Tabs/Tabs.hpp"
 
 #include "../Hooks/Graphics/GraphicsHook.hpp"
+#include "imnodes.h"
 
 #include "../Notifications/Notifications.hpp"
 
@@ -143,7 +144,7 @@ static float font_size = 12.0F;
 void GUI::init()
 {
 	ImGui::CreateContext();
-
+	
 	ImGuiIO& io = ImGui::GetIO();
 
 	io.IniFilename = nullptr; // TODO Bring it back

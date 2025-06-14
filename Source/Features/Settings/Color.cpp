@@ -7,15 +7,14 @@
 #include <string>
 #include <utility>
 
-Color::Color(SettingsHolder* parent, std::string name, ImColor value)
+RawColor::RawColor(SettingsHolder* parent, std::string name, ImColor value)
 	: Setting(parent, std::move(name))
 	, value(value)
 {
 }
 
-void Color::render()
+void RawColor::render()
 {
-
 	const bool clicked = ImGui::ColorButton((get_name() + "##Button").c_str(), value, ImGuiColorEditFlags_None, ImVec2(0, 0));
 	ImGui::SameLine();
 	ImGui::Text("%s", get_name().c_str());
@@ -33,12 +32,12 @@ void Color::render()
 	}
 }
 
-void Color::serialize(nlohmann::json& output_json) const
+void RawColor::serialize(nlohmann::json& output_json) const
 {
 	output_json = { value.Value.x, value.Value.y, value.Value.z, value.Value.w };
 }
 
-void Color::deserialize(const nlohmann::json& input_json)
+void RawColor::deserialize(const nlohmann::json& input_json)
 {
 	value.Value.x = input_json[0];
 	value.Value.y = input_json[1];

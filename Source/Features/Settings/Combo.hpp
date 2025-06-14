@@ -1,35 +1,31 @@
 #pragma once
 
+#include "../Instrumentation/IdType.hpp"
+#include "../Instrumentation/InstrumentableSetting.hpp"
+#include "../Instrumentation/Node.hpp"
+#include "../Instrumentation/NodeResult.hpp"
+#include "../Instrumentation/NodeType.hpp"
 #include "../Setting.hpp"
 
 #include "imgui.h"
+#include "imnodes.h"
 
 #include "magic_enum/magic_enum.hpp"
 
+#include "../../GUI/Elements/EnumCombo.hpp"
+
 #include <string>
-#include <unordered_map>
+#include <string_view>
 #include <utility>
 
 template <typename E>
 	requires std::is_enum_v<E>
-class Combo : public Setting {
-	std::unordered_map<E, std::string> names;
+class RawCombo : public Setting {
 	E value;
 
-	static std::unordered_map<E, std::string> generate_names()
-	{
-		std::unordered_map<E, std::string> names;
-		// TODO case conversion
-		for (auto [value, name] : magic_enum::enum_entries<E>()) {
-			names[value] = name;
-		}
-		return names;
-	}
-
 public:
-	Combo(SettingsHolder* parent, std::string name, E value = magic_enum::enum_values<E>()[0], std::unordered_map<E, std::string> names = generate_names())
+	RawCombo(SettingsHolder* parent, std::string name, E value = magic_enum::enum_values<E>()[0])
 		: Setting(parent, std::move(name))
-		, names(std::move(names))
 		, value(value)
 	{
 	}
@@ -38,18 +34,7 @@ public:
 
 	void render() override
 	{
-		// TODO this iteration is slow, but I can't iterate over the map, because its unordered and even std::map does not keep order (ordered_map soonTM)
-		if (ImGui::BeginCombo(get_name().c_str(), names[value].c_str(), ImGuiComboFlags_None)) {
-			for (E value : magic_enum::enum_values<E>()) {
-				bool selected = value == this->value;
-				if (ImGui::Selectable(names[value].c_str(), selected))
-					this->value = value;
-
-				if (selected)
-					ImGui::SetItemDefaultFocus();
-			}
-			ImGui::EndCombo();
-		}
+		ImGuiExt::EnumCombo(get_name().c_str(), value);
 	}
 	void serialize(nlohmann::json& output_json) const override
 	{
@@ -60,3 +45,60 @@ public:
 		value = static_cast<E>(input_json);
 	}
 };
+
+template <typename E>
+	requires std::is_enum_v<E>
+class EnumNode : public Node {
+	E value{};
+	IdType output{};
+
+	explicit EnumNode(NodeCircuit* parent, IdType output)
+		: Node(parent)
+		, output(output)
+	{
+	}
+
+public:
+	static constexpr std::string_view NAME = "Primitives/Enum value";
+	static EnumNode* initialized(NodeCircuit* parent)
+	{
+		return new EnumNode{ parent, parent->next_id() };
+	}
+	static EnumNode* uninitialized(NodeCircuit* parent)
+	{
+		return new EnumNode{ parent, 0 };
+	}
+	~EnumNode() override = default;
+
+	void render_io() override
+	{
+		ImGui::SetNextItemWidth(100.0F);
+		ImGuiExt::EnumCombo("Value", value);
+
+		ImGui::Spacing();
+
+		ImNodes::BeginOutputAttribute(output);
+		ImGui::TextUnformatted("output");
+		ImNodes::EndOutputAttribute();
+	}
+
+	[[nodiscard]] NodeType get_input_type(IdType /*id*/) const override { return NodeType::NOTHING; }
+	[[nodiscard]] NodeType get_output_type(IdType /*id*/) const override { return NodeType::ENUM; }
+
+	[[nodiscard]] NodeResult get_value(IdType /*id*/) const override { return value; }
+
+	void serialize(nlohmann::json& output_json) const override
+	{
+		output_json["value"] = std::to_underlying(value);
+		output_json["output"] = output;
+	}
+
+	void deserialize(const nlohmann::json& input_json) override
+	{
+		value = magic_enum::enum_cast<E>(input_json["value"]).value();
+		output = input_json["output"];
+	}
+};
+
+template <typename E>
+using Combo = InstrumentableSetting<RawCombo<E>, EnumNode<E>>;

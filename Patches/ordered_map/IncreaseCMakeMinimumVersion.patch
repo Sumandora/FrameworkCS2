@@ -1,0 +1,9 @@
+diff -Naur a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2025-06-13 14:30:07.028032892 +0200
++++ b/CMakeLists.txt	2025-06-13 14:31:49.733437288 +0200
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.1)
++cmake_minimum_required(VERSION 3.10)
+ include(GNUInstallDirs)
+ 
+ 

@@ -27,9 +27,9 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 	Checkbox enabled{ this, "Enabled", false };
 
 	Checkbox health_based{ this, "Health-based color", false };
-	Color color = Color{ this, "Color" };
-	Color alive_color = Color{ this, "Alive color", { 0.0F, 1.0F, 0.0F, 1.0F } };
-	Color dead_color = Color{ this, "Dead color", { 1.0F, 0.0F, 0.0F, 1.0F } };
+	Color color{ this, "Color" };
+	Color alive_color{ this, "Alive color", ImColor{ 0.0F, 1.0F, 0.0F, 1.0F } };
+	Color dead_color{ this, "Dead color", ImColor{ 1.0F, 0.0F, 0.0F, 1.0F } };
 
 	FloatSlider rounding{ this, "Rounding", 0.0F, 10.0F, 0.0F };
 
@@ -42,7 +42,7 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 
 	FloatSlider thickness{ this, "Thickness", 1.0F, 10.0F, 1.0F };
 	Checkbox outlined{ this, "Outlined", true };
-	Color outline_color{ this, "Outline color", { 0.0F, 0.0F, 0.0F, 1.0F } };
+	Color outline_color{ this, "Outline color", ImColor{ 0.0F, 0.0F, 0.0F, 1.0F } };
 	FloatSlider outline_thickness{ this, "Outline thickness", 1.0F, 10.0F, 1.0F };
 	Checkbox fill{ this, "Fill", false };
 	Color fill_color{ this, "Fill color" };
@@ -95,7 +95,7 @@ struct PlayerSidedText : MetaSetting, GenericESP::SidedText {
 	Color font_color{ this, "Font color" };
 	Checkbox shadow{ this, "Shadow", true };
 	FloatSlider shadow_offset{ this, "Shadow offset", 1.0F, 5.0F, 1.0F };
-	Color shadow_color{ this, "Shadow color", { 0.0F, 0.0F, 0.0F, 1.0F } };
+	Color shadow_color{ this, "Shadow color", ImColor{ 0.0F, 0.0F, 0.0F, 1.0F } };
 
 	using MetaSetting::MetaSetting;
 
@@ -119,17 +119,17 @@ struct PlayerBar : MetaSetting, GenericESP::BarWithText {
 
 	Combo<GenericESP::Side> side{ this, "Side", GenericESP::Side::LEFT };
 
-	Color background_color{ this, "Background color", { 0.0F, 0.0F, 0.0F, 1.0F } };
+	Color background_color{ this, "Background color", ImColor{ 0.0F, 0.0F, 0.0F, 1.0F } };
 	FloatSlider spacing{ this, "Spacing", 0.0F, 10.0F, 3.0F };
 	FloatSlider width{ this, "Width", 0.0F, 10.0F, 3.0F };
-	Color filled_color{ this, "Filled color", { 0.0F, 1.0F, 0.0F, 1.0F } };
-	Color empty_color{ this, "Empty color", { 1.0F, 0.0F, 0.0F, 1.0F } };
+	Color filled_color{ this, "Filled color", ImColor{ 0.0F, 1.0F, 0.0F, 1.0F } };
+	Color empty_color{ this, "Empty color", ImColor{ 1.0F, 0.0F, 0.0F, 1.0F } };
 	Checkbox gradient{ this, "Gradient", false };
 	Checkbox flipped{ this, "Flipped", false };
 
 	Checkbox outlined{ this, "Outlined", true };
 
-	Color outline_color{ this, "Outline color", { 0.0F, 0.0F, 0.0F, 1.0F } };
+	Color outline_color{ this, "Outline color", ImColor{ 0.0F, 0.0F, 0.0F, 1.0F } };
 	FloatSlider outline_thickness{ this, "Outline thickness", 0.0F, 10.0F, 1.0F };
 
 	Checkbox text_enabled{ this, "Text enabled", false };
@@ -141,7 +141,7 @@ struct PlayerBar : MetaSetting, GenericESP::BarWithText {
 	Color font_color{ text_group, "Font color" };
 	Checkbox shadow{ text_group, "Shadow", true };
 	FloatSlider shadow_offset{ text_group, "Shadow offset", 1.0F, 5.0F, 1.0F };
-	Color shadow_color{ text_group, "Shadow color", { 0.0F, 0.0F, 0.0F, 1.0F } };
+	Color shadow_color{ text_group, "Shadow color", ImColor{ 0.0F, 0.0F, 0.0F, 1.0F } };
 
 	PlayerBar(SettingsHolder* parent, std::string name, PercentageProvider percentage_provider, Provider text_provider)
 		: MetaSetting(parent, std::move(name))

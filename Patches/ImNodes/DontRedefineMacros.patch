@@ -1,0 +1,22 @@
+diff -Naur a/imnodes.cpp b/imnodes.cpp
+--- a/imnodes.cpp	2025-06-11 23:08:51.858313609 +0200
++++ b/imnodes.cpp	2025-06-12 15:56:20.815555679 +0200
+@@ -9,7 +9,6 @@
+ #include "imnodes.h"
+ #include "imnodes_internal.h"
+ 
+-#define IMGUI_DEFINE_MATH_OPERATORS
+ #include <imgui_internal.h>
+ 
+ // Check minimum ImGui version
+diff -Naur a/imnodes_internal.h b/imnodes_internal.h
+--- a/imnodes_internal.h	2025-06-11 23:08:51.858313609 +0200
++++ b/imnodes_internal.h	2025-06-12 15:56:28.458806687 +0200
+@@ -3,7 +3,6 @@
+ #include "imnodes.h"
+ 
+ #include <imgui.h>
+-#define IMGUI_DEFINE_MATH_OPERATORS
+ #include <imgui_internal.h>
+ 
+ #include <assert.h>
