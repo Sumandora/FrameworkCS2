@@ -143,9 +143,8 @@ struct PlayerBar : MetaSetting, GenericESP::BarWithText {
 	FloatSlider shadow_offset{ text_group, "Shadow offset", 1.0F, 5.0F, 1.0F };
 	Color shadow_color{ text_group, "Shadow color", ImColor{ 0.0F, 0.0F, 0.0F, 1.0F } };
 
-	PlayerBar(SettingsHolder* parent, std::string name, PercentageProvider percentage_provider, Provider text_provider)
+	PlayerBar(SettingsHolder* parent, std::string name)
 		: MetaSetting(parent, std::move(name))
-		, GenericESP::BarWithText(std::move(percentage_provider), std::move(text_provider))
 	{
 	}
 
@@ -171,4 +170,20 @@ struct PlayerBar : MetaSetting, GenericESP::BarWithText {
 	bool get_shadow(const GenericESP::EntityType* /*e*/) const override { return shadow.get(); }
 	float get_shadow_offset(const GenericESP::EntityType* /*e*/) const override { return shadow_offset.get(); }
 	ImColor get_shadow_color(const GenericESP::EntityType* /*e*/) const override { return shadow_color.get(); }
+};
+
+class PlayerHealthbar : public PlayerBar {
+	using PlayerBar::PlayerBar;
+
+	float get_filled_percentage(const GenericESP::EntityType* e) const override
+	{
+		const auto* entity = static_cast<const BaseEntity*>(e);
+		return static_cast<float>(entity->health()) / static_cast<float>(entity->max_health());
+	}
+
+	std::string get_number_text_content(const GenericESP::EntityType* e) const override
+	{
+		const auto* entity = static_cast<const BaseEntity*>(e);
+		return std::to_string(entity->health());
+	}
 };
