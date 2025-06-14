@@ -3,6 +3,7 @@
 #include "../../Graphics/GraphicsHook.hpp"
 
 #include "../../../SDK/Entities/BaseEntity.hpp"
+
 #include "../../../SDK/GameClass/ClientFrameStage.hpp"
 
 #include "../../../Memory.hpp"
@@ -10,6 +11,7 @@
 #include "RetAddrSpoofer.hpp"
 
 #include "../../../Features/Visuals/ESP/ESP.hpp"
+#include "../../../Features/Visuals/GrenadePrediction.hpp"
 
 #include <mutex>
 
@@ -30,6 +32,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 			GraphicsHook::espDrawList->PushClipRectFullScreen();
 			GraphicsHook::espDrawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
 			esp->draw(GraphicsHook::espDrawList.get());
+			grenade_prediction->draw(GraphicsHook::espDrawList.get());
 		}
 		break;
 	}

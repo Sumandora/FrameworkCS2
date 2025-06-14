@@ -3,8 +3,10 @@
 #include "../../Interfaces.hpp"
 #include "../../Memory.hpp"
 
+#include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
 #include "DetourHooking.hpp"
+#include "SignatureScanner/PatternSignature.hpp"
 
 #include <cstddef>
 
@@ -33,16 +35,25 @@ namespace Hooks::Game {
 			BCRL::pointer_array(Memory::mem_mgr, Memory::csgo_input, 22)
 				.expect<void*>("Couldn't find CreateMove"),
 			reinterpret_cast<void*>(CreateMove::hook_func));
+		GrenadePrediction::hook.emplace(
+			Memory::emalloc,
+			BCRL::signature(Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_array_of_bytes<"55 BE FF FF FF FF 48 89 E5 41 57 41 56 41 55 41 54 49 89 FC 53 48 83 EC 28">(),
+				BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+				.expect<void*>("Couldn't find grenade prediction hook"),
+			reinterpret_cast<void*>(GrenadePrediction::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
 		FireEvent::hook->enable();
 		GetFunLoading::hook->enable();
 		CreateMove::hook->enable();
+		GrenadePrediction::hook->enable();
 	}
 
 	void destroy()
 	{
+		GrenadePrediction::hook.reset();
 		CreateMove::hook.reset();
 		GetFunLoading::hook.reset();
 		FireEvent::hook.reset();

@@ -8,6 +8,8 @@
 
 void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int unk, UserCmd* usercmd)
 {
+	void* ret = RetAddrSpoofer::invoke<void*>(reinterpret_cast<void*>(hook->get_trampoline()), csgo_input, unk, usercmd);
+
 #ifdef DEBUG
 	Logging::info("UserCmd: {}", usercmd);
 	if (UserCmd* cmd = usercmd; cmd)
@@ -16,5 +18,5 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int unk, UserCmd* use
 				Logging::info("View angles: {}", view_angles->ang_value);
 #endif
 
-	return RetAddrSpoofer::invoke<void*>(reinterpret_cast<void*>(hook->get_trampoline()), csgo_input, unk, usercmd);
+	return ret;
 }

@@ -18,12 +18,16 @@ struct SchemaClassInfo;
 	}
 
 // FIXME, TODO: self.classInfo() can walk up the inheritance tree through its template like properties, fix this properly soon
-#define SCHEMA_VAR(type, prettyName, name)                                                             \
-	inline auto&& prettyName(this auto&& self)                                                         \
-	{                                                                                                  \
-		static const std::int32_t offset = SchemaSystem::findOffset(self.classInfo(), name);           \
-		if constexpr (std::is_const_v<std::remove_pointer_t<decltype(&self)>>)                         \
-			return *reinterpret_cast<type const*>(reinterpret_cast<const std::byte*>(&self) + offset); \
-		else                                                                                           \
-			return *reinterpret_cast<type*>(reinterpret_cast<std::byte*>(&self) + offset);             \
+#define SCHEMA_VAR(type, prettyName, name)                                                     \
+	inline auto& prettyName()                                                                  \
+	{                                                                                          \
+		static const std::int32_t offset = SchemaSystem::findOffset(classInfo(), name);        \
+		using T = type;                                                                        \
+		return *reinterpret_cast<T*>(reinterpret_cast<std::byte*>(this) + offset);             \
+	}                                                                                          \
+	inline auto& prettyName() const                                                            \
+	{                                                                                          \
+		static const std::int32_t offset = SchemaSystem::findOffset(classInfo(), name);        \
+		using T = type;                                                                        \
+		return *reinterpret_cast<T const*>(reinterpret_cast<const std::byte*>(this) + offset); \
 	}
