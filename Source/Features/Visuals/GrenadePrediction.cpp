@@ -100,7 +100,7 @@ void GrenadePrediction::cache_initial_state()
 			points.emplace_back(screen);
 		}
 	}
-	// remove_entity(predictor);
+	remove_entity(predictor);
 }
 
 void GrenadePrediction::draw(ImDrawList* draw_list) const
