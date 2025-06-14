@@ -128,5 +128,5 @@ void GrenadePrediction::draw(ImDrawList* draw_list) const
 		screen_points.emplace_back(screen);
 	}
 
-	draw_list->AddPolyline(screen_points.data(), static_cast<int>(screen_points.size()), -1, 0, 2.0F);
+	line.draw(draw_list, nullptr, screen_points);
 }

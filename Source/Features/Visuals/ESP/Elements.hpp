@@ -2,6 +2,7 @@
 
 #include "GenericESP/Element/Bar.hpp"
 #include "GenericESP/Element/Element.hpp"
+#include "GenericESP/Element/Line.hpp"
 #include "GenericESP/Element/Rectangle.hpp"
 #include "GenericESP/Element/SidedElement.hpp"
 #include "GenericESP/Element/SidedText.hpp"
@@ -186,4 +187,27 @@ class PlayerHealthbar : public PlayerBar {
 		const auto* entity = static_cast<const BaseEntity*>(e);
 		return std::to_string(entity->health());
 	}
+};
+
+// NOTE: This is not like the other elements, it is used in the grenade prediction
+// TODO: More flexible design with these elements (e.g. don't add new properties to it (Enabled) and don't assume there is an ESP entity, when NodeCircuits will be able to access that information)
+struct PlayerLine : MetaSetting, GenericESP::Line {
+	Color color{ this, "Color", ImColor{ 1.0F, 1.0F, 1.0F, 1.0F } };
+	FloatSlider thickness{ this, "Thickness", 0.0F, 10.0F, 3.0F };
+	Checkbox outlined{ this, "Outlined", true };
+	Color outline_color{ this, "Outline color", ImColor{ 0.0F, 0.0F, 0.0F, 1.0F } };
+	FloatSlider outline_thickness{ this, "Outline thickness", 0.0F, 10.0F, 2.0F };
+
+	using MetaSetting::MetaSetting;
+
+	PlayerLine(SettingsHolder* parent, std::string name)
+		: MetaSetting(parent, std::move(name))
+	{
+	}
+
+	ImColor get_color(const GenericESP::EntityType* /*e*/) const override { return color.get(); }
+	float get_thickness(const GenericESP::EntityType* /*e*/) const override { return thickness.get(); }
+	bool get_outlined(const GenericESP::EntityType* /*e*/) const override { return outlined.get(); }
+	ImColor get_outline_color(const GenericESP::EntityType* /*e*/) const override { return outline_color.get(); }
+	float get_outline_thickness(const GenericESP::EntityType* /*e*/) const override { return outline_thickness.get(); }
 };
