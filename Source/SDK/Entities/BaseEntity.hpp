@@ -22,11 +22,17 @@ struct BaseEntity {
 	SCHEMA_VAR(GameSceneNode*, gameSceneNode, "m_pGameSceneNode");
 	SCHEMA_VAR(CollisionProperty*, collision, "m_pCollision");
 
-    SCHEMA_VAR(std::int32_t, health, "m_iHealth");
-    SCHEMA_VAR(std::int32_t, max_health, "m_iMaxHealth");
+	SCHEMA_VAR(std::int32_t, health, "m_iHealth");
+	SCHEMA_VAR(std::int32_t, max_health, "m_iMaxHealth");
 
 	static CSPlayerPawn* /*TODO find actual type*/ getLocalPlayer()
 	{
 		return RetAddrSpoofer::invoke<CSPlayerPawn*>(Memory::getLocalPlayer);
+	}
+
+	template <typename T>
+	T entity_cast()
+	{
+		return schema_cast<T>(this, getSchemaType());
 	}
 };
