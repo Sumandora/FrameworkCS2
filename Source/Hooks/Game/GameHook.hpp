@@ -47,9 +47,4 @@ namespace Hooks::Game {
 		// TODO does this actually return void? lets go with void* for now.
 		void* hook_func(void* csgo_input, int unk, UserCmd* usercmd);
 	}
-
-	namespace GrenadePrediction {
-		inline UninitializedObject<DetourHook<true>> hook;
-		void hook_func(void* rdi, double xmm0, float xmm1);
-	}
 }
