@@ -93,7 +93,7 @@ void GrenadePrediction::calculate_grenade_prediction()
 	static_assert(offsetof(GrenadePredictor, count) == 0xce8);
 	static_assert(offsetof(GrenadePredictor, elements) == 0xcf0);
 
-	GrenadePredictor* predictor = make_grenade_predictor(0.0F, grenade_type, nullptr);
+	GrenadePredictor* predictor = make_grenade_predictor(30.0F, grenade_type, weapon);
 
 	glm::vec3 position;
 	glm::vec3 velocity;
