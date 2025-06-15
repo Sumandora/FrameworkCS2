@@ -374,9 +374,9 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 			if (GraphicsHook::espDrawList != nullptr) {
 				draw_data->AddDrawList(GraphicsHook::espDrawList.get());
 			}
-		}
 
-		ImGui_ImplVulkan_RenderDrawData(draw_data, fd->CommandBuffer);
+			ImGui_ImplVulkan_RenderDrawData(draw_data, fd->CommandBuffer);
+		}
 
 		// Record dear imgui primitives into command buffer
 
