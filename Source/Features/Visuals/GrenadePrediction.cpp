@@ -112,10 +112,12 @@ void GrenadePrediction::calculate_grenade_prediction()
 	remove_entity(predictor);
 }
 
-void GrenadePrediction::draw(ImDrawList* draw_list) const
+void GrenadePrediction::draw(ImDrawList* draw_list)
 {
 	if (!enabled.get())
 		return;
+
+	calculate_grenade_prediction();
 
 	std::vector<ImVec2> screen_points;
 	screen_points.reserve(points.size());

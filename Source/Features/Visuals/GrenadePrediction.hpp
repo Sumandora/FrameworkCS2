@@ -26,7 +26,7 @@ public:
 	GrenadePrediction();
 
 	void calculate_grenade_prediction();
-	void draw(ImDrawList* draw_list) const;
+	void draw(ImDrawList* draw_list);
 };
 
 inline UninitializedObject<GrenadePrediction> grenade_prediction;
