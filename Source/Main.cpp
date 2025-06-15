@@ -9,6 +9,7 @@
 #include "Hooks/Hooks.hpp"
 #include "Serialization/Serialization.hpp"
 #include "Utils/Logging.hpp"
+#include "Utils/Protobuf.hpp"
 
 static void initializer()
 {
@@ -19,6 +20,9 @@ static void initializer()
 	GUI::init();
 	Interfaces::grab_interfaces();
 	Memory::create();
+
+	Protobuf::verify_version();
+
 	Features::create();
 	Serialization::create_config_directory();
 	Hooks::create();
