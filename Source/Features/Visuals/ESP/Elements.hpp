@@ -193,7 +193,7 @@ class PlayerHealthbar : public PlayerBar {
 // TODO: More flexible design with these elements (e.g. don't add new properties to it (Enabled) and don't assume there is an ESP entity, when NodeCircuits will be able to access that information)
 struct PlayerLine : MetaSetting, GenericESP::Line {
 	Color color{ this, "Color", ImColor{ 1.0F, 1.0F, 1.0F, 1.0F } };
-	FloatSlider thickness{ this, "Thickness", 0.0F, 10.0F, 3.0F };
+	FloatSlider thickness{ this, "Thickness", 0.0F, 10.0F, 1.0F };
 	Checkbox outlined{ this, "Outlined", true };
 	Color outline_color{ this, "Outline color", ImColor{ 0.0F, 0.0F, 0.0F, 1.0F } };
 	FloatSlider outline_thickness{ this, "Outline thickness", 0.0F, 10.0F, 2.0F };
