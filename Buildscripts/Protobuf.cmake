@@ -3,6 +3,7 @@ set(protobuf_INSTALL OFF CACHE BOOL "" FORCE)
 set(protobuf_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 # set(protobuf_WITH_ZLIB OFF CACHE BOOL "" FORCE)
 set(protobuf_DISABLE_RTTI ON CACHE BOOL "" FORCE)
+set(protobuf_DEBUG_POSTFIX "" CACHE STRING "" FORCE)
 
 # What a beautiful build system.
 set(ORIG_BUILD_TYPE ${CMAKE_BUILD_TYPE})
