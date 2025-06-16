@@ -2,7 +2,8 @@
 FetchContent_Declare(json
 	GIT_REPOSITORY https://github.com/nlohmann/json.git
 	GIT_PROGRESS TRUE
-	GIT_TAG v3.12.0)
+	GIT_TAG v3.12.0
+	GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(json)
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE nlohmann_json)

@@ -12,7 +12,8 @@ set(CMAKE_BUILD_TYPE Release)
 FetchContent_Declare(protobuf
 	GIT_REPOSITORY https://github.com/protocolbuffers/protobuf
 	GIT_PROGRESS TRUE
-	GIT_TAG v3.21.8)
+	GIT_TAG v3.21.8
+	GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(protobuf)
 
 set(CMAKE_BUILD_TYPE ${ORIG_BUILD_TYPE})
