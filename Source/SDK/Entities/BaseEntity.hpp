@@ -25,6 +25,8 @@ struct BaseEntity {
 	SCHEMA_VAR(std::int32_t, health, "m_iHealth");
 	SCHEMA_VAR(std::int32_t, max_health, "m_iMaxHealth");
 
+	SCHEMA_VAR(std::uint32_t, flags, "m_fFlags");
+
 	static CSPlayerPawn* /*TODO find actual type*/ getLocalPlayer()
 	{
 		return RetAddrSpoofer::invoke<CSPlayerPawn*>(Memory::getLocalPlayer);
