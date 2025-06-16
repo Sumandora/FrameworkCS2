@@ -144,7 +144,7 @@ static float font_size = 12.0F;
 void GUI::init()
 {
 	ImGui::CreateContext();
-	
+
 	ImGuiIO& io = ImGui::GetIO();
 
 	io.IniFilename = nullptr; // TODO Bring it back
@@ -188,8 +188,10 @@ static void create_font()
 	ImGuiIO& io = ImGui::GetIO();
 
 	for (const char* path : {
+			 // Preferably load a system Noto Sans, but if we can't find one, then the game offers its own.
 			 "/usr/share/fonts/noto/NotoSans-Regular.ttf",
-			 "/usr/share/fonts/google-noto/NotoSans-Regular.ttf" }) {
+			 "/usr/share/fonts/google-noto/NotoSans-Regular.ttf",
+			 "../../csgo/panorama/fonts/notosans-regular.ttf" }) {
 		if (access(path, F_OK) == 0 && io.Fonts->AddFontFromFileTTF(path, font_size)) {
 			loaded_font = true;
 			break;
