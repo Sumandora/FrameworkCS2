@@ -31,14 +31,19 @@ foreach(FILE ${PROTOBUF_FILES})
 	list(APPEND GENERATED_PB_FILES "${GEN_FILE_B}")
 endforeach()
 
-# TODO Can this be prevented from rebuilding every single time?
+add_custom_command(
+	OUTPUT ${GENERATED_PB_FILES}
+	COMMAND "$<TARGET_FILE:protoc>" "--cpp_out" "${PROTOBUF_OUTDIR}" "--proto_path" "${protobuf_SOURCE_DIR}/src/:${PROTOBUF_DIR}" ${PROTOBUF_FILES}
+	DEPENDS ${PROTOBUF_FILES}
+	BYPRODUCTS ${GENERATED_PB_FILES}
+)
+
 add_custom_target(
 	ProtobufGenerate
-	COMMAND "$<TARGET_FILE:protoc>" "--cpp_out" "${PROTOBUF_OUTDIR}" "--proto_path" "${protobuf_SOURCE_DIR}/src/:${PROTOBUF_DIR}" ${PROTOBUF_FILES}
-	DEPENDS protoc
-	COMMENT "Generating Protocol buffer implementation files"
-	BYPRODUCTS ${GENERATED_PB_FILES})
+	DEPENDS ${GENERATED_PB_FILES}
+	COMMENT "Generating Protocol buffer implementation files")
 
+add_dependencies(ProtobufGenerate protoc)
 add_dependencies(${CMAKE_PROJECT_NAME} ProtobufGenerate)
 
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE "${GENERATED_PB_FILES}")
