@@ -9,12 +9,15 @@
 #include "Hooks/Hooks.hpp"
 #include "Serialization/Serialization.hpp"
 #include "Utils/Logging.hpp"
+#include "Utils/SDL.hpp"
 
 static void initializer()
 {
 	Logging::debug("Hello, world, from inside the thread!");
 
 	Memory::mem_mgr.sync_layout();
+
+	SDL::verify_version();
 
 	GUI::init();
 	Interfaces::grab_interfaces();
