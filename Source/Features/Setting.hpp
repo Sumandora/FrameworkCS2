@@ -20,9 +20,9 @@ protected:
 
 	friend Setting;
 
+public:
 	void render_all_childs();
 
-public:
 	void serialize(nlohmann::json& output_json) const;
 	void deserialize(const nlohmann::json& input_json);
 

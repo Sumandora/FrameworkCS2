@@ -1,7 +1,5 @@
 #include "Feature.hpp"
 
-#include "Setting.hpp"
-
 #include "Features.hpp"
 
 #include <algorithm>
@@ -21,10 +19,4 @@ Feature::Feature(std::string category, std::string name)
 		it = Features::features.insert(it, { this->category, { this } });
 	else
 		it->second.emplace_back(this);
-}
-
-void Feature::render()
-{
-	for (Setting* setting : settings)
-		setting->render();
 }

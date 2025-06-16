@@ -14,8 +14,6 @@ public:
 	Feature(const Feature&) = delete;
 	Feature& operator=(const Feature&) = delete;
 
-	void render();
-
 	[[nodiscard]] const std::string& get_category() const { return category; }
 	[[nodiscard]] const std::string& get_name() const { return name; }
 };

@@ -26,7 +26,7 @@ void GUI::Tabs::render()
 					if (ImGui::BeginTabBar(tag.c_str(), ImGuiTabBarFlags_Reorderable)) {
 						for (Feature* feature : vector) {
 							if (ImGuiExt::BeginBoxedTabItem(feature->get_name().c_str(), ImGui::GetContentRegionAvail())) {
-								feature->render();
+								feature->render_all_childs();
 								ImGuiExt::EndBoxedTabItem();
 							}
 						}
