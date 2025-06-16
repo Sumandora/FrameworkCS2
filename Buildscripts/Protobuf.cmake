@@ -5,18 +5,12 @@ set(protobuf_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(protobuf_DISABLE_RTTI ON CACHE BOOL "" FORCE)
 set(protobuf_DEBUG_POSTFIX "" CACHE STRING "" FORCE)
 
-# What a beautiful build system.
-set(ORIG_BUILD_TYPE ${CMAKE_BUILD_TYPE})
-set(CMAKE_BUILD_TYPE Release)
-
 FetchContent_Declare(protobuf
 	GIT_REPOSITORY https://github.com/protocolbuffers/protobuf
 	GIT_PROGRESS TRUE
 	GIT_TAG v3.21.8
 	GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(protobuf)
-
-set(CMAKE_BUILD_TYPE ${ORIG_BUILD_TYPE})
 
 target_compile_options(libprotobuf-lite PRIVATE "-fdata-sections" "-Oz")
 target_compile_options(libprotobuf PRIVATE "-fdata-sections" "-Oz")
