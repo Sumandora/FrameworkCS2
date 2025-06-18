@@ -8,6 +8,8 @@ class UninitializedObject {
 	alignas(T) std::byte storage[sizeof(T)];
 
 public:
+	using Type = T;
+
 	template <typename... Args>
 	T* emplace(Args&&... args)
 	{
