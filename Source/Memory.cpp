@@ -7,9 +7,12 @@
 
 #include "SDK/Entities/GameEntitySystem.hpp"
 #include "SDK/GameClass/CSGOInput.hpp"
+#include "SDK/GameClass/MemAlloc.hpp"
 #include "SDK/GameClass/ViewRender.hpp"
+
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
+
 #include "Utils/Logging.hpp"
 
 const void* RetAddrSpoofer::leaveRet;
@@ -116,4 +119,6 @@ void Memory::create()
 						  .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 						  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 						  .expect<void*>("Couldn't find get_fun_loading");
+
+	MemAlloc::the(); // Acquire the allocator now.
 }
