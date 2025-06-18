@@ -5,8 +5,9 @@
 
 #include "../../Memory.hpp"
 
-#include "../GameClass/EngineToClient.hpp"
 #include "RetAddrSpoofer.hpp"
+
+#include "../Enums/LifeState.hpp"
 
 #include <cstdint>
 
@@ -21,6 +22,8 @@ struct BaseEntity {
 
 	SCHEMA_VAR(GameSceneNode*, gameSceneNode, "m_pGameSceneNode");
 	SCHEMA_VAR(CollisionProperty*, collision, "m_pCollision");
+
+	SCHEMA_VAR(LifeState, life_state, "m_lifeState");
 
 	SCHEMA_VAR(std::int32_t, health, "m_iHealth");
 	SCHEMA_VAR(std::int32_t, max_health, "m_iMaxHealth");

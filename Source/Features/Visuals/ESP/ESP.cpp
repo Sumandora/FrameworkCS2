@@ -8,9 +8,9 @@
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../../SDK/Entities/GameEntitySystem.hpp"
+#include "../../../SDK/Enums/LifeState.hpp"
 #include "../../../SDK/GameClass/CollisionProperty.hpp"
 #include "../../../SDK/GameClass/GameSceneNode.hpp"
-#include "../../../SDK/Schema/SchemaClassInfo.hpp"
 
 #include "../../../Utils/Projection.hpp"
 
@@ -39,8 +39,11 @@ void ESP::draw(ImDrawList* draw_list)
 			BaseEntity* entity = GameEntitySystem::the()->getBaseEntity(i);
 			if (entity == nullptr)
 				continue;
-			SchemaClassInfo* schema_type = entity->getSchemaType();
-			if (schema_type != CSPlayerPawn::classInfo())
+			auto* player_pawn = entity->entity_cast<CSPlayerPawn*>();
+			if (!player_pawn)
+				continue;
+
+			if (player_pawn->health() <= 0 || player_pawn->life_state() != LifeState::ALIVE)
 				continue;
 
 			GameSceneNode* game_scene_node = entity->gameSceneNode();
@@ -95,7 +98,7 @@ void ESP::draw(ImDrawList* draw_list)
 				if (box.enabled.get())
 					box.draw(draw_list, entity, unioned_rect);
 				if (name.enabled.get()) {
-					CSPlayerController* controller = static_cast<CSPlayerPawnBase*>(entity)->original_controller().get();
+					CSPlayerController* controller = player_pawn->original_controller().get();
 					if (controller)
 						name.draw(draw_list, entity, controller->sanitizied_name(), unioned_rect);
 				}
