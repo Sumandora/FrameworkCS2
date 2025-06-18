@@ -35,7 +35,6 @@ add_custom_command(
 	OUTPUT ${GENERATED_PB_FILES}
 	COMMAND "$<TARGET_FILE:protoc>" "--cpp_out" "${PROTOBUF_OUTDIR}" "--proto_path" "${protobuf_SOURCE_DIR}/src/:${PROTOBUF_DIR}" ${PROTOBUF_FILES}
 	DEPENDS ${PROTOBUF_FILES}
-	BYPRODUCTS ${GENERATED_PB_FILES}
 )
 
 add_custom_target(
