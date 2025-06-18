@@ -1,15 +1,12 @@
 #pragma once
 
-#include <cstdint>
 #include <type_traits>
 
-#include "../../Interfaces.hpp"
+#include "../../Interfaces.hpp" // IWYU pragma: keep
 
 #include "SchemaClassInfo.hpp"
 #include "SchemaSystem.hpp"
 #include "SchemaSystemTypeScope.hpp"
-
-struct SchemaClassInfo;
 
 #define CLASS_INFO(moduleName, className)                                                                                          \
 	static inline SchemaClassInfo* classInfo()                                                                                     \

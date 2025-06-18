@@ -5,7 +5,7 @@
 
 #include "BaseEntity.hpp"
 
-struct GameEntitySystem { // TODO Reorganize the entire structure of this
+struct GameEntitySystem {
 private:
 	static void* get_highest_entity_index_ptr;
 	static void* get_base_entity_ptr;

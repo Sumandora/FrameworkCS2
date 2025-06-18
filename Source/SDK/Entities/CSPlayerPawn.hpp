@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Schema/FieldOffset.hpp"
-#include "../Schema/SchemaClassInfo.hpp"
+
 #include "CSPlayerPawnBase.hpp"
 
 struct CSPlayerPawn : public CSPlayerPawnBase {
