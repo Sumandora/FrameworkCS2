@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../SDK/GameClass/ClientFrameStage.hpp"
+#include "../../SDK/Enums/ClientFrameStage.hpp"
 
 #include "../../Utils/ThreadExecutor.hpp"
 #include "../../Utils/UninitializedObject.hpp"

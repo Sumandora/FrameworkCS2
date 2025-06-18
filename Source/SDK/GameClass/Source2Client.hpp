@@ -2,7 +2,7 @@
 
 #include "../VirtualMethod.hpp"
 
-#include "ClientFrameStage.hpp"
+#include "../Enums/ClientFrameStage.hpp"
 
 class Source2Client {
 public:

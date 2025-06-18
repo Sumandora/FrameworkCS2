@@ -4,7 +4,7 @@
 
 #include "../../../SDK/Entities/BaseEntity.hpp"
 
-#include "../../../SDK/GameClass/ClientFrameStage.hpp"
+#include "../../../SDK/Enums/ClientFrameStage.hpp"
 
 #include "../../../Memory.hpp"
 
