@@ -3,10 +3,10 @@
 #include "../../Interfaces.hpp"
 #include "../../Memory.hpp"
 
-#include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
 #include "DetourHooking.hpp"
-#include "SignatureScanner/PatternSignature.hpp"
+
+#include "../../SDK/GameClass/CSGOInput.hpp"
 
 #include <cstddef>
 
@@ -32,7 +32,7 @@ namespace Hooks::Game {
 			reinterpret_cast<void*>(GetFunLoading::hook_func));
 		CreateMove::hook.emplace(
 			Memory::emalloc,
-			BCRL::pointer_array(Memory::mem_mgr, Memory::csgo_input, 22)
+			BCRL::pointer_array(Memory::mem_mgr, Memory::csgo_input, Memory::csgo_input->create_move_index)
 				.expect<void*>("Couldn't find CreateMove"),
 			reinterpret_cast<void*>(CreateMove::hook_func));
 

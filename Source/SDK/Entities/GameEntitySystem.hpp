@@ -5,8 +5,7 @@
 
 #include "BaseEntity.hpp"
 
-struct GameEntitySystem {
-private:
+class GameEntitySystem {
 	static void* get_highest_entity_index_ptr;
 	static void* get_base_entity_ptr;
 

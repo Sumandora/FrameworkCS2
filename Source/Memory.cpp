@@ -6,6 +6,7 @@
 #include "Interfaces.hpp"
 
 #include "SDK/Entities/GameEntitySystem.hpp"
+#include "SDK/GameClass/CSGOInput.hpp"
 #include "SDK/GameClass/ViewRender.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
@@ -50,7 +51,7 @@ void Memory::create()
 	//            (_g_pRenderGameSystem,(CViewSetup *)(CFrustum *)(this + 0x10),(VMatrix *)&g_WorldToView,
 	//             (VMatrix *)&g_ViewToProjection,(VMatrix *)&_g_WorldToProjection,
 	//             (VMatrix *)&g_WorldToScreen);
-	worldToProjectionMatrix = BCRL::pointer_array(mem_mgr, viewRender, ViewRender::onRenderStartIdx)
+	worldToProjectionMatrix = BCRL::pointer_array(mem_mgr, viewRender, ViewRender::on_render_start_index)
 								  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"4c 8d 05">())
 								  .add(3)
 								  .relative_to_absolute()
@@ -109,7 +110,7 @@ void Memory::create()
 					 })
 					 .add(3)
 					 .relative_to_absolute()
-					 .expect<void*>("Couldn't find CCSGOInput");
+					 .expect<CSGOInput*>("Couldn't find CCSGOInput");
 
 	get_fun_loading = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"#LoadingProgress_CSFunLoading%d">(), BCRL::everything(mem_mgr).thats_readable().thats_not_executable().with_name("libclient.so"))
 						  .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))

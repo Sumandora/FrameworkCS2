@@ -23,4 +23,4 @@ namespace VirtualMethod {
 	{                                                               \
 		return VirtualMethod::invoke<returnType, index> argsCall;   \
 	}                                                               \
-	static constexpr std::size_t name##Idx = index
+	static constexpr std::size_t name##_index = index

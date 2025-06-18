@@ -10,6 +10,8 @@ struct GameEntitySystem;
 struct BaseEntity;
 struct CSPlayerPawn;
 
+class CSGOInput;
+
 namespace Memory {
 	inline ViewRender* viewRender;
 	inline glm::mat4x4* worldToProjectionMatrix;
@@ -19,7 +21,7 @@ namespace Memory {
 
 	inline void* fireEvent;
 
-	inline void* csgo_input;
+	inline CSGOInput* csgo_input;
 
 	inline CSPlayerPawn* local_player;
 
