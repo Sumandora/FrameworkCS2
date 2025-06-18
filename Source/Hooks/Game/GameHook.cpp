@@ -7,6 +7,7 @@
 #include "DetourHooking.hpp"
 
 #include "../../SDK/GameClass/CSGOInput.hpp"
+#include "../../SDK/GameClass/Source2Client.hpp"
 
 #include <cstddef>
 
@@ -15,7 +16,7 @@ namespace Hooks::Game {
 	{
 		FrameStageNotify::hook.emplace(
 			Memory::emalloc,
-			BCRL::pointer_array(Memory::mem_mgr, Interfaces::source2Client, 36)
+			BCRL::pointer_array(Memory::mem_mgr, Interfaces::source2Client, Source2Client::frame_stage_notify_index)
 				.expect<void*>("Couldn't find FrameStageNotify"),
 			reinterpret_cast<void*>(FrameStageNotify::hookFunc));
 		ShouldShowCrosshair::hook.emplace(
@@ -32,7 +33,7 @@ namespace Hooks::Game {
 			reinterpret_cast<void*>(GetFunLoading::hook_func));
 		CreateMove::hook.emplace(
 			Memory::emalloc,
-			BCRL::pointer_array(Memory::mem_mgr, Memory::csgo_input, Memory::csgo_input->create_move_index)
+			BCRL::pointer_array(Memory::mem_mgr, Memory::csgo_input, CSGOInput::create_move_index)
 				.expect<void*>("Couldn't find CreateMove"),
 			reinterpret_cast<void*>(CreateMove::hook_func));
 
