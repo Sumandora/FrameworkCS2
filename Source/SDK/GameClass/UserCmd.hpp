@@ -23,4 +23,9 @@ private:
 public:
 	CSGOUserCmdPB csgo_usercmd;
 	Buttons buttons;
+
+private:
+	PADDING(32);
 };
+
+static_assert(sizeof(UserCmd) == 0x98);
