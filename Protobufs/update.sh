@@ -18,7 +18,7 @@ recurse_proto() {
 	fi
 
 	echo "Downloading $file."
-	wget -q "$BASE_LINK$file" -O "$DIR/$file"
+	{ echo $'syntax = "proto2";\n'; curl -s "$BASE_LINK$file"; } > "$file"
 
 	grep "^import" "$file" | awk -F '"' '{ print $2; }' | grep -v "^google" | {
 		while read -r line; do
