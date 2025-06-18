@@ -27,7 +27,7 @@ namespace Interfaces {
 		const std::unordered_map<const char*, void*>& get_interfaces() { return interfaces; }
 	};
 
-	inline void* source2Client;
+	inline void* source2_client;
 	inline SchemaSystem* schemaSystem;
 	inline EngineCvar* engineCvar;
 	inline EngineToClient* engine;

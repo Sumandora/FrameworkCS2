@@ -16,7 +16,7 @@ namespace Hooks::Game {
 	{
 		FrameStageNotify::hook.emplace(
 			Memory::emalloc,
-			BCRL::pointer_array(Memory::mem_mgr, Interfaces::source2Client, Source2Client::frame_stage_notify_index)
+			BCRL::pointer_array(Memory::mem_mgr, Interfaces::source2_client, Source2Client::frame_stage_notify_index)
 				.expect<void*>("Couldn't find FrameStageNotify"),
 			reinterpret_cast<void*>(FrameStageNotify::hookFunc));
 		ShouldShowCrosshair::hook.emplace(

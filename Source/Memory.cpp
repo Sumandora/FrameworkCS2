@@ -17,7 +17,7 @@ const void* RetAddrSpoofer::leaveRet;
 void Memory::create()
 {
 	// Set the address for the return address spoofer
-	RetAddrSpoofer::leaveRet = BCRL::pointer_array(mem_mgr, Interfaces::source2Client, 0) // random code piece
+	RetAddrSpoofer::leaveRet = BCRL::pointer_array(mem_mgr, Interfaces::source2_client, 0) // random code piece
 								   .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"c9 c3">(), BCRL::everything(mem_mgr).thats_readable().thats_executable())
 								   .expect<void*>("Couldn't find a *leave; ret* pattern");
 
