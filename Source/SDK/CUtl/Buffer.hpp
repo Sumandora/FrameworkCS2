@@ -23,6 +23,10 @@ struct UtlBuffer {
 	UtlBufferOverflowFunc put_overflow_func;
 
 	Byteswap byteswap;
+
+	explicit UtlBuffer(int grow_size = 0, int init_size = 0, int flags = 0);
+
+	void ensure_capacity(int size);
 };
 
 static_assert(sizeof(UtlBuffer) == 80);
