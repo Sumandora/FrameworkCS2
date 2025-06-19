@@ -2,10 +2,12 @@
 
 #include "../../Utils/Logging.hpp"
 
+#include <cstring>
 #include <dlfcn.h>
 
 UtlBuffer::UtlBuffer(int grow_size, int init_size, int flags)
 {
+	memset(this, 0, sizeof(*this));
 	static void (*ctor)(UtlBuffer*, int, int, int);
 
 	if (!ctor) {
