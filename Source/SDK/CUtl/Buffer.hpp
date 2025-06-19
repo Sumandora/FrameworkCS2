@@ -29,4 +29,4 @@ struct UtlBuffer {
 	void ensure_capacity(int size);
 };
 
-static_assert(sizeof(UtlBuffer) == 80);
+static_assert(sizeof(UtlBuffer) == 0x50);
