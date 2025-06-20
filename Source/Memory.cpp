@@ -106,7 +106,7 @@ void Memory::create()
 						 })
 						 .add(3)
 						 .relative_to_absolute()
-						 .expect<CSPlayerController**>("Couldnt find local_player_controller");
+						 .expect<CSPlayerController**>("Couldn't find local_player_controller");
 
 	Logging::info("Found local_player_controller at: {}", local_player_controller);
 

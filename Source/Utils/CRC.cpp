@@ -31,7 +31,7 @@ void CRC::update_crc(UserCmd* usercmd)
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<int (*)(CBaseUserCmdPB* cmd, int, int)>("couldnt find create_new_base_cmd");
+			  .expect<int (*)(CBaseUserCmdPB* cmd, int, int)>("Couldn't find create_new_base_cmd");
 	static auto* calculate_crc_size
 		= BCRL::signature(
 			Memory::mem_mgr,
@@ -39,13 +39,13 @@ void CRC::update_crc(UserCmd* usercmd)
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<int (*)(CBaseUserCmdPB* cmd)>("couldnt find calculate_crc_size");
+			  .expect<int (*)(CBaseUserCmdPB* cmd)>("Couldn't find calculate_crc_size");
 	static auto* serialize
 		= BCRL::signature(
 			Memory::mem_mgr,
 			SignatureScanner::PatternSignature::for_array_of_bytes<"41 56 41 55 41 89 D6 41 54 55 49 89 FC">(),
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .expect<bool (*)(CBaseUserCmdPB* cmd, void* buf, int size)>("couldnt find serialize");
+			  .expect<bool (*)(CBaseUserCmdPB* cmd, void* buf, int size)>("Couldn't find serialize");
 	static auto* write_message // This is what windows folks call this, I think the name is misleading... it's more like `create_string` or something like that...
 		= BCRL::signature(
 			Memory::mem_mgr,
@@ -53,13 +53,13 @@ void CRC::update_crc(UserCmd* usercmd)
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<char* (*)(void* begin, void* end)>("couldnt find write_message");
+			  .expect<char* (*)(void* begin, void* end)>("Couldn't find write_message");
 	static auto* set_message_data
 		= BCRL::signature(
 			Memory::mem_mgr,
 			SignatureScanner::PatternSignature::for_array_of_bytes<"41 56 41 55 41 54 55 48 89 FD 53 48 83 EC 10 F6 07 03">(),
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .expect<bool (*)(void** move_crc, char** crc_result, void* has_bits)>("couldnt find set_message_data");
+			  .expect<bool (*)(void** move_crc, char** crc_result, void* has_bits)>("Couldn't find set_message_data");
 	static auto* empty_str
 		= BCRL::signature(
 			Memory::mem_mgr,
@@ -67,7 +67,7 @@ void CRC::update_crc(UserCmd* usercmd)
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(3)
 			  .relative_to_absolute()
-			  .expect<char**>("couldnt find empty_str");
+			  .expect<char**>("Couldn't find empty_str");
 	static auto* operator_delete
 		= BCRL::signature(
 			Memory::mem_mgr,
@@ -75,7 +75,7 @@ void CRC::update_crc(UserCmd* usercmd)
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<void* (*)(void*, std::size_t)>("couldnt find empty_str");
+			  .expect<void* (*)(void*, std::size_t)>("Couldn't find empty_str");
 
 	CBaseUserCmdPB new_base_cmd;
 	create_new_base_cmd(&new_base_cmd, 0, 0);
