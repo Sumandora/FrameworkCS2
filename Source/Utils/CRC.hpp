@@ -1,9 +1,11 @@
 #pragma once
 
-#include "../SDK/CUtl/Buffer.hpp"
+#include <cstddef>
+#include <vector>
 
 struct UserCmd;
 
 namespace CRC {
-	void update_crc(UserCmd* usercmd);
+	bool update_crc(UserCmd* usercmd);
+	std::vector<char> extract_crc(UserCmd* usercmd);
 }

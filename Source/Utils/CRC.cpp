@@ -1,4 +1,6 @@
 #include <cstddef>
+#include <format>
+#include <vector>
 
 #include "CRC.hpp"
 
@@ -22,7 +24,7 @@
 
 #include "../SDK/GameClass/UserCmd.hpp"
 
-void CRC::update_crc(UserCmd* usercmd)
+bool CRC::update_crc(UserCmd* usercmd)
 {
 	static auto* create_new_base_cmd
 		= BCRL::signature(
@@ -80,11 +82,19 @@ void CRC::update_crc(UserCmd* usercmd)
 	CBaseUserCmdPB new_base_cmd;
 	create_new_base_cmd(&new_base_cmd, 0, 0);
 
-	*new_base_cmd.mutable_viewangles() = usercmd->csgo_usercmd.base().viewangles();
+	// NOTE: Don't use the copy constructor, it will use MergeFrom, which will omit zeroed elements, however the game expects those to be there.
+	const CMsgQAngle& from = usercmd->csgo_usercmd.base().viewangles();
+	CMsgQAngle* to = new_base_cmd.mutable_viewangles();
 
-	new_base_cmd.mutable_buttons_pb()->set_buttonstate1(usercmd->buttons.buttonstate1);
-	new_base_cmd.mutable_buttons_pb()->set_buttonstate2(usercmd->buttons.buttonstate2);
-	new_base_cmd.mutable_buttons_pb()->set_buttonstate3(usercmd->buttons.buttonstate3);
+	to->set_x(from.x());
+	to->set_y(from.y());
+	to->set_z(from.z());
+
+	CInButtonStatePB* buttons = new_base_cmd.mutable_buttons_pb();
+
+	buttons->set_buttonstate1(usercmd->buttons.buttonstate1);
+	buttons->set_buttonstate2(usercmd->buttons.buttonstate2);
+	buttons->set_buttonstate3(usercmd->buttons.buttonstate3);
 
 	UtlBuffer buffer(0, 0, 0);
 	const int crc_size = calculate_crc_size(&new_base_cmd);
@@ -92,7 +102,7 @@ void CRC::update_crc(UserCmd* usercmd)
 	const bool success = serialize(&new_base_cmd, buffer.memory.memory, crc_size);
 	if (!success) {
 		Logging::error("Failed to generate CRC");
-		return;
+		return false;
 	}
 
 	bool empty = false;
@@ -104,11 +114,11 @@ void CRC::update_crc(UserCmd* usercmd)
 		local_110 = *empty_str + 0x18;
 	}
 
-	void* crc = usercmd->csgo_usercmd.mutable_base()->_impl_.move_crc_.UnsafeMutablePointer();
+	void* crc = &usercmd->csgo_usercmd.mutable_base()->_impl_.move_crc_;
 	usercmd->csgo_usercmd.mutable_base()->_impl_._has_bits_.has_bits_[0] |= 1;
 
 	// Previous CRC does not need to be deallocated because it was allocated in the same arena.
-	set_message_data(&crc, &local_110, usercmd->csgo_usercmd.base().GetArena());
+	set_message_data(reinterpret_cast<void**>(crc), &local_110, usercmd->csgo_usercmd.base().GetArena());
 
 	if (!empty) {
 		// Using operator.delete from the game, because I'm not sure about how the whole string ABI stuff works out here...
@@ -122,4 +132,17 @@ void CRC::update_crc(UserCmd* usercmd)
 
 	if ((buffer.memory.growSize & 0xc0000000) == 0 && buffer.memory.memory != nullptr)
 		MemAlloc::the()->deallocate(buffer.memory.memory);
+
+	return true;
+}
+
+std::vector<char> CRC::extract_crc(UserCmd* usercmd)
+{
+	if (!usercmd->csgo_usercmd.has_base() || !usercmd->csgo_usercmd.base().has_move_crc())
+		return {};
+
+	const void* thisptr = usercmd->csgo_usercmd.mutable_base()->_impl_.move_crc_.UnsafeGetPointer();
+	const char* str = *static_cast<const char* const*>(thisptr);
+	const std::size_t length = *reinterpret_cast<const std::size_t*>(str - 0x18);
+	return { str, str + length };
 }
