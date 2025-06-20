@@ -11,7 +11,7 @@
 
 struct BasePlayerController;
 
-struct Buttons {
+struct Buttons { // TODO, is this a protobuf buttons?
 	PADDING(0x8);
 	std::uint64_t buttonstate1;
 	std::uint64_t buttonstate2;
