@@ -2,16 +2,15 @@
 
 #include "../../Graphics/GraphicsHook.hpp"
 
-#include "../../../SDK/Entities/BaseEntity.hpp"
-
-#include "../../../SDK/Enums/ClientFrameStage.hpp"
-
 #include "../../../Memory.hpp"
 
 #include "RetAddrSpoofer.hpp"
 
 #include "../../../Features/Visuals/ESP/ESP.hpp"
 #include "../../../Features/Visuals/GrenadePrediction.hpp"
+
+#include "../../../SDK/Entities/CSPlayerController.hpp"
+#include "../../../SDK/Enums/ClientFrameStage.hpp"
 
 #include <mutex>
 
@@ -20,7 +19,9 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 	switch (stage) {
 		using enum ClientFrameStage;
 	case FRAME_SIMULATE_END: {
-		Memory::local_player = BaseEntity::getLocalPlayer();
+		CSPlayerController* controller = *Memory::local_player_controller;
+		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
+
 		thread_executor.run_all_queued_functions();
 		break;
 	}

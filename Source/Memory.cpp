@@ -5,6 +5,7 @@
 
 #include "Interfaces.hpp"
 
+#include "SDK/Entities/CSPlayerController.hpp"
 #include "SDK/Entities/GameEntitySystem.hpp"
 #include "SDK/GameClass/CSGOInput.hpp"
 #include "SDK/GameClass/MemAlloc.hpp"
@@ -80,8 +81,7 @@ void Memory::create()
 							  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 							  .expect<void*>("Couldn't find shouldShowCrosshair");
 
-	// TODO look into this function, one can extract the player controller itself, not just the pawn
-	getLocalPlayer = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"cl_sim_grenade_trajectory">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
+	local_player_controller = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"cl_sim_grenade_trajectory">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
 						 .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
 						 .sub(11)
 						 .relative_to_absolute()
@@ -94,7 +94,21 @@ void Memory::create()
 						 })
 						 .add(1)
 						 .relative_to_absolute()
-						 .expect<void*>("Couldnt find getLocalPlayer");
+						 .repeater([](auto& ptr) {
+							 ptr.next_instruction();
+							 return !ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">());
+						 })
+						 .add(1)
+						 .relative_to_absolute()
+						 .repeater([](auto& ptr) {
+							 ptr.next_instruction();
+							 return !ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8b 05">());
+						 })
+						 .add(3)
+						 .relative_to_absolute()
+						 .expect<CSPlayerController**>("Couldnt find local_player_controller");
+
+	Logging::info("Found local_player_controller at: {}", local_player_controller);
 
 	fireEvent = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"FireEvent: event '%s' not registered.\n">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
 					.find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))

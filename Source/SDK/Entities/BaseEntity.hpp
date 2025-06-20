@@ -30,11 +30,6 @@ struct BaseEntity {
 
 	SCHEMA_VAR(std::uint32_t, flags, "m_fFlags");
 
-	static CSPlayerPawn* /*TODO find actual type*/ getLocalPlayer()
-	{
-		return RetAddrSpoofer::invoke<CSPlayerPawn*>(Memory::getLocalPlayer);
-	}
-
 	template <typename T>
 	T entity_cast()
 	{

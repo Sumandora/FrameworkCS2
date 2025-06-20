@@ -85,6 +85,7 @@ void GrenadePrediction::calculate_grenade_prediction()
 	auto* player = Memory::local_player;
 	if (!player)
 		return;
+
 	auto* weapon = RetAddrSpoofer::invoke<BasePlayerWeapon*>(get_weapon, player);
 	if (!weapon)
 		return;

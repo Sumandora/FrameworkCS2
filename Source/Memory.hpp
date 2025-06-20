@@ -6,10 +6,11 @@
 #include "glm/ext/matrix_float4x4.hpp"
 
 struct ViewRender;
-struct GameEntitySystem;
 struct BaseEntity;
 struct CSPlayerPawn;
+struct CSPlayerController;
 
+class GameEntitySystem;
 class CSGOInput;
 
 namespace Memory {
@@ -17,7 +18,8 @@ namespace Memory {
 	inline glm::mat4x4* worldToProjectionMatrix;
 
 	inline void* shouldShowCrosshair;
-	inline void* getLocalPlayer;
+
+	inline CSPlayerController** local_player_controller;
 
 	inline void* fireEvent;
 
