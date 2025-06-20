@@ -9,6 +9,8 @@
 
 #include <cstdint>
 
+struct BasePlayerController;
+
 struct Buttons {
 	PADDING(0x8);
 	std::uint64_t buttonstate1;
@@ -26,6 +28,9 @@ public:
 
 private:
 	PADDING(32);
+
+public:
+	static UserCmd* get_current_command(BasePlayerController* controller);
 };
 
 static_assert(sizeof(UserCmd) == 0x98);
