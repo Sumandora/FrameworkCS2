@@ -1,18 +1,21 @@
 #include "../GameHook.hpp"
 
-#include "../../../SDK/GameClass/UserCmd.hpp"
-
 #include "RetAddrSpoofer.hpp"
 
 #include "../../../Memory.hpp"
+
+#include "../../../Utils/CRC.hpp"
 #include "../../../Utils/Logging.hpp"
 
-#include "../../../SDK/Entities/CSPlayerController.hpp"
+#include "../../../SDK/Entities/CSPlayerController.hpp" // IWYU pragma: keep
+#include "../../../SDK/GameClass/UserCmd.hpp"
+
 #include "glm/ext/vector_float3.hpp"
 
-void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int unk, UserCmd* usercmd)
+void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 {
-	void* ret = RetAddrSpoofer::invoke<void*>(reinterpret_cast<void*>(hook->get_trampoline()), csgo_input, unk, usercmd);
+	void* ret = RetAddrSpoofer::invoke<void*>(reinterpret_cast<void*>(hook->get_trampoline()), csgo_input, esi, dl);
+
 	if (!Memory::local_player_controller)
 		return ret;
 

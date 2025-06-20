@@ -6,5 +6,5 @@ struct UserCmd;
 
 class CSGOInput {
 public:
-	VIRTUAL_METHOD(22, create_move, void*, (int unk, UserCmd* cmd), (this, unk, cmd));
+	VIRTUAL_METHOD(6, create_move, void*, (int unk1, char unk2), (this, unk1, unk2));
 };
