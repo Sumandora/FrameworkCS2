@@ -1,5 +1,7 @@
 #include "Serialization.hpp"
 
+#include <algorithm>
+#include <array>
 #include <cstdlib>
 #include <expected>
 #include <filesystem>
@@ -21,6 +23,11 @@ static bool is_first_launch = false;
 static bool available = true;
 
 static constexpr std::string_view CONFIG_DIR_NAME = "FrameworkCS2";
+
+static constexpr std::array RESERVED_CONFIG_NAMES = {
+	"grenades.json", // Grenade helper
+	"users.json", // Player list
+};
 
 void Serialization::create_config_directory()
 {
@@ -57,6 +64,9 @@ std::expected<void, std::string> Serialization::create_config(std::string_view n
 	// NOTE: Despite it saying '+=', this does not affect the name variable itself, only the path
 	const std::filesystem::path config_file{ get_config_directory() / name += ".json" };
 
+	if (std::ranges::contains(RESERVED_CONFIG_NAMES, config_file.filename()))
+		return std::unexpected("Config name is reserved.");
+
 	std::error_code status;
 	if (std::filesystem::exists(config_file, status)) {
 		if (!overwrite)
@@ -84,6 +94,9 @@ bool Serialization::load_config(std::string_view name, std::error_code& status)
 {
 	// NOTE: Despite it saying '+=', this does not affect the name variable itself, only the path
 	const std::filesystem::path config_file{ get_config_directory() / name += ".json" };
+
+	if (std::ranges::contains(RESERVED_CONFIG_NAMES, config_file.filename()))
+		return false;
 
 	if (!std::filesystem::exists(config_file, status))
 		return false;
@@ -114,6 +127,9 @@ std::vector<std::filesystem::path> Serialization::get_available_configs()
 
 	for (const std::filesystem::path& config_file : std::filesystem::directory_iterator{ get_config_directory() }) {
 		if (config_file.extension() != ".json")
+			continue;
+
+		if (std::ranges::contains(RESERVED_CONFIG_NAMES, config_file.filename()))
 			continue;
 
 		configs.emplace_back(config_file);
