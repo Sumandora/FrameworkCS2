@@ -1,0 +1,14 @@
+diff '--color=auto' -Naur octree-src/CMakeLists.txt octree-2src/CMakeLists.txt
+--- octree-src/CMakeLists.txt	2025-06-21 21:04:34.677563207 +0200
++++ octree-2src/CMakeLists.txt	2025-06-21 21:05:18.807623308 +0200
+@@ -8,8 +8,7 @@
+ add_library(${PROJECT_NAME} INTERFACE)
+ target_include_directories(${PROJECT_NAME} INTERFACE "include")
+ 
+-add_subdirectory("tests")
+ if (false)
+     add_subdirectory("example")
+     add_subdirectory("benchmark")
+-endif()
+\ No newline at end of file
++endif()
