@@ -19,6 +19,7 @@
 
 #include "../../SDK/Entities/BaseCSGrenade.hpp"
 #include "../../SDK/Entities/BasePlayerWeapon.hpp"
+#include "../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../SDK/Entities/Services/PlayerWeaponServices.hpp"
 #include "../../SDK/Padding.hpp"
 
@@ -42,11 +43,11 @@ struct GrenadePredictor {
 static_assert(offsetof(GrenadePredictor, count) == 0xce8);
 static_assert(offsetof(GrenadePredictor, elements) == 0xcf0);
 
-static void* get_weapon;
-static void* calculate_initial_state;
-static void* make_grenade_predictor;
-static void* predict_grenade;
-static void* remove_entity;
+static BasePlayerWeapon* (*get_weapon)(BaseEntity* player);
+static void (*calculate_initial_state)(BasePlayerWeapon* weapon, BaseEntity* player, glm::vec3* pos, glm::vec3* rot, bool jump_throw);
+static GrenadePredictor* (*make_grenade_predictor)(float time_to_render, int grenade_type, BaseCSGrenade* grenade);
+static void(*predict_grenade)(GrenadePredictor* predictor, glm::vec3* pos, glm::vec3* rot);
+static void(*remove_entity)(GrenadePredictor* predictor);
 
 GrenadePrediction::GrenadePrediction()
 	: Feature("Visuals", "Grenade prediction")
@@ -82,11 +83,11 @@ static std::vector<glm::vec3> points;
 
 void GrenadePrediction::calculate_grenade_prediction()
 {
-	auto* player = Memory::local_player;
+	BaseEntity* player = Memory::local_player;
 	if (!player)
 		return;
 
-	auto* weapon = RetAddrSpoofer::invoke<BasePlayerWeapon*>(get_weapon, player);
+	BasePlayerWeapon* weapon = RetAddrSpoofer::invoke(get_weapon, player);
 	if (!weapon)
 		return;
 
@@ -96,13 +97,13 @@ void GrenadePrediction::calculate_grenade_prediction()
 
 	const int grenade_type = grenade->get_grenade_type();
 
-	auto* predictor = RetAddrSpoofer::invoke<GrenadePredictor*>(make_grenade_predictor, 30.0F, grenade_type, weapon);
+	auto* predictor = RetAddrSpoofer::invoke(make_grenade_predictor, 30.0F, grenade_type, grenade);
 
 	glm::vec3 position;
 	glm::vec3 velocity;
 
-	RetAddrSpoofer::invoke<void>(calculate_initial_state, weapon, player, &position, &velocity, predict_jumpthrow.get());
-	RetAddrSpoofer::invoke<void>(predict_grenade, predictor, &position, &velocity);
+	RetAddrSpoofer::invoke(calculate_initial_state, weapon, player, &position, &velocity, predict_jumpthrow.get());
+	RetAddrSpoofer::invoke(predict_grenade, predictor, &position, &velocity);
 
 	for (int i = 0; i < predictor->count; i++) {
 		const GrenadePredictor::Element& elem = predictor->elements[i];
@@ -113,7 +114,7 @@ void GrenadePrediction::calculate_grenade_prediction()
 		}
 	}
 
-	RetAddrSpoofer::invoke<void>(remove_entity, predictor);
+	RetAddrSpoofer::invoke(remove_entity, predictor);
 }
 
 void GrenadePrediction::draw(ImDrawList* draw_list)

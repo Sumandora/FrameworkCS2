@@ -2,7 +2,7 @@
 FetchContent_Declare(ReturnAddressSpoofer
 	GIT_REPOSITORY https://github.com/Sumandora/ReturnAddressSpoofer
 	GIT_PROGRESS TRUE
-	GIT_TAG experimental-32-bit-and-clang-support)
+	GIT_TAG b70e2369b984db43720a28261c6516c8864089ef)
 FetchContent_MakeAvailable(ReturnAddressSpoofer)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ReturnAddressSpoofer)
 

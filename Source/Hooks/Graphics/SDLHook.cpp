@@ -85,19 +85,23 @@ static int peep_events_hook(
 			}
 		}
 
-		return RetAddrSpoofer::invoke<int, SDL_Event*, int, SDL_EventAction, Uint32, Uint32, bool>(
-			reinterpret_cast<void*>(hook->get_trampoline()), filtered_events.data(), static_cast<int>(filtered_events.size()), action, minType, maxType, include_sentinel);
+		return RetAddrSpoofer::invoke(reinterpret_cast<SDL_PeepEventsInternal>(hook->get_trampoline()), filtered_events.data(), static_cast<int>(filtered_events.size()), action, minType, maxType, include_sentinel);
 	}
-	return RetAddrSpoofer::invoke<int, SDL_Event*, int, SDL_EventAction, Uint32, Uint32, bool>(
-		reinterpret_cast<void*>(hook->get_trampoline()), events, numevents, action, minType, maxType, include_sentinel);
+	return RetAddrSpoofer::invoke(reinterpret_cast<SDL_PeepEventsInternal>(hook->get_trampoline()), events, numevents, action, minType, maxType, include_sentinel);
 }
 
 bool GraphicsHook::hookSDL()
 {
-	void* peep_events_internal_ptr = BCRL::signature(Memory::mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"Event queue is full (%d events)">(), BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libSDL3.so.0"))
-										 .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libSDL3.so.0"))
-										 .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"41 57 41 89 f7">())
-										 .expect<void*>("Failed to find backend function pointer for SDL_PeepEventsInternal");
+	void* peep_events_internal_ptr
+		= BCRL::signature(
+			Memory::mem_mgr,
+			SignatureScanner::PatternSignature::for_literal_string<"Event queue is full (%d events)">(),
+			BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libSDL3.so.0"))
+			  .find_xrefs(
+				  SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libSDL3.so.0"))
+			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"41 57 41 89 f7">())
+			  .expect<void*>("Failed to find backend function pointer for SDL_PeepEventsInternal");
 
 	hook.emplace(Memory::emalloc, peep_events_internal_ptr, reinterpret_cast<void*>(peep_events_hook));
 

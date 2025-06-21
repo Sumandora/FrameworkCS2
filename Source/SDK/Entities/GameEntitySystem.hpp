@@ -6,20 +6,21 @@
 #include "BaseEntity.hpp"
 
 class GameEntitySystem {
-	static void* get_highest_entity_index_ptr;
-	static void* get_base_entity_ptr;
+	static int (*get_highest_entity_index_ptr)(GameEntitySystem* thisptr);
+	static BaseEntity* (*get_base_entity_ptr)(GameEntitySystem* thisptr, int index);
 
 	static GameEntitySystem** find();
+
 public:
 	static GameEntitySystem* the();
 
 	int getHighestEntityIndex()
 	{
-		return RetAddrSpoofer::invoke<int, void*>(get_highest_entity_index_ptr, this);
+		return RetAddrSpoofer::invoke(get_highest_entity_index_ptr, this);
 	}
 
 	BaseEntity* getBaseEntity(int index)
 	{
-		return RetAddrSpoofer::invoke<BaseEntity*, void*, int>(get_base_entity_ptr, this, index);
+		return RetAddrSpoofer::invoke(get_base_entity_ptr, this, index);
 	}
 };

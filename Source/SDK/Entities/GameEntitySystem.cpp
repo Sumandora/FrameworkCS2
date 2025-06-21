@@ -9,8 +9,8 @@
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
 
-void* GameEntitySystem::get_base_entity_ptr = nullptr;
-void* GameEntitySystem::get_highest_entity_index_ptr = nullptr;
+int (*GameEntitySystem::get_highest_entity_index_ptr)(GameEntitySystem* thisptr) = nullptr;
+BaseEntity* (*GameEntitySystem::get_base_entity_ptr)(GameEntitySystem* thisptr, int index) = nullptr;
 
 GameEntitySystem** GameEntitySystem::find()
 {
@@ -35,20 +35,20 @@ GameEntitySystem** GameEntitySystem::find()
 							  .add(4)
 							  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"49 8b 3e e8">())
 							  .add(4);
-	GameEntitySystem::get_highest_entity_index_ptr = reinit_predictables
+	get_highest_entity_index_ptr = reinit_predictables
 														 .clone()
 														 .relative_to_absolute()
-														 .expect<void*>("Couldn't find getHighestEntityIndex");
-	Logging::info("Found getHighestEntityIndex at: {}", GameEntitySystem::get_highest_entity_index_ptr);
+														 .expect<decltype(get_highest_entity_index_ptr)>("Couldn't find getHighestEntityIndex");
+	Logging::info("Found getHighestEntityIndex at: {}", get_highest_entity_index_ptr);
 	reinit_predictables = reinit_predictables
 							  .add(4)
 							  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"3e 44 89 fe e8">())
 							  .add(5);
-	GameEntitySystem::get_base_entity_ptr = reinit_predictables
+	get_base_entity_ptr = reinit_predictables
 												.clone()
 												.relative_to_absolute()
-												.expect<void*>("Couldn't find getBaseEntity");
-	Logging::info("Found getBaseEntity at: {}", GameEntitySystem::get_base_entity_ptr);
+												.expect<decltype(get_base_entity_ptr)>("Couldn't find getBaseEntity");
+	Logging::info("Found getBaseEntity at: {}", get_base_entity_ptr);
 
 	return game_entity_system;
 }
