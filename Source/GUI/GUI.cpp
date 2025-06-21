@@ -16,7 +16,9 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
 #include <mutex>
+#include <string.h>
 #include <unistd.h>
 #include <utility>
 #include <vector>
@@ -141,13 +143,13 @@ static SDL_Window* window;
 static float scale = 1.0F;
 static float font_size = 12.0F;
 
-void GUI::init()
+void GUI::init(const std::filesystem::path& config_directory)
 {
 	ImGui::CreateContext();
 
 	ImGuiIO& io = ImGui::GetIO();
 
-	io.IniFilename = nullptr; // TODO Bring it back
+	io.IniFilename = strdup((config_directory / "imgui.ini").c_str());
 	io.LogFilename = nullptr;
 
 	Logging::info("Initialized ImGui Context");

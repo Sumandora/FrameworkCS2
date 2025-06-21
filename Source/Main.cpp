@@ -22,14 +22,14 @@ static void initializer()
 
 	SDL::verify_version();
 
-	GUI::init();
+	Serialization::create_config_directory();
+	GUI::init(Serialization::get_config_directory());
 	Interfaces::grab_interfaces();
 	Memory::create();
 
 	Protobuf::verify_version();
 
 	Features::create();
-	Serialization::create_config_directory();
 	Hooks::create();
 
 	Logging::info("Initialization complete");

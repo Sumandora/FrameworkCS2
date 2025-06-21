@@ -3,8 +3,10 @@
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_video.h"
 
+#include <filesystem>
+
 namespace GUI {
-	void init();
+	void init(const std::filesystem::path& config_directory);
 	void destroy();
 
 	void provide_window(SDL_Window* window);
