@@ -30,6 +30,7 @@ private:
 	PADDING(32);
 
 public:
+	static void resolve_signatures();
 	static UserCmd* get_current_command(BasePlayerController* controller);
 };
 

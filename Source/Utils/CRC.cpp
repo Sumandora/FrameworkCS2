@@ -27,13 +27,13 @@
 
 #include "../SDK/GameClass/UserCmd.hpp"
 
-static int (*create_new_base_cmd)(CBaseUserCmdPB* cmd, int, int);
-static int (*calculate_crc_size)(CBaseUserCmdPB* cmd);
-static bool (*serialize)(CBaseUserCmdPB* cmd, void* buf, int size);
-static char* (*write_message)(void* begin, void* end); // This is what windows folks call this, I think the name is misleading... it's more like `create_string` or something like that...
-static bool (*set_message_data)(void* move_crc, char** crc_result, google::protobuf::Arena* arena);
-static char** empty_str;
-static void* (*operator_delete)(void*, std::size_t);
+static int (*create_new_base_cmd)(CBaseUserCmdPB* cmd, int, int) = nullptr;
+static int (*calculate_crc_size)(CBaseUserCmdPB* cmd) = nullptr;
+static bool (*serialize)(CBaseUserCmdPB* cmd, void* buf, int size) = nullptr;
+static char* (*write_message)(void* begin, void* end) = nullptr; // This is what windows folks call this, I think the name is misleading... it's more like `create_string` or something like that...
+static bool (*set_message_data)(void* move_crc, char** crc_result, google::protobuf::Arena* arena) = nullptr;
+static char** empty_str = nullptr;
+static void* (*operator_delete)(void*, std::size_t) = nullptr;
 
 void CRC::resolve_signatures()
 {

@@ -9,13 +9,14 @@
 #include "SDK/Entities/GameEntitySystem.hpp"
 #include "SDK/GameClass/CSGOInput.hpp"
 #include "SDK/GameClass/MemAlloc.hpp"
+#include "SDK/GameClass/UserCmd.hpp"
 #include "SDK/GameClass/ViewRender.hpp"
 
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
 
-#include "Utils/Logging.hpp"
 #include "Utils/CRC.hpp"
+#include "Utils/Logging.hpp"
 
 const void* RetAddrSpoofer::leaveRet;
 
@@ -83,31 +84,31 @@ void Memory::create()
 							  .expect<void*>("Couldn't find shouldShowCrosshair");
 
 	local_player_controller = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"cl_sim_grenade_trajectory">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
-						 .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
-						 .sub(11)
-						 .relative_to_absolute()
-						 .repeater([](auto& ptr) {
-							 ptr.next_instruction();
-							 static int i = 0;
-							 if (ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()))
-								 i++;
-							 return i != 2;
-						 })
-						 .add(1)
-						 .relative_to_absolute()
-						 .repeater([](auto& ptr) {
-							 ptr.next_instruction();
-							 return !ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">());
-						 })
-						 .add(1)
-						 .relative_to_absolute()
-						 .repeater([](auto& ptr) {
-							 ptr.next_instruction();
-							 return !ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8b 05">());
-						 })
-						 .add(3)
-						 .relative_to_absolute()
-						 .expect<CSPlayerController**>("Couldn't find local_player_controller");
+								  .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
+								  .sub(11)
+								  .relative_to_absolute()
+								  .repeater([](auto& ptr) {
+									  ptr.next_instruction();
+									  static int i = 0;
+									  if (ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()))
+										  i++;
+									  return i != 2;
+								  })
+								  .add(1)
+								  .relative_to_absolute()
+								  .repeater([](auto& ptr) {
+									  ptr.next_instruction();
+									  return !ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">());
+								  })
+								  .add(1)
+								  .relative_to_absolute()
+								  .repeater([](auto& ptr) {
+									  ptr.next_instruction();
+									  return !ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8b 05">());
+								  })
+								  .add(3)
+								  .relative_to_absolute()
+								  .expect<CSPlayerController**>("Couldn't find local_player_controller");
 
 	Logging::info("Found local_player_controller at: {}", local_player_controller);
 
@@ -137,4 +138,5 @@ void Memory::create()
 
 	MemAlloc::the(); // Acquire the allocator now.
 	CRC::resolve_signatures();
+	UserCmd::resolve_signatures();
 }
