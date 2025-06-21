@@ -15,6 +15,7 @@
 #include "SignatureScanner/XRefSignature.hpp"
 
 #include "Utils/Logging.hpp"
+#include "Utils/CRC.hpp"
 
 const void* RetAddrSpoofer::leaveRet;
 
@@ -135,4 +136,5 @@ void Memory::create()
 						  .expect<void*>("Couldn't find get_fun_loading");
 
 	MemAlloc::the(); // Acquire the allocator now.
+	CRC::resolve_signatures();
 }

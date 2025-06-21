@@ -23,6 +23,14 @@ struct std::formatter<T*> : public std::formatter<void*> {
 	}
 };
 
+template <typename R, typename... Args>
+struct std::formatter<R(*)(Args...)> : public std::formatter<void*> {
+	constexpr auto format(auto* ptr, std::format_context& ctx) const
+	{
+		return std::formatter<void*>::format(reinterpret_cast<void*>(ptr), ctx);
+	}
+};
+
 template <>
 struct std::formatter<glm::vec3> {
 	std::formatter<float> float_formatter;
