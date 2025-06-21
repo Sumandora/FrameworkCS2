@@ -6,7 +6,13 @@
 
 #include "../../../SDK/GameClass/GameEvent.hpp"
 
-void* Hooks::Game::FireEvent::hookFunc(void* gameEventManager, GameEvent* event, bool rdx, bool rcx) {
+#include "../../../Features/Visuals/GrenadeHelper.hpp"
+
+void* Hooks::Game::FireEvent::hookFunc(void* game_event_manager, GameEvent* event, bool rdx, bool rcx)
+{
 	event_counters[event->GetName()]++;
-	return RetAddrSpoofer::invoke<void*>(reinterpret_cast<void*>(hook->get_trampoline()), gameEventManager, event, rdx, rcx);
+
+	grenade_helper->event_handler(event);
+
+	return RetAddrSpoofer::invoke<void*>(reinterpret_cast<void*>(hook->get_trampoline()), game_event_manager, event, rdx, rcx);
 }

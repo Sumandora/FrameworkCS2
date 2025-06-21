@@ -32,7 +32,7 @@ namespace Hooks::Game {
 
 	namespace FireEvent {
 		inline UninitializedObject<DetourHook<true>> hook;
-		void* hookFunc([[maybe_unused]] void* gameEventManager, GameEvent* event, [[maybe_unused]] bool rdx, [[maybe_unused]] bool rcx);
+		void* hookFunc([[maybe_unused]] void* game_event_manager, GameEvent* event, [[maybe_unused]] bool rdx, [[maybe_unused]] bool rcx);
 
 		inline std::unordered_map<std::string, std::size_t> event_counters;
 	}

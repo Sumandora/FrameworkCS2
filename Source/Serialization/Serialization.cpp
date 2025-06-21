@@ -1,11 +1,14 @@
 #include "Serialization.hpp"
 
+#include "GrenadeSerialization.hpp"
+
 #include <algorithm>
 #include <array>
 #include <cstdlib>
 #include <expected>
 #include <filesystem>
 #include <fstream>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -18,15 +21,19 @@
 #include "../Utils/Logging.hpp"
 
 #include "nlohmann/json.hpp"
+#include "nlohmann/json_fwd.hpp"
 
 static bool is_first_launch = false;
 static bool available = true;
 
 static constexpr std::string_view CONFIG_DIR_NAME = "FrameworkCS2";
 
+static constexpr std::string_view GRENADES_FILE = "grenades.json";
+static constexpr std::string_view PLAYERLIST_FILE = "users.json";
+
 static constexpr std::array RESERVED_CONFIG_NAMES = {
-	"grenades.json", // Grenade helper
-	"users.json", // Player list
+	GRENADES_FILE, // Grenade helper
+	PLAYERLIST_FILE, // Player list
 };
 
 void Serialization::create_config_directory()
@@ -166,4 +173,19 @@ std::filesystem::path Serialization::get_config_directory()
 bool Serialization::is_first_launch()
 {
 	return ::is_first_launch;
+}
+
+std::optional<nlohmann::json> Serialization::Grenades::parse_grenades()
+{
+	const std::filesystem::path grenades_path = get_config_directory() / GRENADES_FILE;
+
+	if (!std::filesystem::exists(grenades_path))
+		return std::nullopt;
+
+	nlohmann::json j;
+	std::ifstream stream{ grenades_path };
+	stream >> j;
+	stream.close();
+
+	return j;
 }

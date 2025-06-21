@@ -8,6 +8,7 @@
 
 #include "../../../Features/Visuals/ESP/ESP.hpp"
 #include "../../../Features/Visuals/GrenadePrediction.hpp"
+#include "../../../Features/Visuals/GrenadeHelper.hpp"
 
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Enums/ClientFrameStage.hpp"
@@ -34,6 +35,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 			GraphicsHook::espDrawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
 			esp->draw(GraphicsHook::espDrawList.get());
 			grenade_prediction->draw(GraphicsHook::espDrawList.get());
+			grenade_helper->draw(GraphicsHook::espDrawList.get());
 		}
 		break;
 	}

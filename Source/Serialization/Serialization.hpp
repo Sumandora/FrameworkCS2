@@ -2,10 +2,13 @@
 
 #include <expected>
 #include <filesystem>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <system_error>
 #include <vector>
+
+#include "nlohmann/json_fwd.hpp"
 
 namespace Serialization {
 	void create_config_directory();
