@@ -22,7 +22,7 @@ struct GameEvent;
 class GrenadeHelper : public Feature {
 
 	Checkbox enabled{ this, "Enabled", false };
-	FloatSlider render_distance{ this, "Render distance", 0.0F, 32768.0F, 4096.0F };
+	FloatSlider render_distance{ this, "Render distance", 0.0F, 32768.0F, 1024.0F };
 
 	using Octree = OctreeCpp<glm::vec3, Serialization::Grenades::Grenade>;
 	Octree grenades;
