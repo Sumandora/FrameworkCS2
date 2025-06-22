@@ -16,7 +16,6 @@
 
 #include "octree-cpp/OctreeCpp.h"
 
-#include <atomic>
 #include <cctype>
 #include <cstddef>
 #include <mutex>
@@ -52,7 +51,7 @@ class GrenadeHelper : public Feature {
 
 	std::vector<GrenadeBundle> proximate_grenades;
 	glm::vec3 view_offset;
-	std::atomic<glm::vec3> player_viewangles;
+	glm::vec3 player_viewangles;
 	mutable std::mutex proximate_grenades_mutex;
 
 	void clear_current_grenades();

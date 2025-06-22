@@ -72,7 +72,8 @@ void GrenadeHelper::clear_current_grenades()
 
 void GrenadeHelper::update_viewangles(const glm::vec3& viewangles)
 {
-	player_viewangles.store(viewangles);
+	const std::lock_guard lock{ proximate_grenades_mutex };
+	player_viewangles = viewangles;
 }
 
 void GrenadeHelper::update()
@@ -119,7 +120,7 @@ void GrenadeHelper::update()
 		| std::ranges::views::transform([&origin, render_distance, grenade_weapon, this](const Octree::TDataWrapper& data) {
 			  std::vector<Grenade> grenades = data.Data.at(grenade_weapon);
 
-			  glm::vec2 viewangles = player_viewangles.load().xy();
+			  glm::vec2 viewangles = player_viewangles.xy(); // No lock needed because this is the same thread as CreateMove (TODO verify.)
 
 			  std::ranges::sort(grenades, [&viewangles](const Grenade& a, const Grenade& b) {
 				  return distance(viewangles, a.viewangles) < distance(viewangles, b.viewangles);
@@ -312,7 +313,6 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 	draw_list->PathStroke(aim_circle_color.get(), ImDrawFlags_Closed, 1.0F);
 
 	const glm::vec3 needed_viewangles{ grenade.viewangles, 0.0F };
-	const glm::vec3 player_viewangles = this->player_viewangles.load();
 
 	glm::vec3 aim_diff = needed_viewangles - player_viewangles;
 	aim_diff.y = std::remainder(aim_diff.y, 360.0F);
