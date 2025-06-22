@@ -331,9 +331,11 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 
 	ImDrawList* draw_list = ImGui::GetForegroundDrawList();
 
+	const float circle_thickness = 1.0F * GUI::get_scale();
+
 	draw_list->PathArcTo(screen_pos, aim_circle_radius, 0.0F, 2.0F * std::numbers::pi_v<float>);
 	draw_list->_Path.Size--;
-	draw_list->PathStroke(aim_circle_color.get(), ImDrawFlags_Closed, 1.0F);
+	draw_list->PathStroke(aim_circle_color.get(), ImDrawFlags_Closed, circle_thickness);
 
 	const glm::vec3 needed_viewangles{ grenade.viewangles, 0.0F };
 
@@ -350,7 +352,7 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 
 	draw_list->PathArcTo(screen_pos, aim_circle_radius, 0.0F, 2.0F * std::numbers::pi_v<float> * (1.0F - sqrt(normalized_distance)));
 	draw_list->_Path.Size--;
-	draw_list->PathStroke(aim_circle_fill_color.get(), ImDrawFlags_None, 0.5F);
+	draw_list->PathStroke(aim_circle_fill_color.get(), ImDrawFlags_None, circle_thickness / 2.0F);
 }
 
 void GrenadeHelper::draw() const
