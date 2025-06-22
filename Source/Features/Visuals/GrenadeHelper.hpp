@@ -18,6 +18,7 @@
 
 #include <cctype>
 #include <cstddef>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
@@ -38,27 +39,31 @@ class GrenadeHelper : public Feature {
 	using GrenadeWeapon = Serialization::Grenades::GrenadeWeapon;
 	using Grenade = Serialization::Grenades::Grenade;
 
-	using Octree = OctreeCpp<glm::vec3, std::unordered_map<GrenadeWeapon, std::vector<Grenade>>>;
-	Octree grenades;
-	std::string current_map;
-
 	struct GrenadeBundle {
 		std::vector<Grenade> grenades;
 		std::vector<std::pair<std::string, std::size_t>> counts;
+	};
+
+	using Octree = OctreeCpp<glm::vec3, std::unordered_map<GrenadeWeapon, std::shared_ptr<GrenadeBundle>>>;
+	Octree grenades;
+	std::string current_map;
+
+	struct ProximateGrenadeBundle {
+		std::shared_ptr<GrenadeBundle> grenades;
 		float alpha;
 		glm::vec3 position;
 		std::size_t hash;
 		bool in_position; // Is the player standing on this bundle?
 	};
 
-	std::vector<GrenadeBundle> proximate_grenades;
+	std::vector<ProximateGrenadeBundle> proximate_grenades;
 	glm::vec3 view_offset;
 	glm::vec3 player_viewangles;
 	bool crouching;
 	mutable std::mutex proximate_grenades_mutex;
 
 	void clear_current_grenades();
-	static void draw_surrounded_grenade(const GrenadeBundle& bundle, ImVec2 screen_pos);
+	static void draw_surrounded_grenade(const ProximateGrenadeBundle& bundle, ImVec2 screen_pos);
 	void draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) const;
 
 public:

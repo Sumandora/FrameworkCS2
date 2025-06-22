@@ -37,6 +37,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <numbers>
 #include <ranges>
@@ -119,34 +120,26 @@ void GrenadeHelper::update()
 			  return data.Data.contains(grenade_weapon);
 		  })
 		| std::ranges::views::transform([&origin, render_distance, grenade_weapon, this](const Octree::TDataWrapper& data) {
-			  std::vector<Grenade> grenades = data.Data.at(grenade_weapon);
-
-			  std::vector<std::pair<std::string, std::size_t>> counts;
+			  std::shared_ptr<GrenadeBundle> grenades = data.Data.at(grenade_weapon);
 
 			  glm::vec2 viewangles = player_viewangles.xy(); // No lock needed because this is the same thread as CreateMove (TODO verify.)
 
-			  std::ranges::sort(grenades, [&viewangles](const Grenade& a, const Grenade& b) {
+			  std::ranges::sort(grenades->grenades, [&viewangles](const Grenade& a, const Grenade& b) {
 				  return distance(viewangles, a.viewangles) < distance(viewangles, b.viewangles);
 			  });
 
 			  std::size_t hash = 0;
 
-			  for (const Grenade& grenade : grenades) {
+			  for (const Grenade& grenade : grenades->grenades) {
 				  hash = hash ^ (std::hash<Grenade>{}(grenade) << 1);
-
-				  auto it = std::ranges::find(counts, grenade.name.to, [](const auto& pair) { return pair.first; });
-				  if (it == counts.end())
-					  it = counts.insert(it, { grenade.name.to, 0 });
-				  it->second++;
 			  }
 
 			  const float fade = (1.0F - distance(origin, data.Vector) / render_distance) * 0.7F;
 
 			  static constexpr float IN_POSITION_THRESHOLD = 1.0F;
 
-			  return GrenadeBundle{
-				  .grenades = grenades,
-				  .counts = counts,
+			  return ProximateGrenadeBundle{
+				  .grenades = std::move(grenades),
 				  .alpha = fade,
 				  .position = data.Vector,
 				  .hash = hash,
@@ -154,9 +147,9 @@ void GrenadeHelper::update()
 			  };
 		  });
 
-	std::vector<GrenadeBundle> bundles(range.begin(), range.end());
+	std::vector<ProximateGrenadeBundle> bundles(range.begin(), range.end());
 
-	std::ranges::sort(bundles, [&origin](const GrenadeBundle& a, const GrenadeBundle& b) {
+	std::ranges::sort(bundles, [&origin](const ProximateGrenadeBundle& a, const ProximateGrenadeBundle& b) {
 		return glm::distance(origin, a.position) < glm::distance(origin, b.position);
 	});
 
@@ -177,7 +170,7 @@ void GrenadeHelper::event_handler(GameEvent* event)
 	const std::string_view new_map = event->get_string("mapname");
 
 	if (current_map != new_map) {
-		std::unordered_map<glm::vec3, std::unordered_map<GrenadeWeapon, std::vector<Grenade>>> map;
+		std::unordered_map<glm::vec3, std::unordered_map<GrenadeWeapon, std::shared_ptr<GrenadeBundle>>> map;
 		for (Grenade grenade : parse_grenades_for_map(new_map)) {
 			auto map_iter = std::ranges::find_if(map, [&grenade](const auto& it) {
 				// static constexpr float MERGE_DISTANCE = 1E-2F;
@@ -197,19 +190,25 @@ void GrenadeHelper::event_handler(GameEvent* event)
 
 			if (vec_iter == map_iter->second.end())
 				// new vector
-				vec_iter = map_iter->second.insert(vec_iter, { weapon, {} });
+				vec_iter = map_iter->second.insert(vec_iter, { weapon, std::make_shared<GrenadeBundle>() });
 
-			vec_iter->second.emplace_back(std::move(grenade));
+			auto& counts = vec_iter->second->counts;
+			auto it = std::ranges::find(counts, grenade.name.to, [](const auto& pair) { return pair.first; });
+			if (it == counts.end())
+				it = counts.insert(it, { grenade.name.to, 0 });
+			it->second++;
+
+			vec_iter->second->grenades.emplace_back(std::move(grenade));
 		}
 
-		for (const auto& [pos, v] : map) {
-			grenades.Add({ .Vector = pos, .Data = { v } });
+		for (auto&& [pos, v] : map) {
+			grenades.Add({ .Vector = pos, .Data = std::move(v) });
 		}
 		current_map = new_map;
 	}
 }
 
-void GrenadeHelper::draw_surrounded_grenade(const GrenadeBundle& bundle, ImVec2 screen_pos)
+void GrenadeHelper::draw_surrounded_grenade(const ProximateGrenadeBundle& bundle, ImVec2 screen_pos)
 {
 	const std::string grenade_id{ "##Grenade" + std::to_string(bundle.hash) };
 
@@ -229,11 +228,11 @@ void GrenadeHelper::draw_surrounded_grenade(const GrenadeBundle& bundle, ImVec2 
 				| ImGuiWindowFlags_NoSavedSettings
 				| ImGuiWindowFlags_AlwaysAutoResize)) {
 
-		for (const auto& [grenade_target, count] : bundle.counts)
-		if(count > 1)
-			ImGui::Text("%zux %s", count, grenade_target.c_str());
-		else
-			ImGui::TextUnformatted(grenade_target.c_str());
+		for (const auto& [grenade_target, count] : bundle.grenades->counts)
+			if (count > 1)
+				ImGui::Text("%zux %s", count, grenade_target.c_str());
+			else
+				ImGui::TextUnformatted(grenade_target.c_str());
 	}
 
 	ImGui::BringWindowToDisplayBack(ImGui::GetCurrentWindow());
@@ -364,13 +363,13 @@ void GrenadeHelper::draw() const
 
 	const std::lock_guard lock{ proximate_grenades_mutex };
 
-	for (const GrenadeBundle& bundle : proximate_grenades) {
+	for (const ProximateGrenadeBundle& bundle : proximate_grenades) {
 		ImVec2 screen_pos;
 		if (Projection::project(bundle.position, screen_pos))
 			draw_surrounded_grenade(bundle, screen_pos);
 
 		if (bundle.in_position) {
-			for (const Grenade& grenade : bundle.grenades) {
+			for (const Grenade& grenade : bundle.grenades->grenades) {
 				const float pitch = glm::radians(grenade.viewangles.x);
 				const float yaw = glm::radians(grenade.viewangles.y);
 				const glm::vec3 dir{
