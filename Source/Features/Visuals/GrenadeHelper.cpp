@@ -66,31 +66,30 @@ void GrenadeHelper::update()
 
 	const float render_distance = this->render_distance.get();
 
-	std::vector<GrenadeBundle> bundles{
-		std::from_range,
-		grenades.Query(Octree::Sphere{ .Midpoint = origin, .Radius = render_distance })
-			| std::ranges::views::filter([](const Octree::TDataWrapper& data) {
-				  return data.Data.contains(GrenadeWeapon::WEAPON_SMOKEGRENADE);
-			  })
-			| std::ranges::views::transform([&origin, render_distance](const Octree::TDataWrapper& data) {
-				  const std::vector<Grenade>& grenades = data.Data.at(GrenadeWeapon::WEAPON_SMOKEGRENADE);
+	auto range = grenades.Query(Octree::Sphere{ .Midpoint = origin, .Radius = render_distance })
+		| std::ranges::views::filter([](const Octree::TDataWrapper& data) {
+			  return data.Data.contains(GrenadeWeapon::WEAPON_SMOKEGRENADE);
+		  })
+		| std::ranges::views::transform([&origin, render_distance](const Octree::TDataWrapper& data) {
+			  const std::vector<Grenade>& grenades = data.Data.at(GrenadeWeapon::WEAPON_SMOKEGRENADE);
 
-				  std::size_t hash = 0;
+			  std::size_t hash = 0;
 
-				  for (const Grenade& grenade : grenades) {
-					  hash = hash ^ (std::hash<Grenade>{}(grenade) << 1);
-				  }
+			  for (const Grenade& grenade : grenades) {
+				  hash = hash ^ (std::hash<Grenade>{}(grenade) << 1);
+			  }
 
-				  const float fade = (1.0F - distance(origin, data.Vector) / render_distance) * 0.7F;
+			  const float fade = (1.0F - distance(origin, data.Vector) / render_distance) * 0.7F;
 
-				  return GrenadeBundle{
-					  .grenades = grenades,
-					  .alpha = fade,
-					  .position = data.Vector,
-					  .hash = hash,
-				  };
-			  })
-	};
+			  return GrenadeBundle{
+				  .grenades = grenades,
+				  .alpha = fade,
+				  .position = data.Vector,
+				  .hash = hash,
+			  };
+		  });
+
+	std::vector<GrenadeBundle> bundles(range.begin(), range.end());
 
 	std::ranges::sort(bundles, [&origin](const GrenadeBundle& a, const GrenadeBundle& b) {
 		return glm::distance(origin, a.position) < glm::distance(origin, b.position);
