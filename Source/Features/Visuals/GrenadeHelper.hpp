@@ -21,6 +21,7 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 struct GameEvent;
@@ -43,6 +44,7 @@ class GrenadeHelper : public Feature {
 
 	struct GrenadeBundle {
 		std::vector<Grenade> grenades;
+		std::vector<std::pair<std::string, std::size_t>> counts;
 		float alpha;
 		glm::vec3 position;
 		std::size_t hash;

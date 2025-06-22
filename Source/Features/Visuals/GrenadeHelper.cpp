@@ -121,6 +121,8 @@ void GrenadeHelper::update()
 		| std::ranges::views::transform([&origin, render_distance, grenade_weapon, this](const Octree::TDataWrapper& data) {
 			  std::vector<Grenade> grenades = data.Data.at(grenade_weapon);
 
+			  std::vector<std::pair<std::string, std::size_t>> counts;
+
 			  glm::vec2 viewangles = player_viewangles.xy(); // No lock needed because this is the same thread as CreateMove (TODO verify.)
 
 			  std::ranges::sort(grenades, [&viewangles](const Grenade& a, const Grenade& b) {
@@ -131,6 +133,11 @@ void GrenadeHelper::update()
 
 			  for (const Grenade& grenade : grenades) {
 				  hash = hash ^ (std::hash<Grenade>{}(grenade) << 1);
+
+				  auto it = std::ranges::find(counts, grenade.name.to, [](const auto& pair) { return pair.first; });
+				  if (it == counts.end())
+					  it = counts.insert(it, { grenade.name.to, 0 });
+				  it->second++;
 			  }
 
 			  const float fade = (1.0F - distance(origin, data.Vector) / render_distance) * 0.7F;
@@ -139,6 +146,7 @@ void GrenadeHelper::update()
 
 			  return GrenadeBundle{
 				  .grenades = grenades,
+				  .counts = counts,
 				  .alpha = fade,
 				  .position = data.Vector,
 				  .hash = hash,
@@ -221,8 +229,11 @@ void GrenadeHelper::draw_surrounded_grenade(const GrenadeBundle& bundle, ImVec2 
 				| ImGuiWindowFlags_NoSavedSettings
 				| ImGuiWindowFlags_AlwaysAutoResize)) {
 
-		for (const Grenade& grenade : bundle.grenades)
-			ImGui::TextUnformatted(grenade.name.to.c_str());
+		for (const auto& [grenade_target, count] : bundle.counts)
+		if(count > 1)
+			ImGui::Text("%zux %s", count, grenade_target.c_str());
+		else
+			ImGui::TextUnformatted(grenade_target.c_str());
 	}
 
 	ImGui::BringWindowToDisplayBack(ImGui::GetCurrentWindow());
