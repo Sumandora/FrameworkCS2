@@ -97,7 +97,7 @@ void Notifications::render()
 			if (notification.severity != Severity::INFO)
 				ImGui::PopStyleColor();
 
-			ImGui::Text(" %s", notification.title.c_str()); // The space is separation from the circle.
+			ImGui::Text("%s", notification.title.c_str());
 			ImGui::Separator();
 			ImGui::TextWrapped("%s", notification.message.c_str());
 		} else if (notification.severity != Severity::INFO)
