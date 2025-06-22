@@ -23,6 +23,8 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		CSPlayerController* controller = *Memory::local_player_controller;
 		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
 
+		grenade_helper->update();
+
 		thread_executor.run_all_queued_functions();
 		break;
 	}
@@ -35,7 +37,6 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 			GraphicsHook::espDrawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
 			esp->draw(GraphicsHook::espDrawList.get());
 			grenade_prediction->draw(GraphicsHook::espDrawList.get());
-			grenade_helper->draw(GraphicsHook::espDrawList.get());
 		}
 		break;
 	}
