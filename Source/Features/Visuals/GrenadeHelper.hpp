@@ -3,6 +3,7 @@
 #include "../Feature.hpp"
 
 #include "../Settings/Checkbox.hpp"
+#include "../Settings/Color.hpp"
 #include "../Settings/FloatSlider.hpp"
 
 #include "../../Utils/UninitializedObject.hpp"
@@ -29,6 +30,10 @@ class GrenadeHelper : public Feature {
 
 	Checkbox enabled{ this, "Enabled", false };
 	FloatSlider render_distance{ this, "Render distance", 0.0F, 32768.0F, 1024.0F };
+
+	FloatSlider aim_circle_radius{ this, "Aim circle radius", 0.0F, 20.0F, 5.0F };
+	Color aim_circle_color{ this, "Aim circle color", ImColor{ 1.0F, 1.0F, 1.0F, 1.0F } };
+	Color aim_circle_fill_color{ this, "Aim circle fill color", ImColor{ 0.0F, 1.0F, 0.0F, 1.0F } };
 
 	using GrenadeWeapon = Serialization::Grenades::GrenadeWeapon;
 	using Grenade = Serialization::Grenades::Grenade;

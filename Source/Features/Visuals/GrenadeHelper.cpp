@@ -231,13 +231,13 @@ void GrenadeHelper::draw_surrounded_grenade(const GrenadeBundle& bundle, ImVec2 
 
 void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) const
 {
-	static constexpr float AIM_CIRCLE_RADIUS = 5.0F;
-
 	const glm::vec2 screen_vec{ screen_pos.x, screen_pos.y };
 	const ImVec2 screen_center = ImGui::GetIO().DisplaySize / 2.0;
 	const glm::vec2 center_vec{ screen_center.x, screen_center.y };
 
-	const float max_distance = glm::length(glm::vec2{ AIM_CIRCLE_RADIUS, AIM_CIRCLE_RADIUS });
+	const float aim_circle_radius = this->aim_circle_radius.get();
+
+	const float max_distance = glm::length(glm::vec2{ aim_circle_radius, aim_circle_radius });
 	const float distance = glm::distance(screen_vec, center_vec);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.6F + glm::clamp(1.0F - distance / max_distance, 0.0F, 1.0F) * 0.3F);
@@ -307,32 +307,27 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 
 	ImDrawList* draw_list = ImGui::GetForegroundDrawList();
 
-	draw_list->PathArcTo(screen_pos, AIM_CIRCLE_RADIUS, 0.0F, 2.0F * std::numbers::pi_v<float>);
+	draw_list->PathArcTo(screen_pos, aim_circle_radius, 0.0F, 2.0F * std::numbers::pi_v<float>);
 	draw_list->_Path.Size--;
-	draw_list->PathStroke(-1, ImDrawFlags_Closed, 1.0F);
+	draw_list->PathStroke(aim_circle_color.get(), ImDrawFlags_Closed, 1.0F);
 
 	const glm::vec3 needed_viewangles{ grenade.viewangles, 0.0F };
 	const glm::vec3 player_viewangles = this->player_viewangles.load();
 
 	glm::vec3 aim_diff = needed_viewangles - player_viewangles;
-	aim_diff.y = std::fmod(aim_diff.y, 360.0F);
-	if (aim_diff.y >= 180.0F)
-		aim_diff.y -= 360.0F;
-	if (aim_diff.y < -180.0F)
-		aim_diff.y += 360.0F;
+	aim_diff.y = std::remainder(aim_diff.y, 360.0F);
 
 	const float aim_distance = glm::length(aim_diff);
 
 	const float normalized_distance = glm::clamp(
-		(aim_distance - grenade.throw_info.aim_tolerance) / (sqrt(AIM_CIRCLE_RADIUS) * 2 /*x and y*/), 0.0F, 1.0F);
+		(aim_distance - grenade.throw_info.aim_tolerance) / (sqrt(aim_circle_radius) * 2 /*x and y*/), 0.0F, 1.0F);
 
 	if (normalized_distance >= 1.0F)
 		return;
 
-	draw_list->PathArcTo(screen_pos, AIM_CIRCLE_RADIUS, 0.0F, 2.0F * std::numbers::pi_v<float> * (1.0F - sqrt(normalized_distance)));
+	draw_list->PathArcTo(screen_pos, aim_circle_radius, 0.0F, 2.0F * std::numbers::pi_v<float> * (1.0F - sqrt(normalized_distance)));
 	draw_list->_Path.Size--;
-	static constexpr ImColor GREEN{ 0.0F, 1.0F, 0.0F, 1.0F };
-	draw_list->PathStroke(GREEN, ImDrawFlags_None, 0.5F);
+	draw_list->PathStroke(aim_circle_fill_color.get(), ImDrawFlags_None, 0.5F);
 }
 
 void GrenadeHelper::draw() const
