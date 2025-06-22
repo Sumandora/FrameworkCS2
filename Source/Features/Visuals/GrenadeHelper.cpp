@@ -22,6 +22,7 @@
 #include "glm/gtx/hash.hpp" // IWYU pragma: keep
 
 #include "glm/trigonometric.hpp"
+#include "imgui_internal.h"
 #include "magic_enum/magic_enum.hpp"
 #include "nlohmann/json_fwd.hpp"
 
@@ -115,8 +116,14 @@ void GrenadeHelper::update()
 		| std::ranges::views::filter([grenade_weapon](const Octree::TDataWrapper& data) {
 			  return data.Data.contains(grenade_weapon);
 		  })
-		| std::ranges::views::transform([&origin, render_distance, grenade_weapon](const Octree::TDataWrapper& data) {
-			  const std::vector<Grenade>& grenades = data.Data.at(grenade_weapon);
+		| std::ranges::views::transform([&origin, render_distance, grenade_weapon, this](const Octree::TDataWrapper& data) {
+			  std::vector<Grenade> grenades = data.Data.at(grenade_weapon);
+
+			  glm::vec2 viewangles = player_viewangles.load().xy();
+
+			  std::ranges::sort(grenades, [&viewangles](const Grenade& a, const Grenade& b) {
+				  return distance(viewangles, a.viewangles) < distance(viewangles, b.viewangles);
+			  });
 
 			  std::size_t hash = 0;
 
@@ -214,6 +221,8 @@ void GrenadeHelper::draw_surrounded_grenade(const GrenadeBundle& bundle, ImVec2 
 			ImGui::TextUnformatted(grenade.name.to.c_str());
 	}
 
+	ImGui::BringWindowToDisplayBack(ImGui::GetCurrentWindow());
+
 	ImGui::End();
 	if (bundle.in_position)
 		ImGui::PopStyleColor();
@@ -222,7 +231,16 @@ void GrenadeHelper::draw_surrounded_grenade(const GrenadeBundle& bundle, ImVec2 
 
 void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) const
 {
-	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0F /* TODO */);
+	static constexpr float AIM_CIRCLE_RADIUS = 5.0F;
+
+	const glm::vec2 screen_vec{ screen_pos.x, screen_pos.y };
+	const ImVec2 screen_center = ImGui::GetIO().DisplaySize / 2.0;
+	const glm::vec2 center_vec{ screen_center.x, screen_center.y };
+
+	const float max_distance = glm::length(glm::vec2{ AIM_CIRCLE_RADIUS, AIM_CIRCLE_RADIUS });
+	const float distance = glm::distance(screen_vec, center_vec);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.6F + glm::clamp(1.0F - distance / max_distance, 0.0F, 1.0F) * 0.3F);
 	ImGui::SetNextWindowPos(screen_pos, ImGuiCond_None, { 1.1F, 0.5F });
 
 	const std::string grenade_id{ "##Grenade_Hint" + std::to_string(std::hash<Grenade>{}(grenade)) };
@@ -282,13 +300,14 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 			ImGui::TextUnformatted(grenade.description.c_str());
 	}
 
+	ImGui::BringWindowToDisplayBack(ImGui::GetCurrentWindow());
+
 	ImGui::End();
 	ImGui::PopStyleVar();
 
-	ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
-	static constexpr float RADIUS = 5.0F;
+	ImDrawList* draw_list = ImGui::GetForegroundDrawList();
 
-	draw_list->PathArcTo(screen_pos, RADIUS, 0.0F, 2.0F * std::numbers::pi_v<float>);
+	draw_list->PathArcTo(screen_pos, AIM_CIRCLE_RADIUS, 0.0F, 2.0F * std::numbers::pi_v<float>);
 	draw_list->_Path.Size--;
 	draw_list->PathStroke(-1, ImDrawFlags_Closed, 1.0F);
 
@@ -302,15 +321,15 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 	if (aim_diff.y < -180.0F)
 		aim_diff.y += 360.0F;
 
-	const float distance = glm::length(aim_diff);
+	const float aim_distance = glm::length(aim_diff);
 
 	const float normalized_distance = glm::clamp(
-		(distance - grenade.throw_info.aim_tolerance) / (sqrt(RADIUS) * 2 /*x and y*/), 0.0F, 1.0F);
+		(aim_distance - grenade.throw_info.aim_tolerance) / (sqrt(AIM_CIRCLE_RADIUS) * 2 /*x and y*/), 0.0F, 1.0F);
 
 	if (normalized_distance >= 1.0F)
 		return;
 
-	draw_list->PathArcTo(screen_pos, RADIUS, 0.0F, 2.0F * std::numbers::pi_v<float> * (1.0F - sqrt(normalized_distance)));
+	draw_list->PathArcTo(screen_pos, AIM_CIRCLE_RADIUS, 0.0F, 2.0F * std::numbers::pi_v<float> * (1.0F - sqrt(normalized_distance)));
 	draw_list->_Path.Size--;
 	static constexpr ImColor GREEN{ 0.0F, 1.0F, 0.0F, 1.0F };
 	draw_list->PathStroke(GREEN, ImDrawFlags_None, 0.5F);
