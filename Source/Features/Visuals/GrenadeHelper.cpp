@@ -4,9 +4,13 @@
 
 #include "../../Serialization/GrenadeSerialization.hpp"
 
+#include "../../SDK/Entities/BaseCSGrenade.hpp"
+#include "../../SDK/Entities/BasePlayerWeapon.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
+#include "../../SDK/Entities/Services/PlayerWeaponServices.hpp"
 #include "../../SDK/GameClass/GameEvent.hpp"
 
+#include "../../Utils/Logging.hpp"
 #include "../../Utils/Projection.hpp"
 
 #include "../../Memory.hpp"
@@ -16,6 +20,7 @@
 #include "glm/geometric.hpp"
 #include "glm/gtx/hash.hpp" // IWYU pragma: keep
 
+#include "magic_enum/magic_enum.hpp"
 #include "nlohmann/json_fwd.hpp"
 
 #include "imgui.h"
@@ -54,24 +59,55 @@ struct std::hash<Grenade> {
 	}
 };
 
+void GrenadeHelper::clear_current_grenades()
+{
+	const std::lock_guard lock{ proximate_grenades_mutex };
+	proximate_grenades.clear();
+}
+
 void GrenadeHelper::update()
 {
 	if (!Memory::local_player) {
-		const std::lock_guard lock{ proximate_grenades_mutex };
-		proximate_grenades.clear();
+		clear_current_grenades();
 		return;
 	}
+
+	BasePlayerWeapon* weapon = Memory::local_player->weapon_services()
+		? Memory::local_player->weapon_services()->active_weapon().get()
+		: nullptr;
+	if (!weapon) {
+		clear_current_grenades();
+		return;
+	}
+
+	auto* grenade = weapon->entity_cast<BaseCSGrenade*>();
+	if (!grenade) {
+		clear_current_grenades();
+		return;
+	}
+
+	const int grenade_type = grenade->get_grenade_type();
+
+	const auto optional_weapon = magic_enum::enum_cast<GrenadeWeapon>(grenade_type);
+
+	if (!optional_weapon.has_value()) {
+		Logging::error("Unknown grenade type: {}", grenade_type);
+		clear_current_grenades();
+		return;
+	}
+
+	const GrenadeWeapon grenade_weapon = optional_weapon.value();
 
 	const glm::vec3 origin = Memory::local_player->old_origin();
 
 	const float render_distance = this->render_distance.get();
 
 	auto range = grenades.Query(Octree::Sphere{ .Midpoint = origin, .Radius = render_distance })
-		| std::ranges::views::filter([](const Octree::TDataWrapper& data) {
-			  return data.Data.contains(GrenadeWeapon::WEAPON_SMOKEGRENADE);
+		| std::ranges::views::filter([grenade_weapon](const Octree::TDataWrapper& data) {
+			  return data.Data.contains(grenade_weapon);
 		  })
-		| std::ranges::views::transform([&origin, render_distance](const Octree::TDataWrapper& data) {
-			  const std::vector<Grenade>& grenades = data.Data.at(GrenadeWeapon::WEAPON_SMOKEGRENADE);
+		| std::ranges::views::transform([&origin, render_distance, grenade_weapon](const Octree::TDataWrapper& data) {
+			  const std::vector<Grenade>& grenades = data.Data.at(grenade_weapon);
 
 			  std::size_t hash = 0;
 

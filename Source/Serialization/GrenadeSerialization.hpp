@@ -20,10 +20,11 @@
 
 namespace Serialization::Grenades {
 	enum class GrenadeWeapon : std::uint8_t {
-		WEAPON_MOLOTOV,
-		WEAPON_HEGRENADE,
-		WEAPON_SMOKEGRENADE,
-		WEAPON_FLASHBANG,
+		WEAPON_HEGRENADE = 0, // This are the same ids that BaseCSGrenade::get_grenade_type outputs.
+		WEAPON_FLASHBANG = 1,
+		WEAPON_MOLOTOV = 2,
+		WEAPON_DECOY = 3,
+		WEAPON_SMOKEGRENADE = 4,
 	};
 
 	template <typename BasicJsonType>

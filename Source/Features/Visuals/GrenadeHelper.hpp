@@ -44,6 +44,8 @@ class GrenadeHelper : public Feature {
 	std::vector<GrenadeBundle> proximate_grenades;
 	mutable std::mutex proximate_grenades_mutex;
 
+	void clear_current_grenades();
+
 public:
 	GrenadeHelper();
 
