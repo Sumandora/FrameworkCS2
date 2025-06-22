@@ -52,6 +52,7 @@ class GrenadeHelper : public Feature {
 	std::vector<GrenadeBundle> proximate_grenades;
 	glm::vec3 view_offset;
 	glm::vec3 player_viewangles;
+	bool crouching;
 	mutable std::mutex proximate_grenades_mutex;
 
 	void clear_current_grenades();

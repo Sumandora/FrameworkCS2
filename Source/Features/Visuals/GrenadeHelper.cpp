@@ -155,6 +155,8 @@ void GrenadeHelper::update()
 	{
 		const std::lock_guard lock{ proximate_grenades_mutex };
 		view_offset = Memory::local_player->view_offset();
+		static constexpr auto FL_DUCKING = 1 << 1;
+		crouching = (Memory::local_player->flags() & FL_DUCKING) != 0;
 		std::swap(proximate_grenades, bundles);
 	}
 }
@@ -285,10 +287,6 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 			grenade.name.from.empty() ? "here" /*saved*/ : grenade.name.from.c_str());
 
 		ImGui::Separator();
-		if (grenade.duck)
-			ImGui::Text("Crouching");
-		if (grenade.throw_info.jump)
-			ImGui::Text("Jump-throw");
 
 		const auto colored_text_if_unfulfilled = [](const char* text, bool fulfilled) {
 			if (fulfilled)
@@ -296,6 +294,12 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 			else
 				ImGui::TextColored(ImColor{ 1.0F, 0.0F, 0.0F, 1.0F }, "%s", text);
 		};
+		if (grenade.duck)
+			colored_text_if_unfulfilled("Crouching", crouching);
+		if (grenade.throw_info.jump)
+			// Jump throw is never satisfied, because if you jump then it is no longer rendered.
+			// Just assume that it is satisfied.
+			ImGui::Text("Jump-throw");
 
 		if (grenade.throw_info.strength == 1.0F)
 			colored_text_if_unfulfilled("Left-click",
