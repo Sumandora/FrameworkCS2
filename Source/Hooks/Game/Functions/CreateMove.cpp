@@ -11,6 +11,8 @@
 #include "../../../SDK/Entities/CSPlayerController.hpp" // IWYU pragma: keep
 #include "../../../SDK/GameClass/UserCmd.hpp"
 
+#include "../../../Features/Visuals/GrenadeHelper.hpp"
+
 #include "glm/ext/vector_float3.hpp"
 
 #include <cassert>
@@ -47,10 +49,10 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 	}
 #endif
 
-	Logging::info("UserCmd: {}", usercmd);
 	if (usercmd->csgo_usercmd.has_base() && usercmd->csgo_usercmd.base().has_viewangles()) {
 		const CMsgQAngle& viewangles = usercmd->csgo_usercmd.base().viewangles();
-		Logging::info("View angles: {}", glm::vec3(viewangles.x(), viewangles.y(), viewangles.z()));
+		const glm::vec3 vec = glm::vec3(viewangles.x(), viewangles.y(), viewangles.z());
+		grenade_helper->update_viewangles(vec);
 	}
 
 	// Update the CRC stored in the UserCmd to accommodate our changes.

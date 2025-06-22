@@ -11,8 +11,11 @@
 
 #include "glm/ext/vector_float3.hpp"
 
+#include "imgui.h"
+
 #include "octree-cpp/OctreeCpp.h"
 
+#include <atomic>
 #include <cctype>
 #include <cstddef>
 #include <mutex>
@@ -39,16 +42,22 @@ class GrenadeHelper : public Feature {
 		float alpha;
 		glm::vec3 position;
 		std::size_t hash;
+		bool in_position; // Is the player standing on this bundle?
 	};
 
 	std::vector<GrenadeBundle> proximate_grenades;
+	glm::vec3 view_offset;
+	std::atomic<glm::vec3> player_viewangles;
 	mutable std::mutex proximate_grenades_mutex;
 
 	void clear_current_grenades();
+	static void draw_surrounded_grenade(const GrenadeBundle& bundle, ImVec2 screen_pos);
+	void draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) const;
 
 public:
 	GrenadeHelper();
 
+	void update_viewangles(const glm::vec3& viewangles);
 	void update();
 
 	void event_handler(GameEvent* event);

@@ -54,6 +54,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE LinuxMemoryManager)
 
 include("Buildscripts/Obfuscation.cmake")
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE dl ${Vulkan_LIBRARIES})
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE dl atomic ${Vulkan_LIBRARIES})
 
 define_licenses()

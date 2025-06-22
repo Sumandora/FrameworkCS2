@@ -15,11 +15,13 @@
 
 #include "../../Memory.hpp"
 
+#include "glm/common.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 #include "glm/gtx/hash.hpp" // IWYU pragma: keep
 
+#include "glm/trigonometric.hpp"
 #include "magic_enum/magic_enum.hpp"
 #include "nlohmann/json_fwd.hpp"
 
@@ -29,10 +31,12 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cmath>
 #include <cstddef>
 #include <cstdlib>
 #include <functional>
 #include <mutex>
+#include <numbers>
 #include <ranges>
 #include <string>
 #include <string_view>
@@ -63,6 +67,11 @@ void GrenadeHelper::clear_current_grenades()
 {
 	const std::lock_guard lock{ proximate_grenades_mutex };
 	proximate_grenades.clear();
+}
+
+void GrenadeHelper::update_viewangles(const glm::vec3& viewangles)
+{
+	player_viewangles.store(viewangles);
 }
 
 void GrenadeHelper::update()
@@ -117,11 +126,14 @@ void GrenadeHelper::update()
 
 			  const float fade = (1.0F - distance(origin, data.Vector) / render_distance) * 0.7F;
 
+			  static constexpr float IN_POSITION_THRESHOLD = 1.0F;
+
 			  return GrenadeBundle{
 				  .grenades = grenades,
 				  .alpha = fade,
 				  .position = data.Vector,
 				  .hash = hash,
+				  .in_position = distance(data.Vector, origin) < IN_POSITION_THRESHOLD,
 			  };
 		  });
 
@@ -133,6 +145,7 @@ void GrenadeHelper::update()
 
 	{
 		const std::lock_guard lock{ proximate_grenades_mutex };
+		view_offset = Memory::local_player->view_offset();
 		std::swap(proximate_grenades, bundles);
 	}
 }
@@ -177,6 +190,132 @@ void GrenadeHelper::event_handler(GameEvent* event)
 	}
 }
 
+void GrenadeHelper::draw_surrounded_grenade(const GrenadeBundle& bundle, ImVec2 screen_pos)
+{
+	const std::string grenade_id{ "##Grenade" + std::to_string(bundle.hash) };
+
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, bundle.alpha);
+	if (bundle.in_position)
+		ImGui::PushStyleColor(ImGuiCol_Border, { 0.0F, 1.0F, 0.0F, 0.5F });
+	ImGui::SetNextWindowPos(screen_pos, ImGuiCond_None, { 0.5F, 0.5F });
+
+	if (ImGui::Begin(grenade_id.c_str(), nullptr,
+			ImGuiWindowFlags_NoInputs
+				| ImGuiWindowFlags_NoDecoration
+				| ImGuiWindowFlags_NoMove
+				| ImGuiWindowFlags_NoNav
+				| ImGuiWindowFlags_NoCollapse
+				| ImGuiWindowFlags_NoScrollWithMouse
+				| ImGuiWindowFlags_NoFocusOnAppearing
+				| ImGuiWindowFlags_NoSavedSettings
+				| ImGuiWindowFlags_AlwaysAutoResize)) {
+
+		for (const Grenade& grenade : bundle.grenades)
+			ImGui::TextUnformatted(grenade.name.to.c_str());
+	}
+
+	ImGui::End();
+	if (bundle.in_position)
+		ImGui::PopStyleColor();
+	ImGui::PopStyleVar();
+}
+
+void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) const
+{
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0F /* TODO */);
+	ImGui::SetNextWindowPos(screen_pos, ImGuiCond_None, { 1.1F, 0.5F });
+
+	const std::string grenade_id{ "##Grenade_Hint" + std::to_string(std::hash<Grenade>{}(grenade)) };
+
+	if (ImGui::Begin(grenade_id.c_str(), nullptr,
+			ImGuiWindowFlags_NoInputs
+				| ImGuiWindowFlags_NoDecoration
+				| ImGuiWindowFlags_NoMove
+				| ImGuiWindowFlags_NoNav
+				| ImGuiWindowFlags_NoCollapse
+				| ImGuiWindowFlags_NoScrollWithMouse
+				| ImGuiWindowFlags_NoFocusOnAppearing
+				| ImGuiWindowFlags_NoSavedSettings
+				| ImGuiWindowFlags_AlwaysAutoResize)) {
+
+		const char* action = nullptr;
+		switch (grenade.weapon) {
+		case GrenadeWeapon::WEAPON_HEGRENADE:
+			action = "Nade";
+			break;
+		case GrenadeWeapon::WEAPON_FLASHBANG:
+			action = "Flash";
+			break;
+		case GrenadeWeapon::WEAPON_MOLOTOV:
+			action = "Molotov";
+			break;
+		case GrenadeWeapon::WEAPON_DECOY:
+			action = "Deploy decoy at";
+			break;
+		case GrenadeWeapon::WEAPON_SMOKEGRENADE:
+			action = "Smoke";
+			break;
+		default:
+			std::unreachable();
+		}
+
+		ImGui::Text("%s %s from %s",
+			action,
+			grenade.name.to.c_str(),
+			grenade.name.from.empty() ? "here" /*saved*/ : grenade.name.from.c_str());
+
+		ImGui::Separator();
+		if (grenade.duck)
+			ImGui::Text("Crouching");
+		if (grenade.throw_info.jump)
+			ImGui::Text("Jump-throw");
+		if (grenade.throw_info.strength == 1.0F)
+			ImGui::TextUnformatted("Left-click");
+		else if (grenade.throw_info.strength == 0.0F)
+			ImGui::TextUnformatted("Right-click");
+		else if (grenade.throw_info.strength == 0.5F)
+			ImGui::TextUnformatted("Left-click + Right-click");
+		else
+			ImGui::Text("Throw strength: %f", grenade.throw_info.strength);
+
+		if (!grenade.description.empty())
+			ImGui::TextUnformatted(grenade.description.c_str());
+	}
+
+	ImGui::End();
+	ImGui::PopStyleVar();
+
+	ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+	static constexpr float RADIUS = 5.0F;
+
+	draw_list->PathArcTo(screen_pos, RADIUS, 0.0F, 2.0F * std::numbers::pi_v<float>);
+	draw_list->_Path.Size--;
+	draw_list->PathStroke(-1, ImDrawFlags_Closed, 1.0F);
+
+	const glm::vec3 needed_viewangles{ grenade.viewangles, 0.0F };
+	const glm::vec3 player_viewangles = this->player_viewangles.load();
+
+	glm::vec3 aim_diff = needed_viewangles - player_viewangles;
+	aim_diff.y = std::fmod(aim_diff.y, 360.0F);
+	if (aim_diff.y >= 180.0F)
+		aim_diff.y -= 360.0F;
+	if (aim_diff.y < -180.0F)
+		aim_diff.y += 360.0F;
+
+	const float distance = glm::length(aim_diff);
+
+	const float normalized_distance = glm::clamp(
+		(distance - grenade.throw_info.aim_tolerance) / (sqrt(RADIUS) * 2 /*x and y*/), 0.0F, 1.0F);
+
+	if (normalized_distance >= 1.0F)
+		return;
+
+	draw_list->PathArcTo(screen_pos, RADIUS, 0.0F, 2.0F * std::numbers::pi_v<float> * (1.0F - sqrt(normalized_distance)));
+	draw_list->_Path.Size--;
+	static constexpr ImColor GREEN{ 0.0F, 1.0F, 0.0F, 1.0F };
+	draw_list->PathStroke(GREEN, ImDrawFlags_None, 0.5F);
+}
+
 void GrenadeHelper::draw() const
 {
 	if (!enabled.get())
@@ -186,29 +325,27 @@ void GrenadeHelper::draw() const
 
 	for (const GrenadeBundle& bundle : proximate_grenades) {
 		ImVec2 screen_pos;
-		if (!Projection::project(bundle.position, screen_pos))
-			continue;
+		if (Projection::project(bundle.position, screen_pos))
+			draw_surrounded_grenade(bundle, screen_pos);
 
-		const std::string grenade_id{ "##Grenade" + std::to_string(bundle.hash) };
+		if (bundle.in_position) {
+			for (const Grenade& grenade : bundle.grenades) {
+				const float pitch = glm::radians(grenade.viewangles.x);
+				const float yaw = glm::radians(grenade.viewangles.y);
+				const glm::vec3 dir{
+					glm::cos(yaw) * glm::cos(pitch),
+					glm::sin(yaw) * glm::cos(pitch),
+					-glm::sin(pitch),
+				};
 
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, bundle.alpha);
-		ImGui::SetNextWindowPos(screen_pos, ImGuiCond_None, { 0.5F, 0.5F });
-		if (ImGui::Begin(grenade_id.c_str(), nullptr,
-				ImGuiWindowFlags_NoInputs
-					| ImGuiWindowFlags_NoDecoration
-					| ImGuiWindowFlags_NoMove
-					| ImGuiWindowFlags_NoNav
-					| ImGuiWindowFlags_NoCollapse
-					| ImGuiWindowFlags_NoScrollWithMouse
-					| ImGuiWindowFlags_NoFocusOnAppearing
-					| ImGuiWindowFlags_NoSavedSettings
-					| ImGuiWindowFlags_AlwaysAutoResize)) {
+				const glm::vec3 intended_eye_pos = grenade.position + view_offset;
 
-			for (const Grenade& grenade : bundle.grenades)
-				ImGui::TextUnformatted(grenade.name.to.c_str());
+				const glm::vec3 aim_position = intended_eye_pos + dir * 128.0F; /* Prevent ending up in near clip plane */
+
+				ImVec2 screen_pos;
+				if (Projection::project(aim_position, screen_pos))
+					draw_aim_helpers(grenade, screen_pos);
+			}
 		}
-
-		ImGui::End();
-		ImGui::PopStyleVar();
 	}
 }
