@@ -5,6 +5,7 @@ FetchContent_Declare(octree
 	GIT_SUBMODULES ""
 	GIT_TAG 90f428db2fe436ec1564aae4eb0b0123c2c26256
 	PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/Patches/octree-cpp/DisableTests.patch
+							${CMAKE_CURRENT_SOURCE_DIR}/Patches/octree-cpp/FixConceptDecl.patch
 	UPDATE_DISCONNECTED TRUE)
 FetchContent_MakeAvailable(octree)
 
