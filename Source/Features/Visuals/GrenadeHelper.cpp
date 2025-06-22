@@ -15,6 +15,8 @@
 
 #include "../../Memory.hpp"
 
+#include "../../GUI/GUI.hpp"
+
 #include "glm/common.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float3.hpp"
@@ -249,7 +251,7 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 	const ImVec2 screen_center = ImGui::GetIO().DisplaySize / 2.0;
 	const glm::vec2 center_vec{ screen_center.x, screen_center.y };
 
-	const float aim_circle_radius = this->aim_circle_radius.get();
+	const float aim_circle_radius = this->aim_circle_radius.get() * GUI::get_scale();
 
 	const float max_distance = glm::length(glm::vec2{ aim_circle_radius, aim_circle_radius });
 	const float distance = glm::distance(screen_vec, center_vec);
