@@ -6,7 +6,6 @@
 
 #include "../../../Utils/CRC.hpp"
 #include "../../../Utils/EmergencyCrash.hpp"
-#include "../../../Utils/Logging.hpp"
 
 #include "../../../SDK/Entities/CSPlayerController.hpp" // IWYU pragma: keep
 #include "../../../SDK/GameClass/UserCmd.hpp"

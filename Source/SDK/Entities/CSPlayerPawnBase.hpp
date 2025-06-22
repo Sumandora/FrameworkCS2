@@ -1,7 +1,10 @@
 #pragma once
 
-#include "BasePlayerPawn.hpp"
+#include "../Schema/FieldOffset.hpp"
+
 #include "../EntityHandle.hpp"
+
+#include "BasePlayerPawn.hpp"
 
 struct CSPlayerController;
 
