@@ -20,15 +20,16 @@
 #include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 #include "glm/gtx/hash.hpp" // IWYU pragma: keep
-
 #include "glm/trigonometric.hpp"
-#include "imgui_internal.h"
+
 #include "magic_enum/magic_enum.hpp"
+
 #include "nlohmann/json_fwd.hpp"
 
-#include "imgui.h"
-
 #include "octree-cpp/OctreeCpp.h"
+
+#include "imgui.h"
+#include "imgui_internal.h"
 
 #include <algorithm>
 #include <cctype>
@@ -288,12 +289,23 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 			ImGui::Text("Crouching");
 		if (grenade.throw_info.jump)
 			ImGui::Text("Jump-throw");
+
+		const auto colored_text_if_unfulfilled = [](const char* text, bool fulfilled) {
+			if (fulfilled)
+				ImGui::TextUnformatted(text);
+			else
+				ImGui::TextColored(ImColor{ 1.0F, 0.0F, 0.0F, 1.0F }, "%s", text);
+		};
+
 		if (grenade.throw_info.strength == 1.0F)
-			ImGui::TextUnformatted("Left-click");
+			colored_text_if_unfulfilled("Left-click",
+				ImGui::IsMouseDown(ImGuiMouseButton_Left) && !ImGui::IsMouseDown(ImGuiMouseButton_Right));
 		else if (grenade.throw_info.strength == 0.0F)
-			ImGui::TextUnformatted("Right-click");
+			colored_text_if_unfulfilled("Right-click",
+				!ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsMouseDown(ImGuiMouseButton_Right));
 		else if (grenade.throw_info.strength == 0.5F)
-			ImGui::TextUnformatted("Left-click + Right-click");
+			colored_text_if_unfulfilled("Left-click + Right-click",
+				ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsMouseDown(ImGuiMouseButton_Right));
 		else
 			ImGui::Text("Throw strength: %f", grenade.throw_info.strength);
 
