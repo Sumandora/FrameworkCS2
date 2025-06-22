@@ -5,18 +5,17 @@
 
 #include "magic_enum/magic_enum.hpp"
 
-#include "nlohmann/detail/macro_scope.hpp"
 #include "nlohmann/json.hpp"
+#include "nlohmann/json_fwd.hpp"
 
 #include <cctype>
 #include <cstddef>
 #include <cstdint>
-#include <expected>
 #include <optional>
 #include <ranges>
+#include <stdexcept>
 #include <string>
 #include <string_view>
-#include <utility>
 #include <vector>
 
 namespace Serialization::Grenades {
@@ -27,11 +26,26 @@ namespace Serialization::Grenades {
 		WEAPON_FLASHBANG,
 	};
 
-	NLOHMANN_JSON_SERIALIZE_ENUM(GrenadeWeapon,
-		magic_enum::enum_entries<GrenadeWeapon>()
-			| std::ranges::views::transform([](const std::pair<GrenadeWeapon, std::string_view>& pair) {
-				  return std::pair{ pair.first, pair.second | std::ranges::views::transform([](char c) { return std::tolower(c); }) };
-			  }))
+	template <typename BasicJsonType>
+	inline void to_json(BasicJsonType& j, const GrenadeWeapon& e)
+	{
+		const auto name = magic_enum::enum_name(e) | std::ranges::views::transform([](char c) { return std::tolower(c); });
+		j = std::string{ name.begin(), name.end() };
+	}
+	template <typename BasicJsonType>
+	inline void from_json(const BasicJsonType& j, GrenadeWeapon& e)
+	{
+		const auto entries = magic_enum::enum_entries<GrenadeWeapon>();
+		for (const auto& [e2, v] : entries) {
+			const auto lowercased = v | std::ranges::views::transform([](char c) { return std::tolower(c); });
+			const std::string lowercased_str{ lowercased.begin(), lowercased.end() };
+			if (lowercased_str.c_str() == j) {
+				e = e2;
+				return;
+			}
+		}
+		throw std::invalid_argument{ j.dump() };
+	}
 
 	struct Grenade {
 		std::string description;
@@ -40,7 +54,7 @@ namespace Serialization::Grenades {
 		private:
 			static constexpr bool DEFAULT_JUMP = false;
 			static constexpr float DEFAULT_STRENGTH = 1.0F;
-			static constexpr float DEFAULT_AIM_TOLERANCE = 1e-2F;
+			static constexpr float DEFAULT_AIM_TOLERANCE = 1E-2F;
 
 		public:
 			bool jump = DEFAULT_JUMP;
@@ -61,7 +75,7 @@ namespace Serialization::Grenades {
 				if (throw_info.aim_tolerance != DEFAULT_AIM_TOLERANCE)
 					json["aim_tolerance"] = throw_info.aim_tolerance;
 			}
-			
+
 			friend void from_json(const nlohmann::json& json, ThrowInfo& throw_info)
 			{
 				throw_info.jump = json.value("jump", DEFAULT_JUMP);
@@ -80,7 +94,7 @@ namespace Serialization::Grenades {
 					name.to,
 				};
 			}
-			
+
 			friend void from_json(const nlohmann::json& json, Name& name)
 			{
 				name.from = json[0].get<std::string>();
@@ -89,7 +103,7 @@ namespace Serialization::Grenades {
 		} name;
 		glm::vec3 position;
 		glm::vec2 viewangles;
-		std::string weapon;
+		GrenadeWeapon weapon;
 
 		// NOLINTNEXTLINE(modernize-use-constraints)
 		friend void to_json(nlohmann::json& json, const Grenade& grenade)
@@ -112,7 +126,7 @@ namespace Serialization::Grenades {
 			};
 			json["weapon"] = grenade.weapon;
 		}
-		
+
 		friend void from_json(const nlohmann::json& json, Grenade& grenade)
 		{
 			grenade.description = json.value("description", std::string{});
