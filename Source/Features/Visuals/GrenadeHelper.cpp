@@ -130,12 +130,6 @@ void GrenadeHelper::update()
 				  return distance(viewangles, a.viewangles) < distance(viewangles, b.viewangles);
 			  });
 
-			  std::size_t hash = 0;
-
-			  for (const Grenade& grenade : grenades->grenades) {
-				  hash = hash ^ (std::hash<Grenade>{}(grenade) << 1);
-			  }
-
 			  const float fade = (1.0F - distance(origin, data.Vector) / render_distance) * 0.7F;
 
 			  static constexpr float IN_POSITION_THRESHOLD = 1.0F;
@@ -144,7 +138,6 @@ void GrenadeHelper::update()
 				  .grenades = std::move(grenades),
 				  .alpha = fade,
 				  .position = data.Vector,
-				  .hash = hash,
 				  .in_position = distance(data.Vector, origin) < IN_POSITION_THRESHOLD,
 			  };
 		  });
@@ -200,19 +193,21 @@ void GrenadeHelper::event_handler(GameEvent* event)
 				it = counts.insert(it, { grenade.name.to, 0 });
 			it->second++;
 
+			vec_iter->second->hash ^= (std::hash<Grenade>{}(grenade) << 1);
+
 			vec_iter->second->grenades.emplace_back(std::move(grenade));
 		}
 
-		for (auto&& [pos, v] : map) {
+		for (auto&& [pos, v] : map)
 			grenades.Add({ .Vector = pos, .Data = std::move(v) });
-		}
+
 		current_map = new_map;
 	}
 }
 
 void GrenadeHelper::draw_surrounded_grenade(const ProximateGrenadeBundle& bundle, ImVec2 screen_pos)
 {
-	const std::string grenade_id{ "##Grenade" + std::to_string(bundle.hash) };
+	const std::string grenade_id{ "##Grenade" + std::to_string(bundle.grenades->hash) };
 
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, bundle.alpha);
 	if (bundle.in_position)
