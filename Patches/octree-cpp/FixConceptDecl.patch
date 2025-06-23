@@ -1,0 +1,15 @@
+diff --git a/include/octree-cpp/OctreeUtil.h b/include/octree-cpp/OctreeUtil.h
+index ac24022..e492de9 100644
+--- a/include/octree-cpp/OctreeUtil.h
++++ b/include/octree-cpp/OctreeUtil.h
+@@ -34,9 +34,7 @@ constexpr bool isVectorLike3D() {
+ }
+ 
+ template <typename TVector>
+-concept VectorLike = requires(TVector Vector) {
+-    VectorLike3D<TVector> || VectorLike2D_t<TVector>;
+-};
++concept VectorLike = VectorLike3D<TVector> || VectorLike2D_t<TVector>;
+ template <typename TVector>
+ requires VectorLike3D<TVector> || VectorLike2D_t<TVector>
+ struct Boundary {};

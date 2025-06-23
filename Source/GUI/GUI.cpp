@@ -26,9 +26,12 @@
 #include "Tabs/Tabs.hpp"
 
 #include "../Hooks/Graphics/GraphicsHook.hpp"
+
 #include "imnodes.h"
 
 #include "../Notifications/Notifications.hpp"
+
+#include "../Features/Visuals/GrenadeHelper.hpp"
 
 class OwningSDLEvent {
 	SDL_Event event;
@@ -235,6 +238,7 @@ void GUI::render()
 	}
 
 	Notifications::render();
+	grenade_helper->draw();
 
 	ImGui::Render();
 }

@@ -1,15 +1,15 @@
 #pragma once
 
-#include "BaseEntity.hpp"
+#include "../Schema/FieldOffset.hpp"
+
 #include "../EntityHandle.hpp"
 
-struct CSPlayerController;
-struct PlayerWeaponServices;
+#include "BasePlayerPawn.hpp"
 
-struct CSPlayerPawnBase : public BaseEntity {
+struct CSPlayerController;
+
+struct CSPlayerPawnBase : public BasePlayerPawn {
 	CLASS_INFO("libclient.so", "C_CSPlayerPawnBase");
 
 	SCHEMA_VAR(EntityHandle<CSPlayerController>, original_controller, "m_hOriginalController")
-
-    SCHEMA_VAR(PlayerWeaponServices*, weapon_services, "m_pWeaponServices")
 };

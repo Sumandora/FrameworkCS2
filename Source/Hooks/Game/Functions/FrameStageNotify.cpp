@@ -8,6 +8,7 @@
 
 #include "../../../Features/Visuals/ESP/ESP.hpp"
 #include "../../../Features/Visuals/GrenadePrediction.hpp"
+#include "../../../Features/Visuals/GrenadeHelper.hpp"
 
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Enums/ClientFrameStage.hpp"
@@ -21,6 +22,8 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 	case FRAME_SIMULATE_END: {
 		CSPlayerController* controller = *Memory::local_player_controller;
 		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
+
+		grenade_helper->update();
 
 		thread_executor.run_all_queued_functions();
 		break;

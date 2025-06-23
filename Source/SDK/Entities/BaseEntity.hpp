@@ -5,8 +5,6 @@
 
 #include "../../Memory.hpp"
 
-#include "RetAddrSpoofer.hpp"
-
 #include "../Enums/LifeState.hpp"
 
 #include <cstdint>
