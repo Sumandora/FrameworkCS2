@@ -105,8 +105,8 @@ A friend of mine, [snek](https://github.com/jovvik/), generously provided his co
 Download this file to `~/.config/FrameworkCS2/grenades.json`.  
 
 ```sh
-$ mkdir -p ~/.config/FrameworkCS2
-$ wget 'https://l2p.sn3k.dev/grenades.json' -O ~/.config/FrameworkCS2/grenades.json
+mkdir -p ~/.config/FrameworkCS2
+wget 'https://l2p.sn3k.dev/grenades.json' -O ~/.config/FrameworkCS2/grenades.json
 ```
 
 ### Contribution
