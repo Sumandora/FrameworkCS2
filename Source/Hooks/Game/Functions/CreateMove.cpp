@@ -2,6 +2,8 @@
 
 #include "RetAddrSpoofer.hpp"
 
+#include "../../../Features/Misc/Bhop.hpp"
+
 #include "../../../Memory.hpp"
 
 #include "../../../Utils/CRC.hpp"
@@ -52,6 +54,8 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 		const CMsgQAngle& viewangles = usercmd->csgo_usercmd.base().viewangles();
 		Logging::info("View angles: {}", glm::vec3(viewangles.x(), viewangles.y(), viewangles.z()));
 	}
+
+	bhop->create_move(usercmd);
 
 	// Update the CRC stored in the UserCmd to accommodate our changes.
 	if (usercmd->csgo_usercmd.has_base() && usercmd->csgo_usercmd.base().has_move_crc()) {

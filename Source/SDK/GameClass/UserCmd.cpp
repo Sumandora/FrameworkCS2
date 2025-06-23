@@ -65,3 +65,39 @@ UserCmd* UserCmd::get_current_command(BasePlayerController* controller)
 
 	return get_usercmd(controller, current_usercmd_index);
 }
+
+std::uint64_t UserCmd::get_buttonstate1() const
+{
+	return buttons.buttonstate1;
+}
+
+std::uint64_t UserCmd::get_buttonstate2() const
+{
+	return buttons.buttonstate2;
+}
+
+std::uint64_t UserCmd::get_buttonstate3() const
+{
+	return buttons.buttonstate3;
+}
+
+void UserCmd::set_buttonstate1(std::uint64_t value)
+{
+	if (csgo_usercmd.has_base() && csgo_usercmd.base().has_buttons_pb())
+		csgo_usercmd.mutable_base()->mutable_buttons_pb()->set_buttonstate1(value);
+	buttons.buttonstate1 = value;
+}
+
+void UserCmd::set_buttonstate2(std::uint64_t value)
+{
+	if (csgo_usercmd.has_base() && csgo_usercmd.base().has_buttons_pb())
+		csgo_usercmd.mutable_base()->mutable_buttons_pb()->set_buttonstate2(value);
+	buttons.buttonstate2 = value;
+}
+
+void UserCmd::set_buttonstate3(std::uint64_t value)
+{
+	if (csgo_usercmd.has_base() && csgo_usercmd.base().has_buttons_pb())
+		csgo_usercmd.mutable_base()->mutable_buttons_pb()->set_buttonstate3(value);
+	buttons.buttonstate3 = value;
+}

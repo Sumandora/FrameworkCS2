@@ -11,6 +11,8 @@
 
 struct BasePlayerController;
 
+static constexpr std::uint64_t IN_JUMP = 1 << 1;
+
 struct Buttons { // TODO, is this a protobuf buttons?
 	PADDING(0x8);
 	std::uint64_t buttonstate1;
@@ -32,6 +34,13 @@ private:
 public:
 	static void resolve_signatures();
 	static UserCmd* get_current_command(BasePlayerController* controller);
+
+	std::uint64_t get_buttonstate1() const;
+	std::uint64_t get_buttonstate2() const;
+	std::uint64_t get_buttonstate3() const;
+	void set_buttonstate1(std::uint64_t value);
+	void set_buttonstate2(std::uint64_t value);
+	void set_buttonstate3(std::uint64_t value);
 };
 
 static_assert(sizeof(UserCmd) == 0x98);
