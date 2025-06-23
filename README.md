@@ -98,6 +98,17 @@ Make sure to use the script in a state, where the game is not changing frequentl
 - Don't inject before you can see the main menu
 - Don't inject when you are loading a level
 
+### Grenade Helper
+By default, no grenades are available.
+The grenade format can be found in the `Source/Serialization/GrenadeSerialization.hpp` file.
+A friend of mine, [snek](https://github.com/jovvik/), generously provided his collection of grenades [here](https://l2p.sn3k.dev/grenades.json).
+Download this file to `~/.config/FrameworkCS2/grenades.json`.
+
+```sh
+$ mkdir -p ~/.config/FrameworkCS2
+$ wget 'https://l2p.sn3k.dev/grenades.json' -O ~/.config/FrameworkCS2/grenades.json
+```
+
 ### Contribution
 Contributions are welcome  
 Issues and Pull Requests can help improve the program
