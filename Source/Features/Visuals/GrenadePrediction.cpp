@@ -43,20 +43,14 @@ struct GrenadePredictor {
 static_assert(offsetof(GrenadePredictor, count) == 0xce8);
 static_assert(offsetof(GrenadePredictor, elements) == 0xcf0);
 
-static BasePlayerWeapon* (*get_weapon)(BaseEntity* player);
 static void (*calculate_initial_state)(BasePlayerWeapon* weapon, BaseEntity* player, glm::vec3* pos, glm::vec3* rot, bool jump_throw);
 static GrenadePredictor* (*make_grenade_predictor)(float time_to_render, int grenade_type, BaseCSGrenade* grenade);
-static void(*predict_grenade)(GrenadePredictor* predictor, glm::vec3* pos, glm::vec3* rot);
-static void(*remove_entity)(GrenadePredictor* predictor);
+static void (*predict_grenade)(GrenadePredictor* predictor, glm::vec3* pos, glm::vec3* rot);
+static void (*remove_entity)(GrenadePredictor* predictor);
 
 GrenadePrediction::GrenadePrediction()
 	: Feature("Visuals", "Grenade prediction")
 {
-	get_weapon = BCRL::signature(
-		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 54 49 89 FC 48 83 EC 08 48 8B BF ? ? ? ? 48 85 FF 74 ? 4C 8B 65">(),
-		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-					 .expect<decltype(get_weapon)>("Failed to find get_weapon");
 	calculate_initial_state = BCRL::signature(
 		Memory::mem_mgr,
 		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 49 89 FF 41 56 4C 8D 8D">(),
@@ -87,7 +81,9 @@ void GrenadePrediction::calculate_grenade_prediction()
 	if (!player)
 		return;
 
-	BasePlayerWeapon* weapon = RetAddrSpoofer::invoke(get_weapon, player);
+	BasePlayerWeapon* weapon = Memory::local_player->weapon_services()
+		? Memory::local_player->weapon_services()->active_weapon().get()
+		: nullptr;
 	if (!weapon)
 		return;
 
