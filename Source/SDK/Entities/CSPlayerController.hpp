@@ -5,7 +5,7 @@
 #include "CSPlayerPawn.hpp"
 #include "BasePlayerController.hpp"
 
-struct CSPlayerController : BasePlayerController {
+struct CSPlayerController : public BasePlayerController {
 	CLASS_INFO("libclient.so", "CCSPlayerController");
 
 	SCHEMA_VAR(const char*, sanitizied_name, "m_sSanitizedPlayerName");
