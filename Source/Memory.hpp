@@ -9,6 +9,7 @@ struct ViewRender;
 struct BaseEntity;
 struct CSPlayerPawn;
 struct CSPlayerController;
+struct GlobalVars;
 
 class GameEntitySystem;
 class CSGOInput;
@@ -28,6 +29,8 @@ namespace Memory {
 	inline CSPlayerPawn* local_player;
 
 	inline void* get_fun_loading;
+
+	inline GlobalVars** globals;
 
 	inline MemoryManager::LinuxMemoryManager<false, true, true> mem_mgr;
 	inline ExecutableMalloc::MemoryManagerAllocator emalloc{mem_mgr};
