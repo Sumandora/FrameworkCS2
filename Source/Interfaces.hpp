@@ -7,6 +7,7 @@ struct SchemaSystem;
 struct EngineCvar;
 struct EngineToClient;
 struct PanoramaUIEngine;
+
 class NetworkClientService;
 
 namespace Interfaces {
