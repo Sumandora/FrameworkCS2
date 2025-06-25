@@ -6,6 +6,7 @@
 
 #include "glm/ext/vector_float3.hpp"
 
+struct PlayerMovementServices;
 struct PlayerWeaponServices;
 
 struct BasePlayerPawn : public BaseModelEntity {
@@ -14,4 +15,5 @@ struct BasePlayerPawn : public BaseModelEntity {
 	SCHEMA_VAR(glm::vec3, old_origin, "m_vOldOrigin")
 
 	SCHEMA_VAR(PlayerWeaponServices*, weapon_services, "m_pWeaponServices")
+	SCHEMA_VAR(PlayerMovementServices*, movement_services, "m_pMovementServices");
 };
