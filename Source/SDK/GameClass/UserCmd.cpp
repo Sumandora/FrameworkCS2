@@ -12,9 +12,9 @@
 #include <cstdint>
 
 static void** usercmd_list = nullptr;
-static int (*cmdlist_index_from_entity)(void*) = nullptr;
+static int (*cmdlist_index_from_entity)(BasePlayerController*) = nullptr;
 static void* (*get_usercmds)(void*, uint64_t) = nullptr;
-static UserCmd* (*get_usercmd)(void*, int) = nullptr;
+static UserCmd* (*get_usercmd)(BasePlayerController*, int) = nullptr;
 
 void UserCmd::resolve_signatures()
 {
@@ -54,18 +54,18 @@ void UserCmd::resolve_signatures()
 
 UserCmd* UserCmd::get_current_command(BasePlayerController* controller)
 {
-	int list_index = cmdlist_index_from_entity(controller);
+	int list_index = RetAddrSpoofer::invoke(cmdlist_index_from_entity, controller);
 
 	if (list_index == -1)
 		return nullptr;
 
 	list_index -= 1;
 
-	void* usercmds = get_usercmds(*usercmd_list, list_index);
+	void* usercmds = RetAddrSpoofer::invoke(get_usercmds, *usercmd_list, static_cast<std::uint64_t>(list_index));
 
 	const int current_usercmd_index = *reinterpret_cast<int*>(reinterpret_cast<char*>(usercmds) + 0x5c00);
 
-	return get_usercmd(controller, current_usercmd_index);
+	return RetAddrSpoofer::invoke(get_usercmd, controller, current_usercmd_index);
 }
 
 CSubtickMoveStep* UserCmd::allocate_new_move_step(float when)
