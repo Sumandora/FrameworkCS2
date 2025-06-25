@@ -5,7 +5,9 @@
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
 
+#include "RetAddrSpoofer.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
+#include "usercmd.pb.h"
 
 #include <cstdint>
 
@@ -66,38 +68,29 @@ UserCmd* UserCmd::get_current_command(BasePlayerController* controller)
 	return get_usercmd(controller, current_usercmd_index);
 }
 
-std::uint64_t UserCmd::get_buttonstate1() const
+CSubtickMoveStep* UserCmd::allocate_new_move_step(float when)
 {
-	return buttons.buttonstate1;
-}
+	static auto* allocate_subtick_move
+		= BCRL::signature(
+			Memory::mem_mgr,
+			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 49 8D 7D ? 48 89 C6 E8 ? ? ? ? 66 0F EF C9">(),
+			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+			  .add(1)
+			  .relative_to_absolute()
+			  .expect<CSubtickMoveStep* (*)(google::protobuf::Arena * arena)>("Couldn't find allocate subtick move");
 
-std::uint64_t UserCmd::get_buttonstate2() const
-{
-	return buttons.buttonstate2;
-}
+	if (!csgo_usercmd.has_base())
+		return nullptr;
 
-std::uint64_t UserCmd::get_buttonstate3() const
-{
-	return buttons.buttonstate3;
-}
+	auto* subtick_moves = csgo_usercmd.mutable_base()->mutable_subtick_moves();
 
-void UserCmd::set_buttonstate1(std::uint64_t value)
-{
-	if (csgo_usercmd.has_base() && csgo_usercmd.base().has_buttons_pb())
-		csgo_usercmd.mutable_base()->mutable_buttons_pb()->set_buttonstate1(value);
-	buttons.buttonstate1 = value;
-}
+	CSubtickMoveStep* new_step = RetAddrSpoofer::invoke(allocate_subtick_move, subtick_moves->GetArena());
 
-void UserCmd::set_buttonstate2(std::uint64_t value)
-{
-	if (csgo_usercmd.has_base() && csgo_usercmd.base().has_buttons_pb())
-		csgo_usercmd.mutable_base()->mutable_buttons_pb()->set_buttonstate2(value);
-	buttons.buttonstate2 = value;
-}
+	new_step->set_when(when);
 
-void UserCmd::set_buttonstate3(std::uint64_t value)
-{
-	if (csgo_usercmd.has_base() && csgo_usercmd.base().has_buttons_pb())
-		csgo_usercmd.mutable_base()->mutable_buttons_pb()->set_buttonstate3(value);
-	buttons.buttonstate3 = value;
+	// TODO: Reorder move steps when the 'when' lies in between other move steps, e.g. when whens look like this 0.1, 0.2, 0.15, they should be reordered to 0.1, 0.15, 0.2
+
+	subtick_moves->AddAllocated(new_step);
+
+	return new_step;
 }

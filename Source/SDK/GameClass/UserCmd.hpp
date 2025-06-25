@@ -35,12 +35,7 @@ public:
 	static void resolve_signatures();
 	static UserCmd* get_current_command(BasePlayerController* controller);
 
-	std::uint64_t get_buttonstate1() const;
-	std::uint64_t get_buttonstate2() const;
-	std::uint64_t get_buttonstate3() const;
-	void set_buttonstate1(std::uint64_t value);
-	void set_buttonstate2(std::uint64_t value);
-	void set_buttonstate3(std::uint64_t value);
+	CSubtickMoveStep* allocate_new_move_step(float when);
 };
 
 static_assert(sizeof(UserCmd) == 0x98);
