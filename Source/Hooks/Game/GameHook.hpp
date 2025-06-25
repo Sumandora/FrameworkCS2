@@ -12,6 +12,7 @@
 #include <unordered_map>
 
 struct GameEvent;
+struct GameRadar;
 struct UserCmd;
 
 namespace Hooks::Game {
@@ -46,5 +47,10 @@ namespace Hooks::Game {
 		inline UninitializedObject<DetourHook<true>> hook;
 		// TODO does this actually return void? lets go with void* for now.
 		void* hook_func(void* csgo_input, int, char);
+	}
+
+	namespace RadarUpdate {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(GameRadar* thisptr);
 	}
 }

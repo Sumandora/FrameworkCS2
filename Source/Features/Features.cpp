@@ -6,6 +6,7 @@
 #include "Visuals/GrenadeHelper.hpp"
 #include "Visuals/GrenadePrediction.hpp"
 #include "Visuals/LoadingTextChanger.hpp"
+#include "Visuals/Radar.hpp"
 
 void Features::create()
 {
@@ -15,10 +16,12 @@ void Features::create()
 	grenade_prediction.emplace();
 	grenade_helper.emplace();
 	bhop.emplace();
+	radar.emplace();
 }
 
 void Features::destroy()
 {
+	radar.reset();
 	bhop.reset();
 	grenade_helper.reset();
 	grenade_prediction.reset();
