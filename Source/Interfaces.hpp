@@ -7,6 +7,7 @@ struct SchemaSystem;
 struct EngineCvar;
 struct EngineToClient;
 struct PanoramaUIEngine;
+class NetworkClientService;
 
 namespace Interfaces {
 	class InterfacedLibrary {
@@ -32,6 +33,7 @@ namespace Interfaces {
 	inline EngineCvar* engineCvar;
 	inline EngineToClient* engine;
 	inline PanoramaUIEngine* panorama_ui_engine;
+	inline NetworkClientService* network_client_service;
 
 	void grab_interfaces();
 

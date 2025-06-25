@@ -122,4 +122,6 @@ void Interfaces::grab_interfaces()
 	INFO("Source2Engine", engine);
 	panorama_ui_engine = panorama.get_interface<PanoramaUIEngine>("PanoramaUIEngine");
 	INFO("PanoramaUIEngine", panorama_ui_engine);
+	network_client_service = engine2.get_interface<NetworkClientService>("NetworkClientService_");
+	INFO("NetworkClientService", panorama_ui_engine);
 }
