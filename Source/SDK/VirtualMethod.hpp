@@ -1,20 +1,26 @@
 #pragma once
 
 #include "RetAddrSpoofer.hpp"
-#include <cstdint>
+#include <cstddef>
 
 // Inspired by danielkrupinski/Osiris
 
 namespace VirtualMethod {
-	inline void** getVTable(void* gameClass)
+	inline void** get_vtable(const void* game_class)
 	{
-		return *reinterpret_cast<void***>(gameClass);
+		return *reinterpret_cast<void** const*>(game_class);
 	}
 
-	template <typename Ret, unsigned long Index, typename... Args>
-	inline Ret invoke(void* gameClass, Args... args)
+	template <typename Ret, std::size_t Index, typename... Args>
+	inline Ret invoke(void* game_class, Args... args)
 	{
-		return RetAddrSpoofer::invoke<Ret, void*, Args...>(getVTable(gameClass)[Index], gameClass, args...);
+		return RetAddrSpoofer::invoke<Ret, decltype(game_class), Args...>(get_vtable(game_class)[Index], game_class, args...);
+	}
+
+	template <typename Ret, std::size_t Index, typename... Args>
+	inline Ret invoke(const void* game_class, Args... args)
+	{
+		return RetAddrSpoofer::invoke<Ret, decltype(game_class), Args...>(get_vtable(game_class)[Index], game_class, args...);
 	}
 }
 
