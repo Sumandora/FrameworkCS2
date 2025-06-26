@@ -10,6 +10,7 @@
 #include "../../Utils/Projection.hpp"
 
 #include "glm/ext/vector_float3.hpp"
+#include "SignatureScanner/XRefSignature.hpp"
 
 #include "RetAddrSpoofer.hpp"
 
@@ -51,26 +52,72 @@ static void (*remove_entity)(GrenadePredictor* predictor);
 GrenadePrediction::GrenadePrediction()
 	: Feature("Visuals", "Grenade prediction")
 {
-	calculate_initial_state = BCRL::signature(
-		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 49 89 FF 41 56 4C 8D 8D">(),
-		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-								  .expect<decltype(calculate_initial_state)>("Failed to find calculate_initial_state");
-	make_grenade_predictor = BCRL::signature(
-		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 8D 05 ? ? ? ? 48 89 E5 41 57 41 56 49 89 F6 41 55 4C 63 EF">(),
-		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-								 .expect<decltype(make_grenade_predictor)>("Failed to find make_grenade_predictor");
-	predict_grenade = BCRL::signature(
-		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 41 56 41 55 49 89 D5 41 54 49 89 FC 53 48 83 EC 78">(),
-		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-						  .expect<decltype(predict_grenade)>("Failed to find predict_grenade");
-	remove_entity = BCRL::signature(
-		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"48 85 FF 0F 84 ? ? ? ? 55 48 89 E5 41 55 41 54 48 8B 47">(),
-		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-						.expect<decltype(remove_entity)>("Failed to find remove_entity");
+	auto convar_callback
+		= BCRL::signature(
+			Memory::mem_mgr,
+			SignatureScanner::PatternSignature::for_literal_string<"cl_sim_grenade_trajectory">(),
+			BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+			  .sub(11)
+			  .relative_to_absolute();
+	calculate_initial_state
+		= convar_callback
+			  .clone()
+			  .repeater([](auto& ptr) {
+				  ptr.next_instruction();
+				  static int i = 0;
+				  if (ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()))
+					  i++;
+				  return i != 5;
+			  })
+			  .add(1)
+			  .relative_to_absolute()
+			  .next_instruction()
+			  .next_instruction()
+			  .next_instruction()
+			  .add(1)
+			  .relative_to_absolute()
+			  .expect<decltype(calculate_initial_state)>("Failed to find calculate_initial_state");
+	make_grenade_predictor
+		= convar_callback
+			  .clone()
+			  .repeater([](auto& ptr) {
+				  ptr.next_instruction();
+				  static int i = 0;
+				  if (ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()))
+					  i++;
+				  return i != 6;
+			  })
+			  .add(1)
+			  .relative_to_absolute()
+			  .expect<decltype(make_grenade_predictor)>("Failed to find make_grenade_predictor");
+	predict_grenade
+		= convar_callback
+			  .clone()
+			  .repeater([](auto& ptr) {
+				  ptr.next_instruction();
+				  static int i = 0;
+				  if (ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()))
+					  i++;
+				  return i != 7;
+			  })
+			  .add(1)
+			  .relative_to_absolute()
+			  .expect<decltype(predict_grenade)>("Failed to find predict_grenade");
+	remove_entity
+		= convar_callback
+			  .clone()
+			  .repeater([](auto& ptr) {
+				  ptr.next_instruction();
+				  static int i = 0;
+				  if (ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()))
+					  i++;
+				  return i != 8;
+			  })
+			  .add(1)
+			  .relative_to_absolute()
+			  .expect<decltype(remove_entity)>("Failed to find remove_entity");
 }
 
 static std::vector<glm::vec3> points;
