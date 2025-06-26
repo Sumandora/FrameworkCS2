@@ -13,7 +13,7 @@ struct BasePlayerController;
 
 static constexpr std::uint64_t IN_JUMP = 1 << 1;
 
-struct Buttons { // TODO, is this a protobuf buttons?
+struct Buttons {
 	PADDING(0x8);
 	std::uint64_t buttonstate1;
 	std::uint64_t buttonstate2;
