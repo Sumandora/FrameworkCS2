@@ -51,11 +51,21 @@ namespace Hooks::Game {
 			reinterpret_cast<void*>(CreateMove::hook_func));
 		RadarUpdate::hook.emplace(
 			Memory::emalloc,
-			// TODO use the convenient convars in that function to figure out where it is.
 			BCRL::signature(
 				Memory::mem_mgr,
-				SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 56 41 55 41 54 49 89 FC 53 E8 ? ? ? ? 48 85 C0 0F 84 ? ? ? ? 41 80 A4 24 ? ? ? ? FE">(),
-				BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+				SignatureScanner::PatternSignature::for_literal_string<"cl_radar_square_with_scoreboard">(),
+				BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+				.find_xrefs(SignatureScanner::XRefTypes::relative(),
+					BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+				.add(11)
+				.relative_to_absolute()
+				.find_xrefs(SignatureScanner::XRefTypes::relative(),
+					BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+				.sub(3)
+				.filter([](const auto& ptr) {
+					return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 3d ? ? ? ? be ff ff ff ff">());
+				})
+				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 				.expect<void*>("Couldn't find radar update function"),
 			reinterpret_cast<void*>(RadarUpdate::hook_func));
 
