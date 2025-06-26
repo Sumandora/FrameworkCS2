@@ -38,7 +38,7 @@ void UtlBuffer::ensure_capacity(int size)
 		if (fptr)
 			Logging::info("Found CUtlBuffer::EnsureCapacity at {}", reinterpret_cast<void*>(fptr));
 		else
-			Logging::error("Couldn't find global allocator!");
+			Logging::error("Couldn't find CUtlBuffer::EnsureCapacity!");
 
 		dlclose(handle);
 	}
