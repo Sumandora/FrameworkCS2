@@ -3,7 +3,7 @@
 echo "Building Debug-Binary"
 mkdir -p Build-Debug
 
-cmake -B Build-Debug -D CMAKE_BUILD_TYPE=Debug -D CMAKE_CXX_FLAGS_RELEASE="$CXXFLAGS" || exit 1
+cmake -B Build-Debug -D CMAKE_BUILD_TYPE=Debug -D CMAKE_CXX_FLAGS_DEBUG="$CXXFLAGS" || exit 1
 cmake --build Build-Debug -j "$(nproc)" || exit 1
 
 cs2_pid=$(pidof cs2)
@@ -15,5 +15,6 @@ fi
 lib_name="lib$(cat ProjectName).so"
 
 gdb -p "$cs2_pid" \
+	-ex "handle SIGSTOP nostop pass noprint SIGCONT nostop pass noprint" \
 	-ex "call ((void*(*)(char*, int)) dlopen)(\"$(pwd)/Build-Debug/$lib_name\", 1)" \
 	-ex "continue"
