@@ -162,15 +162,17 @@ void GrenadeHelper::event_handler(GameEvent* event)
 	if (std::string_view{ event->GetName() } != "game_newmap")
 		return;
 
-	const std::string_view new_map = event->get_string("mapname");
+	const std::string_view new_map = event->get_string("mapname", "");
+
+	if (new_map.empty()) {
+		Logging::error("Failed to retrieve map name");
+		// TODO clear grenades
+	}
 
 	if (current_map == new_map)
 		return;
 
 	current_map = new_map;
-
-	if (new_map.empty())
-		return;
 
 	std::unordered_map<glm::vec3, std::unordered_map<GrenadeWeapon, std::shared_ptr<GrenadeBundle>>> map;
 	for (Grenade grenade : parse_grenades_for_map(new_map)) {
@@ -205,6 +207,7 @@ void GrenadeHelper::event_handler(GameEvent* event)
 		vec_iter->second->grenades.emplace_back(std::move(grenade));
 	}
 
+	// TODO clear grenades here.
 	for (auto&& [pos, v] : map)
 		grenades.Add({ .Vector = pos, .Data = std::move(v) });
 }
