@@ -48,6 +48,7 @@ include("Buildscripts/ImNodes.cmake")
 include("Buildscripts/OrderedMap.cmake")
 include("Buildscripts/Protobuf.cmake")
 include("Buildscripts/Octree.cmake")
+include("Buildscripts/MurmurHash.cmake")
 
 add_subdirectory("${MemoryManager_SOURCE_DIR}/Modules/Linux" "LinuxMemoryManager")
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE LinuxMemoryManager)
