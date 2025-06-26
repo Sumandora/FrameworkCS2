@@ -7,7 +7,7 @@
 
 #include "RetAddrSpoofer.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
-#include "usercmd.pb.h"
+#include "SignatureScanner/XRefSignature.hpp"
 
 #include <cstdint>
 
@@ -73,10 +73,14 @@ CSubtickMoveStep* UserCmd::allocate_new_move_step(float when)
 	static auto* allocate_subtick_move
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 49 8D 7D ? 48 89 C6 E8 ? ? ? ? 66 0F EF C9">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .add(1)
-			  .relative_to_absolute()
+			SignatureScanner::PatternSignature::for_literal_string<"16CSubtickMoveStep">(),
+			BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+			  .find_xrefs(SignatureScanner::XRefTypes::absolute(),
+				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+			  .sub(8)
+			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 			  .expect<CSubtickMoveStep* (*)(google::protobuf::Arena * arena)>("Couldn't find allocate subtick move");
 
 	if (!csgo_usercmd.has_base())
