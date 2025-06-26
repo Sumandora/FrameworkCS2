@@ -28,7 +28,6 @@
 struct GameEvent;
 
 class GrenadeHelper : public Feature {
-
 	Checkbox enabled{ this, "Enabled", false };
 	FloatSlider render_distance{ this, "Render distance", 0.0F, 32768.0F, 1024.0F };
 
@@ -44,6 +43,9 @@ class GrenadeHelper : public Feature {
 		std::vector<std::pair<std::string, std::size_t>> counts;
 		std::size_t hash = 0;
 	};
+
+	// TODO: Verify that this is actually the boundaries that the s2 engine restricts to.
+	static constexpr float OCTREE_SIZE = 32768;
 
 	using Octree = OctreeCpp<glm::vec3, std::unordered_map<GrenadeWeapon, std::shared_ptr<GrenadeBundle>>>;
 	Octree grenades;
@@ -61,6 +63,8 @@ class GrenadeHelper : public Feature {
 	glm::vec3 player_viewangles;
 	bool crouching;
 	mutable std::mutex proximate_grenades_mutex;
+
+	void reset_octree();
 
 	void clear_current_grenades();
 	static void draw_surrounded_grenade(const ProximateGrenadeBundle& bundle, ImVec2 screen_pos);

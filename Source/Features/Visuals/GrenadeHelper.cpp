@@ -53,8 +53,7 @@ using namespace Serialization::Grenades;
 
 GrenadeHelper::GrenadeHelper()
 	: Feature("Visuals", "Grenade helper")
-	// TODO: Verify that this is actually the boundaries that the s2 engine restricts to.
-	, grenades({ glm::vec3{ -32768 }, glm::vec3{ 32768 } })
+	, grenades({ glm::vec3{ -OCTREE_SIZE }, glm::vec3{ OCTREE_SIZE } })
 {
 }
 
@@ -157,6 +156,13 @@ void GrenadeHelper::update()
 	}
 }
 
+void GrenadeHelper::reset_octree()
+{
+	// eh, maybe make a patch for resetting an octree one day.
+	grenades.~Octree();
+	new (&grenades) Octree({ glm::vec3{ -OCTREE_SIZE }, glm::vec3{ OCTREE_SIZE } });
+}
+
 void GrenadeHelper::event_handler(GameEvent* event)
 {
 	if (std::string_view{ event->GetName() } != "game_newmap")
@@ -166,7 +172,8 @@ void GrenadeHelper::event_handler(GameEvent* event)
 
 	if (new_map.empty()) {
 		Logging::error("Failed to retrieve map name");
-		// TODO clear grenades
+		reset_octree();
+		return;
 	}
 
 	if (current_map == new_map)
@@ -207,7 +214,7 @@ void GrenadeHelper::event_handler(GameEvent* event)
 		vec_iter->second->grenades.emplace_back(std::move(grenade));
 	}
 
-	// TODO clear grenades here.
+	reset_octree();
 	for (auto&& [pos, v] : map)
 		grenades.Add({ .Vector = pos, .Data = std::move(v) });
 }
