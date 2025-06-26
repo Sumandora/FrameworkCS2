@@ -164,45 +164,49 @@ void GrenadeHelper::event_handler(GameEvent* event)
 
 	const std::string_view new_map = event->get_string("mapname");
 
-	if (current_map != new_map) {
-		std::unordered_map<glm::vec3, std::unordered_map<GrenadeWeapon, std::shared_ptr<GrenadeBundle>>> map;
-		for (Grenade grenade : parse_grenades_for_map(new_map)) {
-			auto map_iter = std::ranges::find_if(map, [&grenade](const auto& it) {
-				// static constexpr float MERGE_DISTANCE = 1E-2F;
-				// TODO This is insane, some grenades don't merge with that little
-				static constexpr float MERGE_DISTANCE = 1.0F;
-				return distance(it.first, grenade.position) < MERGE_DISTANCE;
-			});
+	if (current_map == new_map)
+		return;
 
-			if (map_iter == map.end())
-				// new map
-				map_iter = map.insert(map_iter, { grenade.position, {} });
+	current_map = new_map;
 
-			GrenadeWeapon weapon = grenade.weapon;
-			auto vec_iter = std::ranges::find_if(map_iter->second, [weapon](const auto& pair) {
-				return pair.first == weapon;
-			});
+	if (new_map.empty())
+		return;
 
-			if (vec_iter == map_iter->second.end())
-				// new vector
-				vec_iter = map_iter->second.insert(vec_iter, { weapon, std::make_shared<GrenadeBundle>() });
+	std::unordered_map<glm::vec3, std::unordered_map<GrenadeWeapon, std::shared_ptr<GrenadeBundle>>> map;
+	for (Grenade grenade : parse_grenades_for_map(new_map)) {
+		auto map_iter = std::ranges::find_if(map, [&grenade](const auto& it) {
+			// static constexpr float MERGE_DISTANCE = 1E-2F;
+			// TODO This is insane, some grenades don't merge with that little
+			static constexpr float MERGE_DISTANCE = 1.0F;
+			return distance(it.first, grenade.position) < MERGE_DISTANCE;
+		});
 
-			auto& counts = vec_iter->second->counts;
-			auto it = std::ranges::find(counts, grenade.name.to, [](const auto& pair) { return pair.first; });
-			if (it == counts.end())
-				it = counts.insert(it, { grenade.name.to, 0 });
-			it->second++;
+		if (map_iter == map.end())
+			// new map
+			map_iter = map.insert(map_iter, { grenade.position, {} });
 
-			vec_iter->second->hash ^= (std::hash<Grenade>{}(grenade) << 1);
+		GrenadeWeapon weapon = grenade.weapon;
+		auto vec_iter = std::ranges::find_if(map_iter->second, [weapon](const auto& pair) {
+			return pair.first == weapon;
+		});
 
-			vec_iter->second->grenades.emplace_back(std::move(grenade));
-		}
+		if (vec_iter == map_iter->second.end())
+			// new vector
+			vec_iter = map_iter->second.insert(vec_iter, { weapon, std::make_shared<GrenadeBundle>() });
 
-		for (auto&& [pos, v] : map)
-			grenades.Add({ .Vector = pos, .Data = std::move(v) });
+		auto& counts = vec_iter->second->counts;
+		auto it = std::ranges::find(counts, grenade.name.to, [](const auto& pair) { return pair.first; });
+		if (it == counts.end())
+			it = counts.insert(it, { grenade.name.to, 0 });
+		it->second++;
 
-		current_map = new_map;
+		vec_iter->second->hash ^= (std::hash<Grenade>{}(grenade) << 1);
+
+		vec_iter->second->grenades.emplace_back(std::move(grenade));
 	}
+
+	for (auto&& [pos, v] : map)
+		grenades.Add({ .Vector = pos, .Data = std::move(v) });
 }
 
 void GrenadeHelper::draw_surrounded_grenade(const ProximateGrenadeBundle& bundle, ImVec2 screen_pos)
