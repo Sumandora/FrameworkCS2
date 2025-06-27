@@ -3,15 +3,12 @@
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
 
+#include "RetAddrSpoofer.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
 
 #include "glm/ext/vector_float3.hpp"
 
 #include "../../Memory.hpp"
-
-#include "../../Utils/Logging.hpp"
-
-#include "TraceFilter.hpp"
 
 static EngineTrace** engine_trace;
 static bool (*trace_shape)(EngineTrace* thisptr, Ray* ray, const glm::vec3* from, const glm::vec3* to, TraceFilter* filter, GameTrace* trace);
@@ -27,8 +24,6 @@ void EngineTrace::resolve_signatures()
 			  .relative_to_absolute()
 			  .expect<EngineTrace**>("Couldn't find engine trace");
 
-	Logging::debug("engine_trace = {}", engine_trace);
-
 	::trace_shape
 		= BCRL::signature(
 			Memory::mem_mgr,
@@ -37,8 +32,6 @@ void EngineTrace::resolve_signatures()
 			  .add(1)
 			  .relative_to_absolute()
 			  .expect<decltype(::trace_shape)>("Couldn't find trace shape");
-
-	Logging::debug("trace_shape = {}", ::trace_shape);
 }
 
 EngineTrace* EngineTrace::the()
@@ -50,5 +43,5 @@ EngineTrace* EngineTrace::the()
 
 bool EngineTrace::trace_shape(Ray* ray, const glm::vec3& from, const glm::vec3& to, TraceFilter* filter, GameTrace* trace)
 {
-	return ::trace_shape(this, ray, &from, &to, filter, trace);
+	return RetAddrSpoofer::invoke(::trace_shape, this, ray, &from, &to, filter, trace);
 }

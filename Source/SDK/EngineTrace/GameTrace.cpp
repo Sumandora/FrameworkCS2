@@ -5,6 +5,8 @@
 
 #include "SignatureScanner/PatternSignature.hpp"
 
+#include "RetAddrSpoofer.hpp"
+
 #include "../../Memory.hpp"
 
 GameTrace GameTrace::initialized()
@@ -19,7 +21,7 @@ GameTrace GameTrace::initialized()
 									   .relative_to_absolute()
 									   .expect<void (*)(GameTrace*)>("Couldn't find InitGameTrace");
 
-	init_game_trace(&trace); // TODO ret addr spoofer
+	RetAddrSpoofer::invoke(init_game_trace, &trace);
 
 	return trace;
 }
