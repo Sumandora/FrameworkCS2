@@ -32,6 +32,8 @@ struct BaseEntity : public EntityInstance {
 
 	SCHEMA_VAR(std::uint32_t, flags, "m_fFlags");
 
+	SCHEMA_VAR(EntityHandle<BaseEntity>, owner_entity, "m_hOwnerEntity")
+
 	template <typename T>
 	T entity_cast()
 	{

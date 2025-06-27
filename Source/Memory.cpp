@@ -5,6 +5,7 @@
 
 #include "Interfaces.hpp"
 
+#include "SDK/EngineTrace/EngineTrace.hpp"
 #include "SDK/Entities/CSPlayerController.hpp"
 #include "SDK/Entities/GameEntitySystem.hpp"
 #include "SDK/GameClass/CSGOInput.hpp"
@@ -144,4 +145,6 @@ void Memory::create()
 				  .add(3)
 				  .relative_to_absolute()
 				  .expect<GlobalVars**>("Couldn't find global vars");
+
+	EngineTrace::resolve_signatures();
 }
