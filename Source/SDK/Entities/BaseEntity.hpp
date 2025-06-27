@@ -3,9 +3,13 @@
 #include "../Schema/FieldOffset.hpp"
 #include "../Schema/SchemaClassInfo.hpp"
 
+#include "../EntityHandle.hpp"
+
 #include "../../Memory.hpp"
 
 #include "../Enums/LifeState.hpp"
+
+#include "EntityInstance.hpp"
 
 #include <cstdint>
 
@@ -13,7 +17,7 @@ struct CollisionProperty;
 struct GameSceneNode;
 struct CSPlayerPawn;
 
-struct BaseEntity {
+struct BaseEntity : public EntityInstance {
 	VIRTUAL_METHOD(39, getSchemaType, SchemaClassInfo*, (), (this));
 
 	CLASS_INFO("libclient.so", "C_BaseEntity");
@@ -33,4 +37,6 @@ struct BaseEntity {
 	{
 		return schema_cast<T>(this, getSchemaType());
 	}
+
+	EntityHandle<BaseEntity> get_handle();
 };
