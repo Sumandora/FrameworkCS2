@@ -3,7 +3,7 @@
 #include "../../Memory.hpp"
 #include "RetAddrSpoofer.hpp"
 
-#include "BaseEntity.hpp"
+struct BaseEntity;
 
 class GameEntitySystem {
 	static int (*get_highest_entity_index_ptr)(GameEntitySystem* thisptr);
