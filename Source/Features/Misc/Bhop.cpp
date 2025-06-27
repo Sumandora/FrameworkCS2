@@ -14,15 +14,6 @@
 
 #include "../../Interfaces.hpp"
 
-#include "BCRL/SearchConstraints.hpp"
-#include "BCRL/Session.hpp"
-
-#include "SignatureScanner/PatternSignature.hpp"
-
-#include "google/protobuf/arena.h"
-
-#include "RetAddrSpoofer.hpp"
-
 #include <cfloat>
 #include <cstdint>
 #include <cstring>

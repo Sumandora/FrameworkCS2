@@ -2,7 +2,6 @@
 
 #include "../Padding.hpp"
 
-#include <cstdint>
 #include <bitset>
 
 union ConVarValue {

@@ -12,7 +12,6 @@
 
 #include <algorithm>
 #include <initializer_list>
-#include <optional>
 #include <utility>
 
 RGBANode::RGBANode(NodeCircuit* parent, RGBADirection direction, IdType r, IdType g, IdType b, IdType a, IdType color)

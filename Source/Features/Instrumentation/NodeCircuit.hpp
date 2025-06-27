@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <functional>
-#include <optional>
 #include <unordered_map>
 #include <vector>
 
@@ -16,7 +15,7 @@
 #include "Nodes/OutputNode.hpp"
 
 #include "nlohmann/detail/macro_scope.hpp"
-#include "nlohmann/json.hpp"
+#include "nlohmann/json.hpp" // IWYU pragma: keep
 
 struct ImNodesContext;
 

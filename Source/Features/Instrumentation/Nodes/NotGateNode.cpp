@@ -8,8 +8,6 @@
 #include "imgui.h"
 #include "imnodes.h"
 
-#include <optional>
-
 NotGateNode::NotGateNode(NodeCircuit* parent, IdType input, IdType output)
 	: Node(parent)
 	, input(input)

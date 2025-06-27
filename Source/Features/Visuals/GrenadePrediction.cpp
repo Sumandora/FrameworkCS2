@@ -5,18 +5,18 @@
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
 
+#include "SignatureScanner/PatternSignature.hpp"
+#include "SignatureScanner/XRefSignature.hpp"
+
 #include "../../Memory.hpp"
 
 #include "../../Utils/Projection.hpp"
 
 #include "glm/ext/vector_float3.hpp"
-#include "SignatureScanner/XRefSignature.hpp"
 
 #include "RetAddrSpoofer.hpp"
 
 #include "imgui.h"
-
-#include "SignatureScanner/PatternSignature.hpp"
 
 #include "../../SDK/Entities/BaseCSGrenade.hpp"
 #include "../../SDK/Entities/BasePlayerWeapon.hpp"

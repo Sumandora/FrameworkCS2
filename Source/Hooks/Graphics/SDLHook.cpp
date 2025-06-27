@@ -20,7 +20,6 @@
 
 #include "SDL3/SDL_video.h"
 
-#include <memory>
 #include <vector>
 
 #include "../Hooks.hpp"

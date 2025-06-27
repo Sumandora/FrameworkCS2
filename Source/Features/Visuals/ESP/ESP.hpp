@@ -10,8 +10,8 @@
 
 #include "imgui.h"
 
-#include "../../../Utils/UninitializedObject.hpp"
 #include "../../../Utils/Logging.hpp"
+#include "../../../Utils/UninitializedObject.hpp"
 
 #include <cstdint>
 #include <string>
@@ -29,7 +29,7 @@ class ESP : public Feature {
 	Tabs elements{ this, "Elements" };
 	PlayerRectangle box{ elements, "Box" };
 	PlayerSidedText name{ elements, "Name" };
-	PlayerHealthbar healthbar{ elements, "Health bar"};
+	PlayerHealthbar healthbar{ elements, "Health bar" };
 
 	enum BabbysFirstEnum : std::uint8_t {
 		HELLO,

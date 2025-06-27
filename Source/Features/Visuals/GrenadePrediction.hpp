@@ -3,7 +3,6 @@
 #include "../Feature.hpp"
 
 #include "../Settings/Checkbox.hpp"
-#include "../Settings/FloatSlider.hpp"
 
 #include "../../Utils/UninitializedObject.hpp"
 

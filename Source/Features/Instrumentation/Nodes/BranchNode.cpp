@@ -10,8 +10,6 @@
 #include "imnodes.h"
 
 #include <cassert>
-#include <optional>
-#include <variant>
 
 BranchNode::BranchNode(NodeCircuit* parent, IdType falsy, IdType condition, IdType truthy, IdType output)
 	: Node(parent)

@@ -15,7 +15,6 @@
 		return info;                                                                                                               \
 	}
 
-// FIXME, TODO: self.classInfo() can walk up the inheritance tree through its template like properties, fix this properly soon
 #define SCHEMA_VAR(type, prettyName, name)                                                     \
 	inline auto& prettyName()                                                                  \
 	{                                                                                          \

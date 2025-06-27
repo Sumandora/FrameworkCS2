@@ -11,7 +11,6 @@
 #include <cctype>
 #include <cmath>
 #include <cstddef>
-#include <optional>
 #include <utility>
 
 ArithmeticNode::ArithmeticNode(NodeCircuit* parent, ArithmeticOp operation, IdType lhs, IdType rhs, IdType output)

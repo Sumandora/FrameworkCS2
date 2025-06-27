@@ -3,7 +3,6 @@
 #include "Theme.hpp"
 
 #include "backends/imgui_impl_sdl3.h"
-#include "backends/imgui_impl_vulkan.h"
 #include "imgui.h"
 
 #include "SDL3/SDL_events.h"
@@ -18,16 +17,11 @@
 #include <cstring>
 #include <filesystem>
 #include <mutex>
-#include <string.h>
 #include <unistd.h>
 #include <utility>
 #include <vector>
 
 #include "Tabs/Tabs.hpp"
-
-#include "../Hooks/Graphics/GraphicsHook.hpp"
-
-#include "imnodes.h"
 
 #include "../Notifications/Notifications.hpp"
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../../Padding.hpp"
-
 struct Flag;
 
 struct SchemaType {

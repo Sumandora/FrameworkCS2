@@ -3,12 +3,8 @@
 #include <cstring>
 #include <functional>
 #include <string>
-#include <tuple>
-#include <type_traits>
-#include <utility>
 #include <vector>
 
-#include "imgui.h"
 #include "nlohmann/json.hpp" // IWYU pragma: keep
 
 class Setting;

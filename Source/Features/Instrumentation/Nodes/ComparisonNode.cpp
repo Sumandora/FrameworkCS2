@@ -10,7 +10,6 @@
 
 #include <cctype>
 #include <cstddef>
-#include <optional>
 #include <utility>
 
 ComparisonNode::ComparisonNode(NodeCircuit* parent, ComparisonOp operation, IdType lhs, IdType rhs, IdType output)

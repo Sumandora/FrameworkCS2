@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Schema/FieldOffset.hpp"
-#include "../Schema/SchemaClassInfo.hpp"
 #include "Transform.hpp"
 
 struct GameSceneNode {
