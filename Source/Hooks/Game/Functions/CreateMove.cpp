@@ -35,18 +35,18 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 	if (usercmd->csgo_usercmd.has_base() && usercmd->csgo_usercmd.base().has_move_crc()) {
 		const std::vector<char> pre = CRC::extract_crc(usercmd);
 		[[maybe_unused]] const void* pre_ptr = *reinterpret_cast<void* const*>(&usercmd->csgo_usercmd.base().move_crc());
-		EMERGENCYCRASH_IF(!CRC::update_crc(usercmd), "Couldn't update CRC! (pre-cm)");
+		emergency_crash_if(!CRC::update_crc(usercmd), "Couldn't update CRC! (pre-cm)");
 		const std::vector<char> post = CRC::extract_crc(usercmd);
 		[[maybe_unused]] const void* post_ptr = *reinterpret_cast<void* const*>(&usercmd->csgo_usercmd.base().move_crc());
 
 		// The data needs to match, but the pointers need to differ.
 		// This way if the computed data mismatches or it doesn't update the CRC at all it fails.
-		EMERGENCYCRASH_IF(pre != post, "UserCmd CRC was incorrectly recomputed!");
+		emergency_crash_if(pre != post, "UserCmd CRC was incorrectly recomputed!");
 
 		// TODO This check does not work, I think the arena tries to reuse memory or something, fix this some time soon.
 		// I think one could change a button and see if it results in a different CRC, but that seems a bit obnoxious for a simple self test.
 		// Can we perhaps store sample CRCs and verify that they come out the right way?
-		//EMERGENCYCRASH_IF(pre_ptr == post_ptr, "UserCmd CRC did not update!");
+		//emergency_crash_if(pre_ptr == post_ptr, "UserCmd CRC did not update!");
 	}
 #endif
 
@@ -60,7 +60,7 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 
 	// Update the CRC stored in the UserCmd to accommodate our changes.
 	if (usercmd->csgo_usercmd.has_base() && usercmd->csgo_usercmd.base().has_move_crc()) {
-		EMERGENCYCRASH_IF(!CRC::update_crc(usercmd), "Couldn't update CRC (post-cm)!");
+		emergency_crash_if(!CRC::update_crc(usercmd), "Couldn't update CRC (post-cm)!");
 	}
 
 	return ret;
