@@ -14,6 +14,16 @@ class EntityHandle /* a.k.a. CBaseHandle and CHandle */ {
 	std::uint32_t index;
 
 public:
+	explicit EntityHandle(std::uint32_t index)
+		: index(index)
+	{
+	}
+
+	static EntityHandle invalid()
+	{
+		return EntityHandle{ INVALID_ENTITY_HANDLE };
+	}
+
 	[[nodiscard]] Ent* get() const
 	{
 		if (!has_entity())
