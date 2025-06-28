@@ -16,11 +16,14 @@
 struct CollisionProperty;
 struct GameSceneNode;
 struct CSPlayerPawn;
+struct BodyComponent;
 
 struct BaseEntity : public EntityInstance {
 	VIRTUAL_METHOD(39, getSchemaType, SchemaClassInfo*, (), (this));
 
 	CLASS_INFO("libclient.so", "C_BaseEntity");
+
+	SCHEMA_VAR(BodyComponent*, body_component, "m_CBodyComponent");
 
 	SCHEMA_VAR(GameSceneNode*, gameSceneNode, "m_pGameSceneNode");
 	SCHEMA_VAR(CollisionProperty*, collision, "m_pCollision");
