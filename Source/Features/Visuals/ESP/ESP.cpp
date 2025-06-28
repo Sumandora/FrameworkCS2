@@ -1,16 +1,23 @@
 #include "ESP.hpp"
 
+#include <concepts>
+#include <functional>
 #include <limits>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "../../../Memory.hpp"
 
 #include "../../../SDK/Entities/BaseEntity.hpp"
+#include "../../../SDK/Entities/Components/BodyComponentSkeletonInstance.hpp"
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../../SDK/Entities/GameEntitySystem.hpp"
 #include "../../../SDK/Enums/LifeState.hpp"
 #include "../../../SDK/GameClass/CollisionProperty.hpp"
 #include "../../../SDK/GameClass/GameSceneNode.hpp"
+#include "../../../SDK/GameClass/SkeletonInstance.hpp"
 
 #include "../../../Utils/Projection.hpp"
 
@@ -29,6 +36,49 @@ ESP::ESP()
 {
 }
 
+struct SkeletonTree {
+	int index;
+	std::vector<SkeletonTree> subtrees;
+
+	template <typename... T>
+		requires(std::same_as<T, SkeletonTree> && ...)
+	explicit SkeletonTree(int index, T... subtress)
+		: index(index)
+		, subtrees{ std::forward<T>(subtress)... }
+	{
+	}
+};
+
+// TODO Flatten
+const static SkeletonTree SKELETON_HEAD{
+	6,
+	SkeletonTree{
+		5,
+		// Arms
+		SkeletonTree{ 13, SkeletonTree{ 14, SkeletonTree{ 15 } } },
+		SkeletonTree{ 8, SkeletonTree{ 9, SkeletonTree{ 10 } } },
+
+		SkeletonTree{
+			4,
+			SkeletonTree{
+				3,
+				SkeletonTree{
+					2,
+					SkeletonTree{
+						1,
+						SkeletonTree{
+							0,
+							// Legs
+							SkeletonTree{ 25, SkeletonTree{ 26, SkeletonTree{ 27 } } },
+							SkeletonTree{ 22, SkeletonTree{ 23, SkeletonTree{ 24 } } },
+						},
+					},
+				},
+			},
+		},
+	},
+};
+
 void ESP::draw(ImDrawList* draw_list)
 {
 	if (!enabled.get())
@@ -41,6 +91,9 @@ void ESP::draw(ImDrawList* draw_list)
 				continue;
 			auto* player_pawn = entity->entity_cast<CSPlayerPawn*>();
 			if (!player_pawn)
+				continue;
+
+			if (player_pawn == Memory::local_player)
 				continue;
 
 			if (player_pawn->health() <= 0 || player_pawn->life_state() != LifeState::ALIVE)
@@ -104,6 +157,37 @@ void ESP::draw(ImDrawList* draw_list)
 				}
 				if (healthbar.enabled.get())
 					healthbar.draw(draw_list, entity, unioned_rect);
+			}
+
+			// TODO there can be flickers before the player is respawned, I'm not sure how to approach this quite yet.
+			if (this->skeleton.get()) {
+				BodyComponent* body_component = entity->body_component();
+
+				const SkeletonInstance& skeleton = static_cast<BodyComponentSkeletonInstance*>(body_component)->skeleton_instance();
+
+				if (skeleton.bone_count == 0)
+					continue;
+
+				static const std::function<void(const SkeletonInstance&, const SkeletonTree&)> PROCESS_TREE
+					= [draw_list](const SkeletonInstance& skeleton, const SkeletonTree& tree) {
+						  bool can_draw = true;
+						  ImVec2 from_screen_space;
+						  if (!Projection::project(skeleton.bones[tree.index].pos, from_screen_space))
+							  can_draw = false;
+
+						  for (const SkeletonTree& subtree : tree.subtrees) {
+							  if (can_draw) {
+								  ImVec2 to_screen_space;
+								  if (Projection::project(skeleton.bones[subtree.index].pos, to_screen_space)) {
+									  draw_list->AddLine(from_screen_space, to_screen_space, -1);
+								  }
+							  }
+
+							  PROCESS_TREE(skeleton, subtree);
+						  }
+					  };
+
+				PROCESS_TREE(skeleton, SKELETON_HEAD);
 			}
 		next_ent:;
 		}

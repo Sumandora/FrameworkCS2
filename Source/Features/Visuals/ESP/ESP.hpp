@@ -5,6 +5,7 @@
 #include "../../Settings/Button.hpp"
 #include "../../Settings/Checkbox.hpp"
 #include "../../Settings/Combo.hpp"
+#include "../../Settings/MetaSetting.hpp"
 #include "../../Settings/Subgroup.hpp"
 #include "../../Settings/Tabs.hpp"
 
@@ -30,6 +31,8 @@ class ESP : public Feature {
 	PlayerRectangle box{ elements, "Box" };
 	PlayerSidedText name{ elements, "Name" };
 	PlayerHealthbar healthbar{ elements, "Health bar" };
+	MetaSetting skeleton_meta{ elements, "Skeleton" };
+	Checkbox skeleton{ skeleton_meta, "Skeleton enabled", false };
 
 	enum BabbysFirstEnum : std::uint8_t {
 		HELLO,
