@@ -27,7 +27,18 @@ void Hooks::create()
 		kill(p, SIGSTOP);
 		other_threads.push_back(p);
 	}
+#ifdef __cpp_lib_format_ranges
 	Logging::debug("Paused threads: {}", other_threads);
+#else
+	// temporary, bad reimplementation:
+	std::string vec_string;
+	for (const pid_t pid : other_threads) {
+		if (!vec_string.empty())
+			vec_string += ", ";
+		vec_string += std::to_string(pid);
+	}
+	Logging::debug("Paused threads: [{}]", vec_string);
+#endif
 
 	if (!GraphicsHook::hookSDL()) {
 		Logging::error("Failed to hook SDL");
