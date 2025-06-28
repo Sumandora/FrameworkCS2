@@ -29,7 +29,9 @@ include("Buildscripts/BuildParameters.cmake")
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE PROJECT_NAME="${CMAKE_PROJECT_NAME}")
 
 include(FetchContent)
-set(FETCHCONTENT_QUIET FALSE)
+if(NOT DEFINED ENV{CI})
+	set(FETCHCONTENT_QUIET FALSE)
+endif()
 
 include("Buildscripts/Licenses.cmake") # Macro to generate license headers
 
