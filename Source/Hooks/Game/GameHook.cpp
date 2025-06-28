@@ -13,16 +13,10 @@
 #include "../../SDK/GameClass/CSGOInput.hpp"
 #include "../../SDK/GameClass/Source2Client.hpp"
 
-#include "../../Utils/Logging.hpp"
-
 #include <csignal>
 #include <cstddef>
-#include <filesystem>
-#include <signal.h>
 #include <string>
-#include <time.h>
 #include <unistd.h>
-#include <vector>
 
 namespace Hooks::Game {
 	void create()
@@ -69,30 +63,12 @@ namespace Hooks::Game {
 				.expect<void*>("Couldn't find radar update function"),
 			reinterpret_cast<void*>(RadarUpdate::hook_func));
 
-		std::vector<pid_t> other_threads;
-
-		const pid_t my_tid = gettid();
-
-		for (const std::filesystem::path& it : std::filesystem::directory_iterator{ "/proc/self/task/" }) {
-			const pid_t p = std::stoi(it.filename());
-			if (p == my_tid)
-				continue;
-
-			kill(p, SIGSTOP);
-			other_threads.push_back(p);
-			Logging::debug("Pausing thread {}", p);
-		}
-
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
 		FireEvent::hook->enable();
 		GetFunLoading::hook->enable();
 		CreateMove::hook->enable();
 		RadarUpdate::hook->enable();
-
-		for (const pid_t pid : other_threads) {
-			kill(pid, SIGCONT);
-		}
 	}
 
 	void destroy()
