@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../Schema/FieldOffset.hpp"
 #include "../EntityHandle.hpp"
-#include "CSPlayerPawn.hpp"
+#include "../Schema/FieldOffset.hpp"
 #include "BasePlayerController.hpp"
+#include "CSPlayerPawn.hpp"
 
 struct CSPlayerController : public BasePlayerController {
 	CLASS_INFO("libclient.so", "CCSPlayerController");
 
-	SCHEMA_VAR(const char*, sanitizied_name, "m_sSanitizedPlayerName");
-	SCHEMA_VAR(EntityHandle<CSPlayerPawn>, player_pawn, "m_hPlayerPawn")
+	SCHEMA_VAR(const char*, sanitized_name, "m_sSanitizedPlayerName");
+	SCHEMA_VAR(EntityHandle<CSPlayerPawn>, player_pawn, "m_hPlayerPawn");
 };
