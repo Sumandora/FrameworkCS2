@@ -2,6 +2,7 @@
 
 #include "../Schema/FieldOffset.hpp"
 #include "../Schema/SchemaClassInfo.hpp"
+#include "../Schema/SchemaSystem.hpp"
 
 #include "../EntityHandle.hpp"
 
@@ -17,6 +18,7 @@ struct CollisionProperty;
 struct GameSceneNode;
 struct CSPlayerPawn;
 struct BodyComponent;
+struct EntitySubclassVDataBase;
 
 struct BaseEntity : public EntityInstance {
 	VIRTUAL_METHOD(39, getSchemaType, SchemaClassInfo*, (), (this));
@@ -35,7 +37,15 @@ struct BaseEntity : public EntityInstance {
 
 	SCHEMA_VAR(std::uint32_t, flags, "m_fFlags");
 
-	SCHEMA_VAR(EntityHandle<BaseEntity>, owner_entity, "m_hOwnerEntity")
+	SCHEMA_VAR(EntityHandle<BaseEntity>, owner_entity, "m_hOwnerEntity");
+
+
+	// This type changes based on the entity type
+	EntitySubclassVDataBase* get_vdata()
+	{
+		static const std::int32_t OFFSET = SchemaSystem::findOffset(classInfo(), "m_nSubclassID");
+		return *reinterpret_cast<EntitySubclassVDataBase**>(reinterpret_cast<char*>(this) + OFFSET + 0x8);
+	}
 
 	template <typename T>
 	T entity_cast()
