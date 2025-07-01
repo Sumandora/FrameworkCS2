@@ -373,19 +373,14 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 			const std::lock_guard<std::mutex> lock(GraphicsHook::espMutex);
 			if (GraphicsHook::espDrawList != nullptr) {
 				draw_data->AddDrawList(GraphicsHook::espDrawList.get());
+			} else {
+				GraphicsHook::espDrawListSharedData = std::make_unique<ImDrawListSharedData>(*ImGui::GetDrawListSharedData());
+				GraphicsHook::espDrawList = std::make_unique<ImDrawList>(GraphicsHook::espDrawListSharedData.get());
 			}
 
 			ImGui_ImplVulkan_RenderDrawData(draw_data, fd->CommandBuffer);
 		}
 
-		// Record dear imgui primitives into command buffer
-
-		if (GraphicsHook::espDrawList == nullptr) {
-			GraphicsHook::espDrawListSharedData = std::make_unique<ImDrawListSharedData>(*ImGui::GetDrawListSharedData());
-			GraphicsHook::espDrawList = std::make_unique<ImDrawList>(GraphicsHook::espDrawListSharedData.get());
-		}
-
-		// Submit command buffer
 		vkCmdEndRenderPass(fd->CommandBuffer);
 		vkEndCommandBuffer(fd->CommandBuffer);
 
