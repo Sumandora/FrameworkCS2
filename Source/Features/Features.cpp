@@ -1,6 +1,7 @@
 #include "Features.hpp"
 
 #include "Misc/Bhop.hpp"
+#include "Misc/AutoStrafer.hpp"
 #include "Visuals/ESP/ESP.hpp"
 #include "Visuals/ForceCrosshair.hpp"
 #include "Visuals/GrenadeHelper.hpp"
@@ -17,10 +18,12 @@ void Features::create()
 	grenade_helper.emplace();
 	bhop.emplace();
 	radar.emplace();
+	auto_strafer.emplace();
 }
 
 void Features::destroy()
 {
+	auto_strafer.reset();
 	radar.reset();
 	bhop.reset();
 	grenade_helper.reset();

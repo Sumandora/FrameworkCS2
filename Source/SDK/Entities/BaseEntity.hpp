@@ -20,6 +20,8 @@ struct CSPlayerPawn;
 struct BodyComponent;
 struct EntitySubclassVDataBase;
 
+constexpr std::uint32_t FL_ONGROUND = 1 << 0;
+
 struct BaseEntity : public EntityInstance {
 	VIRTUAL_METHOD(39, getSchemaType, SchemaClassInfo*, (), (this));
 
@@ -39,6 +41,7 @@ struct BaseEntity : public EntityInstance {
 
 	SCHEMA_VAR(EntityHandle<BaseEntity>, owner_entity, "m_hOwnerEntity");
 
+	SCHEMA_VAR(glm::vec3, velocity, "m_vecAbsVelocity");
 
 	// This type changes based on the entity type
 	EntitySubclassVDataBase* get_vdata()
@@ -51,6 +54,11 @@ struct BaseEntity : public EntityInstance {
 	T entity_cast()
 	{
 		return schema_cast<T>(this, getSchemaType());
+	}
+
+	[[nodiscard]] bool alive() const
+	{
+		return life_state() == LifeState::ALIVE && health() > 0;
 	}
 
 	EntityHandle<BaseEntity> get_handle();

@@ -2,6 +2,7 @@
 
 #include "RetAddrSpoofer.hpp"
 
+#include "../../../Features/Misc/AutoStrafer.hpp"
 #include "../../../Features/Misc/Bhop.hpp"
 
 #include "../../../Memory.hpp"
@@ -57,6 +58,7 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 	}
 
 	bhop->create_move(usercmd);
+	auto_strafer->create_move(usercmd);
 
 	// Update the CRC stored in the UserCmd to accommodate our changes.
 	if (usercmd->csgo_usercmd.has_base() && usercmd->csgo_usercmd.base().has_move_crc()) {

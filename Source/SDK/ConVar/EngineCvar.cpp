@@ -1,5 +1,8 @@
 #include "EngineCvar.hpp"
+
 #include "ConVar.hpp"
+
+#include "../../Utils/Logging.hpp"
 
 #include <cstring>
 
@@ -14,5 +17,7 @@ ConVar* EngineCvar::findByName(const char* name)
 
 		it = listElem.next;
 	}
+
+	Logging::error("Failed to find convar '{}'", name);
 	return nullptr;
 }

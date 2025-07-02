@@ -43,6 +43,12 @@ public:
 	{
 	}
 
+	// Provided mainly for visiblity conditions, which shouldn't change based on game state
+	decltype(setting.get()) get_raw() const
+	{
+		return setting.get();
+	}
+
 	decltype(setting.get()) get() const
 	{
 		const std::lock_guard<std::mutex> guard{ circuit_access };
