@@ -45,9 +45,11 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 		emergency_crash_if(pre != post, "UserCmd CRC was incorrectly recomputed!");
 
 		// TODO This check does not work, I think the arena tries to reuse memory or something, fix this some time soon.
+#if 0
 		// I think one could change a button and see if it results in a different CRC, but that seems a bit obnoxious for a simple self test.
 		// Can we perhaps store sample CRCs and verify that they come out the right way?
-		//emergency_crash_if(pre_ptr == post_ptr, "UserCmd CRC did not update!");
+		emergency_crash_if(pre_ptr == post_ptr, "UserCmd CRC did not update!");
+#endif
 	}
 #endif
 
