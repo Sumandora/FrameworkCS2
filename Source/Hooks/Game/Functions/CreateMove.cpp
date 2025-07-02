@@ -18,6 +18,8 @@
 #include "glm/ext/vector_float3.hpp"
 
 #include <cassert>
+#include <cstdint>
+#include <optional>
 #include <vector>
 
 void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
@@ -59,8 +61,37 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 		grenade_helper->update_viewangles(vec);
 	}
 
+	const float forward = usercmd->csgo_usercmd.base().forwardmove();
+	const float left = usercmd->csgo_usercmd.base().leftmove();
+
 	bhop->create_move(usercmd);
 	auto_strafer->create_move(usercmd);
+
+	const float new_forward = usercmd->csgo_usercmd.base().forwardmove();
+	const float new_left = usercmd->csgo_usercmd.base().leftmove();
+
+	if (forward != new_forward || left != new_left) {
+		struct LastCmd {
+			std::int32_t tick;
+			Buttons buttons;
+		};
+		static std::optional<LastCmd> last_cmd = std::nullopt;
+
+		if (last_cmd && last_cmd->tick >= usercmd->csgo_usercmd.base().client_tick()) {
+			// TODO: This is not accurate, but I think it is still better to do this incorrectly, than not at all.
+			//		 Because these states are dependent on subticks, I think they are not verifiable by valve,
+			// 		 however I might be wrong because of subtick moves and input history vectors inside the command.
+			// 		 To do this very correctly I might have to add my own... I'm not sure if they are checking this already, however.
+			usercmd->fixup_buttons_for_move();
+			usercmd->fixup_button_changes(last_cmd->buttons);
+		}
+
+		if (!usercmd->has_been_predicted)
+			last_cmd = {
+				.tick = usercmd->csgo_usercmd.base().client_tick(),
+				.buttons = usercmd->buttons,
+			};
+	}
 
 	// Update the CRC stored in the UserCmd to accommodate our changes.
 	if (usercmd->csgo_usercmd.has_base() && usercmd->csgo_usercmd.base().has_move_crc()) {

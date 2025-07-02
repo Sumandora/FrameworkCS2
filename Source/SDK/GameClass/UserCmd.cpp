@@ -5,9 +5,10 @@
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
 
-#include "RetAddrSpoofer.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
+
+#include "RetAddrSpoofer.hpp"
 
 #include <cstdint>
 
@@ -97,4 +98,62 @@ CSubtickMoveStep* UserCmd::allocate_new_move_step(float when)
 	subtick_moves->AddAllocated(new_step);
 
 	return new_step;
+}
+
+void UserCmd::set_buttonstate1(std::uint64_t value)
+{
+	if (csgo_usercmd.has_base() && csgo_usercmd.base().has_buttons_pb())
+		csgo_usercmd.mutable_base()->mutable_buttons_pb()->set_buttonstate1(value);
+	buttons.buttonstate1 = value;
+}
+
+void UserCmd::set_buttonstate2(std::uint64_t value)
+{
+	if (csgo_usercmd.has_base() && csgo_usercmd.base().has_buttons_pb())
+		csgo_usercmd.mutable_base()->mutable_buttons_pb()->set_buttonstate2(value);
+	buttons.buttonstate2 = value;
+}
+
+void UserCmd::set_buttonstate3(std::uint64_t value)
+{
+	if (csgo_usercmd.has_base() && csgo_usercmd.base().has_buttons_pb())
+		csgo_usercmd.mutable_base()->mutable_buttons_pb()->set_buttonstate3(value);
+	buttons.buttonstate3 = value;
+}
+
+void UserCmd::fixup_buttons_for_move()
+{
+	std::uint64_t buttons = this->buttons.buttonstate1;
+
+	const float forward = csgo_usercmd.base().forwardmove();
+	const float left = csgo_usercmd.base().leftmove();
+
+	if (forward > 0.0F) {
+		buttons |= IN_FORWARD;
+		buttons &= ~IN_BACK;
+	} else if (forward < 0.0F) {
+		buttons |= IN_BACK;
+		buttons &= ~IN_FORWARD;
+	} else {
+		buttons &= ~IN_FORWARD;
+		buttons &= ~IN_BACK;
+	}
+
+	if (left > 0.0F) {
+		buttons |= IN_MOVERIGHT;
+		buttons &= ~IN_MOVELEFT;
+	} else if (left < 0.0F) {
+		buttons |= IN_MOVELEFT;
+		buttons &= ~IN_MOVERIGHT;
+	} else {
+		buttons &= ~IN_MOVELEFT;
+		buttons &= ~IN_MOVERIGHT;
+	}
+
+	set_buttonstate1(buttons);
+}
+
+void UserCmd::fixup_button_changes(const Buttons& old_buttons)
+{
+	set_buttonstate2(buttons.buttonstate1 ^ old_buttons.buttonstate1);
 }
