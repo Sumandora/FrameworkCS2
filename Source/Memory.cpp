@@ -134,6 +134,8 @@ void Memory::create()
 
 	get_fun_loading = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"#LoadingProgress_CSFunLoading%d">(), BCRL::everything(mem_mgr).thats_readable().thats_not_executable().with_name("libclient.so"))
 						  .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+						  .sub(3)
+						  .filter([](const auto& ptr) { return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 35">()); })
 						  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 						  .expect<void*>("Couldn't find get_fun_loading");
 
