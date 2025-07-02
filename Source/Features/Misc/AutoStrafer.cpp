@@ -102,7 +102,7 @@ void AutoStrafer::create_move(UserCmd* cmd)
 		const int change = cmd->csgo_usercmd.base().mousedx();
 		if (!only_when_idle.get() || (cmd->csgo_usercmd.base().leftmove() == 0.0F && cmd->csgo_usercmd.base().forwardmove() == 0.0F)) {
 			cmd->csgo_usercmd.mutable_base()->set_forwardmove(0.0F);
-			cmd->csgo_usercmd.mutable_base()->set_leftmove(glm::sign(static_cast<float>(change)));
+			cmd->csgo_usercmd.mutable_base()->set_leftmove(-glm::sign(static_cast<float>(change)));
 		}
 		break;
 	}
