@@ -317,6 +317,8 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 		};
 		if (grenade.duck)
 			colored_text_if_unfulfilled("Crouching", crouching);
+		else if(crouching)
+			colored_text_if_unfulfilled("Standing", false);
 		if (grenade.throw_info.jump)
 			// Jump throw is never satisfied, because if you jump then it is no longer rendered.
 			// Just assume that it is satisfied.
