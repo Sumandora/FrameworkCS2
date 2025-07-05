@@ -7,7 +7,7 @@
 
 bool Projection::project(const glm::vec3& world, ImVec2& screen)
 {
-	const glm::mat4x4& matrix = glm::transpose(*Memory::worldToProjectionMatrix);
+	const glm::mat4x4 matrix = glm::transpose(*Memory::worldToProjectionMatrix);
 	const glm::vec4 transformed = matrix * glm::vec4(world, 1.0F);
 
 	if (transformed.z <= 0.0F || transformed.w <= 0.0F)
