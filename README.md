@@ -53,6 +53,13 @@ A fully-featured training software for Counter Strike: 2, made for Linux.
 
   Only Tumbleweed is being tested, Leap installs a very outdated GCC version by default.
 </details>
+<details>
+  <summary> Gentoo </summary>
+
+  ```sh
+  emerge dev-vcs/git dev-build/cmake dev-util/vulkan-headers dev-util/vulkan-tools
+  ```
+</details>
 These might be outdated, in that case please open an issue or a pull request, which updates the package names.
 
 ### Download
