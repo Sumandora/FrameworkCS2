@@ -24,6 +24,7 @@ class AutoStrafer : public Feature {
 	Combo<AutoStraferMode> mode{ this, "Mode", AutoStraferMode::Directional };
 	Checkbox allow_hard_turns{ this, "Allow hard turns", true };
 	FloatSlider hard_turn_threshold{ this, "Hard turn threshold", 0.0F, 180.0F, 135.0F };
+	Checkbox subtick{ this, "Subtick (WIP)", true };
 	Checkbox only_when_idle{ this, "Only when idle", false };
 
 public:

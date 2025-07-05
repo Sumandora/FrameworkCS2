@@ -17,6 +17,8 @@ static constexpr std::uint64_t IN_BACK = 1 << 4;
 static constexpr std::uint64_t IN_MOVELEFT = 1 << 9;
 static constexpr std::uint64_t IN_MOVERIGHT = 1 << 10;
 
+static constexpr int MAX_SUBTICKS_PER_MOVE = 12;
+
 struct Buttons {
 	PADDING(0x8);
 	std::uint64_t buttonstate1;
