@@ -62,6 +62,17 @@ namespace Hooks::Game {
 				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 				.expect<void*>("Couldn't find radar update function"),
 			reinterpret_cast<void*>(RadarUpdate::hook_func));
+		RenderLegs::hook.emplace(
+			Memory::emalloc,
+			BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"FirstpersonLegsPrepass">(),
+				BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+				.find_xrefs(SignatureScanner::XRefTypes::relative(),
+					BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+				.expect<void*>("Couldn't find render legs function"),
+			reinterpret_cast<void*>(RenderLegs::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -69,10 +80,12 @@ namespace Hooks::Game {
 		GetFunLoading::hook->enable();
 		CreateMove::hook->enable();
 		RadarUpdate::hook->enable();
+		RenderLegs::hook->enable();
 	}
 
 	void destroy()
 	{
+		RenderLegs::hook.reset();
 		RadarUpdate::hook.reset();
 		CreateMove::hook.reset();
 		GetFunLoading::hook.reset();

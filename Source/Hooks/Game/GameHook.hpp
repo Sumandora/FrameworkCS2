@@ -53,4 +53,9 @@ namespace Hooks::Game {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(GameRadar* thisptr);
 	}
+
+	namespace RenderLegs {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(void* rdi, void* rsi, void* rdx, void* rcx, void* r8);
+	}
 }

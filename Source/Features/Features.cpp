@@ -1,13 +1,14 @@
 #include "Features.hpp"
 
-#include "Misc/Bhop.hpp"
 #include "Misc/AutoStrafer.hpp"
+#include "Misc/Bhop.hpp"
 #include "Visuals/ESP/ESP.hpp"
 #include "Visuals/ForceCrosshair.hpp"
 #include "Visuals/GrenadeHelper.hpp"
 #include "Visuals/GrenadePrediction.hpp"
 #include "Visuals/LoadingTextChanger.hpp"
 #include "Visuals/Radar.hpp"
+#include "Visuals/Removals.hpp"
 
 void Features::create()
 {
@@ -19,10 +20,12 @@ void Features::create()
 	bhop.emplace();
 	radar.emplace();
 	auto_strafer.emplace();
+	removals.emplace();
 }
 
 void Features::destroy()
 {
+	removals.reset();
 	auto_strafer.reset();
 	radar.reset();
 	bhop.reset();
