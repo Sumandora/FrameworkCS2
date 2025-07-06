@@ -58,4 +58,9 @@ namespace Hooks::Game {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(void* rdi, void* rsi, void* rdx, void* rcx, void* r8);
 	}
+
+	namespace AddSleeveModel {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(void* rdi, void* rsi);
+	}
 }

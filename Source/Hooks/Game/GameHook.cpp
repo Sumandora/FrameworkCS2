@@ -17,6 +17,7 @@
 #include <cstddef>
 #include <string>
 #include <unistd.h>
+#include <vulkan/vulkan_core.h>
 
 namespace Hooks::Game {
 	void create()
@@ -73,6 +74,19 @@ namespace Hooks::Game {
 				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 				.expect<void*>("Couldn't find render legs function"),
 			reinterpret_cast<void*>(RenderLegs::hook_func));
+		AddSleeveModel::hook.emplace(
+			Memory::emalloc,
+			BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"sleeve_model">(),
+				BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+				.find_xrefs(SignatureScanner::XRefTypes::relative(),
+					BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+				.sub(6)
+				.filter([](const auto& ptr) { return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"44 89 ff">()); })
+				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 31 c9 ba">())
+				.expect<void*>("Couldn't find add sleeve model function"),
+			reinterpret_cast<void*>(AddSleeveModel::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -81,10 +95,12 @@ namespace Hooks::Game {
 		CreateMove::hook->enable();
 		RadarUpdate::hook->enable();
 		RenderLegs::hook->enable();
+		AddSleeveModel::hook->enable();
 	}
 
 	void destroy()
 	{
+		AddSleeveModel::hook.reset();
 		RenderLegs::hook.reset();
 		RadarUpdate::hook.reset();
 		CreateMove::hook.reset();
