@@ -92,7 +92,7 @@ void AutoStrafer::create_move(UserCmd* cmd)
 			const float speed = glm::length(velocity.xy());
 
 			// https://github.com/degeneratehyperbola/NEPS/blob/7e41ae811cf4ae136203093a059e137c8a10796f/NEPS/Hacks/Misc.cpp#L845-L857
-			const float term = sv_air_max_wishspeed->value.floatingPoint / sv_airaccelerate->value.floatingPoint / sv_maxspeed->value.floatingPoint * 100.0F / speed;
+			const float term = sv_air_max_wishspeed->get_float() / sv_airaccelerate->get_float() / sv_maxspeed->get_float() * 100.0F / speed;
 			const float perfect_delta = acos(term);
 
 			const float delta = std::remainder(wish_direction - real_direction, 2.0F * std::numbers::pi_v<float>);

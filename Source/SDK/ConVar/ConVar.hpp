@@ -20,4 +20,14 @@ struct ConVar {
 	PADDING(12);
 	ConVarValue value;
 	ConVarValue valueBackup;
+
+	// Functions to mirror how the game accesses con vars:
+	[[nodiscard]] float get_float() const
+	{
+		return value.floatingPoint;
+	}
+	[[nodiscard]] bool get_bool() const
+	{
+		return value.boolean;
+	}
 };
