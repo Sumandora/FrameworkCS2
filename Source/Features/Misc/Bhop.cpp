@@ -35,7 +35,7 @@ void Bhop::create_move(UserCmd* cmd)
 	Memory::local_player->movement_services()->set_prediction_command(cmd);
 	*(*Memory::local_player_controller)->get_current_command() = cmd;
 	if (auto* network_game_client = Interfaces::network_client_service->network_game_client; network_game_client) {
-		network_game_client->client_side_predict(0);
+		network_game_client->client_side_predict(PredictionStage::CLIENT_COMMAND_TICK);
 	}
 
 	const bool holding_jump = cmd->buttons.buttonstate1 & IN_JUMP;
