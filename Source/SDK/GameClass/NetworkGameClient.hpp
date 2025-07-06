@@ -5,7 +5,7 @@
 // NOLINTNEXTLINE(performance-enum-size)
 enum class PredictionStage : int {
 	// Determined through enum -> string conversion inside the ClientSidePredict function
-	CLIENT_COMMAND_TICK,
+	CLIENT_COMMAND_TICK = 0,
 	DEMO_PREENTITY,
 	DEMO_SIMULATION,
 	POSTNETUPDATE,
