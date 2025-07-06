@@ -74,6 +74,10 @@ void GUI::Tabs::render()
 						Debug::draw_notifications();
 						ImGuiExt::EndBoxedTabItem();
 					}
+					if (ImGuiExt::BeginBoxedTabItem("Force update", ImGui::GetContentRegionAvail())) {
+						Debug::draw_force_update();
+						ImGuiExt::EndBoxedTabItem();
+					}
 
 					ImGui::EndTabBar();
 				}

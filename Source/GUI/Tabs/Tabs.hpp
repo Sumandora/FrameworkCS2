@@ -11,6 +11,7 @@ namespace GUI::Tabs {
 		void draw_event_list();
 		void draw_panorama();
 		void draw_notifications();
+		void draw_force_update();
 	}
 	namespace About {
 		void draw_configs();
