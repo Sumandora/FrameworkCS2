@@ -18,6 +18,7 @@
 
 #include "Utils/CRC.hpp"
 #include "Utils/Logging.hpp"
+#include "Utils/BulletSimulation.hpp"
 
 const void* RetAddrSpoofer::leaveRet;
 
@@ -149,4 +150,5 @@ void Memory::create()
 				  .expect<GlobalVars**>("Couldn't find global vars");
 
 	EngineTrace::resolve_signatures();
+	BulletSimulation::resolve_signatures();
 }

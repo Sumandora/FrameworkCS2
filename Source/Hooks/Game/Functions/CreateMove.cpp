@@ -2,6 +2,7 @@
 
 #include "RetAddrSpoofer.hpp"
 
+#include "../../../Features/Combat/Aimbot.hpp"
 #include "../../../Features/Misc/AutoStrafer.hpp"
 #include "../../../Features/Misc/Bhop.hpp"
 
@@ -66,6 +67,7 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 
 	bhop->create_move(usercmd);
 	auto_strafer->create_move(usercmd);
+	aimbot->create_move(usercmd);
 
 	const float new_forward = usercmd->csgo_usercmd.base().forwardmove();
 	const float new_left = usercmd->csgo_usercmd.base().leftmove();

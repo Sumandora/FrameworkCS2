@@ -12,4 +12,5 @@ struct CSWeaponBaseVData : public BasePlayerWeaponVData {
 	SCHEMA_VAR(float, range, "m_flRange");
 	SCHEMA_VAR(float, range_modifier, "m_flRangeModifier");
 	SCHEMA_VAR(float, headshot_multiplier, "m_flHeadshotMultiplier");
+	SCHEMA_VAR(float, armor_ratio, "m_flArmorRatio");
 };

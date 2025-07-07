@@ -11,6 +11,7 @@
 
 struct BasePlayerController;
 
+static constexpr std::uint64_t IN_ATTACK = 1 << 0;
 static constexpr std::uint64_t IN_JUMP = 1 << 1;
 static constexpr std::uint64_t IN_FORWARD = 1 << 3;
 static constexpr std::uint64_t IN_BACK = 1 << 4;

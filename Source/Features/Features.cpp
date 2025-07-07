@@ -1,5 +1,6 @@
 #include "Features.hpp"
 
+#include "Combat/Aimbot.hpp"
 #include "Misc/AutoStrafer.hpp"
 #include "Misc/Bhop.hpp"
 #include "Visuals/ESP/ESP.hpp"
@@ -19,6 +20,7 @@ void Features::create()
 	grenade_helper.emplace();
 	bhop.emplace();
 	radar.emplace();
+	aimbot.emplace();
 	auto_strafer.emplace();
 	removals.emplace();
 }
@@ -27,6 +29,7 @@ void Features::destroy()
 {
 	removals.reset();
 	auto_strafer.reset();
+	aimbot.reset();
 	radar.reset();
 	bhop.reset();
 	grenade_helper.reset();

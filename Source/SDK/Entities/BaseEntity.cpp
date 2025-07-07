@@ -4,9 +4,14 @@
 
 #include "EntityIdentity.hpp"
 
+#include "../ConVar/ConVar.hpp"
+#include "../ConVar/EngineCvar.hpp"
+
+#include "../../Interfaces.hpp"
+
 #include <cstdint>
 
-EntityHandle<BaseEntity> BaseEntity::get_handle()
+EntityHandle<BaseEntity> BaseEntity::get_handle() const
 {
 	if (EntityIdentity* identity = entity(); identity) {
 		std::uint16_t entry_index = 0;
@@ -20,4 +25,13 @@ EntityHandle<BaseEntity> BaseEntity::get_handle()
 	}
 
 	return EntityHandle<BaseEntity>::invalid();
+}
+
+bool BaseEntity::is_enemy(BaseEntity* other) const
+{
+	static ConVar* mp_teammates_are_enemies = Interfaces::engineCvar->findByName("mp_teammates_are_enemies");
+	if (mp_teammates_are_enemies->get_bool())
+		return true;
+
+	return team_id() != other->team_id();
 }

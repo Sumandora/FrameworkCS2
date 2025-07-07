@@ -10,6 +10,11 @@
 
 #include <cstdint>
 
+enum BoneIds : std::uint8_t {
+	BONE_HEAD = 6,
+	// TODO add more
+};
+
 struct SkeletonInstance : GameSceneNode {
 public:
 	PADDING(0x1CC);

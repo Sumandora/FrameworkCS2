@@ -1,0 +1,315 @@
+#include "BulletSimulation.hpp"
+
+#include "../SDK/ConVar/ConVar.hpp"
+#include "../SDK/ConVar/EngineCvar.hpp"
+#include "../SDK/EngineTrace/EngineTrace.hpp"
+#include "../SDK/EngineTrace/GameTrace.hpp"
+#include "../SDK/EngineTrace/TraceFilter.hpp"
+#include "../SDK/Entities/BaseEntity.hpp"
+#include "../SDK/Entities/BasePlayerWeapon.hpp"
+#include "../SDK/Entities/CSPlayerPawn.hpp"
+#include "../SDK/Entities/Services/PlayerWeaponServices.hpp"
+#include "../SDK/Entities/VData/CSWeaponBaseVData.hpp"
+#include "../SDK/EntityHandle.hpp"
+#include "../SDK/Padding.hpp"
+
+#include "../Memory.hpp"
+
+#include "../Interfaces.hpp"
+
+#include "BCRL/SearchConstraints.hpp"
+#include "BCRL/Session.hpp"
+#include "SignatureScanner/PatternSignature.hpp"
+
+#include "glm/ext/vector_float2.hpp"
+#include "glm/ext/vector_float3.hpp"
+
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+
+// Reenable for debugging
+#ifdef DEBUG_BULLET_SIMULATION
+#include "../SDK/Entities/CSPlayerController.hpp"
+#include "Logging.hpp"
+#include "magic_enum/magic_enum.hpp"
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define BULLETSIM_DBG(...) Logging::debug(__VA_ARGS__)
+#else
+#define BULLETSIM_DBG(...)
+#endif
+
+struct TraceElement {
+	float unk;
+	float distance;
+	float damage;
+	std::uint32_t penetration_count;
+	std::uint16_t handle_1;
+	std::uint16_t handle_1_2;
+	std::uint32_t handle_2;
+};
+static_assert(sizeof(TraceElement) == 0x18);
+
+struct OtherElem {
+	PADDING(0x30);
+};
+static_assert(sizeof(OtherElem) == 0x30);
+
+struct TraceData {
+	PADDING(1024 * 10);
+
+	OFFSET(int, count, 6176);
+	OFFSET(TraceElement*, elements, 6184);
+	OFFSET(OtherElem*, other_elements, 8);
+};
+
+static_assert(sizeof(TraceData) >= 0x1850); // I don't know the real size
+
+struct WeaponData {
+	float damage;
+	float penetration;
+	float range_modifier;
+	float range;
+	int pen_count;
+	bool failed;
+};
+
+// The following names are the ones that the Windows community seems to have agreed upon,
+// I don't fully agree with them, but in the spirit of comparability I will use them as well.
+static glm::vec2 (*create_trace)(TraceData*, glm::vec3*, glm::vec3*, TraceFilter*, int); // Interesting, but non-essential return type.
+static bool (*handle_bullet_penetration)(TraceData*, WeaponData*, void*, TeamID, void*);
+static void (*get_trace)(TraceData*, GameTrace*, void*, float);
+static void (*finalize_tracedata)(TraceData*); // Haven't seen this function anywhere else...
+
+void BulletSimulation::resolve_signatures()
+{
+	// TODO Find better signatures, this may be hard because all of these functions are in the penetration of FX_FireBullets
+	create_trace = BCRL::signature(
+		Memory::mem_mgr,
+		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 41 56 49 89 F6 41 55 49 89 FD 41 54 48 8D BD">(),
+		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+					   .expect<decltype(create_trace)>("Couldn't find CreateTrace");
+
+	handle_bullet_penetration = BCRL::signature(
+		Memory::mem_mgr,
+		SignatureScanner::PatternSignature::for_array_of_bytes<"55 66 0F EF F6 48 89 E5 41 57 41 56 41 55">(),
+		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+									.expect<decltype(handle_bullet_penetration)>("Couldn't find HandleBulletPenetration");
+	get_trace = BCRL::signature(
+		Memory::mem_mgr,
+		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 66 41 0F 7E C7 41 56 41 55 49 89 FD">(),
+		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+					.expect<decltype(get_trace)>("Couldn't find GetTrace");
+	finalize_tracedata = BCRL::signature(
+		Memory::mem_mgr,
+		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 53 48 89 FB 48 83 EC 08 8B 87 ? ? ? ? C7 87 ? ? ? ? 00 00 00 00 8B 8F">(),
+		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+							 .expect<decltype(finalize_tracedata)>("Couldn't find finalize_tracedata");
+}
+
+static void scale_damage(CSPlayerPawn* entity, CSWeaponBaseVData* weapon_data, BulletSimulation::Results& results)
+{
+	// @see CCSPlayer::TraceAttack
+
+	// TODO If the game brings back riot shields proper their support must be reflected here.
+	// 		However one should question if never shooting a riot shield is a good tactical decision,
+	// 			perhaps "wasting" a shot on destroying it would be justified
+	const bool hit_shield = false; // IsHittingShield(vecDir, ptr);
+
+	static ConVar* mp_damage_scale_ct_body = Interfaces::engineCvar->findByName("mp_damage_scale_ct_body");
+	static ConVar* mp_damage_scale_t_body = Interfaces::engineCvar->findByName("mp_damage_scale_t_body");
+	static ConVar* mp_damage_scale_ct_head = Interfaces::engineCvar->findByName("mp_damage_scale_ct_head");
+	static ConVar* mp_damage_scale_t_head = Interfaces::engineCvar->findByName("mp_damage_scale_t_head");
+
+	// NOTE: Game considers non-ct to be t here. Shouldn't matter, but should be noted.
+	const bool is_ct = entity->team_id() == TeamID::TEAM_COUNTER_TERRORIST;
+	const float body_damage_scale = is_ct ? mp_damage_scale_ct_body->get_float() : mp_damage_scale_t_body->get_float();
+	float head_damage_scale = is_ct ? mp_damage_scale_ct_head->get_float() : mp_damage_scale_t_head->get_float();
+
+	float damage = results.raw_damage;
+
+	if (entity->has_heavy_armor())
+		head_damage_scale = head_damage_scale * 0.5F;
+
+	if (entity->gun_game_immunity() || hit_shield) {
+		results.scaled_damage = 0;
+		return;
+	}
+
+	switch (results.hit_group) {
+	case HitGroup::GENERIC:
+		break;
+	case HitGroup::HEAD:
+		damage *= weapon_data->headshot_multiplier();
+		damage *= head_damage_scale;
+		break;
+	case HitGroup::CHEST:
+		damage *= 1.0F;
+		damage *= body_damage_scale;
+		break;
+	case HitGroup::STOMACH:
+		damage *= 1.25F;
+		damage *= body_damage_scale;
+		break;
+	case HitGroup::LEFTARM:
+	case HitGroup::RIGHTARM:
+		damage *= 1.0F;
+		damage *= body_damage_scale;
+		break;
+	case HitGroup::LEFTLEG:
+	case HitGroup::RIGHTLEG:
+		damage *= 0.75F;
+		damage *= body_damage_scale;
+		break;
+	default:
+		break;
+	}
+
+	// @see CCSPlayer::OnTakeDamage
+
+	float armor_bonus = 0.5F;
+	float armor_ratio = weapon_data->armor_ratio() * 0.5F; // TODO correct?
+
+	float damage_to_health = damage;
+	float damage_to_armor = 0.0F;
+	float heavy_armor_bonus = 1.0F;
+
+	if (entity->has_heavy_armor()) {
+		// TODO: Those values have probably changed
+		// 		I took them from W1lliam1337s AutoWall post, but I haven't verified them.
+		// 		https://www.unknowncheats.me/forum/counter-strike-2-a/608159-cs2-autowall-penetration-system.html
+		armor_ratio *= 0.2F;
+		armor_bonus = 0.33F;
+		heavy_armor_bonus = 0.25F;
+	}
+
+	const bool damage_type_applies_to_armor = true; // Don't even bother calculating this
+	int armor_value = entity->armor_value();
+	if (damage_type_applies_to_armor && armor_value && entity->is_armored_at(results.hit_group)) {
+		BULLETSIM_DBG("armor calc");
+		damage_to_health = damage * armor_ratio;
+		damage_to_armor = (damage - damage_to_health) * (armor_bonus * heavy_armor_bonus);
+
+		if (damage_to_armor > static_cast<float>(armor_value)) {
+			damage_to_health = damage - static_cast<float>(armor_value) / armor_bonus;
+			damage_to_armor = static_cast<float>(armor_value);
+			armor_value = 0;
+		} else {
+
+			if (damage_to_armor < 0.0F)
+				damage_to_armor = 1.0F;
+
+			armor_value -= static_cast<int>(damage_to_armor);
+		}
+
+		damage = damage_to_health;
+
+		if (armor_value <= 0) {
+			// Maybe the caller can make tactical decisions based on this?
+			results.lost_armor = true;
+		}
+	}
+
+	results.scaled_damage = damage;
+}
+
+BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& from, const glm::vec3& to, BaseEntity* entity)
+{
+	if (!Memory::local_player
+		|| !Memory::local_player->weapon_services()->active_weapon().has_entity()
+		|| !Memory::local_player->weapon_services()->active_weapon().get())
+		return {}; // leck eier
+
+	TraceData data{};
+	const auto indexer = reinterpret_cast<std::uintptr_t>(&data);
+	*reinterpret_cast<std::uint64_t*>(indexer + 16) = 0x8000000000000080;
+	*reinterpret_cast<void**>(indexer + 8) = reinterpret_cast<void*>(indexer + 0x18);
+	*reinterpret_cast<std::uint64_t*>(indexer + 6192) = 0x8000000000000008;
+	*reinterpret_cast<void**>(indexer + 6184) = reinterpret_cast<void*>(indexer + 0x1838);
+
+	TraceFilter filter{ 0x1c300b };
+	filter.unk3 = 15;
+	filter.unk4 = 3;
+
+	filter.add_skip(Memory::local_player);
+
+	auto* vdata = static_cast<CSWeaponBaseVData*>(Memory::local_player->weapon_services()->active_weapon().get()->get_vdata());
+
+	glm::vec3 the_from = from;
+	glm::vec3 direction = to - from;
+
+	[[maybe_unused]] const glm::vec2 something = create_trace(&data, &the_from, &direction, &filter, 4 /* count of penetrations? */);
+
+	if (data.count() == 0)
+		return {};
+
+// NOLINTNEXTLINE(readability-avoid-unconditional-preprocessor-if)
+#if 0
+	// These two functions are called in the game, but seem non-essential, create_trace also calls them internally
+	f1(EngineTrace::the(), &data, &the_from, &something, &filter.mask);
+	f2(&data, &something);
+#endif
+
+	WeaponData wep_data{
+		.damage = static_cast<float>(vdata->damage()),
+		.penetration = vdata->penetration(),
+		.range_modifier = vdata->range_modifier(),
+		// .range = glm::distance(from, to),
+		.range = vdata->range(),
+		.pen_count = 4,
+		.failed = false
+	};
+
+	BULLETSIM_DBG("wpn dmg: {}", vdata->damage());
+
+	auto damage = static_cast<float>(vdata->damage());
+	BULLETSIM_DBG("count: {}", data.count());
+	for (int i = 0; i < data.count(); i++) {
+		TraceElement* elem = &data.elements()[i];
+		// if ((elem->handle_2 & 1) != 0)
+		// 	continue; // ???
+
+		GameTrace game_trace = GameTrace::initialized();
+
+		void* arg3 = reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(data.other_elements()) + static_cast<std::uintptr_t>(0x30 * (elem->handle_1_2 & ENTITY_LIST_INDEX_MASK)));
+		get_trace(&data, &game_trace, arg3, 0.0F);
+
+		BULLETSIM_DBG("intermediate fraction: {}", game_trace.fraction);
+		BULLETSIM_DBG("trace from: {}, trace to: {}", game_trace.from, the_from + game_trace.to);
+
+		if (game_trace.hit_entity != nullptr && game_trace.hit_entity == entity) {
+			if (damage < 1.0F)
+				return {};
+
+			auto* pawn = game_trace.hit_entity->entity_cast<CSPlayerPawn*>(); // TODO don't recompute
+
+			if (pawn) {
+				BULLETSIM_DBG("player_name:\n{}", pawn->original_controller().get()->sanitized_name());
+
+				BULLETSIM_DBG("hitgroup: {}", magic_enum::enum_name(game_trace.hitbox_data->hitgroup));
+
+				Results results{
+					.raw_damage = damage,
+					.scaled_damage = damage,
+					.hit_group = game_trace.hitbox_data->hitgroup,
+					.lost_armor = false,
+				};
+
+				scale_damage(pawn, vdata, results);
+
+				return results;
+			}
+		}
+
+		if (handle_bullet_penetration(&data, &wep_data, &data.elements()[i], Memory::local_player->team_id(), nullptr)) {
+			BULLETSIM_DBG("end");
+			return {};
+		}
+		BULLETSIM_DBG("intermediate dmg: {}", wep_data.damage);
+
+		damage = wep_data.damage;
+	}
+
+	finalize_tracedata(&data);
+	return {};
+}

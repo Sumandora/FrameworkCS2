@@ -12,6 +12,8 @@
 
 #include "EntityInstance.hpp"
 
+#include "glm/ext/vector_float3.hpp"
+
 #include <cstdint>
 
 struct CollisionProperty;
@@ -21,6 +23,16 @@ struct BodyComponent;
 struct EntitySubclassVDataBase;
 
 constexpr std::uint32_t FL_ONGROUND = 1 << 0;
+
+// NOLINTNEXTLINE(performance-enum-size)
+enum class TeamID : int {
+	TEAM_INVALID = -1,
+	TEAM_ANY = -1,
+	TEAM_UNASSIGNED = 0,
+	TEAM_SPECTATOR = 1,
+	TEAM_TERRORIST = 2,
+	TEAM_COUNTER_TERRORIST = 3,
+};
 
 struct BaseEntity : public EntityInstance {
 	VIRTUAL_METHOD(39, getSchemaType, SchemaClassInfo*, (), (this));
@@ -40,6 +52,8 @@ struct BaseEntity : public EntityInstance {
 	SCHEMA_VAR(std::uint32_t, flags, "m_fFlags");
 
 	SCHEMA_VAR(EntityHandle<BaseEntity>, owner_entity, "m_hOwnerEntity");
+
+	SCHEMA_VAR(TeamID, team_id, "m_iTeamNum");
 
 	SCHEMA_VAR(glm::vec3, velocity, "m_vecAbsVelocity");
 
@@ -61,5 +75,7 @@ struct BaseEntity : public EntityInstance {
 		return life_state() == LifeState::ALIVE && health() > 0;
 	}
 
-	EntityHandle<BaseEntity> get_handle();
+	[[nodiscard]] EntityHandle<BaseEntity> get_handle() const;
+
+	[[nodiscard]] bool is_enemy(BaseEntity* other) const;
 };
