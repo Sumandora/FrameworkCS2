@@ -7,6 +7,7 @@
 #include "BCRL/Session.hpp"
 
 #include "SignatureScanner/PatternSignature.hpp"
+#include "SignatureScanner/XRefSignature.hpp"
 
 #include "DetourHooking.hpp"
 
@@ -87,6 +88,19 @@ namespace Hooks::Game {
 				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 31 c9 ba">())
 				.expect<void*>("Couldn't find add sleeve model function"),
 			reinterpret_cast<void*>(AddSleeveModel::hook_func));
+		DrawArrayExt::hook.emplace(
+			Memory::emalloc,
+			// This function is CAnimatableSceneObjectDesc's 2nd vfunc, TODO maybe I should scan for that instead.
+			BCRL::signature(
+				Memory::mem_mgr,
+				// This is a 128-bit operand stored at a memory address, which is then accessed through relative reference
+				SignatureScanner::PatternSignature::for_array_of_bytes<"57 79 d4 09 57 79 d4 09 57 79 d4 09 57 79 d4 09">(),
+				BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libscenesystem.so"))
+				.find_xrefs(SignatureScanner::XRefTypes::relative(),
+					BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libscenesystem.so"))
+				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+				.expect<void*>("Couldn't find draw object function"),
+			reinterpret_cast<void*>(DrawArrayExt::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -96,10 +110,12 @@ namespace Hooks::Game {
 		RadarUpdate::hook->enable();
 		RenderLegs::hook->enable();
 		AddSleeveModel::hook->enable();
+		DrawArrayExt::hook->enable();
 	}
 
 	void destroy()
 	{
+		DrawArrayExt::hook.reset();
 		AddSleeveModel::hook.reset();
 		RenderLegs::hook.reset();
 		RadarUpdate::hook.reset();

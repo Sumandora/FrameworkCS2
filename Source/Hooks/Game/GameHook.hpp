@@ -14,6 +14,7 @@
 struct GameEvent;
 struct GameRadar;
 struct UserCmd;
+struct MeshDrawPrimitive;
 
 namespace Hooks::Game {
 	void create();
@@ -62,5 +63,11 @@ namespace Hooks::Game {
 	namespace AddSleeveModel {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(void* rdi, void* rsi);
+	}
+
+	namespace DrawArrayExt {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(void* animatable_scene_object_desc, void* render_context, MeshDrawPrimitive* mesh,
+			int mesh_count, void* scene_view, void* scene_layer, void* scene_system_per_frame_stats, void* material);
 	}
 }
