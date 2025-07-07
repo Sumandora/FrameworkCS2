@@ -3,6 +3,7 @@
 #include "Combat/Aimbot.hpp"
 #include "Misc/AutoStrafer.hpp"
 #include "Misc/Bhop.hpp"
+#include "Visuals/Chams.hpp"
 #include "Visuals/ESP/ESP.hpp"
 #include "Visuals/ForceCrosshair.hpp"
 #include "Visuals/GrenadeHelper.hpp"
@@ -23,10 +24,12 @@ void Features::create()
 	aimbot.emplace();
 	auto_strafer.emplace();
 	removals.emplace();
+	chams.emplace();
 }
 
 void Features::destroy()
 {
+	chams.reset();
 	removals.reset();
 	auto_strafer.reset();
 	aimbot.reset();
