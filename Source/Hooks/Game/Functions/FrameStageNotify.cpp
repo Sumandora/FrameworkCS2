@@ -6,9 +6,10 @@
 
 #include "RetAddrSpoofer.hpp"
 
+#include "../../../Features/Visuals/Chams.hpp"
 #include "../../../Features/Visuals/ESP/ESP.hpp"
-#include "../../../Features/Visuals/GrenadePrediction.hpp"
 #include "../../../Features/Visuals/GrenadeHelper.hpp"
+#include "../../../Features/Visuals/GrenadePrediction.hpp"
 
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Enums/ClientFrameStage.hpp"
@@ -24,6 +25,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
 
 		grenade_helper->update();
+		chams->update_pvs();
 
 		thread_executor.run_all_queued_functions();
 		break;
