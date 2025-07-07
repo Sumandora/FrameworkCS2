@@ -1,5 +1,16 @@
 #include "Interfaces.hpp"
 
+#include "SDK/InterfaceReg.hpp"
+
+#include "BCRL/SearchConstraints.hpp"
+#include "BCRL/Session.hpp"
+
+#include "SignatureScanner/PatternSignature.hpp"
+
+#include "Memory.hpp"
+
+#include "Utils/Logging.hpp"
+
 #include <cstdint>
 #include <cstring>
 #include <dlfcn.h>
@@ -9,15 +20,6 @@
 #include <string_view>
 #include <unordered_map>
 #include <utility>
-
-#include "BCRL/SearchConstraints.hpp"
-#include "Memory.hpp"
-#include "SDK/InterfaceReg.hpp"
-
-#include "BCRL/Session.hpp"
-#include "SDK/Material/MaterialSystem.hpp"
-#include "SignatureScanner/PatternSignature.hpp"
-#include "Utils/Logging.hpp"
 
 using namespace Interfaces;
 
