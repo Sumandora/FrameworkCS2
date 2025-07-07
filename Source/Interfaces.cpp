@@ -15,6 +15,7 @@
 #include "SDK/InterfaceReg.hpp"
 
 #include "BCRL/Session.hpp"
+#include "SDK/Material/MaterialSystem.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
 #include "Utils/Logging.hpp"
 
@@ -102,8 +103,8 @@ void Interfaces::grab_interfaces()
 	auto schemasystem = InterfacedLibrary::create("libschemasystem.so").value();
 	auto tier0 = InterfacedLibrary::create("libtier0.so").value();
 	auto engine2 = InterfacedLibrary::create("libengine2.so").value();
-
 	auto panorama = InterfacedLibrary::create("libpanorama.so").value();
+	auto materialsystem2 = InterfacedLibrary::create("libmaterialsystem2.so").value();
 
 	constexpr static auto INFO = [](std::string_view name, void* ptr) {
 		if (ptr)
@@ -124,4 +125,6 @@ void Interfaces::grab_interfaces()
 	INFO("PanoramaUIEngine", panorama_ui_engine);
 	network_client_service = engine2.get_interface<NetworkClientService>("NetworkClientService_");
 	INFO("NetworkClientService", panorama_ui_engine);
+	material_system = materialsystem2.get_interface<MaterialSystem>("VMaterialSystem2_");
+	INFO("VMaterialSystem2", material_system);
 }

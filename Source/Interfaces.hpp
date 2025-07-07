@@ -9,6 +9,7 @@ struct EngineToClient;
 struct PanoramaUIEngine;
 
 class NetworkClientService;
+class MaterialSystem;
 
 namespace Interfaces {
 	class InterfacedLibrary {
@@ -35,6 +36,7 @@ namespace Interfaces {
 	inline EngineToClient* engine;
 	inline PanoramaUIEngine* panorama_ui_engine;
 	inline NetworkClientService* network_client_service;
+	inline MaterialSystem* material_system;
 
 	void grab_interfaces();
 

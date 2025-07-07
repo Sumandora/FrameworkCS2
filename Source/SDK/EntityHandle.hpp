@@ -32,6 +32,11 @@ public:
 		return static_cast<Ent*>(GameEntitySystem::the()->getBaseEntity(index & ENTITY_LIST_INDEX_MASK));
 	}
 
+	[[nodiscard]] int get_index() const
+	{
+		return index & ENTITY_LIST_INDEX_MASK;
+	}
+
 	[[nodiscard]] bool has_entity() const
 	{
 		return index != INVALID_ENTITY_HANDLE;
