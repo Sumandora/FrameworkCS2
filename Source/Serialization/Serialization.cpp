@@ -1,6 +1,7 @@
 #include "Serialization.hpp"
 
 #include "GrenadeSerialization.hpp"
+#include "Materials.hpp"
 
 #include <algorithm>
 #include <array>
@@ -54,6 +55,10 @@ void Serialization::create_config_directory()
 	if (access(config_dir.c_str(), R_OK | W_OK) != F_OK) {
 		available = false;
 		Logging::perror("Failed to access config directory: {}");
+	}
+
+	if (available) {
+		Materials::initialize_directory(config_dir);
 	}
 }
 

@@ -8,21 +8,45 @@
 
 #include "../../Utils/UninitializedObject.hpp"
 
+#include "../Setting.hpp"
+
 #include "imgui.h"
 
 #include <functional>
+#include <string>
+#include <utility>
 
 struct MeshDrawPrimitive;
+struct Material;
+
+class MaterialCombo : public Setting {
+	std::string material_name;
+	mutable Material** material = nullptr;
+	mutable bool material_has_changed = true;
+
+	bool update_material() const; // welp
+public:
+	MaterialCombo(SettingsHolder* parent, std::string name);
+	~MaterialCombo() override;
+
+	[[nodiscard]] Material* get() const;
+
+	void render() override;
+	void serialize(nlohmann::json& output_json) const override;
+	void deserialize(const nlohmann::json& input_json) override;
+};
+
+// TODO instrumentation?
 
 class Chams : public Feature {
 	Checkbox enabled{ this, "Enabled", false };
+	MaterialCombo material{ this, "Material" };
 	Color tint{ this, "Tint color", ImColor{ 1.0F, 0.0F, 0.0F, 1.0F } };
 	Checkbox disable_pvs{ this, "Disable PVS", true }; // Most cheats disable this by force, but perhaps people with bad PCs would benefit from it.
 	HelpMarker pvs_help{ this, "The PVS is responsible for culling out far away entities, disabling it may result in a performance drop." };
 
 public:
 	Chams();
-	~Chams();
 
 	void update_pvs() const;
 

@@ -15,7 +15,11 @@
 
 #include "../../Interfaces.hpp"
 
+#include "../../Serialization/Materials.hpp"
+
 #include "../../Memory.hpp"
+
+#include "../Setting.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
@@ -25,36 +29,106 @@
 
 #include "imgui.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cstring>
 #include <functional>
-
-static Material** my_material = nullptr;
-
-// TEMP: taken from aspyhxia
-static constexpr char szVMatBufferWhiteVisible[] =
-	R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
-{
-	shader = "csgo_complex.vfx"
-
-	F_SELF_ILLUM = 1
-	F_PAINT_VERTEX_COLORS = 1
-	F_TRANSLUCENT = 1
-    F_DISABLE_Z_BUFFERING = 1
-
-	g_vColorTint = [ 1.000000, 1.000000, 1.000000, 1.000000 ]
-	g_flSelfIllumScale = [ 3.000000, 3.000000, 3.000000, 3.000000 ]
-	g_flSelfIllumBrightness = [ 3.000000, 3.000000, 3.000000, 3.000000 ]
-    g_vSelfIllumTint = [ 10.000000, 10.000000, 10.000000, 10.000000 ]
-
-	g_tColor = resource:"materials/default/default_mask_tga_fde710a5.vtex"
-	g_tNormal = resource:"materials/default/default_mask_tga_fde710a5.vtex"
-	g_tSelfIllumMask = resource:"materials/default/default_mask_tga_fde710a5.vtex"
-	TextureAmbientOcclusion = resource:"materials/debug/particleerror.vtex"
-	g_tAmbientOcclusion = resource:"materials/debug/particleerror.vtex"
-})";
+#include <string>
+#include <unistd.h>
+#include <utility>
 
 static EnginePVSManager* engine_pvs_manager = nullptr;
+
+static ResourceHandleUtils* resource_handle_utils = nullptr;
+
+MaterialCombo::MaterialCombo(SettingsHolder* parent, std::string name)
+	: Setting(parent, std::move(name))
+{
+	const auto& materials = Serialization::Materials::get_materials();
+	if (!materials.empty()) {
+		material_name = materials.at(0).name;
+	}
+}
+
+MaterialCombo::~MaterialCombo()
+{
+	if (!material)
+		return;
+
+	resource_handle_utils->delete_resource(reinterpret_cast<void*>(material));
+}
+
+bool MaterialCombo::update_material() const
+{
+	material_has_changed = false; // Even if this fails, we don't want to be called again
+
+	auto materials = Serialization::Materials::get_materials();
+	auto it = std::ranges::find(
+		materials,
+		material_name,
+		[](const Serialization::Materials::Material& material) { return material.name; });
+
+	// TODO notifications
+
+	if (it == materials.end()) {
+		Logging::error("Attempted to load material '{}', but material is no longer available...", material_name);
+		return false;
+	}
+	const std::string kv3 = it->acquire_kv3();
+	if (kv3.empty()) {
+		Logging::error("Attempted to load material '{}', but kv3 is no longer available...", material_name);
+		return false;
+	}
+
+	if (material) {
+		resource_handle_utils->delete_resource(reinterpret_cast<void*>(material));
+	}
+	material = Interfaces::material_system->create_material(material_name.c_str(), kv3.c_str());
+
+	if (material)
+		Logging::info("Created material '{}' at {} -> {}", material_name, material, *material);
+	else
+		Logging::error("Failed to create material '{}'", material_name);
+
+	return true;
+}
+
+Material* MaterialCombo::get() const
+{
+	if (material_has_changed)
+		update_material();
+
+	if (!material)
+		return nullptr;
+
+	return *material;
+}
+
+void MaterialCombo::render()
+{
+	if (ImGui::BeginCombo(get_name().c_str(), material_name.c_str(), ImGuiComboFlags_None)) {
+		for (const Serialization::Materials::Material& material : Serialization::Materials::get_materials()) {
+			const bool selected = material.name == material_name;
+			if (ImGui::Selectable(material.name.c_str(), selected)) {
+				material_name = material.name;
+				material_has_changed = true;
+			}
+
+			if (selected)
+				ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+}
+void MaterialCombo::serialize(nlohmann::json& output_json) const
+{
+	output_json = material_name;
+}
+void MaterialCombo::deserialize(const nlohmann::json& input_json)
+{
+	material_name = input_json;
+	material_has_changed = true;
+}
 
 Chams::Chams()
 	: Feature("Visuals", "Chams")
@@ -79,18 +153,11 @@ Chams::Chams()
 		pvs_help.add_visible_condition([] { return false; });
 	}
 
-	my_material = Interfaces::material_system->create_material("Lotto otto", szVMatBufferWhiteVisible);
+	resource_handle_utils = reinterpret_cast<ResourceHandleUtils*>(Interfaces::resource_system->query_interface("ResourceHandleUtils001"));
 
-	Logging::info("Created material: {}", my_material);
-	Logging::info("Material name: {}", (*my_material)->get_name());
-}
-
-Chams::~Chams()
-{
-	auto* resource_handle_utils
-		= reinterpret_cast<ResourceHandleUtils*>(Interfaces::resource_system->query_interface("ResourceHandleUtils001"));
-	// NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
-	resource_handle_utils->delete_resource(my_material);
+	if (!resource_handle_utils) {
+		Logging::warn("Wasn't able to acquire ResourceHandleUtils, switching Chams textures will memory leak.");
+	}
 }
 
 void Chams::update_pvs() const
@@ -128,7 +195,9 @@ bool Chams::draw_object(MeshDrawPrimitive* meshes, int count, const std::functio
 			continue;
 		if (!ent->entity_cast<CSPlayerPawn*>())
 			continue;
-		mesh_draw_primitive.material = *my_material;
+		Material* material = this->material.get();
+		if (material)
+			mesh_draw_primitive.material = material;
 		mesh_draw_primitive.color = tint_color;
 	}
 
