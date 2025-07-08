@@ -31,6 +31,8 @@
 
 #include "imgui.h"
 
+#include "gch/small_vector.hpp"
+
 #include <algorithm>
 #include <chrono>
 #include <cstring>
@@ -39,6 +41,7 @@
 #include <string>
 #include <unistd.h>
 #include <utility>
+#include <vector>
 
 static EnginePVSManager* engine_pvs_manager = nullptr;
 
@@ -218,6 +221,8 @@ bool Chams::draw_object(MeshDrawPrimitive* meshes, int count, const std::functio
 	for (const Layer* layer : layers.get()) {
 		const ImColor tint_color = layer->tint.get();
 
+		gch::small_vector<Material*, 4> previous_materials(count);
+
 		for (int i = 0; i < count; i++) {
 			// TODO ideally it would cache if a MeshDrawPrimitive is eligible for enhancement
 			MeshDrawPrimitive& mesh_draw_primitive = meshes[i];
@@ -232,13 +237,20 @@ bool Chams::draw_object(MeshDrawPrimitive* meshes, int count, const std::functio
 				continue;
 			if (!ent->entity_cast<CSPlayerPawn*>())
 				continue;
+			previous_materials[i] = mesh_draw_primitive.material;
 			Material* material = layer->material.get();
-			if (material)
+			if (material) {
 				mesh_draw_primitive.material = material;
+			}
 			mesh_draw_primitive.color = tint_color;
 		}
 
 		draw_mesh(meshes, count);
+
+		// Restore original material for next layer
+		for (int i = 0; i < count; i++) {
+			meshes[i].material = previous_materials[i];
+		}
 	}
 
 	return true;

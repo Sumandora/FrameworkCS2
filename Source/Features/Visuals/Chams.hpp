@@ -6,12 +6,11 @@
 #include "../Settings/Color.hpp"
 #include "../Settings/DynamicTabs.hpp"
 #include "../Settings/HelpMarker.hpp"
+#include "../Settings/MetaSetting.hpp"
 
 #include "../../Utils/UninitializedObject.hpp"
 
 #include "../Setting.hpp"
-
-#include "/home/emi/Documents/l8r/Source/Features/Settings/MetaSetting.hpp"
 #include "imgui.h"
 
 #include <functional>
