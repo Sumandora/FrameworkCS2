@@ -15,6 +15,8 @@
 
 #include "../../Interfaces.hpp"
 
+#include "../../Notifications/Notifications.hpp"
+
 #include "../../Serialization/Materials.hpp"
 
 #include "../../Memory.hpp"
@@ -32,6 +34,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstring>
+#include <format>
 #include <functional>
 #include <string>
 #include <unistd.h>
@@ -41,12 +44,22 @@ static EnginePVSManager* engine_pvs_manager = nullptr;
 
 static ResourceHandleUtils* resource_handle_utils = nullptr;
 
+static void delete_material(Material** material)
+{
+	if (!resource_handle_utils) {
+		Logging::warn("Leaking memory because material '{}' can't be deleted without ResourceHandleUtils", (*material)->get_name());
+	}
+	resource_handle_utils->delete_resource(reinterpret_cast<void*>(material));
+}
+
 MaterialCombo::MaterialCombo(SettingsHolder* parent, std::string name)
 	: Setting(parent, std::move(name))
+	, material_has_changed(false)
 {
 	const auto& materials = Serialization::Materials::get_materials();
 	if (!materials.empty()) {
 		material_name = materials.at(0).name;
+		material_has_changed = true;
 	}
 }
 
@@ -55,12 +68,21 @@ MaterialCombo::~MaterialCombo()
 	if (!material)
 		return;
 
-	resource_handle_utils->delete_resource(reinterpret_cast<void*>(material));
+	delete_material(material);
+	material = nullptr;
 }
 
 bool MaterialCombo::update_material() const
 {
 	material_has_changed = false; // Even if this fails, we don't want to be called again
+
+	if (material_name.empty()) {
+		if (material) {
+			delete_material(material);
+		}
+		material = nullptr;
+		return true;
+	}
 
 	auto materials = Serialization::Materials::get_materials();
 	auto it = std::ranges::find(
@@ -68,27 +90,36 @@ bool MaterialCombo::update_material() const
 		material_name,
 		[](const Serialization::Materials::Material& material) { return material.name; });
 
-	// TODO notifications
-
 	if (it == materials.end()) {
-		Logging::error("Attempted to load material '{}', but material is no longer available...", material_name);
+		Notifications::create(
+			"Material Creation",
+			std::format("Attempted to load material '{}', but material is no longer available...", material_name),
+			Notifications::Severity::ERROR);
 		return false;
 	}
 	const std::string kv3 = it->acquire_kv3();
 	if (kv3.empty()) {
-		Logging::error("Attempted to load material '{}', but kv3 is no longer available...", material_name);
+		Notifications::create(
+			"Material Creation",
+			std::format("Attempted to load material '{}', but kv3 is no longer available...", material_name),
+			Notifications::Severity::ERROR);
 		return false;
 	}
 
 	if (material) {
-		resource_handle_utils->delete_resource(reinterpret_cast<void*>(material));
+		delete_material(material);
 	}
+
 	material = Interfaces::material_system->create_material(material_name.c_str(), kv3.c_str());
 
 	if (material)
 		Logging::info("Created material '{}' at {} -> {}", material_name, material, *material);
-	else
-		Logging::error("Failed to create material '{}'", material_name);
+	else {
+		Notifications::create(
+			"Material Creation",
+			std::format("Failed to create material '{}'", material_name),
+			Notifications::Severity::ERROR);
+	}
 
 	return true;
 }
@@ -107,6 +138,10 @@ Material* MaterialCombo::get() const
 void MaterialCombo::render()
 {
 	if (ImGui::BeginCombo(get_name().c_str(), material_name.c_str(), ImGuiComboFlags_None)) {
+		if (ImGui::Selectable("Unchanged", material_name.empty())) {
+			material_name = {};
+			material_has_changed = true;
+		}
 		for (const Serialization::Materials::Material& material : Serialization::Materials::get_materials()) {
 			const bool selected = material.name == material_name;
 			if (ImGui::Selectable(material.name.c_str(), selected)) {
@@ -180,28 +215,31 @@ bool Chams::draw_object(MeshDrawPrimitive* meshes, int count, const std::functio
 	if (!enabled.get())
 		return false;
 
-	const ImColor tint_color = tint.get();
+	for (const Layer* layer : layers.get()) {
+		const ImColor tint_color = layer->tint.get();
 
-	for (int i = 0; i < count; i++) {
-		MeshDrawPrimitive& mesh_draw_primitive = meshes[i];
-		if (!mesh_draw_primitive.scene_animatable_object)
-			continue;
-		const EntityHandle<BaseEntity> owner = mesh_draw_primitive.scene_animatable_object->owner;
-		if (!owner.has_entity())
-			continue;
-		BaseEntity* ent = owner.get();
-		// TODO When changing the material of the player while in first person, the legs and shadow disappear
-		if (!ent || Memory::local_player == ent)
-			continue;
-		if (!ent->entity_cast<CSPlayerPawn*>())
-			continue;
-		Material* material = this->material.get();
-		if (material)
-			mesh_draw_primitive.material = material;
-		mesh_draw_primitive.color = tint_color;
+		for (int i = 0; i < count; i++) {
+			// TODO ideally it would cache if a MeshDrawPrimitive is eligible for enhancement
+			MeshDrawPrimitive& mesh_draw_primitive = meshes[i];
+			if (!mesh_draw_primitive.scene_animatable_object)
+				continue;
+			const EntityHandle<BaseEntity> owner = mesh_draw_primitive.scene_animatable_object->owner;
+			if (!owner.has_entity())
+				continue;
+			BaseEntity* ent = owner.get();
+			// TODO When changing the material of the player while in first person, the legs and shadow disappear
+			if (!ent || Memory::local_player == ent)
+				continue;
+			if (!ent->entity_cast<CSPlayerPawn*>())
+				continue;
+			Material* material = layer->material.get();
+			if (material)
+				mesh_draw_primitive.material = material;
+			mesh_draw_primitive.color = tint_color;
+		}
+
+		draw_mesh(meshes, count);
 	}
-
-	draw_mesh(meshes, count);
 
 	return true;
 }
