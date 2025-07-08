@@ -8,7 +8,7 @@
 #include <utility>
 
 Text::Text(SettingsHolder* parent, std::string content)
-	: Setting(parent, "Help Marker")
+	: Setting(parent, "Text")
 	, content(std::move(content))
 {
 }
