@@ -6,6 +6,8 @@
 #include "../../SDK/EntityHandle.hpp"
 #include "../../SDK/GameClass/EnginePVSManager.hpp"
 #include "../../SDK/GameClass/MeshDrawPrimitive.hpp"
+#include "../../SDK/GameClass/ResourceHandleUtils.hpp"
+#include "../../SDK/GameClass/ResourceSystem.hpp"
 #include "../../SDK/Material/Material.hpp"
 #include "../../SDK/Material/MaterialSystem.hpp"
 
@@ -17,15 +19,17 @@
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
-#include "imgui.h"
+
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
+
+#include "imgui.h"
 
 #include <chrono>
 #include <cstring>
 #include <functional>
 
-static Material* my_material = nullptr;
+static Material** my_material = nullptr;
 
 // TEMP: taken from aspyhxia
 static constexpr char szVMatBufferWhiteVisible[] =
@@ -78,10 +82,16 @@ Chams::Chams()
 	my_material = Interfaces::material_system->create_material("Lotto otto", szVMatBufferWhiteVisible);
 
 	Logging::info("Created material: {}", my_material);
-	Logging::info("Material name: {}", my_material->get_name());
+	Logging::info("Material name: {}", (*my_material)->get_name());
 }
 
-Chams::~Chams() = default; // TODO https://www.unknowncheats.me/forum/3912719-post16.html
+Chams::~Chams()
+{
+	auto* resource_handle_utils
+		= reinterpret_cast<ResourceHandleUtils*>(Interfaces::resource_system->query_interface("ResourceHandleUtils001"));
+	// NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
+	resource_handle_utils->delete_resource(my_material);
+}
 
 void Chams::update_pvs() const
 {
@@ -118,7 +128,7 @@ bool Chams::draw_object(MeshDrawPrimitive* meshes, int count, const std::functio
 			continue;
 		if (!ent->entity_cast<CSPlayerPawn*>())
 			continue;
-		mesh_draw_primitive.material = my_material;
+		mesh_draw_primitive.material = *my_material;
 		mesh_draw_primitive.color = tint_color;
 	}
 

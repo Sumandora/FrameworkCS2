@@ -14,7 +14,7 @@ void MaterialSystem::create_material(Material*** out_material, const char* mater
 	RetAddrSpoofer::invoke<void>(VirtualMethod::get_vtable(this)[28], out_material, nullptr, material_name, key_values, unk1, unk2);
 }
 
-Material* MaterialSystem::create_material(const char* name, const char* kv_text_buffer)
+Material** MaterialSystem::create_material(const char* name, const char* kv_text_buffer)
 {
 	static const KV3ID GENERIC_KV{
 		.name = "generic",
@@ -33,5 +33,5 @@ Material* MaterialSystem::create_material(const char* name, const char* kv_text_
 
 	create_material(&le_mat, name, kv, 0, 1);
 
-	return *le_mat;
+	return le_mat;
 }

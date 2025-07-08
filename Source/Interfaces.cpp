@@ -107,6 +107,7 @@ void Interfaces::grab_interfaces()
 	auto engine2 = InterfacedLibrary::create("libengine2.so").value();
 	auto panorama = InterfacedLibrary::create("libpanorama.so").value();
 	auto materialsystem2 = InterfacedLibrary::create("libmaterialsystem2.so").value();
+	auto resourcesystem = InterfacedLibrary::create("libresourcesystem.so").value();
 
 	constexpr static auto INFO = [](std::string_view name, void* ptr) {
 		if (ptr)
@@ -129,4 +130,6 @@ void Interfaces::grab_interfaces()
 	INFO("NetworkClientService", panorama_ui_engine);
 	material_system = materialsystem2.get_interface<MaterialSystem>("VMaterialSystem2_");
 	INFO("VMaterialSystem2", material_system);
+	resource_system = resourcesystem.get_interface<ResourceSystem>("ResourceSystem");
+	INFO("ResourceSystem", resource_system);
 }
