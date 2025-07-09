@@ -17,6 +17,7 @@
 #include <cstring>
 #include <filesystem>
 #include <mutex>
+#include <string.h>
 #include <unistd.h>
 #include <utility>
 #include <vector>
@@ -30,6 +31,12 @@
 class OwningSDLEvent {
 	SDL_Event event;
 
+	static const char* strdup_if_possible(const char* str) {
+		if(str)
+			return strdup(str);
+		return nullptr;
+	}
+
 public:
 	OwningSDLEvent() = delete;
 	explicit OwningSDLEvent(const SDL_Event& event)
@@ -37,10 +44,10 @@ public:
 	{
 		switch (event.type) {
 		case SDL_EVENT_TEXT_INPUT:
-			this->event.text.text = strdup(event.text.text);
+			this->event.text.text = strdup_if_possible(event.text.text);
 			break;
 		case SDL_EVENT_TEXT_EDITING:
-			this->event.edit.text = strdup(event.edit.text);
+			this->event.edit.text = strdup_if_possible(event.edit.text);
 			break;
 		case SDL_EVENT_TEXT_EDITING_CANDIDATES:
 			if (!event.edit_candidates.num_candidates)
@@ -49,7 +56,7 @@ public:
 			this->event.edit_candidates.candidates = static_cast<char**>(calloc(event.edit_candidates.num_candidates, sizeof(char*)));
 			for (int i = 0; i < event.edit_candidates.num_candidates; i++) {
 				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-				const_cast<char**>(this->event.edit_candidates.candidates)[i] = strdup(event.edit_candidates.candidates[i]);
+				const_cast<const char**>(this->event.edit_candidates.candidates)[i] = strdup_if_possible(event.edit_candidates.candidates[i]);
 			}
 			break;
 		case SDL_EVENT_DROP_FILE:
@@ -57,8 +64,8 @@ public:
 		case SDL_EVENT_DROP_BEGIN:
 		case SDL_EVENT_DROP_COMPLETE:
 		case SDL_EVENT_DROP_POSITION:
-			this->event.drop.data = strdup(event.drop.data);
-			this->event.drop.source = strdup(event.drop.source);
+			this->event.drop.data = strdup_if_possible(event.drop.data);
+			this->event.drop.source = strdup_if_possible(event.drop.source);
 			break;
 		default:
 			break;
