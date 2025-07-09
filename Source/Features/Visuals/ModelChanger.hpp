@@ -7,9 +7,30 @@
 
 #include "../../Utils/UninitializedObject.hpp"
 
+#include "../Setting.hpp"
+
+#include <string>
+#include <vector>
+
+class PlayerModelCombo : public Setting {
+	std::string player_model;
+
+	static std::vector<std::string> default_models;
+	static std::vector<std::string> custom_models;
+
+public:
+	PlayerModelCombo(SettingsHolder* parent, std::string name);
+
+	[[nodiscard]] const std::string& get() const;
+
+	void render() override;
+	void serialize(nlohmann::json& output_json) const override;
+	void deserialize(const nlohmann::json& input_json) override;
+};
+
 class ModelChanger : public Feature {
 	Checkbox enabled{ this, "Enabled", false };
-	TextInput model_path{ this, "Model path", "characters/models/ctm_diver/ctm_diver_varianta.vmdl" }; // TODO Combo??? this is a meme
+	PlayerModelCombo model{ this, "Model" };
 
 public:
 	ModelChanger();

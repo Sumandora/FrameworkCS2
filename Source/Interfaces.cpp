@@ -108,6 +108,7 @@ void Interfaces::grab_interfaces()
 	auto panorama = InterfacedLibrary::create("libpanorama.so").value();
 	auto materialsystem2 = InterfacedLibrary::create("libmaterialsystem2.so").value();
 	auto resourcesystem = InterfacedLibrary::create("libresourcesystem.so").value();
+	auto filesystem = InterfacedLibrary::create("libfilesystem_stdio.so").value();
 
 	constexpr static auto INFO = [](std::string_view name, void* ptr) {
 		if (ptr)
@@ -132,4 +133,6 @@ void Interfaces::grab_interfaces()
 	INFO("VMaterialSystem2", material_system);
 	resource_system = resourcesystem.get_interface<ResourceSystem>("ResourceSystem");
 	INFO("ResourceSystem", resource_system);
+	file_system = filesystem.get_interface<FileSystem>("VFileSystem");
+	INFO("VFileSystem", file_system);
 }

@@ -11,6 +11,7 @@ struct PanoramaUIEngine;
 class NetworkClientService;
 class MaterialSystem;
 class ResourceSystem;
+class FileSystem;
 
 namespace Interfaces {
 	class InterfacedLibrary {
@@ -39,6 +40,7 @@ namespace Interfaces {
 	inline NetworkClientService* network_client_service;
 	inline MaterialSystem* material_system;
 	inline ResourceSystem* resource_system;
+	inline FileSystem* file_system;
 
 	void grab_interfaces();
 
