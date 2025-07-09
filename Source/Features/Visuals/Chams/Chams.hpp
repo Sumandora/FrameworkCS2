@@ -1,17 +1,17 @@
 #pragma once
 
-#include "../Feature.hpp"
+#include "../../Feature.hpp"
 
-#include "../Settings/Checkbox.hpp"
-#include "../Settings/Color.hpp"
-#include "../Settings/DynamicTabs.hpp"
-#include "../Settings/HelpMarker.hpp"
-#include "../Settings/MetaSetting.hpp"
-#include "../Settings/Text.hpp"
+#include "../../Settings/Checkbox.hpp"
+#include "../../Settings/Color.hpp"
+#include "../../Settings/DynamicTabs.hpp"
+#include "../../Settings/HelpMarker.hpp"
+#include "../../Settings/MetaSetting.hpp"
+#include "../../Settings/Text.hpp"
 
-#include "../../Utils/UninitializedObject.hpp"
+#include "../../../Utils/UninitializedObject.hpp"
 
-#include "../Setting.hpp"
+#include "MaterialCombo.hpp"
 
 #include "imgui.h"
 
@@ -19,25 +19,8 @@
 #include <string>
 
 struct MeshDrawPrimitive;
-struct Material;
 
-// TODO move into sub-directory
-class MaterialCombo : public Setting {
-	std::string material_name;
-	mutable Material** material = nullptr;
-	mutable bool material_has_changed;
-
-	bool update_material() const; // welp
-public:
-	MaterialCombo(SettingsHolder* parent, std::string name);
-	~MaterialCombo() override;
-
-	[[nodiscard]] Material* get() const;
-
-	void render() override;
-	void serialize(nlohmann::json& output_json) const override;
-	void deserialize(const nlohmann::json& input_json) override;
-};
+class ResourceHandleUtils;
 
 // TODO instrumentation?
 

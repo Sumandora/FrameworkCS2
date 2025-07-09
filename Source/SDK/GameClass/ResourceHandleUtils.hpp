@@ -5,4 +5,6 @@
 class ResourceHandleUtils {
 public:
 	VIRTUAL_METHOD(2, delete_resource, void, (void* resource), (this, resource));
+
+	static ResourceHandleUtils* get();
 };
