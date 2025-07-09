@@ -3,15 +3,16 @@
 #include "../Feature.hpp"
 
 #include "../Settings/Checkbox.hpp"
-#include "../Settings/Text.hpp"
 #include "../Settings/Color.hpp"
 #include "../Settings/DynamicTabs.hpp"
 #include "../Settings/HelpMarker.hpp"
 #include "../Settings/MetaSetting.hpp"
+#include "../Settings/Text.hpp"
 
 #include "../../Utils/UninitializedObject.hpp"
 
 #include "../Setting.hpp"
+
 #include "imgui.h"
 
 #include <functional>
@@ -20,6 +21,7 @@
 struct MeshDrawPrimitive;
 struct Material;
 
+// TODO move into sub-directory
 class MaterialCombo : public Setting {
 	std::string material_name;
 	mutable Material** material = nullptr;
@@ -47,7 +49,7 @@ class Chams : public Feature {
 
 		using MetaSetting::MetaSetting;
 	};
-	Text reorder_hint{ this, "Reordering the following tabs is supported. They are rendered from left to right."};
+	Text reorder_hint{ this, "Reordering the following tabs is supported. They are rendered from left to right." };
 	DynamicTabs<Layer> layers{ this, "Layers", "Layer" };
 	Checkbox disable_pvs{ this, "Disable PVS", true }; // Most cheats disable this by force, but perhaps people with bad PCs would benefit from it.
 	HelpMarker pvs_help{ this, "The PVS is responsible for culling out far away entities, disabling it may result in a performance drop." };

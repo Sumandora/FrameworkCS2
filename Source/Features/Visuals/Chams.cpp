@@ -140,8 +140,9 @@ Material* MaterialCombo::get() const
 
 void MaterialCombo::render()
 {
-	if (ImGui::BeginCombo(get_name().c_str(), material_name.c_str(), ImGuiComboFlags_None)) {
-		if (ImGui::Selectable("Unchanged", material_name.empty())) {
+	static constexpr const char* UNCHANGED = "Unchanged";
+	if (ImGui::BeginCombo(get_name().c_str(), material_name.empty() ? UNCHANGED :material_name.c_str(), ImGuiComboFlags_None)) {
+		if (ImGui::Selectable(UNCHANGED, material_name.empty())) {
 			material_name = {};
 			material_has_changed = true;
 		}
