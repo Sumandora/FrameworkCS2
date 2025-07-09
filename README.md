@@ -116,6 +116,10 @@ mkdir -p ~/.config/FrameworkCS2
 wget 'https://l2p.sn3k.dev/grenades.json' -O ~/.config/FrameworkCS2/grenades.json
 ```
 
+### Chams
+2 Materials (and their versions without Z-Buffering) are provided by default, you can add more by adding them to the `~/.config/FrameworkCS2/Materials`.
+For references you can take a look at the default ones, you can also delete them. The directory is regenerated when it doesn't exist.
+
 ### Contribution
 Contributions are welcome  
 Issues and Pull Requests can help improve the program
