@@ -109,6 +109,7 @@ void Interfaces::grab_interfaces()
 	auto materialsystem2 = InterfacedLibrary::create("libmaterialsystem2.so").value();
 	auto resourcesystem = InterfacedLibrary::create("libresourcesystem.so").value();
 	auto filesystem = InterfacedLibrary::create("libfilesystem_stdio.so").value();
+	auto localize = InterfacedLibrary::create("liblocalize.so").value();
 
 	constexpr static auto INFO = [](std::string_view name, void* ptr) {
 		if (ptr)
@@ -135,4 +136,6 @@ void Interfaces::grab_interfaces()
 	INFO("ResourceSystem", resource_system);
 	file_system = filesystem.get_interface<FileSystem>("VFileSystem");
 	INFO("VFileSystem", file_system);
+	::localize = localize.get_interface<Localize>("Localize_");
+	INFO("Localize", ::localize);
 }

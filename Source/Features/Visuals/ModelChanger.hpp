@@ -10,12 +10,22 @@
 #include "../Setting.hpp"
 
 #include <string>
+#include <variant>
 #include <vector>
 
 class PlayerModelCombo : public Setting {
-	std::string player_model;
+public:
+	struct DefaultModel {
+		std::string agent_name;
+		std::string model_path;
+	};
 
-	static std::vector<std::string> default_models;
+private:
+	std::variant<DefaultModel, std::string> player_model;
+	[[nodiscard]] const std::string& get_player_model_path() const;
+	[[nodiscard]] const std::string& get_player_model_name() const;
+
+	static std::vector<DefaultModel> default_models;
 	static std::vector<std::string> custom_models;
 
 public:

@@ -12,6 +12,7 @@ class NetworkClientService;
 class MaterialSystem;
 class ResourceSystem;
 class FileSystem;
+class Localize;
 
 namespace Interfaces {
 	class InterfacedLibrary {
@@ -41,6 +42,7 @@ namespace Interfaces {
 	inline MaterialSystem* material_system;
 	inline ResourceSystem* resource_system;
 	inline FileSystem* file_system;
+	inline Localize* localize;
 
 	void grab_interfaces();
 

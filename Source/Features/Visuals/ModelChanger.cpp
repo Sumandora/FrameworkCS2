@@ -1,12 +1,10 @@
 #include "ModelChanger.hpp"
 
-#include "../../SDK/CUtl/String.hpp"
 #include "../../SDK/CUtl/SymbolLarge.hpp"
-#include "../../SDK/CUtl/Vector.hpp"
 #include "../../SDK/Entities/Components/BodyComponent.hpp"
 #include "../../SDK/Entities/Components/BodyComponentSkeletonInstance.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
-#include "../../SDK/GameClass/FileSystem.hpp"
+#include "../../SDK/GameClass/Localize.hpp"
 #include "../../SDK/GameClass/ModelState.hpp"
 #include "../../SDK/GameClass/NetworkClientService.hpp"
 #include "../../SDK/GameClass/NetworkGameClient.hpp"
@@ -28,48 +26,104 @@
 
 #include "imgui.h"
 
-#include <array>
+#include "../../SDK/Padding.hpp"
+
+#include <algorithm>
 #include <cctype>
 #include <chrono>
 #include <cstddef>
 #include <cstring>
 #include <filesystem>
 #include <functional>
-#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
+#include <variant>
 #include <vector>
 
 static void (*set_model)(BaseEntity* entity, const char* model_name);
 
-static void gather_default_models(std::vector<std::string>& player_models)
+struct EconItemDefinition {
+	PADDING(0x200);
+
+public:
+	const char* name;
+
+	// TODO convert to struct with paddings
+	OFFSET(const char*, internal_name, 0x70);
+	OFFSET(const char*, type_name, 0x80);
+	OFFSET(const char*, description, 0x90);
+	OFFSET(const char*, inventory_image_path, 0xa8);
+	OFFSET(const char*, model_path, 0xD8);
+};
+
+static_assert(offsetof(EconItemDefinition, name) == 0x200);
+
+struct ItemSchema {
+private:
+	PADDING(0x108);
+
+public:
+	struct ItemEntry {
+		PADDING(0x8);
+		EconItemDefinition* econ_item_definition;
+		PADDING(0x8);
+	};
+	static_assert(sizeof(ItemEntry) == 0x18);
+	ItemEntry* items;
+
+private:
+	PADDING(0x10);
+
+public:
+	int count;
+};
+
+static_assert(offsetof(ItemSchema, items) == 0x108);
+static_assert(offsetof(ItemSchema, count) == 0x120);
+
+static void gather_default_models(std::vector<PlayerModelCombo::DefaultModel>& player_models)
 {
-	// TODO: it would be beneficial if the econ item definitions were confronted instead, because then one could display the actual name of the model, not the internal path.
-	UtlVector<UtlString> model_paths{};
-	Interfaces::file_system->find_file_absolute_list(&model_paths, "characters/models/*", "GAME");
-	for (int i = 0; i < model_paths.size; i++) {
-		const std::string_view sv{ model_paths.elements[i] };
-		if (!sv.starts_with("vpk:"))
-			continue; // The rest are custom models, ignore those here.
+	struct ItemSystem {
+	private:
+		PADDING(0x8);
 
-		std::string path{ "characters/models/" };
-		path += (sv.data() + sv.find_last_of('/') + 1);
-		path += "/*.vmdl_c";
+	public:
+		ItemSchema* item_schema;
+	};
 
-		UtlVector<UtlString> model_files{};
-		Interfaces::file_system->find_file_absolute_list(&model_files, path.c_str(), "GAME");
-		for (int j = 0; j < model_files.size; j++) {
-			const std::string_view model_file_path{ model_files.elements[j] };
-			if (!model_file_path.ends_with(".vmdl_c"))
-				continue; // Why do I even get other files?
+	// TODO garbage sig.
+	static auto* item_system
+		= BCRL::signature(
+			Memory::mem_mgr,
+			SignatureScanner::PatternSignature::for_array_of_bytes<"48 89 1D ? ? ? ? 48 89 13">(),
+			BCRL::everything(Memory::mem_mgr).thats_readable().thats_not_writable().thats_executable().with_name("libclient.so"))
+			  .add(3)
+			  .relative_to_absolute()
+			  .expect<ItemSystem**>("Couldn't find Item Schema");
 
-			std::string model_path = model_file_path.data() + model_file_path.find_last_of(':') + 1;
+	ItemSchema* schema = (*item_system)->item_schema;
 
-			model_path = model_path.substr(0, model_path.size() - 2 /* cut the '_c' off */);
+	for (int i = 0; i < schema->count; i++) {
+		EconItemDefinition* item = schema->items[i].econ_item_definition;
+		if (!item->type_name() || std::string_view{ item->type_name() } != "#Type_CustomPlayer")
+			continue;
 
-			player_models.emplace_back(std::move(model_path));
-		}
+		const std::string_view sv{ item->model_path() };
+
+		const bool is_default
+			= sv == "customplayer_t_map_based"
+			|| sv == "customplayer_ct_map_based";
+
+		if (!is_default
+			&& std::ranges::any_of(player_models,
+				[&item](const PlayerModelCombo::DefaultModel& model) { return model.model_path == item->model_path(); }))
+			continue; // Filter out invalid models that just link back to the default models. The map-based models are of course exempted from this.
+
+		const char* localized_name = Interfaces::localize->translate(item->internal_name());
+		// TODO How should I deal with the unlocalized models? I think those are mainly map based ones, but I would still like to offer the user the option to force themselves to them...
+
+		player_models.emplace_back(localized_name, item->model_path());
 	}
 }
 
@@ -101,7 +155,7 @@ static void gather_custom_models(std::vector<std::string>& player_models)
 	RECURSE_MODELS(BASE / "characters/models/");
 }
 
-std::vector<std::string> PlayerModelCombo::default_models{};
+std::vector<PlayerModelCombo::DefaultModel> PlayerModelCombo::default_models{};
 std::vector<std::string> PlayerModelCombo::custom_models{};
 
 PlayerModelCombo::PlayerModelCombo(SettingsHolder* parent, std::string name)
@@ -120,9 +174,31 @@ PlayerModelCombo::PlayerModelCombo(SettingsHolder* parent, std::string name)
 	player_model = default_models.at(0);
 }
 
+const std::string& PlayerModelCombo::get_player_model_path() const
+{
+	if (const auto* model = std::get_if<DefaultModel>(&player_model)) {
+		return model->model_path;
+	}
+	if (const auto* model = std::get_if<std::string>(&player_model)) {
+		return *model;
+	}
+	std::unreachable();
+}
+
+const std::string& PlayerModelCombo::get_player_model_name() const
+{
+	if (const auto* model = std::get_if<DefaultModel>(&player_model)) {
+		return model->agent_name;
+	}
+	if (const auto* model = std::get_if<std::string>(&player_model)) {
+		return *model;
+	}
+	std::unreachable();
+}
+
 const std::string& PlayerModelCombo::get() const
 {
-	return player_model;
+	return get_player_model_path();
 }
 
 void PlayerModelCombo::render()
@@ -139,9 +215,20 @@ void PlayerModelCombo::render()
 		last_update = right_now;
 	}
 
-	if (ImGui::BeginCombo(get_name().c_str(), player_model.c_str(), ImGuiComboFlags_None)) {
-		for (const std::string& model : std::ranges::views::join(std::array{ default_models, custom_models })) {
-			const bool selected = player_model == model;
+	const std::string model_name = get_player_model_name();
+
+	if (ImGui::BeginCombo(get_name().c_str(), model_name.c_str(), ImGuiComboFlags_None)) {
+		const std::string& model_path = get_player_model_path();
+		for (const DefaultModel& model : default_models) {
+			const bool selected = model_path == model.model_path;
+			if (ImGui::Selectable(model.agent_name.c_str(), selected))
+				player_model = model;
+
+			if (selected)
+				ImGui::SetItemDefaultFocus();
+		}
+		for (const std::string& model : custom_models) {
+			const bool selected = model_path == model;
 			if (ImGui::Selectable(model.c_str(), selected))
 				player_model = model;
 
@@ -154,12 +241,21 @@ void PlayerModelCombo::render()
 
 void PlayerModelCombo::serialize(nlohmann::json& output_json) const
 {
-	output_json = player_model;
+	output_json = get_player_model_path();
 }
 
 void PlayerModelCombo::deserialize(const nlohmann::json& input_json)
 {
-	player_model = input_json;
+	const std::string model_path = input_json.get<std::string>();
+	if (auto it = std::ranges::find(
+			default_models,
+			model_path,
+			[](const DefaultModel& model) { return model.model_path; });
+		it != default_models.end()) {
+		player_model = *it;
+	} else {
+		player_model = model_path;
+	}
 }
 
 ModelChanger::ModelChanger()
