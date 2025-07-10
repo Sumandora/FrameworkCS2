@@ -2,7 +2,11 @@
 
 #include "../Padding.hpp"
 
+#include "../Schema/FieldOffset.hpp"
+
 #include "GameSceneNode.hpp"
+
+#include "ModelState.hpp"
 
 #include "glm/ext/matrix_float2x4.hpp"
 #include "glm/ext/vector_float3.hpp"
@@ -15,8 +19,13 @@ enum BoneIds : std::uint8_t {
 	// TODO add more
 };
 
-struct SkeletonInstance : GameSceneNode {
+struct SkeletonInstance : public GameSceneNode {
 public:
+	CLASS_INFO("libclient.so", "CSkeletonInstance");
+
+	SCHEMA_VAR(ModelState, model_state, "m_modelState");
+
+	// TODO: the following is part of the model state, move it.
 	PADDING(0x1CC);
 	std::uint32_t bone_count;
 	PADDING(0x20);

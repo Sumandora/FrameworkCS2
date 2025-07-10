@@ -15,7 +15,9 @@ public:
 	void precache(const char* resource_path)
 	{
 		BufferString str = BufferString::just(resource_path);
+		auto prev_length = str.length;
 		str.length = str.length & ~0x3fffffff; // sure...
 		load_resource(&str, 0);
+		str.length = prev_length;
 	}
 };

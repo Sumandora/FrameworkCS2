@@ -1,10 +1,17 @@
 #include "ModelChanger.hpp"
 
 #include "../../SDK/CUtl/String.hpp"
+#include "../../SDK/CUtl/SymbolLarge.hpp"
 #include "../../SDK/CUtl/Vector.hpp"
-#include "../../SDK/Entities/CSPlayerPawn.hpp" // IWYU pragma: keep
+#include "../../SDK/Entities/Components/BodyComponent.hpp"
+#include "../../SDK/Entities/Components/BodyComponentSkeletonInstance.hpp"
+#include "../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../SDK/GameClass/FileSystem.hpp"
+#include "../../SDK/GameClass/ModelState.hpp"
+#include "../../SDK/GameClass/NetworkClientService.hpp"
+#include "../../SDK/GameClass/NetworkGameClient.hpp"
 #include "../../SDK/GameClass/ResourceSystem.hpp"
+#include "../../SDK/GameClass/SkeletonInstance.hpp"
 
 #include "../Feature.hpp"
 #include "../Setting.hpp"
@@ -22,7 +29,10 @@
 #include "imgui.h"
 
 #include <array>
+#include <cctype>
 #include <chrono>
+#include <cstddef>
+#include <cstring>
 #include <filesystem>
 #include <functional>
 #include <ranges>
@@ -180,7 +190,26 @@ void ModelChanger::update_model()
 	if (model_path.empty())
 		return;
 
-	// Precache every time? really?
+	if (Interfaces::network_client_service && Interfaces::network_client_service->network_game_client
+			? Interfaces::network_client_service->network_game_client->delta_tick == -1
+			: false)
+		return; // urgh...
+
+	const BodyComponent* body_component = Memory::local_player->body_component();
+	const SkeletonInstance& skeleton = static_cast<const BodyComponentSkeletonInstance*>(body_component)->skeleton_instance();
+	const ModelState& model_state = skeleton.model_state();
+
+	if (!model_state.model())
+		return;
+
+	const UtlSymbolLarge& model_name = model_state.model_name();
+
+	if (!model_name.is_valid())
+		return;
+
+	if (model_name.string() == model_path)
+		return;
+
 	Interfaces::resource_system->precache(model_path.c_str());
 	set_model(Memory::local_player, model_path.c_str());
 }
