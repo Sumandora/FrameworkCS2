@@ -1,5 +1,6 @@
 #include "Interfaces.hpp"
 
+#include "SDK/GameClass/Source2Client.hpp"
 #include "SDK/InterfaceReg.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
@@ -118,7 +119,7 @@ void Interfaces::grab_interfaces()
 			Logging::error("Couldn't find {}", name);
 	};
 
-	source2_client = client.get_interface<void>("Source2Client");
+	source2_client = client.get_interface<Source2Client>("Source2Client");
 	INFO("Source2Client", source2_client);
 	schemaSystem = schemasystem.get_interface<SchemaSystem>("SchemaSystem_");
 	INFO("SchemaSystem", schemaSystem);

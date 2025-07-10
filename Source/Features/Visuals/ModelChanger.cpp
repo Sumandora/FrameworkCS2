@@ -10,6 +10,7 @@
 #include "../../SDK/GameClass/NetworkGameClient.hpp"
 #include "../../SDK/GameClass/ResourceSystem.hpp"
 #include "../../SDK/GameClass/SkeletonInstance.hpp"
+#include "../../SDK/GameClass/Source2Client.hpp"
 
 #include "../Feature.hpp"
 #include "../Setting.hpp"
@@ -82,27 +83,17 @@ public:
 static_assert(offsetof(ItemSchema, items) == 0x108);
 static_assert(offsetof(ItemSchema, count) == 0x120);
 
+struct EconItemSystem {
+private:
+	PADDING(0x8);
+
+public:
+	ItemSchema* item_schema;
+};
+
 static void gather_default_models(std::vector<PlayerModelCombo::DefaultModel>& player_models)
 {
-	struct ItemSystem {
-	private:
-		PADDING(0x8);
-
-	public:
-		ItemSchema* item_schema;
-	};
-
-	// TODO garbage sig.
-	static auto* item_system
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"48 89 1D ? ? ? ? 48 89 13">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_not_writable().thats_executable().with_name("libclient.so"))
-			  .add(3)
-			  .relative_to_absolute()
-			  .expect<ItemSystem**>("Couldn't find Item Schema");
-
-	ItemSchema* schema = (*item_system)->item_schema;
+	ItemSchema* schema = Interfaces::source2_client->get_econ_item_system()->item_schema;
 
 	for (int i = 0; i < schema->count; i++) {
 		EconItemDefinition* item = schema->items[i].econ_item_definition;
