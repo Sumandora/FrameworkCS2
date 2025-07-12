@@ -1,6 +1,7 @@
 #include "ModelChanger.hpp"
 
 #include "../../../SDK/CUtl/SymbolLarge.hpp"
+#include "../../../SDK/Entities/BaseModelEntity.hpp"
 #include "../../../SDK/Entities/Components/BodyComponent.hpp"
 #include "../../../SDK/Entities/Components/BodyComponentSkeletonInstance.hpp"
 #include "../../../SDK/Entities/CSPlayerPawn.hpp"
@@ -20,13 +21,15 @@
 #include "BCRL/Session.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
 
+#include "RetAddrSpoofer.hpp"
+
 #include <cctype>
 #include <cstddef>
 #include <cstring>
 #include <string>
 #include <string_view>
 
-static void (*set_model)(BaseEntity* entity, const char* model_name);
+static void (*set_model)(BaseModelEntity* entity, const char* model_name);
 
 ModelChanger::ModelChanger()
 	: Feature("Visuals", "Model changer")
@@ -77,5 +80,5 @@ void ModelChanger::update_model()
 		return;
 
 	Interfaces::resource_system->precache(model_path.c_str());
-	set_model(Memory::local_player, model_path.c_str());
+	RetAddrSpoofer::invoke(set_model, static_cast<BaseModelEntity*>(Memory::local_player), model_path.c_str());
 }

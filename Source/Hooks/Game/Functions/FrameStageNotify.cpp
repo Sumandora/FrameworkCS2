@@ -10,7 +10,7 @@
 #include "../../../Features/Visuals/ESP/ESP.hpp"
 #include "../../../Features/Visuals/GrenadeHelper.hpp"
 #include "../../../Features/Visuals/GrenadePrediction.hpp"
-#include "../../../Features/Visuals/ModelChanger.hpp"
+#include "../../../Features/Visuals/ModelChanger/ModelChanger.hpp"
 
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Enums/ClientFrameStage.hpp"

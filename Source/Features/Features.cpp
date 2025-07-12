@@ -11,7 +11,7 @@
 #include "Visuals/LoadingTextChanger.hpp"
 #include "Visuals/Radar.hpp"
 #include "Visuals/Removals.hpp"
-#include "Visuals/ModelChanger.hpp"
+#include "Visuals/ModelChanger/ModelChanger.hpp"
 
 void Features::create()
 {
