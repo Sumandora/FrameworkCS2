@@ -52,6 +52,7 @@ include("Buildscripts/Protobuf.cmake")
 include("Buildscripts/Octree.cmake")
 include("Buildscripts/MurmurHash.cmake")
 include("Buildscripts/SmallVector.cmake")
+include("Buildscripts/LZ4.cmake")
 
 add_subdirectory("${MemoryManager_SOURCE_DIR}/Modules/Linux" "LinuxMemoryManager")
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE LinuxMemoryManager)
