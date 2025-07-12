@@ -1,21 +1,13 @@
 #pragma once
 
-#include "../Feature.hpp"
+#include "../../Setting.hpp"
 
-#include "../Settings/Checkbox.hpp"
-#include "../Settings/TextInput.hpp"
+#include "../../../Utils/VTexDecoder.hpp"
 
-#include "../../Utils/UninitializedObject.hpp"
-
-#include "../Setting.hpp"
-
-#include "../../Utils/VTexDecoder.hpp"
 #include "imgui.h"
 
-#include <memory>
 #include <optional>
 #include <string>
-#include <variant>
 #include <vector>
 
 class PlayerModelCombo : public Setting {
@@ -44,15 +36,3 @@ public:
 	void serialize(nlohmann::json& output_json) const override;
 	void deserialize(const nlohmann::json& input_json) override;
 };
-
-class ModelChanger : public Feature {
-	Checkbox enabled{ this, "Enabled", false };
-	PlayerModelCombo model{ this, "Model" };
-
-public:
-	ModelChanger();
-
-	void update_model();
-};
-
-inline UninitializedObject<ModelChanger> model_changer;
