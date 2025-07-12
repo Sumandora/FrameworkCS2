@@ -2,6 +2,7 @@
 // # CREDITS: https://github.com/bruhmoment21/ #
 // #############################################
 
+#include "VulkanHook.hpp"
 #include "GraphicsHook.hpp"
 
 #include "backends/imgui_impl_sdl3.h"
@@ -27,19 +28,6 @@
 #include "../../Utils/UninitializedObject.hpp"
 
 #include "../Hooks.hpp"
-
-static constexpr uint32_t g_MinImageCount = 2;
-
-static VkAllocationCallbacks* g_Allocator = nullptr;
-static VkInstance g_Instance = VK_NULL_HANDLE;
-static VkPhysicalDevice g_PhysicalDevice = VK_NULL_HANDLE;
-static VkDevice g_FakeDevice = VK_NULL_HANDLE, g_Device = VK_NULL_HANDLE;
-static uint32_t g_QueueFamily = (uint32_t)-1;
-static std::vector<VkQueueFamilyProperties> g_QueueFamilies;
-static VkPipelineCache g_PipelineCache = VK_NULL_HANDLE;
-static VkDescriptorPool g_DescriptorPool = VK_NULL_HANDLE;
-static VkRenderPass g_RenderPass = VK_NULL_HANDLE;
-static ImGui_ImplVulkanH_Frame g_Frames[8] = {};
 
 static VkQueue GetGraphicQueue()
 {
@@ -239,7 +227,8 @@ static void CreateRenderTarget(VkDevice device, VkSwapchainKHR swapchain)
 
 	if (!g_DescriptorPool) // Create Descriptor Pool.
 	{
-		constexpr VkDescriptorPoolSize pool_sizes[] = { { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+		constexpr VkDescriptorPoolSize pool_sizes[] = {
+			{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
 			{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
 			{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
 			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
@@ -249,7 +238,8 @@ static void CreateRenderTarget(VkDevice device, VkSwapchainKHR swapchain)
 			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
 			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
 			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
-			{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 } };
+			{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 },
+		};
 
 		VkDescriptorPoolCreateInfo pool_info = {};
 		pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -308,6 +298,7 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 		return;
 
 	VkQueue graphicQueue = GetGraphicQueue();
+	current_queue = graphicQueue;
 	if (!graphicQueue) {
 		Logging::error("No queue that has VK_QUEUE_GRAPHICS_BIT has been found!");
 		return;
@@ -320,6 +311,7 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 		}
 
 		ImGui_ImplVulkanH_Frame* fd = &g_Frames[pPresentInfo->pImageIndices[i]];
+		current_command_pool = fd->CommandPool;
 		{
 			vkResetCommandBuffer(fd->CommandBuffer, 0);
 
