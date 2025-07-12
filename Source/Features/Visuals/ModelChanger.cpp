@@ -1,9 +1,11 @@
 #include "ModelChanger.hpp"
 
+#include "../../SDK/CUtl/Buffer.hpp"
 #include "../../SDK/CUtl/SymbolLarge.hpp"
 #include "../../SDK/Entities/Components/BodyComponent.hpp"
 #include "../../SDK/Entities/Components/BodyComponentSkeletonInstance.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
+#include "../../SDK/GameClass/FileSystem.hpp"
 #include "../../SDK/GameClass/Localize.hpp"
 #include "../../SDK/GameClass/ModelState.hpp"
 #include "../../SDK/GameClass/NetworkClientService.hpp"
@@ -19,7 +21,10 @@
 
 #include "../../Interfaces.hpp"
 
+#include "../../GUI/ImageLoader.hpp"
+
 #include "../../Utils/Logging.hpp"
+#include "../../Utils/VTexDecoder.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
@@ -33,13 +38,16 @@
 #include <cctype>
 #include <chrono>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <filesystem>
+#include <format>
 #include <functional>
+#include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
-#include <variant>
 #include <vector>
 
 static void (*set_model)(BaseEntity* entity, const char* model_name);
@@ -111,10 +119,26 @@ static void gather_default_models(std::vector<PlayerModelCombo::DefaultModel>& p
 				[&item](const PlayerModelCombo::DefaultModel& model) { return model.model_path == item->model_path(); }))
 			continue; // Filter out invalid models that just link back to the default models. The map-based models are of course exempted from this.
 
+		const std::string file_path = std::format("panorama/images/{}_square_png.vtex_c", item->inventory_image_path());
+
+		UtlBuffer buf{ 0, 0, 0 };
+		const bool suc = Interfaces::file_system->read_file(file_path.c_str(), "GAME", &buf, 0, 0);
+
+		if (!suc) {
+			Logging::warn("Failed to read player model image: {}", file_path);
+			continue;
+		}
+
+		std::vector<char> vec;
+		vec.resize(buf.memory.allocationCount);
+		std::memcpy(vec.data(), buf.memory.memory, buf.memory.allocationCount);
+
+		const VTexDecoder::RawImage image = VTexDecoder::decode(vec).value();
+
 		const char* localized_name = Interfaces::localize->translate(item->internal_name());
 		// TODO How should I deal with the unlocalized models? I think those are mainly map based ones, but I would still like to offer the user the option to force themselves to them...
 
-		player_models.emplace_back(localized_name, item->model_path());
+		player_models.emplace_back(localized_name, item->model_path(), image, std::nullopt);
 	}
 }
 
@@ -162,34 +186,45 @@ PlayerModelCombo::PlayerModelCombo(SettingsHolder* parent, std::string name)
 
 	// TODO should a theoretical case be handled in which the default models failed to get filled and we still somehow survived until here?
 
-	player_model = default_models.at(0);
-}
-
-const std::string& PlayerModelCombo::get_player_model_path() const
-{
-	if (const auto* model = std::get_if<DefaultModel>(&player_model)) {
-		return model->model_path;
-	}
-	if (const auto* model = std::get_if<std::string>(&player_model)) {
-		return *model;
-	}
-	std::unreachable();
-}
-
-const std::string& PlayerModelCombo::get_player_model_name() const
-{
-	if (const auto* model = std::get_if<DefaultModel>(&player_model)) {
-		return model->agent_name;
-	}
-	if (const auto* model = std::get_if<std::string>(&player_model)) {
-		return *model;
-	}
-	std::unreachable();
+	player_model = default_models.at(0).model_path;
 }
 
 const std::string& PlayerModelCombo::get() const
 {
-	return get_player_model_path();
+	return player_model;
+}
+
+inline void PlayerModelCombo::draw_fancy_model_selection()
+{
+	bool first = true;
+
+	for (DefaultModel& model : default_models) {
+		const bool selected = player_model == model.model_path;
+		if (!model.texture_id.has_value())
+			model.texture_id = GUI::ImageLoader::create_texture(
+				model.image.width, model.image.height, reinterpret_cast<std::uint32_t*>(model.image.rgba.get()));
+
+		static constexpr ImVec2 BUTTON_SIZE{ 100.0F, 100.0F };
+
+		if (!first && ImGui::GetItemRectMax().x + ImGui::GetStyle().ItemSpacing.x + BUTTON_SIZE.x < ImGui::GetCursorScreenPos().x + ImGui::GetContentRegionAvail().x) {
+			ImGui::SameLine();
+		}
+		first = false;
+
+		if (selected)
+			ImGui::PushStyleColor(ImGuiCol_Border, ImVec4{ 0.0F, 1.0F, 0.0F, 1.0F });
+
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 5.0F, 5.0F });
+		if (ImGui::ImageButton(model.agent_name.c_str(), model.texture_id.value(), BUTTON_SIZE))
+			player_model = model.model_path;
+		ImGui::PopStyleVar();
+
+		if (selected)
+			ImGui::PopStyleColor();
+
+		// TODO handle untranslated
+		ImGui::SetItemTooltip("%s", model.agent_name.c_str());
+	}
 }
 
 void PlayerModelCombo::render()
@@ -206,47 +241,41 @@ void PlayerModelCombo::render()
 		last_update = right_now;
 	}
 
-	const std::string model_name = get_player_model_name();
+	if (custom_models.empty()) {
+		draw_fancy_model_selection();
+		return;
+	}
 
-	if (ImGui::BeginCombo(get_name().c_str(), model_name.c_str(), ImGuiComboFlags_None)) {
-		const std::string& model_path = get_player_model_path();
-		for (const DefaultModel& model : default_models) {
-			const bool selected = model_path == model.model_path;
-			if (ImGui::Selectable(model.agent_name.c_str(), selected))
-				player_model = model;
-
-			if (selected)
-				ImGui::SetItemDefaultFocus();
+	if (ImGui::BeginTabBar("Model types", ImGuiTabBarFlags_Reorderable)) {
+		if (ImGui::BeginTabItem("Default models")) {
+			draw_fancy_model_selection();
+			ImGui::EndTabItem();
 		}
-		for (const std::string& model : custom_models) {
-			const bool selected = model_path == model;
-			if (ImGui::Selectable(model.c_str(), selected))
-				player_model = model;
-
-			if (selected)
-				ImGui::SetItemDefaultFocus();
+		if (ImGui::BeginTabItem("Custom models")) {
+			for (const std::string& model : custom_models) {
+				const bool selected = player_model == model;
+				if (selected)
+					ImGui::PushStyleColor(ImGuiCol_Border, ImVec4{ 0.0F, 1.0F, 0.0F, 1.0F });
+				if (ImGui::Button(model.c_str(), { ImGui::GetContentRegionAvail().x, 0.0F }))
+					player_model = model;
+				if (selected)
+					ImGui::PopStyleColor();
+			}
+			ImGui::EndTabItem();
 		}
-		ImGui::EndCombo();
+
+		ImGui::EndTabBar();
 	}
 }
 
 void PlayerModelCombo::serialize(nlohmann::json& output_json) const
 {
-	output_json = get_player_model_path();
+	output_json = player_model;
 }
 
 void PlayerModelCombo::deserialize(const nlohmann::json& input_json)
 {
-	const std::string model_path = input_json.get<std::string>();
-	if (auto it = std::ranges::find(
-			default_models,
-			model_path,
-			[](const DefaultModel& model) { return model.model_path; });
-		it != default_models.end()) {
-		player_model = *it;
-	} else {
-		player_model = model_path;
-	}
+	player_model = input_json;
 }
 
 ModelChanger::ModelChanger()
