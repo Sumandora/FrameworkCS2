@@ -1,10 +1,12 @@
 #include "PlayerModelCombo.hpp"
 
 #include "../../../SDK/CUtl/Buffer.hpp"
+#include "../../../SDK/Econ/ItemDefinition.hpp"
+#include "../../../SDK/Econ/ItemSchema.hpp"
+#include "../../../SDK/Econ/ItemSystem.hpp"
 #include "../../../SDK/GameClass/FileSystem.hpp"
 #include "../../../SDK/GameClass/Localize.hpp"
 #include "../../../SDK/GameClass/Source2Client.hpp"
-#include "../../../SDK/Padding.hpp"
 
 #include "../../../Features/Setting.hpp"
 
@@ -31,56 +33,9 @@
 #include <utility>
 #include <vector>
 
-struct EconItemDefinition {
-	PADDING(0x200);
-
-public:
-	const char* name;
-
-	// TODO convert to struct with paddings
-	OFFSET(const char*, internal_name, 0x70);
-	OFFSET(const char*, type_name, 0x80);
-	OFFSET(const char*, description, 0x90);
-	OFFSET(const char*, inventory_image_path, 0xa8);
-	OFFSET(const char*, model_path, 0xD8);
-};
-
-static_assert(offsetof(EconItemDefinition, name) == 0x200);
-
-struct ItemSchema {
-private:
-	PADDING(0x108);
-
-public:
-	struct ItemEntry {
-		PADDING(0x8);
-		EconItemDefinition* econ_item_definition;
-		PADDING(0x8);
-	};
-	static_assert(sizeof(ItemEntry) == 0x18);
-	ItemEntry* items;
-
-private:
-	PADDING(0x10);
-
-public:
-	int count;
-};
-
-static_assert(offsetof(ItemSchema, items) == 0x108);
-static_assert(offsetof(ItemSchema, count) == 0x120);
-
-struct EconItemSystem {
-private:
-	PADDING(0x8);
-
-public:
-	ItemSchema* item_schema;
-};
-
 static void gather_default_models(std::vector<PlayerModelCombo::DefaultModel>& player_models)
 {
-	ItemSchema* schema = Interfaces::source2_client->get_econ_item_system()->item_schema;
+	EconItemSchema* schema = Interfaces::source2_client->get_econ_item_system()->item_schema;
 
 	for (int i = 0; i < schema->count; i++) {
 		EconItemDefinition* item = schema->items[i].econ_item_definition;
