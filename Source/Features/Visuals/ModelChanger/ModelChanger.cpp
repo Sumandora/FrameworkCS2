@@ -20,6 +20,7 @@
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
+#include "SignatureScanner/XRefSignature.hpp"
 
 #include "RetAddrSpoofer.hpp"
 
@@ -29,17 +30,20 @@
 #include <string>
 #include <string_view>
 
-static void (*set_model)(BaseModelEntity* entity, const char* model_name);
+static void (*set_model)(BaseModelEntity* entity, const char* model_name) = nullptr;
 
 ModelChanger::ModelChanger()
 	: Feature("Visuals", "Model changer")
 {
-	// TODO better signature
 	set_model
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 F2 48 89 E5 41 54 49 89 FC 48 8D 7D ? 48 83 EC 18 48 8D 05 ? ? ? ? 48 8B 30 48 8B 06">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+		= BCRL::signature(Memory::mem_mgr,
+			SignatureScanner::PatternSignature::for_literal_string<"models/inventory_items/dogtags.vmdl">(),
+			BCRL::everything(Memory::mem_mgr).with_flags("r*-").with_name("libclient.so"))
+			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .add(8)
+			  .relative_to_absolute()
+			  .filter(BCRL::everything(Memory::mem_mgr).with_flags("r-x"))
 			  .expect<decltype(set_model)>("Couldn't find set model function");
 }
 
