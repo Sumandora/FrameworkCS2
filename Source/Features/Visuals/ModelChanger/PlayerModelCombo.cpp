@@ -15,7 +15,8 @@
 #include "../../../Utils/Logging.hpp"
 #include "../../../Utils/VTexDecoder.hpp"
 
-#include "/home/emi/Documents/l8r/Source/GUI/TextureManager.hpp"
+#include "../../../GUI/TextureManager.hpp"
+
 #include "imgui.h"
 
 #include <algorithm>
