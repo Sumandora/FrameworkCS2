@@ -11,3 +11,5 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_STATIC_LIBS ON CACHE BOOL "" FORCE)
 add_subdirectory("${lz4_SOURCE_DIR}/build/cmake/")
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE lz4)
+
+embed_license("LZ4" lz4 "${lz4_SOURCE_DIR}/lib/LICENSE")
