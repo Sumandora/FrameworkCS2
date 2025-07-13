@@ -1,31 +1,16 @@
 #include "ImageLoader.hpp"
 
 #include "backends/imgui_impl_vulkan.h"
-#include "imgui.h"
 
 #include "../Hooks/Graphics/VulkanHook.hpp"
 
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <unordered_map>
 
 #include <vulkan/vulkan.h>
 
 // https://github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples#example-for-vulkan-users
-
-struct TextureData {
-	VkDescriptorSet descriptor_set;
-
-	VkImageView image_view;
-	VkImage image;
-	VkDeviceMemory image_memory;
-	VkSampler sampler;
-	VkBuffer upload_buffer;
-	VkDeviceMemory upload_buffer_memory;
-};
-
-static std::unordered_map<ImTextureID, TextureData> textures;
 
 static std::uint32_t find_memory_type(std::uint32_t type_filter, VkMemoryPropertyFlags properties)
 {
@@ -39,7 +24,7 @@ static std::uint32_t find_memory_type(std::uint32_t type_filter, VkMemoryPropert
 	return 0xFFFFFFFF;
 }
 
-ImTextureID GUI::ImageLoader::create_texture(std::size_t width, std::size_t height, uint32_t* rgba)
+auto GUI::ImageLoader::create_texture(std::size_t width, std::size_t height, uint32_t* rgba) -> TextureData
 {
 	const std::size_t channels = 4; // RGBA
 
@@ -278,14 +263,11 @@ ImTextureID GUI::ImageLoader::create_texture(std::size_t width, std::size_t heig
 		CHECK_VK_ERR << vkDeviceWaitIdle(g_Device);
 	}
 
-	textures[reinterpret_cast<ImTextureID>(tex_data.descriptor_set)] = tex_data;
-	return reinterpret_cast<ImTextureID>(tex_data.descriptor_set);
+	return tex_data;
 }
 
-void GUI::ImageLoader::destroy_texture(ImTextureID texture)
+void GUI::ImageLoader::destroy_texture(const TextureData& tex_data)
 {
-	auto& tex_data = textures.at(texture);
-
 	vkFreeMemory(g_Device, tex_data.upload_buffer_memory, g_Allocator);
 	vkDestroyBuffer(g_Device, tex_data.upload_buffer, g_Allocator);
 	vkDestroySampler(g_Device, tex_data.sampler, g_Allocator);

@@ -1,5 +1,6 @@
 #include "GUI.hpp"
 
+#include "TextureManager.hpp"
 #include "Theme.hpp"
 
 #include "backends/imgui_impl_sdl3.h"
@@ -31,8 +32,9 @@
 class OwningSDLEvent {
 	SDL_Event event;
 
-	static const char* strdup_if_possible(const char* str) {
-		if(str)
+	static const char* strdup_if_possible(const char* str)
+	{
+		if (str)
 			return strdup(str);
 		return nullptr;
 	}
@@ -233,10 +235,10 @@ void GUI::render()
 	ImGui::NewFrame();
 
 	if (is_open) {
-		Tabs::render();
-
 		ImGui::ShowDemoWindow();
+		Tabs::render();
 	}
+	get_texture_manager().purge_old_textures();
 
 	Notifications::render();
 	grenade_helper->draw();

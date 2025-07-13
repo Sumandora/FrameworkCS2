@@ -2,11 +2,8 @@
 
 #include "../../Setting.hpp"
 
-#include "../../../Utils/VTexDecoder.hpp"
+#include "../../../GUI/TextureManager.hpp"
 
-#include "imgui.h"
-
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -15,8 +12,7 @@ public:
 	struct DefaultModel {
 		std::string agent_name;
 		std::string model_path;
-		VTexDecoder::RawImage image;
-		std::optional<ImTextureID> texture_id;
+		GUI::TextureManager::RawImage image;
 	};
 
 private:

@@ -1,8 +1,10 @@
 #include "VTexDecoder.hpp"
 
-#include "Logging.hpp"
+#include "../GUI/TextureManager.hpp"
 
 #include "../SDK/Padding.hpp"
+
+#include "Logging.hpp"
 
 #include "magic_enum/magic_enum.hpp"
 
@@ -21,6 +23,8 @@
 extern "C" {
 #include "lz4.h"
 }
+
+using RawImage = GUI::TextureManager::RawImage;
 
 enum class VTexFlags : std::uint16_t {
 	SUGGEST_CLAMPS = 1 << 0,
@@ -167,7 +171,7 @@ static bool decode_buffer(std::vector<char>& buffer, VTexFormat image_format, in
 	}
 }
 
-std::optional<VTexDecoder::RawImage> VTexDecoder::decode(std::vector<char> input_buffer)
+std::optional<RawImage> VTexDecoder::decode(std::vector<char> input_buffer)
 {
 	std::istringstream stream(std::string{ input_buffer.begin(), input_buffer.end() }, std::ios_base::binary);
 	VTexHeader header;

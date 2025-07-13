@@ -10,19 +10,17 @@
 
 #include "../../../Features/Setting.hpp"
 
-#include "../../../GUI/ImageLoader.hpp"
-
 #include "../../../Interfaces.hpp"
 
 #include "../../../Utils/Logging.hpp"
 #include "../../../Utils/VTexDecoder.hpp"
 
+#include "/home/emi/Documents/l8r/Source/GUI/TextureManager.hpp"
 #include "imgui.h"
 
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
-#include <cstdint>
 #include <cstring>
 #include <filesystem>
 #include <format>
@@ -67,12 +65,12 @@ static void gather_default_models(std::vector<PlayerModelCombo::DefaultModel>& p
 		vec.resize(buf.memory.allocationCount);
 		std::memcpy(vec.data(), buf.memory.memory, buf.memory.allocationCount);
 
-		const VTexDecoder::RawImage image = VTexDecoder::decode(vec).value();
+		const GUI::TextureManager::RawImage image = VTexDecoder::decode(vec).value();
 
 		const char* localized_name = Interfaces::localize->translate(item->internal_name());
 		// TODO How should I deal with the unlocalized models? I think those are mainly map based ones, but I would still like to offer the user the option to force themselves to them...
 
-		player_models.emplace_back(localized_name, item->model_path(), image, std::nullopt);
+		player_models.emplace_back(localized_name, item->model_path(), image);
 	}
 }
 
@@ -132,11 +130,9 @@ inline void PlayerModelCombo::draw_fancy_model_selection()
 {
 	bool first = true;
 
-	for (DefaultModel& model : default_models) {
+	for (const DefaultModel& model : default_models) {
 		const bool selected = player_model == model.model_path;
-		if (!model.texture_id.has_value())
-			model.texture_id = GUI::ImageLoader::create_texture(
-				model.image.width, model.image.height, reinterpret_cast<std::uint32_t*>(model.image.rgba.get()));
+		const ImTextureID texture_id = GUI::get_texture_manager().get_texture(model.image);
 
 		static constexpr ImVec2 BUTTON_SIZE{ 100.0F, 100.0F };
 
@@ -149,7 +145,7 @@ inline void PlayerModelCombo::draw_fancy_model_selection()
 			ImGui::PushStyleColor(ImGuiCol_Border, ImVec4{ 0.0F, 1.0F, 0.0F, 1.0F });
 
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 5.0F, 5.0F });
-		if (ImGui::ImageButton(model.agent_name.c_str(), model.texture_id.value(), BUTTON_SIZE))
+		if (ImGui::ImageButton(model.agent_name.c_str(), texture_id, BUTTON_SIZE))
 			player_model = model.model_path;
 		ImGui::PopStyleVar();
 
