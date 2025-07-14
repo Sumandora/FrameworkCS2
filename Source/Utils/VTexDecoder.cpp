@@ -20,9 +20,7 @@
 #include <utility>
 #include <vector>
 
-extern "C" {
 #include "lz4.h"
-}
 
 using RawImage = GUI::TextureManager::RawImage;
 
@@ -287,8 +285,9 @@ std::optional<RawImage> VTexDecoder::decode(std::vector<char> input_buffer)
 
 			// Pray that these bytes somehow make up an image... (Not all formats are like this, but I couldn't care less about the others...)
 
-			std::unique_ptr<RawImage::Color[]> rgba = std::make_unique<RawImage::Color[]>(static_cast<std::size_t>(mipmap_width) * static_cast<std::size_t>(mipmap_height));
+			std::vector<RawImage::Color> rgba(static_cast<std::size_t>(mipmap_width) * static_cast<std::size_t>(mipmap_height));
 
+			// TODO don't copy manually
 			int i = 0;
 			for (int y = 0; y < mipmap_height; y++) {
 				for (int x = 0; x < mipmap_width; x++) {
@@ -302,11 +301,7 @@ std::optional<RawImage> VTexDecoder::decode(std::vector<char> input_buffer)
 				}
 			}
 
-			return RawImage{
-				.width = mipmap_width,
-				.height = mipmap_height,
-				.rgba = std::move(rgba),
-			};
+			return RawImage(mipmap_width, mipmap_height, rgba);
 		}
 
 	next_elem:

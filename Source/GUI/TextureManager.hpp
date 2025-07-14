@@ -7,18 +7,31 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <unordered_map>
+#include <vector>
 
 namespace GUI {
 	class TextureManager {
 	public:
-		struct RawImage {
-			int width, height;
+		class RawImage {
+		public:
 			struct Color {
 				std::uint8_t r, g, b, a;
 			};
-			std::shared_ptr<Color[]> rgba;
+			static_assert(sizeof(Color) == sizeof(std::uint32_t));
+
+		private:
+			int width, height;
+			std::vector<std::byte> compressed_rgba;
+			std::size_t uncompressed_size;
+
+		public:
+			RawImage(int width, int height, const std::vector<Color>& rgba);
+
+			[[nodiscard]] int get_width() const { return width; }
+			[[nodiscard]] int get_height() const { return height; }
+
+			[[nodiscard]] std::vector<std::uint32_t> get_rgba() const;
 		};
 
 	private:
