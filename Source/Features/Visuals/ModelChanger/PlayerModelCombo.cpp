@@ -164,8 +164,8 @@ void PlayerModelCombo::render()
 	using std::chrono::system_clock;
 	static system_clock::time_point last_update = system_clock::now();
 	const system_clock::time_point right_now = system_clock::now();
-	if (right_now - last_update > std::chrono::seconds(5)) {
-		// Maybe TODO: The correct way of doing this is inotify, but I'm not too sure if I want to use this in a context like this one...
+	static constexpr auto CUSTOM_MODEL_RELOAD_TIMER = std::chrono::seconds(5);
+	if (right_now - last_update > CUSTOM_MODEL_RELOAD_TIMER) {
 		// No mutex is needed here because there is only one render thread.
 		custom_models.clear();
 		gather_custom_models(custom_models);

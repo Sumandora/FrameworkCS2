@@ -120,6 +120,27 @@ wget 'https://l2p.sn3k.dev/grenades.json' -O ~/.config/FrameworkCS2/grenades.jso
 2 Materials (and their versions without Z-Buffering) are provided by default, you can add more by adding them to the `~/.config/FrameworkCS2/Materials`.
 For references you can take a look at the default ones, you can also delete them. The directory is regenerated when it doesn't exist.
 
+### Player model changer
+The model changer will display all default models by default. Custom models are supported however, but must be installed first.
+Model files go in `~/.steam/steam/steamapps/common/Counter-Strike Global Offensive/game/csgo/characters/models` directory.
+You can find models on several places like [GameBanana](https://gamebanana.com/mods/cats/25415).
+When downloading models you generally want to end up with a file structure like this:
+
+```
+/path/to/cs2/game/csgo/characters/models/[model author]/[model name]/[model name].vmdl
+```
+
+Some model authors put more subdirectories in, however as long as the model (the `.vmdl` file) is part of the `characters/models/` directory, you should have no problems.
+
+Please make sure you don't have duplicate `characters/models/`, because some model authors duplicate these directories inside their releases to make clear where to put the files.
+Also make sure you are in the `game` subdirectory, as CS:GO and CS:2 have a very similar file structure.
+
+CS:GO models are not compatible with CS:2, however they can be ported.
+There are several guides explaining how to port models, both in video-form and text-form.
+I have seen people sell ported models for real-life money, which I actively vouch against buying, because porting isn't too difficult and the original authors of the models don't get any money or credit from it.
+
+When adding new models the menu should automatically pick up on them and no restart/re-inject is required, although it may take a few seconds, because the menu only searches for new models every 5 seconds.
+
 ### Contribution
 Contributions are welcome  
 Issues and Pull Requests can help improve the program
