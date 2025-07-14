@@ -94,6 +94,14 @@ void GUI::TextureManager::purge_old_textures()
 	last_purge_time = std::chrono::system_clock::now();
 }
 
+void GUI::TextureManager::purge_all_textures()
+{
+	for (const auto& [_, timed_tex_data] : textures)
+		ImageLoader::destroy_texture(timed_tex_data.tex_data);
+
+	textures.clear();
+}
+
 GUI::TextureManager& GUI::get_texture_manager()
 {
 	static GUI::TextureManager texture_manager{};

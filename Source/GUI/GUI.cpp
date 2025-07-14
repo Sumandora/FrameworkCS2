@@ -165,6 +165,7 @@ void GUI::init(const std::filesystem::path& config_directory)
 
 void GUI::destroy()
 {
+	get_texture_manager().purge_all_textures();
 	ImGui::DestroyContext();
 }
 

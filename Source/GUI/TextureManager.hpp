@@ -47,6 +47,8 @@ namespace GUI {
 
 		// Purges textures that haven't been used in a while.
 		void purge_old_textures();
+
+		void purge_all_textures();
 	};
 
 	TextureManager& get_texture_manager();
