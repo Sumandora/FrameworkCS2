@@ -80,6 +80,9 @@ static void gather_custom_models(std::vector<std::string>& player_models)
 	static const std::filesystem::path BASE{ "../../csgo" }; // urgh... TODO
 
 	static const std::function<void(std::filesystem::path)> RECURSE_MODELS = [&player_models](const std::filesystem::path& path) {
+		if (!std::filesystem::exists(path))
+			return;
+
 		for (const std::filesystem::path& iter : std::filesystem::directory_iterator{ path }) {
 			if (std::filesystem::is_directory(iter)) {
 				RECURSE_MODELS(iter);
