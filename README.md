@@ -27,7 +27,7 @@ A fully-featured training software for Counter Strike: 2, made for Linux.
   <summary> Arch Linux and derivatives </summary>
 
   ```sh
-  pacman -S gdb base-devel cmake git vulkan-icd-loader vulkan-headers libX11 libxext
+  pacman -S gdb base-devel cmake git vulkan-icd-loader vulkan-headers libx11 libxext
   ```
 
   Tested derivatives:
