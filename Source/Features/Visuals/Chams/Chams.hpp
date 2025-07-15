@@ -20,8 +20,6 @@
 
 struct MeshDrawPrimitive;
 
-class ResourceHandleUtils;
-
 // TODO instrumentation?
 
 class Chams : public Feature {

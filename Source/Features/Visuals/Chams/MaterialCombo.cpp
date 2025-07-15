@@ -1,7 +1,7 @@
 #include "MaterialCombo.hpp"
 
 #include "../../../SDK/GameClass/MeshDrawPrimitive.hpp"
-#include "../../../SDK/GameClass/ResourceHandleUtils.hpp"
+#include "../../../SDK/GameClass/ResourceSystem.hpp"
 #include "../../../SDK/Material/Material.hpp"
 #include "../../../SDK/Material/MaterialSystem.hpp"
 
@@ -27,14 +27,7 @@
 
 static void delete_material(Material** material)
 {
-	ResourceHandleUtils* resource_handle_utils = ResourceHandleUtils::get();
-
-	if (!resource_handle_utils) {
-		Logging::warn("Leaking memory because material '{}' can't be deleted without ResourceHandleUtils", (*material)->get_name());
-		return;
-	}
-
-	resource_handle_utils->delete_resource(reinterpret_cast<void*>(material));
+	Interfaces::resource_system->delete_resource(reinterpret_cast<void*>(material));
 }
 
 MaterialCombo::MaterialCombo(SettingsHolder* parent, std::string name)

@@ -6,14 +6,10 @@
 #include "../../../SDK/EntityHandle.hpp"
 #include "../../../SDK/GameClass/EnginePVSManager.hpp"
 #include "../../../SDK/GameClass/MeshDrawPrimitive.hpp"
-#include "../../../SDK/GameClass/ResourceHandleUtils.hpp"
-#include "../../../SDK/GameClass/ResourceSystem.hpp"
 #include "../../../SDK/Material/Material.hpp"
 #include "../../../SDK/Material/MaterialSystem.hpp"
 
 #include "../../../Utils/Logging.hpp"
-
-#include "../../../Interfaces.hpp"
 
 #include "../../../Memory.hpp"
 
