@@ -23,6 +23,16 @@ struct std::formatter<T*> : public std::formatter<void*> {
 	}
 };
 
+template <typename T>
+	requires(!std::same_as<std::remove_cvref_t<T>, void> && !std::same_as<std::remove_cvref_t<T>, char>)
+struct std::formatter<const T*> : public std::formatter<void*> {
+	constexpr auto format(const T* ptr, std::format_context& ctx) const
+	{
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+		return std::formatter<void*>::format(const_cast<void*>(static_cast<const void*>(ptr)), ctx);
+	}
+};
+
 template <typename R, typename... Args>
 struct std::formatter<R(*)(Args...)> : public std::formatter<void*> {
 	constexpr auto format(auto* ptr, std::format_context& ctx) const

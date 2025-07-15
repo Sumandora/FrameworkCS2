@@ -1,5 +1,6 @@
 #include "Interfaces.hpp"
 
+#include "SDK/GameClass/Source2Client.hpp"
 #include "SDK/InterfaceReg.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
@@ -108,6 +109,8 @@ void Interfaces::grab_interfaces()
 	auto panorama = InterfacedLibrary::create("libpanorama.so").value();
 	auto materialsystem2 = InterfacedLibrary::create("libmaterialsystem2.so").value();
 	auto resourcesystem = InterfacedLibrary::create("libresourcesystem.so").value();
+	auto filesystem = InterfacedLibrary::create("libfilesystem_stdio.so").value();
+	auto localize = InterfacedLibrary::create("liblocalize.so").value();
 
 	constexpr static auto INFO = [](std::string_view name, void* ptr) {
 		if (ptr)
@@ -116,7 +119,7 @@ void Interfaces::grab_interfaces()
 			Logging::error("Couldn't find {}", name);
 	};
 
-	source2_client = client.get_interface<void>("Source2Client");
+	source2_client = client.get_interface<Source2Client>("Source2Client");
 	INFO("Source2Client", source2_client);
 	schemaSystem = schemasystem.get_interface<SchemaSystem>("SchemaSystem_");
 	INFO("SchemaSystem", schemaSystem);
@@ -132,4 +135,8 @@ void Interfaces::grab_interfaces()
 	INFO("VMaterialSystem2", material_system);
 	resource_system = resourcesystem.get_interface<ResourceSystem>("ResourceSystem");
 	INFO("ResourceSystem", resource_system);
+	file_system = filesystem.get_interface<FileSystem>("VFileSystem");
+	INFO("VFileSystem", file_system);
+	::localize = localize.get_interface<Localize>("Localize_");
+	INFO("Localize", ::localize);
 }

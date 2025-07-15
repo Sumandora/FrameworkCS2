@@ -2,6 +2,8 @@
 
 #include "../VirtualMethod.hpp"
 
+#include "../Padding.hpp"
+
 // NOLINTNEXTLINE(performance-enum-size)
 enum class PredictionStage : int {
 	// Determined through enum -> string conversion inside the ClientSidePredict function
@@ -14,7 +16,12 @@ enum class PredictionStage : int {
 };
 
 class NetworkGameClient {
+	PADDING(0x264);
+
 public:
+	// NOLINTNEXTLINE(cppcoreguidelines-non-private-member-variables-in-classes)
+	int delta_tick;
+
 	void client_side_predict(PredictionStage stage);
 
 	VIRTUAL_METHOD(28, force_full_update, void, (const char* reason), (this, reason));

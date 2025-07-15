@@ -11,6 +11,7 @@
 #include "Visuals/LoadingTextChanger.hpp"
 #include "Visuals/Radar.hpp"
 #include "Visuals/Removals.hpp"
+#include "Visuals/ModelChanger/ModelChanger.hpp"
 
 void Features::create()
 {
@@ -25,10 +26,12 @@ void Features::create()
 	auto_strafer.emplace();
 	removals.emplace();
 	chams.emplace();
+	model_changer.emplace();
 }
 
 void Features::destroy()
 {
+	model_changer.reset();
 	chams.reset();
 	removals.reset();
 	auto_strafer.reset();

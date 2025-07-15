@@ -5,6 +5,7 @@ FetchContent_Declare(imgui
 	GIT_TAG v1.91.7
 	GIT_SHALLOW TRUE
 	PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/Patches/ImGUI/FullyRoundedTabs.patch
+							${CMAKE_CURRENT_SOURCE_DIR}/Patches/ImGUI/RoundedImageButtons.patch
 	UPDATE_DISCONNECTED TRUE)
 FetchContent_MakeAvailable(imgui)
 

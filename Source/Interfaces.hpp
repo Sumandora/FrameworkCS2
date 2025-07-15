@@ -8,9 +8,12 @@ struct EngineCvar;
 struct EngineToClient;
 struct PanoramaUIEngine;
 
+class Source2Client;
 class NetworkClientService;
 class MaterialSystem;
 class ResourceSystem;
+class FileSystem;
+class Localize;
 
 namespace Interfaces {
 	class InterfacedLibrary {
@@ -31,7 +34,7 @@ namespace Interfaces {
 		const std::unordered_map<const char*, void*>& get_interfaces() { return interfaces; }
 	};
 
-	inline void* source2_client;
+	inline Source2Client* source2_client;
 	inline SchemaSystem* schemaSystem;
 	inline EngineCvar* engineCvar;
 	inline EngineToClient* engine;
@@ -39,6 +42,8 @@ namespace Interfaces {
 	inline NetworkClientService* network_client_service;
 	inline MaterialSystem* material_system;
 	inline ResourceSystem* resource_system;
+	inline FileSystem* file_system;
+	inline Localize* localize;
 
 	void grab_interfaces();
 

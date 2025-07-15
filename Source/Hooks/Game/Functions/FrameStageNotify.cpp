@@ -10,6 +10,7 @@
 #include "../../../Features/Visuals/ESP/ESP.hpp"
 #include "../../../Features/Visuals/GrenadeHelper.hpp"
 #include "../../../Features/Visuals/GrenadePrediction.hpp"
+#include "../../../Features/Visuals/ModelChanger/ModelChanger.hpp"
 
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Enums/ClientFrameStage.hpp"
@@ -28,6 +29,11 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		chams->update_pvs();
 
 		thread_executor.run_all_queued_functions();
+		break;
+	}
+
+	case FRAME_NET_UPDATE_POSTDATAUPDATE_END: {
+		model_changer->update_model();
 		break;
 	}
 
