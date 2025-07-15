@@ -22,8 +22,8 @@ namespace ImGuiExt {
 	bool EnumCombo(const char* label, E& value)
 	{
 		bool changed = false;
-		std::string_view current_name = std::ranges::find(EnumNames<E>::NAMES, value, [](const auto& pair) { return pair.first; })->second;
-		if (ImGui::BeginCombo(label, std::string{ current_name }.c_str(), ImGuiComboFlags_None)) {
+		std::string current_name{ (*std::ranges::find(EnumNames<E>::NAMES, value, [](const auto& pair) { return pair.first; })).second };
+		if (ImGui::BeginCombo(label, current_name.c_str(), ImGuiComboFlags_None)) {
 			for (const auto& [other_value, name] : EnumNames<E>::NAMES) {
 				bool selected = other_value == value;
 				if (ImGui::Selectable(std::string{ name }.c_str(), selected)) {

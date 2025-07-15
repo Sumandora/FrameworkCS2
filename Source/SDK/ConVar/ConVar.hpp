@@ -17,9 +17,9 @@ struct ConVar {
 	char* description;
 	PADDING(8);
 	std::bitset<32> flags;
-	PADDING(12);
+	PADDING(8);
 	ConVarValue value;
-	ConVarValue valueBackup;
+	ConVarValue value_backup;
 
 	// Functions to mirror how the game accesses con vars:
 	[[nodiscard]] float get_float() const
