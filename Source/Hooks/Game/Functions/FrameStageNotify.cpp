@@ -11,6 +11,7 @@
 #include "../../../Features/Visuals/GrenadeHelper.hpp"
 #include "../../../Features/Visuals/GrenadePrediction.hpp"
 #include "../../../Features/Visuals/ModelChanger/ModelChanger.hpp"
+#include "../../../Features/Misc/Hitmarker.hpp"
 
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Enums/ClientFrameStage.hpp"
@@ -45,6 +46,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 			GraphicsHook::espDrawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
 			esp->draw(GraphicsHook::espDrawList.get());
 			grenade_prediction->draw(GraphicsHook::espDrawList.get());
+			hit_marker->draw(GraphicsHook::espDrawList.get());
 		}
 		break;
 	}

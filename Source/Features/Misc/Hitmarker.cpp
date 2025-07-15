@@ -14,9 +14,12 @@
 
 #include "../../Utils/Logging.hpp"
 
+#include "imgui.h"
 #include "magic_enum/magic_enum.hpp"
 
 #include <array>
+#include <chrono>
+#include <cstdlib>
 #include <cstring>
 #include <format>
 #include <string>
@@ -50,7 +53,8 @@ std::string HitMarker::get_sound_path() const
 
 void HitMarker::event_handler(GameEvent* game_event)
 {
-	if (!enabled.get())
+	const bool hit_sound_enabled = this->hit_sound_enabled.get();
+	if (!hit_marker_enabled.get() && !hit_sound_enabled)
 		return;
 
 	if (std::strcmp(game_event->GetName(), "player_hurt") != 0)
@@ -70,6 +74,11 @@ void HitMarker::event_handler(GameEvent* game_event)
 	if (!victim->entity_cast<CSPlayerPawn*>())
 		return;
 
+	last_hurt = std::chrono::system_clock::now();
+
+	if (!hit_sound_enabled)
+		return;
+
 	// TODO: This is hacky, I would prefer to just call game functions
 	static constexpr std::format_string<const float&, const std::string&> COMMAND
 		= "snd_toolvolume {};"
@@ -81,4 +90,41 @@ void HitMarker::event_handler(GameEvent* game_event)
 	const std::string command = std::format(COMMAND, volume, sound_path);
 
 	Interfaces::engine->execute_client_cmd(command.c_str());
+}
+
+void HitMarker::draw(ImDrawList* draw_list)
+{
+	if (!hit_marker_enabled.get())
+		return;
+
+	const auto now = std::chrono::system_clock::now();
+	const float timeout_ms = this->timeout.get();
+	const auto timeout = std::chrono::milliseconds{ static_cast<int>(timeout_ms) };
+
+	if (now - last_hurt >= timeout)
+		return;
+
+	const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_hurt);
+	const float progress = static_cast<float>(elapsed.count()) / timeout_ms;
+
+	ImColor color = this->color.get();
+	color.Value.w *= 1.0F - progress;
+
+	const float gap = this->gap.get();
+	const ImVec2 gap_vec{ gap, gap };
+
+	const float length = this->length.get();
+	const ImVec2 length_vec{ length, length };
+
+	const ImVec2 center = ImGui::GetIO().DisplaySize / 2.0F;
+
+	// TODO use genericesp line for shadows and more settings in general...
+	draw_list->AddLine(center - gap_vec, center - gap_vec - length_vec, color);
+	draw_list->AddLine(center + gap_vec, center + gap_vec + length_vec, color);
+
+	const ImVec2 gap_flip_vec{ gap, -gap };
+	const ImVec2 length_flip_vec{ length, -length };
+
+	draw_list->AddLine(center - gap_flip_vec, center - gap_flip_vec - length_flip_vec, color);
+	draw_list->AddLine(center + gap_flip_vec, center + gap_flip_vec + length_flip_vec, color);
 }
