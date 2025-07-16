@@ -8,6 +8,7 @@
 #include "../Hooks.hpp"
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 
@@ -76,5 +77,10 @@ namespace Hooks::Game {
 	namespace SyncViewAngles {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(CSGOInput* thisptr, int rsi);
+	}
+
+	namespace EmitSound {
+		inline UninitializedObject<DetourHook<true>> hook;
+		std::uint64_t hook_func(void* recipient_filter, int entity_index, void* emitsound);
 	}
 }

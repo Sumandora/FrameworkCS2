@@ -7,4 +7,6 @@ namespace Prediction {
 	bool begin(UserCmd* cmd);
 	// Don't call end, if begin returned false
 	void end();
+
+	bool in_prediction();
 }

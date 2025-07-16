@@ -106,6 +106,18 @@ namespace Hooks::Game {
 			BCRL::pointer_array(Memory::mem_mgr, Memory::csgo_input, CSGOInput::sync_view_angles_index)
 				.expect<void*>("Couldn't find SyncViewAngles"),
 			reinterpret_cast<void*>(SyncViewAngles::hook_func));
+		EmitSound::hook.emplace(
+			Memory::emalloc,
+			BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"player_sound">(), // lovely
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+				.find_xrefs(SignatureScanner::XRefTypes::relative(),
+					BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				// This is not the beginning of the function, but it doesn't matter.
+				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+				.expect<void*>("Couldn't find EmitSound"),
+			reinterpret_cast<void*>(EmitSound::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -117,10 +129,12 @@ namespace Hooks::Game {
 		AddSleeveModel::hook->enable();
 		DrawArrayExt::hook->enable();
 		SyncViewAngles::hook->enable();
+		EmitSound::hook->enable();
 	}
 
 	void destroy()
 	{
+		EmitSound::hook.reset();
 		SyncViewAngles::hook.reset();
 		DrawArrayExt::hook.reset();
 		AddSleeveModel::hook.reset();

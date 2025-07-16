@@ -15,6 +15,7 @@
 static GlobalVars prev_globals{};
 static std::uint32_t prev_flags{};
 static std::uint32_t prev_tick_base{};
+static bool in_prediction = false;
 
 bool Prediction::begin(UserCmd* cmd)
 {
@@ -47,11 +48,14 @@ bool Prediction::begin(UserCmd* cmd)
 	*(*Memory::local_player_controller)->get_current_command() = cmd;
 	network_game_client->client_side_predict(PredictionStage::CLIENT_COMMAND_TICK);
 
+	::in_prediction = true;
 	return true;
 }
 
 void Prediction::end()
 {
+	::in_prediction = false;
+
 	// Since in the header, we declared that end may not be called when begin returned false, we can assume that all the variables are non-null.
 
 	Memory::local_player->movement_services()->reset_prediction_command();
@@ -60,4 +64,9 @@ void Prediction::end()
 	Memory::local_player->flags() = prev_flags;
 	(*Memory::local_player_controller)->tick_base() = prev_tick_base;
 	**Memory::globals = prev_globals;
+}
+
+bool Prediction::in_prediction()
+{
+	return ::in_prediction;
 }
