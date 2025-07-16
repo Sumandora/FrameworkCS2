@@ -102,9 +102,7 @@ public:
 		if (settings.size() != input_json.size()) {
 			if (input_json.size() < settings.size()) {
 				settings.erase(settings.begin() + input_json.size(), settings.begin() + settings.size());
-				id_counter = settings.size() + 1;
 			} else {
-				id_counter = 1;
 				for (std::size_t left = 0; left < input_json.size() - settings.size(); left++) {
 					auto* new_element = new IndexedT{ this, child_name };
 					new_element->id = id_counter++;
