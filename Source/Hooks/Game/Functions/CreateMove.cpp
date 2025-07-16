@@ -5,6 +5,8 @@
 #include "../../../Features/Combat/Aimbot.hpp"
 #include "../../../Features/Misc/AutoStrafer.hpp"
 #include "../../../Features/Misc/Bhop.hpp"
+#include "../../../Features/Visuals/ForceThirdPerson.hpp"
+#include "../../../Features/Visuals/GrenadeHelper.hpp"
 
 #include "../../../Memory.hpp"
 
@@ -13,8 +15,6 @@
 
 #include "../../../SDK/Entities/CSPlayerController.hpp" // IWYU pragma: keep
 #include "../../../SDK/GameClass/UserCmd.hpp"
-
-#include "../../../Features/Visuals/GrenadeHelper.hpp"
 
 #include "glm/ext/vector_float3.hpp"
 
@@ -60,6 +60,7 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 		const CMsgQAngle& viewangles = usercmd->csgo_usercmd.base().viewangles();
 		const glm::vec3 vec = glm::vec3(viewangles.x(), viewangles.y(), viewangles.z());
 		grenade_helper->update_viewangles(vec);
+		force_third_person->update_viewangles(vec);
 	}
 
 	const float forward = usercmd->csgo_usercmd.base().forwardmove();

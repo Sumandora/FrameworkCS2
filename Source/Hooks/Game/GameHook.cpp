@@ -13,6 +13,7 @@
 
 #include "../../SDK/GameClass/CSGOInput.hpp"
 #include "../../SDK/GameClass/Source2Client.hpp"
+#include "../../SDK/GameClass/ClientModeCSNormal.hpp"
 
 #include <csignal>
 #include <cstddef>
@@ -118,6 +119,14 @@ namespace Hooks::Game {
 				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 				.expect<void*>("Couldn't find EmitSound"),
 			reinterpret_cast<void*>(EmitSound::hook_func));
+		OverrideView::hook.emplace(
+			Memory::emalloc,
+			BCRL::pointer_array(
+				Memory::mem_mgr,
+				Memory::client_mode_cs_normal,
+				ClientModeCSNormal::override_view_index)
+				.expect<void*>("Couldn't find OverrideView"),
+			reinterpret_cast<void*>(OverrideView::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -130,10 +139,12 @@ namespace Hooks::Game {
 		DrawArrayExt::hook->enable();
 		SyncViewAngles::hook->enable();
 		EmitSound::hook->enable();
+		OverrideView::hook->enable();
 	}
 
 	void destroy()
 	{
+		OverrideView::hook.reset();
 		EmitSound::hook.reset();
 		SyncViewAngles::hook.reset();
 		DrawArrayExt::hook.reset();

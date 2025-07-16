@@ -16,6 +16,8 @@ struct GameEvent;
 struct GameRadar;
 struct UserCmd;
 struct MeshDrawPrimitive;
+struct ViewSetup;
+struct ViewRender;
 
 class CSGOInput;
 
@@ -82,5 +84,10 @@ namespace Hooks::Game {
 	namespace EmitSound {
 		inline UninitializedObject<DetourHook<true>> hook;
 		std::uint64_t hook_func(void* recipient_filter, int entity_index, void* emitsound);
+	}
+
+	namespace OverrideView {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(ViewRender* thisptr, ViewSetup* view_setup);
 	}
 }

@@ -23,6 +23,7 @@ struct BodyComponent;
 struct EntitySubclassVDataBase;
 
 constexpr std::uint32_t FL_ONGROUND = 1 << 0;
+constexpr std::uint32_t FL_DUCKING = 1 << 1;
 
 // NOLINTNEXTLINE(performance-enum-size)
 enum class TeamID : int {

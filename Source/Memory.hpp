@@ -13,6 +13,7 @@ struct GlobalVars;
 
 class GameEntitySystem;
 class CSGOInput;
+class ClientModeCSNormal;
 
 namespace Memory {
 	inline ViewRender* viewRender;
@@ -31,6 +32,8 @@ namespace Memory {
 	inline void* get_fun_loading;
 
 	inline GlobalVars** globals;
+
+	inline ClientModeCSNormal* client_mode_cs_normal;
 
 	inline MemoryManager::LinuxMemoryManager<false, true, true> mem_mgr;
 	inline ExecutableMalloc::MemoryManagerAllocator emalloc{mem_mgr};

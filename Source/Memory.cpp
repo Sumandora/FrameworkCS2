@@ -8,6 +8,7 @@
 #include "SDK/EngineTrace/EngineTrace.hpp"
 #include "SDK/Entities/CSPlayerController.hpp"
 #include "SDK/Entities/GameEntitySystem.hpp"
+#include "SDK/GameClass/ClientModeCSNormal.hpp"
 #include "SDK/GameClass/CSGOInput.hpp"
 #include "SDK/GameClass/MemAlloc.hpp"
 #include "SDK/GameClass/UserCmd.hpp"
@@ -16,9 +17,9 @@
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
 
+#include "Utils/BulletSimulation.hpp"
 #include "Utils/CRC.hpp"
 #include "Utils/Logging.hpp"
-#include "Utils/BulletSimulation.hpp"
 
 const void* RetAddrSpoofer::leaveRet;
 
@@ -151,4 +152,22 @@ void Memory::create()
 
 	EngineTrace::resolve_signatures();
 	BulletSimulation::resolve_signatures();
+
+	client_mode_cs_normal
+		= BCRL::signature(
+			mem_mgr,
+			SignatureScanner::PatternSignature::for_literal_string<"cl_scoreboard_mouse_enable_binding">(),
+			BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
+			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .add(4)
+			  .filter([](const auto& ptr) {
+				  return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"0f 11 4d 90">());
+			  })
+			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 3d ? ? ? ? e8">())
+			  .add(1) // TODO This shouldn't be needed; fix in BCRL
+			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 3d ? ? ? ? e8">())
+			  .add(3)
+			  .relative_to_absolute()
+			  .expect<ClientModeCSNormal*>("Couldn't find ClientModeCSNormal");
 }

@@ -7,6 +7,7 @@
 #include "Visuals/Chams/Chams.hpp"
 #include "Visuals/ESP/ESP.hpp"
 #include "Visuals/ForceCrosshair.hpp"
+#include "Visuals/ForceThirdPerson.hpp"
 #include "Visuals/GrenadeHelper.hpp"
 #include "Visuals/GrenadePrediction.hpp"
 #include "Visuals/LoadingTextChanger.hpp"
@@ -29,10 +30,12 @@ void Features::create()
 	chams.emplace();
 	model_changer.emplace();
 	hit_marker.emplace();
+	force_third_person.emplace();
 }
 
 void Features::destroy()
 {
+	force_third_person.reset();
 	hit_marker.reset();
 	model_changer.reset();
 	chams.reset();
