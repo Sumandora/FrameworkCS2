@@ -2,6 +2,8 @@
 
 #include "../../Utils/Logging.hpp"
 
+#include "../../SDK/GameClass/MemAlloc.hpp"
+
 #include <cstring>
 #include <dlfcn.h>
 
@@ -24,6 +26,15 @@ UtlBuffer::UtlBuffer(int grow_size, int init_size, int flags)
 	}
 
 	ctor(this, grow_size, init_size, flags);
+}
+
+UtlBuffer::~UtlBuffer()
+{
+	if (!memory.memory)
+		return;
+
+	if ((memory.growSize & 0xc0000000) == 0)
+		MemAlloc::the()->deallocate(memory.memory);
 }
 
 void UtlBuffer::ensure_capacity(int size)

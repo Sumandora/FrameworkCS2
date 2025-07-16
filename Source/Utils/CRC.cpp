@@ -144,9 +144,6 @@ bool CRC::update_crc(UserCmd* usercmd)
 		}
 	}
 
-	if ((buffer.memory.growSize & 0xc0000000) == 0 && buffer.memory.memory != nullptr)
-		MemAlloc::the()->deallocate(buffer.memory.memory);
-
 	return true;
 }
 

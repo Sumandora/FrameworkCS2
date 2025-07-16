@@ -25,6 +25,7 @@ struct UtlBuffer {
 	Byteswap byteswap;
 
 	explicit UtlBuffer(int grow_size = 0, int init_size = 0, int flags = 0);
+	~UtlBuffer();
 
 	void ensure_capacity(int size);
 };
