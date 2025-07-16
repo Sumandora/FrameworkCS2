@@ -16,6 +16,7 @@ static void** usercmd_list = nullptr;
 static int (*cmdlist_index_from_entity)(BasePlayerController*) = nullptr;
 static void* (*get_usercmds)(void*, uint64_t) = nullptr;
 static UserCmd* (*get_usercmd)(BasePlayerController*, int) = nullptr;
+static CSubtickMoveStep* (*allocate_subtick_move)(google::protobuf::Arena* arena) = nullptr;
 
 void UserCmd::resolve_signatures()
 {
@@ -51,6 +52,18 @@ void UserCmd::resolve_signatures()
 			  .add(1)
 			  .relative_to_absolute()
 			  .expect<decltype(get_usercmd)>("Couldn't find get_usercmd");
+	allocate_subtick_move
+		= BCRL::signature(
+			Memory::mem_mgr,
+			SignatureScanner::PatternSignature::for_literal_string<"16CSubtickMoveStep">(),
+			BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+			  .find_xrefs(SignatureScanner::XRefTypes::absolute(),
+				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+			  .sub(8)
+			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+			  .expect<decltype(allocate_subtick_move)>("Couldn't find allocate subtick move");
 }
 
 UserCmd* UserCmd::get_current_command(BasePlayerController* controller)
@@ -71,19 +84,6 @@ UserCmd* UserCmd::get_current_command(BasePlayerController* controller)
 
 CSubtickMoveStep* UserCmd::allocate_new_move_step(float when)
 {
-	static auto* allocate_subtick_move
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_literal_string<"16CSubtickMoveStep">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
-			  .find_xrefs(SignatureScanner::XRefTypes::absolute(),
-				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
-			  .sub(8)
-			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
-				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
-			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
-			  .expect<CSubtickMoveStep* (*)(google::protobuf::Arena * arena)>("Couldn't find allocate subtick move");
-
 	if (!csgo_usercmd.has_base())
 		return nullptr;
 
