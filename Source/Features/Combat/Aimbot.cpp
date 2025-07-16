@@ -6,9 +6,9 @@
 
 #include "../../SDK/EngineTrace/GameTrace.hpp"
 #include "../../SDK/EngineTrace/TraceFilter.hpp"
-#include "../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../SDK/Entities/Components/BodyComponent.hpp"
 #include "../../SDK/Entities/Components/BodyComponentSkeletonInstance.hpp"
+#include "../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../SDK/Enums/LifeState.hpp"
 #include "../../SDK/GameClass/GameSceneNode.hpp"
 #include "../../SDK/GameClass/SkeletonInstance.hpp"
@@ -16,12 +16,14 @@
 
 #include "../../Utils/BulletSimulation.hpp"
 #include "../../Utils/Logging.hpp"
+#include "../../Utils/Prediction.hpp"
 
 #include "glm/common.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
+#include "networkbasetypes.pb.h"
 
 #include <cfloat>
 #include <cmath>
@@ -61,6 +63,8 @@ void Aimbot::create_move(UserCmd* cmd)
 		return;
 	if (!Memory::local_player->gameSceneNode())
 		return;
+
+	const bool predicted = Prediction::begin(cmd);
 
 	const glm::vec3 from = Memory::local_player->gameSceneNode()->transform().m_Position + Memory::local_player->view_offset();
 
@@ -138,42 +142,36 @@ void Aimbot::create_move(UserCmd* cmd)
 	}
 
 	if (fov != FLT_MAX) {
-		CMsgQAngle* qangle = cmd->csgo_usercmd.mutable_base()->mutable_viewangles();
-		qangle->set_x(rots.x);
-		qangle->set_y(rots.y);
-		cmd->set_buttonstate1(cmd->buttons.buttonstate1 | IN_ATTACK);
+		CMsgQAngle* base_viewangles = cmd->csgo_usercmd.mutable_base()->mutable_viewangles();
+		base_viewangles->set_x(rots.x);
+		base_viewangles->set_y(rots.y);
+
+		// TODO for silent aim, one must insert a single input history if there is none, then just remove the base view angles assignment.
+		
+		for (auto& input : *cmd->csgo_usercmd.mutable_input_history()) {
+			CMsgQAngle* qangle = input.mutable_view_angles();
+			qangle->set_x(rots.x);
+			qangle->set_y(rots.y);
+		}
+
+		cmd->set_buttonstate2(cmd->buttons.buttonstate2 | IN_ATTACK);
+
+		CSubtickMoveStep* new_step = cmd->allocate_new_move_step(0.0001F);
+
+		new_step->set_button(IN_ATTACK);
+		new_step->set_pressed(true);
+
+		new_step = cmd->allocate_new_move_step(0.0001F);
+
+		new_step->set_button(IN_ATTACK);
+		new_step->set_pressed(false);
 	}
 
-	// const float pitch = glm::radians(cmd->csgo_usercmd.base().viewangles().x());
-	// const float yaw = glm::radians(cmd->csgo_usercmd.base().viewangles().y());
-	// const glm::vec3 dir{
-	// 	glm::cos(yaw) * glm::cos(pitch),
-	// 	glm::sin(yaw) * glm::cos(pitch),
-	// 	-glm::sin(pitch),
-	// };
-	// const glm::vec3 to = from + dir * 32768.0F;
+	if (predicted)
+		Prediction::end();
+}
 
-	// GameTrace trace = GameTrace::initialized();
-	// TraceFilter filter{ TraceFilter::MASK1 };
-	// filter.add_skip(Memory::local_player);
-	// Ray ray{};
-
-	// EngineTrace::the()->trace_shape(&ray, from, to, &filter, &trace);
-
-	// const glm::vec3 dest = from + (to - from) * trace.fraction;
-	// const glm::vec3 dest = to;
-
-	// Logging::debug("From: {}; To: {}", from, dest);
-
-	// const float damage = BulletSimulation::simulate_bullet(from, dest);
-
-	// Logging::info("damage: {}", damage);
-
-	// if (trace.hit_entity) {
-	// 	auto* pawn = trace.hit_entity->entity_cast<CSPlayerPawn*>();
-	// 	if (pawn) {
-	// 		std::string_view s = pawn->original_controller().get()->sanitized_name();
-	// 		Logging::info("aiming at: {}", std::vector<char>{ s.begin(), s.end() });
-	// 	}
-	// }
+bool Aimbot::wants_silent_aim() const
+{
+	return enabled.get();
 }

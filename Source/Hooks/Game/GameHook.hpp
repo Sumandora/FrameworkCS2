@@ -16,6 +16,8 @@ struct GameRadar;
 struct UserCmd;
 struct MeshDrawPrimitive;
 
+class CSGOInput;
+
 namespace Hooks::Game {
 	void create();
 	void destroy();
@@ -69,5 +71,10 @@ namespace Hooks::Game {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(void* animatable_scene_object_desc, void* render_context, MeshDrawPrimitive* mesh,
 			int mesh_count, void* scene_view, void* scene_layer, void* scene_system_per_frame_stats, void* material);
+	}
+
+	namespace SyncViewAngles {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(CSGOInput* thisptr, int rsi);
 	}
 }

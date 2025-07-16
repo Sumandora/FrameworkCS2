@@ -17,6 +17,8 @@ public:
 	Aimbot();
 
 	void create_move(UserCmd* cmd);
+
+	bool wants_silent_aim() const;
 };
 
 inline UninitializedObject<Aimbot> aimbot;

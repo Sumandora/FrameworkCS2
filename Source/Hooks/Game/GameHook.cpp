@@ -101,6 +101,11 @@ namespace Hooks::Game {
 				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 				.expect<void*>("Couldn't find draw object function"),
 			reinterpret_cast<void*>(DrawArrayExt::hook_func));
+		SyncViewAngles::hook.emplace(
+			Memory::emalloc,
+			BCRL::pointer_array(Memory::mem_mgr, Memory::csgo_input, CSGOInput::sync_view_angles_index)
+				.expect<void*>("Couldn't find SyncViewAngles"),
+			reinterpret_cast<void*>(SyncViewAngles::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -111,10 +116,12 @@ namespace Hooks::Game {
 		RenderLegs::hook->enable();
 		AddSleeveModel::hook->enable();
 		DrawArrayExt::hook->enable();
+		SyncViewAngles::hook->enable();
 	}
 
 	void destroy()
 	{
+		SyncViewAngles::hook.reset();
 		DrawArrayExt::hook.reset();
 		AddSleeveModel::hook.reset();
 		RenderLegs::hook.reset();
