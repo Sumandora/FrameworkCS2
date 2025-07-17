@@ -9,7 +9,9 @@ FetchContent_Declare(protobuf
 	GIT_REPOSITORY https://github.com/protocolbuffers/protobuf
 	GIT_PROGRESS TRUE
 	GIT_TAG v3.21.8
-	GIT_SHALLOW TRUE)
+	GIT_SHALLOW TRUE
+	PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/Patches/Protobuf/ProtocOnlyCXX.patch
+	UPDATE_DISCONNECTED TRUE)
 FetchContent_MakeAvailable(protobuf)
 
 target_compile_options(libprotobuf-lite PRIVATE "-fdata-sections" "-Oz")
