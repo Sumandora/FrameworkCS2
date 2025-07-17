@@ -9,6 +9,8 @@ namespace GUI {
 	void init(const std::filesystem::path& config_directory);
 	void destroy();
 
+	bool is_menu_open();
+
 	void provide_window(SDL_Window* window);
 
 	void render();

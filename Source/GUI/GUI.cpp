@@ -1,5 +1,6 @@
 #include "GUI.hpp"
 
+#include "InputManager.hpp"
 #include "TextureManager.hpp"
 #include "Theme.hpp"
 
@@ -169,6 +170,10 @@ void GUI::destroy()
 	ImGui::DestroyContext();
 }
 
+bool GUI::is_menu_open() {
+	return ::is_open;
+}
+
 static void create_font()
 {
 	// We are running straight into the multi monitor dpi issue here, but to my knowledge there is no appropriate solution to this when using ImGui
@@ -225,15 +230,10 @@ void GUI::render()
 {
 	ImGuiIO& io = ImGui::GetIO();
 
-	static constexpr ImGuiConfigFlags INPUT_MASK = ImGuiConfigFlags_NoKeyboard | ImGuiConfigFlags_NoMouse;
-	if (is_open) {
-		io.ConfigFlags &= ~INPUT_MASK;
-	} else {
-		io.ConfigFlags |= INPUT_MASK;
-	}
 	io.MouseDrawCursor = is_open && SDL_GetWindowMouseGrab(window);
 
 	ImGui::NewFrame();
+	get_input_manager().update_states();
 
 	if (is_open) {
 		ImGui::ShowDemoWindow();

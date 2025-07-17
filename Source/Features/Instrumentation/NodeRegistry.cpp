@@ -9,6 +9,7 @@
 #include "Nodes/ComparisonNode.hpp"
 #include "Nodes/FloatValueNode.hpp"
 #include "Nodes/HSVNode.hpp"
+#include "Nodes/KeybindNode.hpp"
 #include "Nodes/LogicGateNode.hpp"
 #include "Nodes/NotGateNode.hpp"
 #include "Nodes/RGBANode.hpp"
@@ -86,6 +87,10 @@ NodeRegistry::NodeRegistry(NodeCircuit* parent)
 	menu["Branch"] = {
 		.create_initialized = BranchNode::initialized,
 		.create_uninitialized = BranchNode::uninitialized
+	};
+	menu["Keybind"] = {
+		.create_initialized = KeybindNode::initialized,
+		.create_uninitialized = KeybindNode::uninitialized
 	};
 }
 
