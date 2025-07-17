@@ -22,6 +22,7 @@ killall -19 steam
 killall -19 steamwebhelper
 
 gdb -p "$cs2_pid" -n -q -batch \
+	-ex "handle SIGSTOP nostop pass noprint SIGCONT nostop pass noprint" \
     -ex "call ((void*(*)(char*, int)) dlopen)(\"/usr/lib64/$lib_name\", 1)" \
     -ex "call ((char*(*)(void)) dlerror)()" \
     -ex "detach" \
