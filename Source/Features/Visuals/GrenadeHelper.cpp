@@ -8,6 +8,7 @@
 #include "../../SDK/Entities/BasePlayerWeapon.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../SDK/Entities/Services/PlayerWeaponServices.hpp"
+#include "../../SDK/Entities/Services/CSPlayerMovementServices.hpp"
 #include "../../SDK/Entities/BaseEntity.hpp"
 #include "../../SDK/GameClass/GameEvent.hpp"
 
@@ -148,10 +149,12 @@ void GrenadeHelper::update()
 		return glm::distance(origin, a.position) < glm::distance(origin, b.position);
 	});
 
+	CSPlayerMovementServices* movement_services = Memory::local_player->movement_services();
+
 	{
 		const std::lock_guard lock{ proximate_grenades_mutex };
 		view_offset = Memory::local_player->view_offset();
-		crouching = (Memory::local_player->flags() & FL_DUCKING) != 0;
+		ducking = movement_services->ducking() || movement_services->ducked();
 		std::swap(proximate_grenades, bundles);
 	}
 }
@@ -316,8 +319,8 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 				ImGui::TextColored(ImColor{ 1.0F, 0.0F, 0.0F, 1.0F }, "%s", text);
 		};
 		if (grenade.duck)
-			colored_text_if_unfulfilled("Crouching", crouching);
-		else if(crouching)
+			colored_text_if_unfulfilled("Crouching", ducking);
+		else if(ducking)
 			colored_text_if_unfulfilled("Standing", false);
 		if (grenade.throw_info.jump)
 			// Jump throw is never satisfied, because if you jump then it is no longer rendered.

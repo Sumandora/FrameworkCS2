@@ -61,7 +61,7 @@ class GrenadeHelper : public Feature {
 	std::vector<ProximateGrenadeBundle> proximate_grenades;
 	glm::vec3 view_offset;
 	glm::vec3 player_viewangles;
-	bool crouching;
+	bool ducking;
 	mutable std::mutex proximate_grenades_mutex;
 
 	void reset_octree();

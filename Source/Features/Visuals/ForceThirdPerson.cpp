@@ -35,13 +35,11 @@ void ForceThirdPerson::override_view(ViewSetup* view_setup)
 	const GameSceneNode* game_scene_node = Memory::local_player->gameSceneNode();
 	glm::vec3 head_pos = game_scene_node->transform().m_Position;
 
-	const CSPlayerMovementServices* movement_services = static_cast<CSPlayerMovementServices*>(Memory::local_player->movement_services());
-
 	// This may look hacky, but is preferable to getting the actual head position, as it will suffer from view offsets
 	// Source: https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive/Mapper%27s_Reference
 	static constexpr float STANDING_EYE_HEIGHT = 64;
 	static constexpr float DUCKING_EYE_HEIGHT = 46;
-	head_pos.z += std::lerp(STANDING_EYE_HEIGHT, DUCKING_EYE_HEIGHT, movement_services ? movement_services->duck_amount() : 0.0F);
+	head_pos.z += std::lerp(STANDING_EYE_HEIGHT, DUCKING_EYE_HEIGHT, Memory::local_player->movement_services()->duck_amount());
 
 	const float pitch = glm::radians(view_angles.x);
 	const float yaw = glm::radians(view_angles.y);
