@@ -4,6 +4,7 @@
 
 #include "../../SDK/Entities/BaseEntity.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
+#include "../../SDK/Entities/Services/CSPlayerMovementServices.hpp"
 #include "../../SDK/GameClass/GameSceneNode.hpp"
 #include "../../SDK/GameClass/ViewSetup.hpp"
 
@@ -11,6 +12,7 @@
 
 #include "glm/ext/vector_float3.hpp"
 #include "glm/trigonometric.hpp"
+#include <cmath>
 
 ForceThirdPerson::ForceThirdPerson()
 	: Feature("Visuals", "Force third person")
@@ -33,12 +35,13 @@ void ForceThirdPerson::override_view(ViewSetup* view_setup)
 	const GameSceneNode* game_scene_node = Memory::local_player->gameSceneNode();
 	glm::vec3 head_pos = game_scene_node->transform().m_Position;
 
+	const CSPlayerMovementServices* movement_services = static_cast<CSPlayerMovementServices*>(Memory::local_player->movement_services());
+
 	// This may look hacky, but is preferable to getting the actual head position, as it will suffer from view offsets
 	// Source: https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive/Mapper%27s_Reference
-	if (Memory::local_player->flags() & FL_DUCKING)
-		head_pos.z += 46;
-	else
-		head_pos.z += 64;
+	static constexpr float STANDING_EYE_HEIGHT = 64;
+	static constexpr float DUCKING_EYE_HEIGHT = 46;
+	head_pos.z += std::lerp(STANDING_EYE_HEIGHT, DUCKING_EYE_HEIGHT, movement_services ? movement_services->duck_amount() : 0.0F);
 
 	const float pitch = glm::radians(view_angles.x);
 	const float yaw = glm::radians(view_angles.y);
