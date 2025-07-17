@@ -12,6 +12,7 @@
 
 #include "../../../Interfaces.hpp"
 
+#include "../../../Utils/Interval.hpp"
 #include "../../../Utils/Logging.hpp"
 #include "../../../Utils/VTexDecoder.hpp"
 
@@ -164,15 +165,11 @@ inline void PlayerModelCombo::draw_fancy_model_selection()
 void PlayerModelCombo::render()
 {
 	// Don't update it every frame, that might result in a performance drop.
-	using std::chrono::system_clock;
-	static system_clock::time_point last_update = system_clock::now();
-	const system_clock::time_point right_now = system_clock::now();
-	static constexpr auto CUSTOM_MODEL_RELOAD_TIMER = std::chrono::seconds(5);
-	if (right_now - last_update > CUSTOM_MODEL_RELOAD_TIMER) {
+	static Interval<std::chrono::seconds, 5> custom_model_reload_timer;
+	if (custom_model_reload_timer.passed()) {
 		// No mutex is needed here because there is only one render thread.
 		custom_models.clear();
 		gather_custom_models(custom_models);
-		last_update = right_now;
 	}
 
 	if (custom_models.empty()) {

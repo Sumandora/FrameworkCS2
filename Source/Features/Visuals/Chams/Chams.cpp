@@ -10,6 +10,7 @@
 #include "../../../SDK/Material/MaterialSystem.hpp"
 
 #include "../../../Utils/Logging.hpp"
+#include "../../../Utils/Interval.hpp"
 
 #include "../../../Memory.hpp"
 
@@ -62,12 +63,9 @@ void Chams::update_pvs() const
 		return;
 
 	// Don't update it every frame, that might result in a bigger performance drop than it should be.
-	using std::chrono::system_clock;
-	static system_clock::time_point last_update = system_clock::now();
-	const system_clock::time_point right_now = system_clock::now();
-	if (right_now - last_update > std::chrono::seconds(5)) {
+	static Interval<std::chrono::seconds, 5> pvs_update_timer;
+	if (pvs_update_timer.passed()) {
 		engine_pvs_manager->enable(!disable_pvs.get());
-		last_update = right_now;
 	}
 }
 

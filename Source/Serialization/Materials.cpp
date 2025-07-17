@@ -1,6 +1,7 @@
 #include "Materials.hpp"
 
 #include "../Utils/Logging.hpp"
+#include "../Utils/Interval.hpp"
 
 #include <array>
 #include <chrono>
@@ -112,11 +113,8 @@ const std::vector<Serialization::Materials::Material>& Serialization::Materials:
 	}
 
 	// Don't update it every time, that would probably cause hard drive failure in the long term.
-	using std::chrono::system_clock;
-	static constexpr auto REFRESH_INTERVAL = std::chrono::seconds(5);
-	static system_clock::time_point last_update = system_clock::from_time_t(0);
-	const system_clock::time_point right_now = system_clock::now();
-	if (right_now - last_update > REFRESH_INTERVAL) {
+	static Interval<std::chrono::seconds, 5> refresh_interval;
+	if (refresh_interval.passed()) {
 		materials.clear();
 		for (const std::filesystem::path& path : std::filesystem::directory_iterator{ materials_dir }) {
 			if (path.extension() != ".kv3")
@@ -132,7 +130,6 @@ const std::vector<Serialization::Materials::Material>& Serialization::Materials:
 				return s;
 			});
 		}
-		last_update = right_now;
 	}
 
 	return materials;

@@ -5,6 +5,7 @@
 #include "imgui.h"
 
 #include "../Utils/Logging.hpp"
+#include "../Utils/Interval.hpp"
 
 #include "lz4.h"
 
@@ -71,11 +72,10 @@ void GUI::TextureManager::purge_old_textures()
 	if (textures.empty())
 		return;
 
-	static constexpr auto GLOBAL_COOLDOWN = std::chrono::seconds(3);
-	static auto last_purge_time = std::chrono::system_clock::now();
 	// If many textures have been created at the same time, then deallocating them all at once, might slow down the game.
 	// This is not a perfect solution, I might need to investigate how other game engines handle this. TODO
-	if (std::chrono::system_clock::now() - last_purge_time < GLOBAL_COOLDOWN)
+	static Interval<std::chrono::seconds, 3> global_cooldown;
+	if (global_cooldown.passed(false))
 		return;
 
 	auto it = std::ranges::find_if(textures, [](const std::pair<const RawImage*, TimedTextureData>& pair) {
@@ -91,7 +91,7 @@ void GUI::TextureManager::purge_old_textures()
 		return;
 
 	textures.erase(it);
-	last_purge_time = std::chrono::system_clock::now();
+	global_cooldown.reset();
 }
 
 void GUI::TextureManager::purge_all_textures()
