@@ -11,12 +11,31 @@
 
 struct BasePlayerController;
 
-static constexpr std::uint64_t IN_ATTACK = 1 << 0;
-static constexpr std::uint64_t IN_JUMP = 1 << 1;
-static constexpr std::uint64_t IN_FORWARD = 1 << 3;
-static constexpr std::uint64_t IN_BACK = 1 << 4;
-static constexpr std::uint64_t IN_MOVELEFT = 1 << 9;
-static constexpr std::uint64_t IN_MOVERIGHT = 1 << 10;
+// @schema InputBitMask_t
+enum InputBitMask : std::uint64_t
+{
+	IN_NONE = 0x0,
+	IN_ALL = 0xffffffffffffffff,
+	IN_ATTACK = 1UL << 0UL,
+	IN_JUMP = 1UL << 1UL,
+	IN_DUCK = 1UL << 2UL,
+	IN_FORWARD = 1UL << 3UL,
+	IN_BACK = 1UL << 4UL,
+	IN_USE = 1UL << 5UL,
+	IN_TURNLEFT = 1UL << 7UL,
+	IN_TURNRIGHT = 1UL << 8UL,
+	IN_MOVELEFT = 1UL << 9UL,
+	IN_MOVERIGHT = 1UL << 10UL,
+	IN_ATTACK2 = 1UL << 11UL,
+	IN_RELOAD = 1UL << 13UL,
+	IN_SPEED = 1UL << 16UL,
+	IN_JOYAUTOSPRINT = 1UL << 17UL,
+	IN_FIRST_MOD_SPECIFIC_BIT = 1UL << 32UL,
+	IN_USEORRELOAD = 1UL << 32UL,
+	IN_SCORE = 1UL << 33UL,
+	IN_ZOOM = 1UL << 34UL,
+	IN_LOOK_AT_WEAPON = 1UL << 35UL,
+};
 
 static constexpr int MAX_SUBTICKS_PER_MOVE = 12;
 

@@ -9,8 +9,9 @@
 
 struct BaseEntity;
 
-// NOLINTNEXTLINE(performance-enum-size)
+// @schema HitGroup_t
 enum class HitGroup : std::uint32_t {
+	INVALID = 0xffffffff,
 	GENERIC = 0,
 	HEAD = 1,
 	CHEST = 2,
@@ -19,7 +20,11 @@ enum class HitGroup : std::uint32_t {
 	RIGHTARM = 5,
 	LEFTLEG = 6,
 	RIGHTLEG = 7,
+	NECK = 8,
+	UNUSED = 9,
 	GEAR = 10,
+	SPECIAL = 11,
+	COUNT = 12,
 };
 
 struct TraceHitboxData {

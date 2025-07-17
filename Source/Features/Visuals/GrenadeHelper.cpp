@@ -8,6 +8,7 @@
 #include "../../SDK/Entities/BasePlayerWeapon.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../SDK/Entities/Services/PlayerWeaponServices.hpp"
+#include "../../SDK/Entities/BaseEntity.hpp"
 #include "../../SDK/GameClass/GameEvent.hpp"
 
 #include "../../Utils/Logging.hpp"
@@ -150,7 +151,6 @@ void GrenadeHelper::update()
 	{
 		const std::lock_guard lock{ proximate_grenades_mutex };
 		view_offset = Memory::local_player->view_offset();
-		static constexpr auto FL_DUCKING = 1 << 1;
 		crouching = (Memory::local_player->flags() & FL_DUCKING) != 0;
 		std::swap(proximate_grenades, bundles);
 	}
