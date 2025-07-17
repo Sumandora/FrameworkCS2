@@ -34,6 +34,7 @@ void ForceThirdPerson::override_view(ViewSetup* view_setup)
 	glm::vec3 head_pos = game_scene_node->transform().m_Position;
 
 	// This may look hacky, but is preferable to getting the actual head position, as it will suffer from view offsets
+	// Source: https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive/Mapper%27s_Reference
 	if (Memory::local_player->flags() & FL_DUCKING)
 		head_pos.z += 46;
 	else

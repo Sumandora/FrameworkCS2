@@ -255,7 +255,9 @@ bool GUI::queue_event(const SDL_Event* event)
 	if (event->type == SDL_EVENT_USER)
 		return false; // The data in this thing is pretty much uncloneable. ImGui doesn't need it, I don't need it, don't save it.
 
-	if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_INSERT)
+	if (event->type == SDL_EVENT_KEY_DOWN
+		// Since some keyboards don't have an INSERT key, ALT-I is also fine.
+		&& (event->key.key == SDLK_INSERT || (event->key.mod == SDL_KMOD_LALT && event->key.key == SDLK_I)))
 		is_open = !is_open;
 
 	const std::lock_guard lock{ event_queue_mutex };
