@@ -35,7 +35,6 @@ class GrenadeHelper : public Feature {
 	Color aim_circle_color{ this, "Aim circle color", ImColor{ 1.0F, 1.0F, 1.0F, 1.0F } };
 	Color aim_circle_fill_color{ this, "Aim circle fill color", ImColor{ 0.0F, 1.0F, 0.0F, 1.0F } };
 
-	using GrenadeWeapon = Serialization::Grenades::GrenadeWeapon;
 	using Grenade = Serialization::Grenades::Grenade;
 
 	struct GrenadeBundle {
@@ -47,7 +46,7 @@ class GrenadeHelper : public Feature {
 	// TODO: Verify that this is actually the boundaries that the s2 engine restricts to.
 	static constexpr float OCTREE_SIZE = 32768;
 
-	using Octree = OctreeCpp<glm::vec3, std::unordered_map<GrenadeWeapon, std::shared_ptr<GrenadeBundle>>>;
+	using Octree = OctreeCpp<glm::vec3, std::unordered_map<GrenadeType, std::shared_ptr<GrenadeBundle>>>;
 	Octree grenades;
 	std::string current_map;
 

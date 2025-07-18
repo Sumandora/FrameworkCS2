@@ -5,11 +5,11 @@
 #include "../../Serialization/GrenadeSerialization.hpp"
 
 #include "../../SDK/Entities/BaseCSGrenade.hpp"
+#include "../../SDK/Entities/BaseEntity.hpp"
 #include "../../SDK/Entities/BasePlayerWeapon.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
-#include "../../SDK/Entities/Services/PlayerWeaponServices.hpp"
 #include "../../SDK/Entities/Services/CSPlayerMovementServices.hpp"
-#include "../../SDK/Entities/BaseEntity.hpp"
+#include "../../SDK/Entities/Services/PlayerWeaponServices.hpp"
 #include "../../SDK/GameClass/GameEvent.hpp"
 
 #include "../../Utils/Logging.hpp"
@@ -104,7 +104,7 @@ void GrenadeHelper::update()
 
 	const int grenade_type = grenade->get_grenade_type();
 
-	const auto optional_weapon = magic_enum::enum_cast<GrenadeWeapon>(grenade_type);
+	const auto optional_weapon = magic_enum::enum_cast<GrenadeType>(grenade_type);
 
 	if (!optional_weapon.has_value()) {
 		Logging::error("Unknown grenade type: {}", grenade_type);
@@ -112,7 +112,7 @@ void GrenadeHelper::update()
 		return;
 	}
 
-	const GrenadeWeapon grenade_weapon = optional_weapon.value();
+	const GrenadeType grenade_weapon = optional_weapon.value();
 
 	const glm::vec3 origin = Memory::local_player->old_origin();
 
@@ -184,7 +184,7 @@ void GrenadeHelper::event_handler(GameEvent* event)
 
 	current_map = new_map;
 
-	std::unordered_map<glm::vec3, std::unordered_map<GrenadeWeapon, std::shared_ptr<GrenadeBundle>>> map;
+	std::unordered_map<glm::vec3, std::unordered_map<GrenadeType, std::shared_ptr<GrenadeBundle>>> map;
 	for (Grenade grenade : parse_grenades_for_map(new_map)) {
 		auto map_iter = std::ranges::find_if(map, [&grenade](const auto& it) {
 			// static constexpr float MERGE_DISTANCE = 1E-2F;
@@ -197,7 +197,7 @@ void GrenadeHelper::event_handler(GameEvent* event)
 			// new map
 			map_iter = map.insert(map_iter, { grenade.position, {} });
 
-		GrenadeWeapon weapon = grenade.weapon;
+		GrenadeType weapon = grenade.weapon;
 		auto vec_iter = std::ranges::find_if(map_iter->second, [weapon](const auto& pair) {
 			return pair.first == weapon;
 		});
@@ -286,20 +286,26 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 
 		const char* action = nullptr;
 		switch (grenade.weapon) {
-		case GrenadeWeapon::WEAPON_HEGRENADE:
+		case GRENADE_TYPE_EXPLOSIVE:
 			action = "Nade";
 			break;
-		case GrenadeWeapon::WEAPON_FLASHBANG:
+		case GRENADE_TYPE_FLASH:
 			action = "Flash";
 			break;
-		case GrenadeWeapon::WEAPON_MOLOTOV:
+		case GRENADE_TYPE_FIRE:
 			action = "Molotov";
 			break;
-		case GrenadeWeapon::WEAPON_DECOY:
+		case GRENADE_TYPE_DECOY:
 			action = "Deploy decoy at";
 			break;
-		case GrenadeWeapon::WEAPON_SMOKEGRENADE:
+		case GRENADE_TYPE_SMOKE:
 			action = "Smoke";
+			break;
+		case GRENADE_TYPE_SENSOR:
+			action = "Monitor";
+			break;
+		case GRENADE_TYPE_SNOWBALL:
+			action = "Throw snowball at";
 			break;
 		default:
 			std::unreachable();
@@ -320,7 +326,7 @@ void GrenadeHelper::draw_aim_helpers(const Grenade& grenade, ImVec2 screen_pos) 
 		};
 		if (grenade.duck)
 			colored_text_if_unfulfilled("Crouching", ducking);
-		else if(ducking)
+		else if (ducking)
 			colored_text_if_unfulfilled("Standing", false);
 		if (grenade.throw_info.jump)
 			// Jump throw is never satisfied, because if you jump then it is no longer rendered.

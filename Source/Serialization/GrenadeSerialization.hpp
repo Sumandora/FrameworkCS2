@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../SDK/Entities/BaseCSGrenade.hpp"
+
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float3.hpp"
 
@@ -10,7 +12,6 @@
 
 #include <cctype>
 #include <cstddef>
-#include <cstdint>
 #include <optional>
 #include <ranges>
 #include <stdexcept>
@@ -19,24 +20,16 @@
 #include <vector>
 
 namespace Serialization::Grenades {
-	enum class GrenadeWeapon : std::uint8_t {
-		WEAPON_HEGRENADE = 0, // This are the same ids that BaseCSGrenade::get_grenade_type outputs.
-		WEAPON_FLASHBANG = 1,
-		WEAPON_MOLOTOV = 2,
-		WEAPON_DECOY = 3,
-		WEAPON_SMOKEGRENADE = 4,
-	};
-
 	template <typename BasicJsonType>
-	inline void to_json(BasicJsonType& j, const GrenadeWeapon& e)
+	inline void to_json(BasicJsonType& j, const GrenadeType& e)
 	{
 		const auto name = magic_enum::enum_name(e) | std::ranges::views::transform([](char c) { return std::tolower(c); });
 		j = std::string{ name.begin(), name.end() };
 	}
 	template <typename BasicJsonType>
-	inline void from_json(const BasicJsonType& j, GrenadeWeapon& e)
+	inline void from_json(const BasicJsonType& j, GrenadeType& e)
 	{
-		const auto entries = magic_enum::enum_entries<GrenadeWeapon>();
+		const auto entries = magic_enum::enum_entries<GrenadeType>();
 		for (const auto& [e2, v] : entries) {
 			const auto lowercased = v | std::ranges::views::transform([](char c) { return std::tolower(c); });
 			const std::string lowercased_str{ lowercased.begin(), lowercased.end() };
@@ -104,7 +97,7 @@ namespace Serialization::Grenades {
 		} name;
 		glm::vec3 position;
 		glm::vec2 viewangles;
-		GrenadeWeapon weapon;
+		GrenadeType weapon;
 
 		// NOLINTNEXTLINE(modernize-use-constraints)
 		friend void to_json(nlohmann::json& json, const Grenade& grenade)
