@@ -41,4 +41,9 @@ public:
 	{
 		return index != INVALID_ENTITY_HANDLE;
 	}
+
+	[[nodiscard]] std::uint32_t raw() const
+	{
+		return index;
+	}
 };

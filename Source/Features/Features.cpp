@@ -3,6 +3,7 @@
 #include "Combat/Aimbot.hpp"
 #include "Misc/AutoStrafer.hpp"
 #include "Misc/Bhop.hpp"
+#include "Misc/BombTimer.hpp"
 #include "Misc/Hitmarker.hpp"
 #include "Visuals/Chams/Chams.hpp"
 #include "Visuals/ESP/ESP.hpp"
@@ -31,12 +32,14 @@ void Features::create()
 	model_changer.emplace();
 	hit_marker.emplace();
 	force_third_person.emplace();
+	bomb_timer.emplace();
 
 	initialized = true;
 }
 
 void Features::destroy()
 {
+	bomb_timer.reset();
 	force_third_person.reset();
 	hit_marker.reset();
 	model_changer.reset();

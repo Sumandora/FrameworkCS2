@@ -7,6 +7,7 @@
 #include "RetAddrSpoofer.hpp"
 
 #include "../../../Features/Misc/Hitmarker.hpp"
+#include "../../../Features/Misc/BombTimer.hpp"
 #include "../../../Features/Visuals/Chams/Chams.hpp"
 #include "../../../Features/Visuals/ESP/ESP.hpp"
 #include "../../../Features/Visuals/GrenadeHelper.hpp"
@@ -30,6 +31,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		grenade_helper->update();
 		chams->update_pvs();
 		removals->remove_ads_update();
+		bomb_timer->update();
 
 		thread_executor.run_all_queued_functions();
 		break;

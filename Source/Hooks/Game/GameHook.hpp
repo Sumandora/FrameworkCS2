@@ -18,6 +18,7 @@ struct UserCmd;
 struct MeshDrawPrimitive;
 struct ViewSetup;
 struct ViewRender;
+struct MapInfo;
 
 class CSGOInput;
 
@@ -89,5 +90,10 @@ namespace Hooks::Game {
 	namespace OverrideView {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(ViewRender* thisptr, ViewSetup* view_setup);
+	}
+
+	namespace UpdateBombRadius {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(MapInfo* thisptr, const char* key, const char* value);
 	}
 }

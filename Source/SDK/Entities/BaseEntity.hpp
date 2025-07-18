@@ -4,8 +4,6 @@
 #include "../Schema/SchemaClassInfo.hpp"
 #include "../Schema/SchemaSystem.hpp"
 
-#include "../EntityHandle.hpp"
-
 #include "../../Memory.hpp"
 
 #include "../Enums/LifeState.hpp"
@@ -22,6 +20,9 @@ struct GameSceneNode;
 struct CSPlayerPawn;
 struct BodyComponent;
 struct EntitySubclassVDataBase;
+
+template <typename Ent>
+class EntityHandle;
 
 constexpr std::uint32_t FL_ONGROUND = 1 << 0;
 constexpr std::uint32_t FL_DUCKING = 1 << 1;

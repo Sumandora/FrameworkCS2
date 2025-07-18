@@ -29,6 +29,7 @@
 #include "../Notifications/Notifications.hpp"
 
 #include "../Features/Features.hpp"
+#include "../Features/Misc/BombTimer.hpp"
 #include "../Features/Visuals/GrenadeHelper.hpp"
 
 class OwningSDLEvent {
@@ -263,6 +264,7 @@ void GUI::render()
 
 	if (Features::initialized) {
 		grenade_helper->draw();
+		bomb_timer->draw();
 	}
 
 	ImGui::Render();

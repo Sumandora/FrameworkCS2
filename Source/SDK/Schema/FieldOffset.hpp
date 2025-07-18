@@ -8,11 +8,11 @@
 #include "SchemaSystem.hpp"
 #include "SchemaSystemTypeScope.hpp"
 
-#define CLASS_INFO(moduleName, className)                                                                                          \
-	static inline SchemaClassInfo* classInfo()                                                                                     \
-	{                                                                                                                              \
-		static SchemaClassInfo* info = Interfaces::schemaSystem->FindTypeScopeForModule(moduleName)->FindDeclaredClass(className); \
-		return info;                                                                                                               \
+#define CLASS_INFO(moduleName, className)                                                                                            \
+	static inline SchemaClassInfo* classInfo()                                                                                       \
+	{                                                                                                                                \
+		static SchemaClassInfo* info = Interfaces::schemaSystem->FindTypeScopeForModule(moduleName)->find_declared_class(className); \
+		return info;                                                                                                                 \
 	}
 
 #define SCHEMA_VAR(type, prettyName, name)                                                     \

@@ -11,9 +11,9 @@
 
 #include "DetourHooking.hpp"
 
+#include "../../SDK/GameClass/ClientModeCSNormal.hpp"
 #include "../../SDK/GameClass/CSGOInput.hpp"
 #include "../../SDK/GameClass/Source2Client.hpp"
-#include "../../SDK/GameClass/ClientModeCSNormal.hpp"
 
 #include <csignal>
 #include <cstddef>
@@ -127,6 +127,18 @@ namespace Hooks::Game {
 				ClientModeCSNormal::override_view_index)
 				.expect<void*>("Couldn't find OverrideView"),
 			reinterpret_cast<void*>(OverrideView::hook_func));
+		UpdateBombRadius::hook.emplace(
+			Memory::emalloc,
+			BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"bombradius">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+			.find_xrefs(SignatureScanner::XRefTypes::relative(),
+			            BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 31 d2 48 89 e5">())
+				.expect<void*>("Couldn't find UpdateBombRadius"),
+			reinterpret_cast<void*>(UpdateBombRadius::hook_func)
+		);
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -140,10 +152,12 @@ namespace Hooks::Game {
 		SyncViewAngles::hook->enable();
 		EmitSound::hook->enable();
 		OverrideView::hook->enable();
+		UpdateBombRadius::hook->enable();
 	}
 
 	void destroy()
 	{
+		UpdateBombRadius::hook.reset();
 		OverrideView::hook.reset();
 		EmitSound::hook.reset();
 		SyncViewAngles::hook.reset();
