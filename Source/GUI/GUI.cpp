@@ -14,6 +14,7 @@
 #include "../Utils/Logging.hpp"
 
 #include <cfloat>
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
@@ -170,7 +171,8 @@ void GUI::destroy()
 	ImGui::DestroyContext();
 }
 
-bool GUI::is_menu_open() {
+bool GUI::is_menu_open()
+{
 	return ::is_open;
 }
 
@@ -226,6 +228,13 @@ void GUI::provide_window(SDL_Window* window)
 	create_font();
 }
 
+// https://www.youtube.com/watch?v=LSNQuFEDOyQ
+static constexpr float exp_decay(float a, float b, float decay)
+{
+	const float dt = ImGui::GetIO().DeltaTime;
+	return b + (a - b) * std::exp(-decay * dt);
+}
+
 void GUI::render()
 {
 	ImGuiIO& io = ImGui::GetIO();
@@ -235,9 +244,18 @@ void GUI::render()
 	ImGui::NewFrame();
 	get_input_manager().update_states();
 
-	if (is_open) {
+	static float alpha = 0.0F;
+	const float target = is_open ? 1.0F : 0.0F;
+
+	constexpr static float ALPHA_DECAY = 25;
+	alpha = exp_decay(alpha, target, ALPHA_DECAY);
+
+	constexpr static float ALPHA_EPSILON = 0.001;
+	if (alpha > ALPHA_EPSILON) {
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 		ImGui::ShowDemoWindow();
 		Tabs::render();
+		ImGui::PopStyleVar();
 	}
 	get_texture_manager().purge_old_textures();
 
