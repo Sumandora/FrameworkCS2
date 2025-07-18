@@ -85,7 +85,7 @@ void Aimbot::create_move(UserCmd* cmd)
 		if (!cs_pawn)
 			continue;
 
-		if (cs_pawn->health() <= 0 || cs_pawn->life_state() != LifeState::ALIVE)
+		if (cs_pawn->health() <= 0 || cs_pawn->life_state() != LIFE_ALIVE)
 			continue;
 
 		if (cs_pawn->team_id() == Memory::local_player->team_id())

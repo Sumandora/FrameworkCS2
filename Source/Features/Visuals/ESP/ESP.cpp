@@ -96,7 +96,7 @@ void ESP::draw(ImDrawList* draw_list)
 			if (player_pawn == Memory::local_player)
 				continue;
 
-			if (player_pawn->health() <= 0 || player_pawn->life_state() != LifeState::ALIVE)
+			if (player_pawn->health() <= 0 || player_pawn->life_state() != LIFE_ALIVE)
 				continue;
 
 			GameSceneNode* game_scene_node = entity->gameSceneNode();

@@ -73,7 +73,7 @@ struct BaseEntity : public EntityInstance {
 
 	[[nodiscard]] bool alive() const
 	{
-		return life_state() == LifeState::ALIVE && health() > 0;
+		return life_state() == LIFE_ALIVE && health() > 0;
 	}
 
 	[[nodiscard]] EntityHandle<BaseEntity> get_handle() const;
