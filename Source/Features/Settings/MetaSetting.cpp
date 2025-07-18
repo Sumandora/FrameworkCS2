@@ -17,12 +17,10 @@ void MetaSetting::render()
 
 void MetaSetting::serialize(nlohmann::json& output_json) const
 {
-	for (Setting* setting : settings)
-		setting->serialize(output_json[setting->get_name()]);
+	SettingsHolder::serialize(output_json);
 }
 
 void MetaSetting::deserialize(const nlohmann::json& input_json)
 {
-	for (Setting* setting : settings)
-		setting->deserialize(input_json[setting->get_name()]);
+	SettingsHolder::deserialize(input_json);
 }
