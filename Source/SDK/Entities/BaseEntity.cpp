@@ -11,7 +11,7 @@
 
 #include <cstdint>
 
-EntityHandle<BaseEntity> BaseEntity::get_handle() const
+EntityHandle<BaseEntity> BaseEntity::get_raw_handle() const
 {
 	if (EntityIdentity* identity = entity(); identity) {
 		std::uint16_t entry_index = 0;

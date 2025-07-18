@@ -15,6 +15,7 @@
 #include "glm/ext/vector_float3.hpp"
 
 #include <cstdint>
+#include <type_traits>
 
 struct CollisionProperty;
 struct GameSceneNode;
@@ -34,6 +35,8 @@ enum class TeamID : int {
 	TEAM_TERRORIST = 2,
 	TEAM_COUNTER_TERRORIST = 3,
 };
+
+// TODO MoveType_t from schema and check inside bhop and autostrafe
 
 struct BaseEntity : public EntityInstance {
 	VIRTUAL_METHOD(39, getSchemaType, SchemaClassInfo*, (), (this));
@@ -76,7 +79,12 @@ struct BaseEntity : public EntityInstance {
 		return life_state() == LIFE_ALIVE && health() > 0;
 	}
 
-	[[nodiscard]] EntityHandle<BaseEntity> get_handle() const;
+	[[nodiscard]] EntityHandle<BaseEntity> get_raw_handle() const;
+
+	template<typename Self>
+	auto get_handle(this const Self& self) -> EntityHandle<Self> {
+		return EntityHandle<Self>{ self.get_raw_handle().raw() };
+	}
 
 	[[nodiscard]] bool is_enemy(BaseEntity* other) const;
 };
