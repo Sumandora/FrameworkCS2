@@ -25,4 +25,10 @@ struct CSPlayerPawn : public CSPlayerPawnBase {
 
 	[[nodiscard]] bool is_armored_at(HitGroup hit_group) const;
 	[[nodiscard]] bool has_heavy_armor() const;
+
+	[[nodiscard]] float scale_damage_with_armor(
+		float unscaled_damage,
+		float weapon_armor_ratio,
+		HitGroup hit_group,
+		bool* lost_armor = nullptr) const;
 };
