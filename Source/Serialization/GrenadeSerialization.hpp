@@ -5,42 +5,17 @@
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float3.hpp"
 
-#include "magic_enum/magic_enum.hpp"
-
 #include "nlohmann/json.hpp"
 #include "nlohmann/json_fwd.hpp"
 
 #include <cctype>
 #include <cstddef>
 #include <optional>
-#include <ranges>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
 
 namespace Serialization::Grenades {
-	template <typename BasicJsonType>
-	inline void to_json(BasicJsonType& j, const GrenadeType& e)
-	{
-		const auto name = magic_enum::enum_name(e) | std::ranges::views::transform([](char c) { return std::tolower(c); });
-		j = std::string{ name.begin(), name.end() };
-	}
-	template <typename BasicJsonType>
-	inline void from_json(const BasicJsonType& j, GrenadeType& e)
-	{
-		const auto entries = magic_enum::enum_entries<GrenadeType>();
-		for (const auto& [e2, v] : entries) {
-			const auto lowercased = v | std::ranges::views::transform([](char c) { return std::tolower(c); });
-			const std::string lowercased_str{ lowercased.begin(), lowercased.end() };
-			if (lowercased_str.c_str() == j) {
-				e = e2;
-				return;
-			}
-		}
-		throw std::invalid_argument{ j.dump() };
-	}
-
 	struct Grenade {
 		std::string description;
 		bool duck = false;
