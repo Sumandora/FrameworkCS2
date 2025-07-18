@@ -113,6 +113,7 @@ void GUI::InputManager::Key::draw()
 	static_assert(std::to_underlying(Type::TOGGLE) == 1, "Changing 'Type' requires updating combo items");
 
 	int type = std::to_underlying(this->type);
+	ImGui::SetNextItemWidth(-FLT_MIN);
 	ImGui::Combo("##Type", &type, "Hold\0Toggle\0");
 	this->type = static_cast<Type>(type);
 
