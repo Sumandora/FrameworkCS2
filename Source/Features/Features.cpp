@@ -31,6 +31,8 @@ void Features::create()
 	model_changer.emplace();
 	hit_marker.emplace();
 	force_third_person.emplace();
+
+	initialized = true;
 }
 
 void Features::destroy()

@@ -14,7 +14,6 @@
 #include "../Utils/Logging.hpp"
 
 #include <cfloat>
-#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
@@ -29,6 +28,7 @@
 
 #include "../Notifications/Notifications.hpp"
 
+#include "../Features/Features.hpp"
 #include "../Features/Visuals/GrenadeHelper.hpp"
 
 class OwningSDLEvent {
@@ -260,7 +260,10 @@ void GUI::render()
 	get_texture_manager().purge_old_textures();
 
 	Notifications::render();
-	grenade_helper->draw();
+
+	if (Features::initialized) {
+		grenade_helper->draw();
+	}
 
 	ImGui::Render();
 }
