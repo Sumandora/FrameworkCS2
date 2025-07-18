@@ -6,12 +6,13 @@
 
 #include "RetAddrSpoofer.hpp"
 
+#include "../../../Features/Misc/Hitmarker.hpp"
 #include "../../../Features/Visuals/Chams/Chams.hpp"
 #include "../../../Features/Visuals/ESP/ESP.hpp"
 #include "../../../Features/Visuals/GrenadeHelper.hpp"
 #include "../../../Features/Visuals/GrenadePrediction.hpp"
 #include "../../../Features/Visuals/ModelChanger/ModelChanger.hpp"
-#include "../../../Features/Misc/Hitmarker.hpp"
+#include "../../../Features/Visuals/Removals.hpp"
 
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Enums/ClientFrameStage.hpp"
@@ -28,6 +29,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 
 		grenade_helper->update();
 		chams->update_pvs();
+		removals->remove_ads_update();
 
 		thread_executor.run_all_queued_functions();
 		break;
