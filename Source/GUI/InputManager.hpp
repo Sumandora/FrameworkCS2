@@ -2,6 +2,8 @@
 
 #include "imgui.h"
 
+#include "nlohmann/json.hpp"
+
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -29,6 +31,40 @@ namespace GUI {
 			union {
 				ImGuiKey key;
 				ImGuiMouseButton mouse_button;
+			};
+
+			template <typename BasicJsonType>
+			friend void to_json(BasicJsonType& json, const Key& key)
+			{
+				json["Name"] = key.name;
+				json["Method"] = key.method;
+				json["Type"] = key.type;
+				json["Active"] = key.active;
+				switch(key.method) {
+				case InputManager::Key::Method::KEY:
+					json["Key"] = key.key;
+					break;
+				case InputManager::Key::Method::MOUSE:
+					json["Mouse Button"] = key.mouse_button;
+					break;
+				}
+			}
+			template <typename BasicJsonType>
+			friend void from_json(const BasicJsonType& json, Key& key)
+			{
+				json.at("Name").get_to(key.name);
+				key.method = json["Method"];
+				key.type = json["Type"];
+				key.active = json["Active"];
+
+				switch(key.method) {
+				case InputManager::Key::Method::KEY:
+					json.at("Key").get_to(key.key);
+					break;
+				case InputManager::Key::Method::MOUSE:
+					json.at("Mouse Button").get_to(key.mouse_button);
+					break;
+				}
 			};
 
 		public:

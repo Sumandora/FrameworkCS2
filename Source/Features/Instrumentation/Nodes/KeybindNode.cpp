@@ -52,9 +52,11 @@ NodeResult KeybindNode::get_value(IdType /*id*/) const
 void KeybindNode::serialize(nlohmann::json& output_json) const
 {
 	output_json["output"] = output;
+	output_json["key"] = *key;
 }
 
 void KeybindNode::deserialize(const nlohmann::json& input_json)
 {
 	output = input_json["output"];
+	*key = input_json["key"];
 }
