@@ -206,6 +206,7 @@ Node* NodeCircuit::node_from_end_attrib(IdType id) const
 
 NodeResult NodeCircuit::value_from_attribute(IdType id) const
 {
+	// TODO This might become a performance bottleneck, perhaps there should be a vector that maps indices to start nodes
 	auto it = std::ranges::find_if(links, [id](const Link& link) { return link.end_attribute == id; });
 	if (it != links.end())
 		return ids.at(it->start_node)->get_value(it->start_attribute);
@@ -264,6 +265,8 @@ void NodeCircuit::deserialize(const nlohmann::json& input_json)
 	ImNodes::DestroyContext(imnodes_context);
 	ImNodes::CreateContext();
 	imnodes_context = ImNodes::GetCurrentContext();
+
+	GUI::Theme::anti_purple_imnodes_theme();
 
 	for (const auto& node : nodes) {
 		const IdType id = node["Id"];
