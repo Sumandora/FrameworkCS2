@@ -148,14 +148,14 @@ void ESP::draw(ImDrawList* draw_list)
 
 			{
 				GenericESP::UnionedRect unioned_rect{ ImRect{ rectangle[0], rectangle[1], rectangle[2], rectangle[3] } };
-				if (box.enabled.get())
+				if (box_enabled.get())
 					box.draw(draw_list, entity, unioned_rect);
-				if (name.enabled.get()) {
+				if (name_enabled.get()) {
 					CSPlayerController* controller = player_pawn->original_controller().get();
 					if (controller)
 						name.draw(draw_list, entity, controller->sanitized_name(), unioned_rect);
 				}
-				if (healthbar.enabled.get())
+				if (healthbar_enabled.get())
 					healthbar.draw(draw_list, entity, unioned_rect);
 			}
 
@@ -169,7 +169,7 @@ void ESP::draw(ImDrawList* draw_list)
 					continue;
 
 				static const std::function<void(const SkeletonInstance&, const SkeletonTree&)> PROCESS_TREE
-					= [draw_list](const SkeletonInstance& skeleton, const SkeletonTree& tree) {
+					= [&](const SkeletonInstance& skeleton, const SkeletonTree& tree) {
 						  bool can_draw = true;
 						  ImVec2 from_screen_space;
 						  if (!Projection::project(skeleton.bones[tree.index].pos, from_screen_space))
@@ -179,7 +179,7 @@ void ESP::draw(ImDrawList* draw_list)
 							  if (can_draw) {
 								  ImVec2 to_screen_space;
 								  if (Projection::project(skeleton.bones[subtree.index].pos, to_screen_space)) {
-									  draw_list->AddLine(from_screen_space, to_screen_space, -1);
+									  skeleton_line.draw(draw_list, entity, from_screen_space, to_screen_space);
 								  }
 							  }
 

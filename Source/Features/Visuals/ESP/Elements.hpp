@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GenericESP/Element/Bar.hpp"
+#include "GenericESP/Element/Circle.hpp"
 #include "GenericESP/Element/Element.hpp"
 #include "GenericESP/Element/Line.hpp"
 #include "GenericESP/Element/Rectangle.hpp"
@@ -18,6 +19,7 @@
 #include "../../Settings/MetaSetting.hpp"
 #include "../../Settings/Subgroup.hpp"
 
+#include "GenericESP/Element/Text.hpp"
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -25,8 +27,6 @@
 #include <utility>
 
 struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
-	Checkbox enabled{ this, "Enabled", false };
-
 	Checkbox health_based{ this, "Health-based color", false };
 	Color color{ this, "Color" };
 	Color alive_color{ this, "Alive color", ImColor{ 0.0F, 1.0F, 0.0F, 1.0F } };
@@ -88,8 +88,6 @@ struct PlayerRectangle : MetaSetting, GenericESP::Rectangle {
 };
 
 struct PlayerSidedText : MetaSetting, GenericESP::SidedText {
-	Checkbox enabled{ this, "Enabled", false };
-
 	FloatSlider spacing{ this, "Spacing", 0.0F, 10.0F, 3.0F };
 	Combo<GenericESP::Side> side{ this, "Side", GenericESP::Side::TOP };
 	FloatSlider font_scale{ this, "Font scale", 0.0F, 2.0F, 1.0F };
@@ -115,9 +113,27 @@ struct PlayerSidedText : MetaSetting, GenericESP::SidedText {
 	ImColor get_shadow_color(const GenericESP::EntityType* /*e*/) const override { return shadow_color.get(); }
 };
 
-struct PlayerBar : MetaSetting, GenericESP::BarWithText {
-	Checkbox enabled{ this, "Enabled", false };
+struct PlayerText : MetaSetting, GenericESP::Text {
+	FloatSlider font_scale{ this, "Font scale", 0.0F, 2.0F, 1.0F };
+	Color font_color{ this, "Font color" };
+	Checkbox shadow{ this, "Shadow", true };
+	FloatSlider shadow_offset{ this, "Shadow offset", 1.0F, 5.0F, 1.0F };
+	Color shadow_color{ this, "Shadow color", ImColor{ 0.0F, 0.0F, 0.0F, 1.0F } };
 
+	PlayerText(SettingsHolder* parent, std::string name)
+		: MetaSetting(parent, std::move(name))
+	{
+	}
+
+	ImFont* get_font(const GenericESP::EntityType* /*e*/) const override { return ImGui::GetFont(); }
+	float get_font_size(const GenericESP::EntityType* /*e*/) const override { return GUI::get_base_font_size() * font_scale.get(); }
+	ImColor get_font_color(const GenericESP::EntityType* /*e*/) const override { return font_color.get(); }
+	bool get_shadow(const GenericESP::EntityType* /*e*/) const override { return shadow.get(); }
+	float get_shadow_offset(const GenericESP::EntityType* /*e*/) const override { return shadow_offset.get(); }
+	ImColor get_shadow_color(const GenericESP::EntityType* /*e*/) const override { return shadow_color.get(); }
+};
+
+struct PlayerBar : MetaSetting, GenericESP::BarWithText {
 	Combo<GenericESP::Side> side{ this, "Side", GenericESP::Side::LEFT };
 
 	Color background_color{ this, "Background color", ImColor{ 0.0F, 0.0F, 0.0F, 1.0F } };
@@ -189,8 +205,6 @@ class PlayerHealthbar : public PlayerBar {
 	}
 };
 
-// NOTE: This is not like the other elements, it is used in the grenade prediction
-// TODO: More flexible design with these elements (e.g. don't add new properties to it (Enabled) and don't assume there is an ESP entity, when NodeCircuits will be able to access that information)
 struct PlayerLine : MetaSetting, GenericESP::Line {
 	Color color{ this, "Color", ImColor{ 1.0F, 1.0F, 1.0F, 1.0F } };
 	FloatSlider thickness{ this, "Thickness", 0.0F, 10.0F, 1.0F };
@@ -210,4 +224,23 @@ struct PlayerLine : MetaSetting, GenericESP::Line {
 	bool get_outlined(const GenericESP::EntityType* /*e*/) const override { return outlined.get(); }
 	ImColor get_outline_color(const GenericESP::EntityType* /*e*/) const override { return outline_color.get(); }
 	float get_outline_thickness(const GenericESP::EntityType* /*e*/) const override { return outline_thickness.get(); }
+};
+
+struct PlayerCircle : MetaSetting, GenericESP::Circle {
+	Color color{ this, "Color", ImColor{ 1.0F, 1.0F, 1.0F, 1.0F } };
+	FloatSlider radius{ this, "Radius", 0.0F, 10.0F, 1.0F };
+	Checkbox outlined{ this, "Outlined", true };
+	Color outline_color{ this, "Outline color", ImColor{ 0.0F, 0.0F, 0.0F, 1.0F } };
+	FloatSlider outline_radius{ this, "Outline radius", 0.0F, 10.0F, 2.0F };
+
+	PlayerCircle(SettingsHolder* parent, std::string name)
+		: MetaSetting(parent, std::move(name))
+	{
+	}
+
+	ImColor get_color(const GenericESP::EntityType* /*e*/) const override { return color.get(); }
+	float get_radius(const GenericESP::EntityType* /*e*/) const override { return radius.get(); }
+	bool get_outlined(const GenericESP::EntityType* /*e*/) const override { return outlined.get(); }
+	ImColor get_outline_color(const GenericESP::EntityType* /*e*/) const override { return outline_color.get(); }
+	float get_outline_radius(const GenericESP::EntityType* /*e*/) const override { return outline_radius.get(); }
 };

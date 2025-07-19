@@ -28,11 +28,22 @@ class ESP : public Feature {
 			   } };
 
 	Tabs elements{ this, "Elements" };
-	PlayerRectangle box{ elements, "Box" };
-	PlayerSidedText name{ elements, "Name" };
-	PlayerHealthbar healthbar{ elements, "Health bar" };
+
+	MetaSetting box_meta{ elements, "Box" };
+	Checkbox box_enabled{ box_meta, "Enabled", false };
+	PlayerRectangle box{ box_meta, "Box" };
+
+	MetaSetting name_meta{ elements, "Name" };
+	Checkbox name_enabled{ name_meta, "Enabled", false };
+	PlayerSidedText name{ name_meta, "Name" };
+
+	MetaSetting healthbar_meta{ elements, "Health bar" };
+	Checkbox healthbar_enabled{ healthbar_meta, "Enabled", false };
+	PlayerHealthbar healthbar{ healthbar_meta, "Health bar" };
+
 	MetaSetting skeleton_meta{ elements, "Skeleton" };
-	Checkbox skeleton{ skeleton_meta, "Skeleton enabled", false };
+	Checkbox skeleton{ skeleton_meta, "Enabled", false };
+	PlayerLine skeleton_line{ skeleton_meta, "Line" };
 
 	enum BabbysFirstEnum : std::uint8_t {
 		HELLO,
