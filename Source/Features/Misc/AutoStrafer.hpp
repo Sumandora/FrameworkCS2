@@ -31,6 +31,8 @@ public:
 	AutoStrafer();
 
 	void create_move(UserCmd* cmd);
+
+	bool wants_silent_aim() const;
 };
 
 inline UninitializedObject<AutoStrafer> auto_strafer;

@@ -12,6 +12,8 @@
 
 #include "../../Interfaces.hpp"
 
+#include "../../Utils/MovementQuantization.hpp"
+
 #include "glm/common.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float3.hpp"
@@ -67,7 +69,7 @@ void AutoStrafer::create_move(UserCmd* cmd)
 
 	switch (mode.get()) {
 	case AutoStraferMode::Directional: {
-		const float yaw = glm::radians(cmd->csgo_usercmd.base().viewangles().y());
+		float yaw = glm::radians(cmd->csgo_usercmd.base().viewangles().y());
 
 		float wish_direction = 0.0F;
 		if (forward != 0.0F || left != 0.0F)
@@ -117,6 +119,12 @@ void AutoStrafer::create_move(UserCmd* cmd)
 		cmd->csgo_usercmd.mutable_base()->set_forwardmove(main.x);
 		cmd->csgo_usercmd.mutable_base()->set_leftmove(main.y);
 
+		if (MovementQuantization::is_movement_quantized()) {
+			MovementQuantization::circumvent_quantization(cmd);
+			// We now have a new yaw to work with.
+			yaw = glm::radians(cmd->csgo_usercmd.base().viewangles().y());
+		}
+
 		if (subtick.get()) {
 			if (local_player->flags() & FL_ONGROUND) // TODO, why???
 				return;
@@ -162,4 +170,9 @@ void AutoStrafer::create_move(UserCmd* cmd)
 		break;
 	}
 	}
+}
+
+bool AutoStrafer::wants_silent_aim() const
+{
+	return MovementQuantization::is_movement_quantized();
 }

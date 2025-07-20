@@ -20,6 +20,7 @@
 #include "Utils/BulletSimulation.hpp"
 #include "Utils/CRC.hpp"
 #include "Utils/Logging.hpp"
+#include "Utils/MovementQuantization.hpp"
 
 const void* RetAddrSpoofer::leaveRet;
 
@@ -170,4 +171,6 @@ void Memory::create()
 			  .add(3)
 			  .relative_to_absolute()
 			  .expect<ClientModeCSNormal*>("Couldn't find ClientModeCSNormal");
+
+	MovementQuantization::init();
 }
