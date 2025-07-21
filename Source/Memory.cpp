@@ -21,6 +21,7 @@
 #include "Utils/CRC.hpp"
 #include "Utils/Logging.hpp"
 #include "Utils/MovementQuantization.hpp"
+#include "Utils/Projection.hpp"
 
 const void* RetAddrSpoofer::leaveRet;
 
@@ -31,43 +32,7 @@ void Memory::create()
 								   .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"c9 c3">(), BCRL::everything(mem_mgr).thats_readable().thats_executable())
 								   .expect<void*>("Couldn't find a *leave; ret* pattern");
 
-	viewRender = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"restart_in_untrusted">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
-					 .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-					 .add(4)
-					 .repeater([](auto& safePointer) {
-						 static std::size_t nthCall = 0;
-
-						 BCRL::SafePointer nextInstruction = safePointer.clone().next_instruction();
-
-						 if (nextInstruction.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()))
-							 nthCall++;
-
-						 if (nthCall >= 3) {
-							 // third call instruction is the ViewRender Constructor
-							 // The first argument is the pointer to g_ViewRender
-							 return false;
-						 }
-
-						 safePointer = nextInstruction;
-						 return true;
-					 })
-					 .add(3)
-					 .relative_to_absolute()
-					 .expect<ViewRender*>("Couldn't find ViewRender structure");
-
-	Logging::info("Found ViewRender at: {}", viewRender);
-
-	//  CRenderGameSystem::GetMatricesForView
-	//            (_g_pRenderGameSystem,(CViewSetup *)(CFrustum *)(this + 0x10),(VMatrix *)&g_WorldToView,
-	//             (VMatrix *)&g_ViewToProjection,(VMatrix *)&_g_WorldToProjection,
-	//             (VMatrix *)&g_WorldToScreen);
-	worldToProjectionMatrix = BCRL::pointer_array(mem_mgr, viewRender, ViewRender::on_render_start_index)
-								  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"4c 8d 05">())
-								  .add(3)
-								  .relative_to_absolute()
-								  .expect<glm::mat4x4*>("Couldn't find WorldToProjection matrix");
-
-	Logging::info("Found WorldToProjection matrix at: {}", worldToProjectionMatrix);
+	Projection::resolve_signatures();
 
 	// Make classes run their searches
 	GameEntitySystem::the();

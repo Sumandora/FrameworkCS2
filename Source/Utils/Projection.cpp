@@ -1,13 +1,79 @@
 #include "Projection.hpp"
 
+#include "../SDK/GameClass/ViewRender.hpp"
+
 #include "../Memory.hpp"
-#include "glm/fwd.hpp"
+
+#include "Logging.hpp"
+
+#include "BCRL/SafePointer.hpp"
+#include "BCRL/SearchConstraints.hpp"
+#include "BCRL/Session.hpp"
+#include "SignatureScanner/PatternSignature.hpp"
+#include "SignatureScanner/XRefSignature.hpp"
+
+#include "glm/ext/matrix_float4x4.hpp"
+#include "glm/ext/vector_float3.hpp"
+#include "glm/ext/vector_float4.hpp"
 #include "glm/matrix.hpp"
+
 #include "imgui.h"
+
+#include <cstddef>
+
+static ViewRender* view_render = nullptr;
+static glm::mat4x4* world_to_projection_matrix = nullptr;
+
+void Projection::resolve_signatures()
+{
+	view_render
+		= BCRL::signature(
+			Memory::mem_mgr,
+			SignatureScanner::PatternSignature::for_literal_string<"restart_in_untrusted">(),
+			BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .add(4)
+			  .repeater([](auto& ptr) {
+				  static std::size_t nth_call = 0;
+
+				  const BCRL::SafePointer next_instruction = ptr.clone().next_instruction();
+
+				  if (next_instruction.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()))
+					  nth_call++;
+
+				  if (nth_call >= 3) {
+					  // third call instruction is the ViewRender Constructor
+					  // The first argument is the pointer to g_ViewRender
+					  return false;
+				  }
+
+				  ptr = next_instruction;
+				  return true;
+			  })
+			  .add(3)
+			  .relative_to_absolute()
+			  .expect<ViewRender*>("Couldn't find ViewRender structure");
+
+	Logging::info("Found ViewRender at: {}", view_render);
+
+	//  CRenderGameSystem::GetMatricesForView
+	//            (_g_pRenderGameSystem,(CViewSetup *)(CFrustum *)(this + 0x10),(VMatrix *)&g_WorldToView,
+	//             (VMatrix *)&g_ViewToProjection,(VMatrix *)&_g_WorldToProjection,
+	//             (VMatrix *)&g_WorldToScreen);
+	world_to_projection_matrix
+		= BCRL::pointer_array(Memory::mem_mgr, view_render, ViewRender::on_render_start_index)
+			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"4c 8d 05">())
+			  .add(3)
+			  .relative_to_absolute()
+			  .expect<glm::mat4x4*>("Couldn't find WorldToProjection matrix");
+
+	Logging::info("Found WorldToProjection matrix at: {}", world_to_projection_matrix);
+}
 
 bool Projection::project(const glm::vec3& world, ImVec2& screen)
 {
-	const glm::mat4x4 matrix = glm::transpose(*Memory::worldToProjectionMatrix);
+	const glm::mat4x4 matrix = glm::transpose(*world_to_projection_matrix);
 	const glm::vec4 transformed = matrix * glm::vec4(world, 1.0F);
 
 	if (transformed.z <= 0.0F || transformed.w <= 0.0F)
@@ -22,4 +88,9 @@ bool Projection::project(const glm::vec3& world, ImVec2& screen)
 	screen.y = display_size.y * 0.5F * (1.0F - y_norm);
 
 	return true;
+}
+
+glm::mat4x4* Projection::get_world_to_projection_matrix()
+{
+	return world_to_projection_matrix;
 }

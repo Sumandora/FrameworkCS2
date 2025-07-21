@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 
-#include "../../../Memory.hpp"
+#include "../../../Utils/Projection.hpp"
 
 void GUI::Tabs::Debug::draw_view_matrix()
 {
@@ -10,7 +10,7 @@ void GUI::Tabs::Debug::draw_view_matrix()
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				ImGui::TableNextColumn();
-				ImGui::Text("%f", Memory::worldToProjectionMatrix[i][j]);
+				ImGui::Text("%f", (*Projection::get_world_to_projection_matrix())[i][j]);
 			}
 		}
 		ImGui::EndTable();

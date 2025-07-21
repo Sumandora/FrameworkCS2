@@ -3,9 +3,6 @@
 #include "MemoryManager/LinuxMemoryManager.hpp"
 #include "ExecutableMalloc/MemoryManagerAllocator.hpp"
 
-#include "glm/ext/matrix_float4x4.hpp"
-
-struct ViewRender;
 struct BaseEntity;
 struct CSPlayerPawn;
 struct CSPlayerController;
@@ -16,9 +13,6 @@ class CSGOInput;
 class ClientModeCSNormal;
 
 namespace Memory {
-	inline ViewRender* viewRender;
-	inline glm::mat4x4* worldToProjectionMatrix;
-
 	inline void* shouldShowCrosshair;
 
 	inline CSPlayerController** local_player_controller;
