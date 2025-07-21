@@ -1,22 +1,22 @@
-#include <cstddef>
-#include <format>
-#include <vector>
-
 #include "CRC.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
+#include "SignatureScanner/PatternSignature.hpp"
 
 #include "Logging.hpp"
+
 #include "RetAddrSpoofer.hpp"
-#include "SignatureScanner/PatternSignature.hpp"
 
 #include "../Memory.hpp"
 
 #include "../SDK/CUtl/Buffer.hpp"
-#include "../SDK/GameClass/MemAlloc.hpp"
 
 #include "google/protobuf/arena.h"
+
+#include <cstddef>
+#include <format>
+#include <vector>
 
 // The game accesses move_crc in an unusual way, I suspect that either write_message or set_message_data is actually a protobuf function like MergeFrom.
 
@@ -28,7 +28,6 @@
 #include "../SDK/GameClass/UserCmd.hpp"
 
 static int (*create_new_base_cmd)(CBaseUserCmdPB* cmd, int, int) = nullptr;
-static int (*calculate_crc_size)(CBaseUserCmdPB* cmd) = nullptr;
 static bool (*serialize)(CBaseUserCmdPB* cmd, void* buf, int size) = nullptr;
 static char* (*write_message)(void* begin, void* end) = nullptr; // This is what windows folks call this, I think the name is misleading... it's more like `create_string` or something like that...
 static bool (*set_message_data)(void* move_crc, char** crc_result, google::protobuf::Arena* arena) = nullptr;
@@ -45,14 +44,6 @@ void CRC::resolve_signatures()
 			  .add(1)
 			  .relative_to_absolute()
 			  .expect<decltype(create_new_base_cmd)>("Couldn't find create_new_base_cmd");
-	calculate_crc_size
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 4C 89 FF 8D 70 ? 48 89 C3">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .add(1)
-			  .relative_to_absolute()
-			  .expect<decltype(calculate_crc_size)>("Couldn't find calculate_crc_size");
 	serialize
 		= BCRL::signature(
 			Memory::mem_mgr,
@@ -111,9 +102,9 @@ bool CRC::update_crc(UserCmd* usercmd)
 	buttons->set_buttonstate3(usercmd->buttons.buttonstate3);
 
 	UtlBuffer buffer(0, 0, 0);
-	const int crc_size = RetAddrSpoofer::invoke(calculate_crc_size, &new_base_cmd);
-	buffer.ensure_capacity(crc_size + 1);
-	const bool success = RetAddrSpoofer::invoke(serialize, &new_base_cmd, static_cast<void*>(buffer.memory.memory), crc_size);
+	const std::size_t crc_size = new_base_cmd.ByteSizeLong();
+	buffer.ensure_capacity(static_cast<int>(crc_size + 1));
+	const bool success = RetAddrSpoofer::invoke(serialize, &new_base_cmd, static_cast<void*>(buffer.memory.memory), static_cast<int>(crc_size));
 	if (!success) {
 		Logging::error("Failed to generate CRC");
 		return false;
