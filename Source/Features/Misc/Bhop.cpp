@@ -2,8 +2,8 @@
 
 #include "../Feature.hpp"
 
+#include "../../SDK/Entities/BaseEntity.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
-#include "../../SDK/Entities/Services/PlayerMovementServices.hpp"
 #include "../../SDK/GameClass/UserCmd.hpp"
 
 #include "../../Utils/Prediction.hpp"
@@ -11,7 +11,6 @@
 #include "../../Memory.hpp"
 
 #include <cfloat>
-#include <cstdint>
 #include <cstring>
 
 Bhop::Bhop()
@@ -31,7 +30,6 @@ void Bhop::create_move(UserCmd* cmd)
 
 	const bool predicted = Prediction::begin(cmd);
 
-	static constexpr std::uint32_t FL_ONGROUND = 1 << 0;
 	if (Memory::local_player->flags() & FL_ONGROUND) {
 		cmd->buttons.buttonstate1 &= ~IN_JUMP;
 
