@@ -4,6 +4,7 @@
 
 #include "BaseModelEntity.hpp"
 
+#include "Services/PlayerObserverServices.hpp"
 #include "glm/ext/vector_float3.hpp"
 
 struct PlayerMovementServices;
@@ -18,4 +19,5 @@ struct BasePlayerPawn : public BaseModelEntity {
 	SCHEMA_VAR(PlayerWeaponServices*, weapon_services, "m_pWeaponServices");
 	SCHEMA_VAR(PlayerMovementServices*, movement_services, "m_pMovementServices");
 	SCHEMA_VAR(PlayerItemServices*, item_services, "m_pItemServices");
+	SCHEMA_VAR(PlayerObserverServices*, observer_services, "m_pObserverServices");
 };
