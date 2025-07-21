@@ -4,26 +4,24 @@
 
 #include "../../SDK/GameClass/MemAlloc.hpp"
 
+#include "../../Libraries.hpp"
+
 #include <cstring>
 #include <dlfcn.h>
 
 UtlBuffer::UtlBuffer(int grow_size, int init_size, int flags)
 {
-	memset(this, 0, sizeof(*this));
-	static void (*ctor)(UtlBuffer*, int, int, int);
+	std::memset(reinterpret_cast<void*>(this), 0, sizeof(*this));
+	static auto ctor = [] {
+		auto* symbol = Libraries::tier0->get_symbol<void (*)(UtlBuffer*, int, int, int)>("_ZN10CUtlBufferC1Eiii");
 
-	if (!ctor) {
-		void* handle = dlmopen(LM_ID_BASE, "libtier0.so", RTLD_NOW | RTLD_NOLOAD | RTLD_LOCAL);
-
-		ctor = reinterpret_cast<decltype(ctor)>(dlsym(handle, "_ZN10CUtlBufferC1Eiii"));
-
-		if (ctor)
-			Logging::info("Found CUtlBuffer constructor at {}", reinterpret_cast<void*>(ctor));
+		if (symbol)
+			Logging::info("Found CUtlBuffer constructor at {}", reinterpret_cast<void*>(symbol));
 		else
-			Logging::error("Couldn't find global allocator!");
+			Logging::error("Couldn't find CUtlBuffer constructor!");
 
-		dlclose(handle);
-	}
+		return symbol;
+	}();
 
 	ctor(this, grow_size, init_size, flags);
 }
@@ -39,20 +37,16 @@ UtlBuffer::~UtlBuffer()
 
 void UtlBuffer::ensure_capacity(int size)
 {
-	static void (*fptr)(UtlBuffer*, int);
+	static auto fptr = [] {
+		auto* symbol = Libraries::tier0->get_symbol<void (*)(UtlBuffer*, int)>("_ZN10CUtlBuffer14EnsureCapacityEi");
 
-	if (!fptr) {
-		void* handle = dlmopen(LM_ID_BASE, "libtier0.so", RTLD_NOW | RTLD_NOLOAD | RTLD_LOCAL);
-
-		fptr = reinterpret_cast<decltype(fptr)>(dlsym(handle, "_ZN10CUtlBuffer14EnsureCapacityEi"));
-
-		if (fptr)
-			Logging::info("Found CUtlBuffer::EnsureCapacity at {}", reinterpret_cast<void*>(fptr));
+		if (symbol)
+			Logging::info("Found CUtlBuffer::EnsureCapacity at {}", reinterpret_cast<void*>(symbol));
 		else
 			Logging::error("Couldn't find CUtlBuffer::EnsureCapacity!");
 
-		dlclose(handle);
-	}
+		return symbol;
+	}();
 
 	fptr(this, size);
 }

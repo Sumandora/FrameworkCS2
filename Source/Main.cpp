@@ -4,6 +4,7 @@
 #include "GUI/GUI.hpp"
 #include "Interfaces.hpp"
 
+#include "Libraries.hpp"
 #include "Memory.hpp"
 
 #include "Hooks/Hooks.hpp"
@@ -24,6 +25,8 @@ static void initializer()
 
 	Serialization::create_config_directory();
 	GUI::init(Serialization::get_config_directory());
+
+	Libraries::create();
 	Interfaces::grab_interfaces();
 	Memory::create();
 
@@ -32,6 +35,7 @@ static void initializer()
 	Features::create();
 	Hooks::create();
 
+	Libraries::destroy();
 	Logging::info("Initialization complete");
 }
 

@@ -10,6 +10,7 @@
 #include <link.h>
 
 #include "../../../Interfaces.hpp"
+#include "../../../Libraries.hpp"
 
 #include "../../../Utils/Logging.hpp"
 
@@ -32,7 +33,9 @@ void GUI::Tabs::Debug::draw_interfaces()
 
             Logging::debug("Looking up interfaces of {}", info->dlpi_name);
 
-			auto interfaced_library = Interfaces::InterfacedLibrary::create(info->dlpi_name);
+            auto library = Libraries::Library{ info->dlpi_name };
+
+			auto interfaced_library = Interfaces::InterfacedLibrary::create(library);
 
 			if(!interfaced_library.has_value())
 				return 0;

@@ -1,5 +1,6 @@
 #include "Interfaces.hpp"
 
+#include "Libraries.hpp"
 #include "SDK/GameClass/Source2Client.hpp"
 #include "SDK/InterfaceReg.hpp"
 
@@ -29,35 +30,34 @@ InterfacedLibrary::InterfacedLibrary(std::unordered_map<const char*, void*> inte
 {
 }
 
-std::optional<InterfacedLibrary> InterfacedLibrary::create(const char* path)
+std::optional<InterfacedLibrary> InterfacedLibrary::create(const Libraries::Library& library)
 {
-	void* handle = dlmopen(LM_ID_BASE, path, RTLD_NOW | RTLD_NOLOAD | RTLD_LOCAL);
-	if (!handle)
-		return std::nullopt;
-
-	void* create_interface_fn = dlsym(handle, "CreateInterface");
+	void* create_interface_fn = library.get_symbol<void*>("CreateInterface");
 	if (!create_interface_fn)
 		return std::nullopt;
 
-	std::expected<InterfaceReg**, BCRL::FinalizationError>
-		interface_list = BCRL::pointer(Memory::mem_mgr, create_interface_fn)
-							 .add(1)
-							 .relative_to_absolute()
-							 .filter(BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().also([le_path = path](const decltype(Memory::mem_mgr)::RegionT& r) {
-								 auto path = r.get_path();
-								 if (!path.has_value())
-									 return false;
-								 return path->contains(le_path);
-							 }))
-							 .repeater([](auto& ptr) {
-								 if (ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8b 1d">())) // mov %%rbx, %0
-									 return false;
-								 ptr.next_instruction();
-								 return true;
-							 })
-							 .add(3)
-							 .relative_to_absolute()
-							 .finalize<InterfaceReg**>();
+	std::expected<InterfaceReg**, BCRL::FinalizationError> interface_list
+		= BCRL::pointer(Memory::mem_mgr, create_interface_fn)
+			  .add(1)
+			  .relative_to_absolute()
+			  .filter(
+				  BCRL::everything(Memory::mem_mgr)
+					  .with_flags("r-x")
+					  .also([library_name = library.get_library_name()](const decltype(Memory::mem_mgr)::RegionT& r) {
+						  auto path = r.get_path();
+						  if (!path.has_value())
+							  return false;
+						  return path->contains(library_name);
+					  }))
+			  .repeater([](auto& ptr) {
+				  if (ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8b 1d">())) // mov %%rbx, %0
+					  return false;
+				  ptr.next_instruction();
+				  return true;
+			  })
+			  .add(3)
+			  .relative_to_absolute()
+			  .finalize<InterfaceReg**>();
 
 	if (!interface_list.has_value())
 		return std::nullopt;
@@ -66,8 +66,6 @@ std::optional<InterfacedLibrary> InterfacedLibrary::create(const char* path)
 	for (InterfaceReg* interface = *interface_list.value(); interface; interface = interface->m_pNext) {
 		interfaces[interface->m_pName] = interface->m_CreateFn;
 	}
-
-	dlclose(handle);
 
 	return InterfacedLibrary{ interfaces };
 }
@@ -102,15 +100,15 @@ void* Interfaces::uncover_create_function(void* create_func)
 
 void Interfaces::grab_interfaces()
 {
-	auto client = InterfacedLibrary::create("libclient.so").value();
-	auto schemasystem = InterfacedLibrary::create("libschemasystem.so").value();
-	auto tier0 = InterfacedLibrary::create("libtier0.so").value();
-	auto engine2 = InterfacedLibrary::create("libengine2.so").value();
-	auto panorama = InterfacedLibrary::create("libpanorama.so").value();
-	auto materialsystem2 = InterfacedLibrary::create("libmaterialsystem2.so").value();
-	auto resourcesystem = InterfacedLibrary::create("libresourcesystem.so").value();
-	auto filesystem = InterfacedLibrary::create("libfilesystem_stdio.so").value();
-	auto localize = InterfacedLibrary::create("liblocalize.so").value();
+	auto client = InterfacedLibrary::create(Libraries::client).value();
+	auto schemasystem = InterfacedLibrary::create(Libraries::schemasystem).value();
+	auto tier0 = InterfacedLibrary::create(Libraries::tier0).value();
+	auto engine2 = InterfacedLibrary::create(Libraries::engine2).value();
+	auto panorama = InterfacedLibrary::create(Libraries::panorama).value();
+	auto materialsystem2 = InterfacedLibrary::create(Libraries::materialsystem2).value();
+	auto resourcesystem = InterfacedLibrary::create(Libraries::resourcesystem).value();
+	auto filesystem = InterfacedLibrary::create(Libraries::filesystem).value();
+	auto localize = InterfacedLibrary::create(Libraries::localize).value();
 
 	constexpr static auto INFO = [](std::string_view name, void* ptr) {
 		if (ptr)

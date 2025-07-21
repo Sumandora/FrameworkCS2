@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Libraries.hpp"
+
 #include <optional>
 #include <unordered_map>
 
@@ -21,7 +23,7 @@ namespace Interfaces {
 
 		explicit InterfacedLibrary(std::unordered_map<const char*, void*> interfaces);
 	public:
-		static std::optional<InterfacedLibrary> create(const char* path);
+		static std::optional<InterfacedLibrary> create(const Libraries::Library& library);
 
 		void* get_interface(const char* name) const;
 

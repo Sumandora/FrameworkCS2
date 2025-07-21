@@ -31,4 +31,7 @@ public:
 	{
 		get()->~T();
 	}
+
+	// NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+	operator T&() { return *get(); }
 };

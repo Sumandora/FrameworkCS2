@@ -2,6 +2,8 @@
 
 #include "../../Utils/Logging.hpp"
 
+#include "../../Libraries.hpp"
+
 #include <dlfcn.h>
 #include <link.h>
 
@@ -25,40 +27,32 @@ BufferString::~BufferString()
 
 void BufferString::purge(int unk1)
 {
-	static void (*fptr)(BufferString*, int);
+	static auto fptr = [] {
+		auto* symbol = Libraries::tier0->get_symbol<void (*)(BufferString*, int)>("_ZN13CBufferString5PurgeEi");
 
-	if (!fptr) {
-		void* handle = dlmopen(LM_ID_BASE, "libtier0.so", RTLD_NOW | RTLD_NOLOAD | RTLD_LOCAL);
-
-		fptr = reinterpret_cast<decltype(fptr)>(dlsym(handle, "_ZN13CBufferString5PurgeEi"));
-
-		if (fptr)
-			Logging::info("Found CBufferString::Purge at {}", reinterpret_cast<void*>(fptr));
+		if (symbol)
+			Logging::info("Found CBufferString::Purge at {}", reinterpret_cast<void*>(symbol));
 		else
 			Logging::error("Couldn't find CBufferString::Purge!");
 
-		dlclose(handle);
-	}
+		return symbol;
+	}();
 
 	fptr(this, unk1);
 }
 
 void BufferString::insert(int unk1, const char* str, int unk2, bool unk3)
 {
-	static void (*fptr)(BufferString*, int, const char*, int, bool);
+	static auto fptr = [] {
+		auto* symbol = Libraries::tier0->get_symbol<void (*)(BufferString*, int, const char*, int, bool)>("_ZN13CBufferString6InsertEiPKcib");
 
-	if (!fptr) {
-		void* handle = dlmopen(LM_ID_BASE, "libtier0.so", RTLD_NOW | RTLD_NOLOAD | RTLD_LOCAL);
-
-		fptr = reinterpret_cast<decltype(fptr)>(dlsym(handle, "_ZN13CBufferString6InsertEiPKcib"));
-
-		if (fptr)
-			Logging::info("Found CBufferString::Insert at {}", reinterpret_cast<void*>(fptr));
+		if (symbol)
+			Logging::info("Found CBufferString::Insert at {}", reinterpret_cast<void*>(symbol));
 		else
 			Logging::error("Couldn't find CBufferString::Insert!");
 
-		dlclose(handle);
-	}
+		return symbol;
+	}();
 
 	fptr(this, unk1, str, unk2, unk3);
 }
