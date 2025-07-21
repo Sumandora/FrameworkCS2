@@ -41,7 +41,18 @@ static float calculate_bomb_damage(float bomb_damage, float distance)
 
 	const float scaled_damage = Memory::local_player->scale_damage_with_armor(adjusted_damage, 1.0F, HitGroup::GENERIC);
 
-	return scaled_damage;
+	return std::floor(scaled_damage);
+}
+
+static bool is_c4_relevant(const PlantedC4* c4)
+{
+	if (c4->has_exploded())
+		return false;
+
+	if (c4->defused())
+		return false;
+
+	return true;
 }
 
 void BombTimer::update()
@@ -52,25 +63,44 @@ void BombTimer::update()
 		return;
 	}
 
+	if (planted_c4.has_entity()) {
+		const PlantedC4* old_c4 = planted_c4.get();
+		if (old_c4 && !is_c4_relevant(old_c4)) {
+			planted_c4 = EntityHandle<PlantedC4>::invalid();
+		}
+	}
+
 	const PlantedC4* c4 = nullptr;
 	// NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
 	if (!planted_c4.has_entity() || (c4 = planted_c4.get()) == nullptr) {
-		c4 = GameEntitySystem::the()->find_first_entity_of_type<PlantedC4>();
+		GameEntitySystem* game_entity_system = GameEntitySystem::the();
+		const int highest = game_entity_system->getHighestEntityIndex();
+		for (int i = 0; i < highest; i++) {
+			BaseEntity* base_entity = game_entity_system->getBaseEntity(i);
+			if (!base_entity)
+				continue;
+
+			if (base_entity->getSchemaType() != PlantedC4::classInfo())
+				continue;
+
+			auto* potential_c4 = static_cast<PlantedC4*>(base_entity);
+
+			if (!is_c4_relevant(potential_c4))
+				continue;
+
+			c4 = potential_c4;
+			break;
+		}
 	}
 
 	if (!c4) {
 		const std::lock_guard lock{ bomb_info_lock };
 		bomb_info.reset();
+		planted_c4 = EntityHandle<PlantedC4>::invalid();
 		return;
 	}
 
 	planted_c4 = c4->get_handle();
-
-	if (c4->has_exploded() || c4->defused() || c4->c4_blow() < (*Memory::globals)->current_time()) {
-		const std::lock_guard lock{ bomb_info_lock };
-		bomb_info.reset();
-		return;
-	}
 
 	const GameSceneNode* local_node = Memory::local_player->gameSceneNode();
 	const GameSceneNode* c4_node = c4->gameSceneNode();
@@ -152,7 +182,8 @@ void BombTimer::draw()
 			ImGui::Text("Bomb planted on Site %c", site);
 
 			const float remaining_time = info.explode_time - info.current_time;
-			ImGui::Text("Remaining time: %.1f", remaining_time);
+			if (remaining_time > 0)
+				ImGui::Text("Remaining time: %.1f", remaining_time);
 			ImGui::Text("Damage: %.0f", info.damage);
 
 			if (info.defuse_info.has_value()) {
@@ -162,7 +193,9 @@ void BombTimer::draw()
 
 				if (!defuse_info.defuser_name.empty())
 					ImGui::Text("Defused by %s", defuse_info.defuser_name.c_str());
-				ImGui::Text("Remaining time: %.1f", defuse_info.end_time - info.current_time);
+				const float remaining_time_for_defuse = defuse_info.end_time - info.current_time;
+				if (remaining_time_for_defuse > 0)
+					ImGui::Text("Remaining time: %.1f", remaining_time_for_defuse);
 
 				const bool will_succeed = defuse_info.end_time <= info.explode_time;
 				static constexpr ImColor RED{ 1.0F, 0.0F, 0.0F, 1.0F };
