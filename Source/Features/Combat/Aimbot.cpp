@@ -70,6 +70,9 @@ void Aimbot::create_move(UserCmd* cmd)
 
 	BasePlayerWeapon* weapon = weapon_services->active_weapon().get();
 
+	if (!weapon)
+		return;
+
 	const auto* vdata = static_cast<CSWeaponBaseVData*>(weapon->get_vdata());
 
 	if (!vdata->is_gun())
