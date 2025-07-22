@@ -28,11 +28,6 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		CSPlayerController* controller = *Memory::local_player_controller;
 		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
 
-		grenade_helper->update();
-		chams->update_pvs();
-		removals->remove_ads_update();
-		bomb_timer->update();
-
 		thread_executor.run_all_queued_functions();
 		break;
 	}
@@ -43,15 +38,22 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 	}
 
 	case FRAME_NET_UPDATE_END: {
-		const std::lock_guard<std::mutex> lock(GraphicsHook::espMutex);
-		if (GraphicsHook::espDrawList != nullptr) { // it was not yet initialized by the other thread
-			GraphicsHook::espDrawList->_ResetForNewFrame();
-			GraphicsHook::espDrawList->PushClipRectFullScreen();
-			GraphicsHook::espDrawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
-			esp->draw(GraphicsHook::espDrawList.get());
-			grenade_prediction->draw(GraphicsHook::espDrawList.get());
-			hit_marker->draw(GraphicsHook::espDrawList.get());
+		{
+			const std::lock_guard<std::mutex> lock(GraphicsHook::espMutex);
+			if (GraphicsHook::espDrawList != nullptr) { // it was not yet initialized by the other thread
+				GraphicsHook::espDrawList->_ResetForNewFrame();
+				GraphicsHook::espDrawList->PushClipRectFullScreen();
+				GraphicsHook::espDrawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
+				esp->draw(GraphicsHook::espDrawList.get());
+				grenade_prediction->draw(GraphicsHook::espDrawList.get());
+				hit_marker->draw(GraphicsHook::espDrawList.get());
+			}
 		}
+
+		grenade_helper->update();
+		chams->update_pvs();
+		removals->remove_ads_update();
+		bomb_timer->update();
 		break;
 	}
 
