@@ -8,6 +8,7 @@
 #include "SDK/EngineTrace/EngineTrace.hpp"
 #include "SDK/Entities/CSPlayerController.hpp"
 #include "SDK/Entities/GameEntitySystem.hpp"
+#include "SDK/Entities/CSPlayerController.hpp"
 #include "SDK/GameClass/ClientModeCSNormal.hpp"
 #include "SDK/GameClass/CSGOInput.hpp"
 #include "SDK/GameClass/MemAlloc.hpp"
@@ -138,4 +139,5 @@ void Memory::create()
 			  .expect<ClientModeCSNormal*>("Couldn't find ClientModeCSNormal");
 
 	MovementQuantization::init();
+	CSPlayerController::resolve_signatures();
 }

@@ -153,7 +153,7 @@ void ESP::draw(ImDrawList* draw_list)
 				if (name_enabled.get()) {
 					CSPlayerController* controller = player_pawn->original_controller().get();
 					if (controller)
-						name.draw(draw_list, entity, controller->sanitized_name(), unioned_rect);
+						name.draw(draw_list, entity, controller->get_decorated_player_name(), unioned_rect);
 				}
 				if (healthbar_enabled.get())
 					healthbar.draw(draw_list, entity, unioned_rect);
