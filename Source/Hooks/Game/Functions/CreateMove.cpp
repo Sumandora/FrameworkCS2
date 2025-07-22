@@ -21,7 +21,6 @@
 #include <cassert>
 #include <cstdint>
 #include <optional>
-#include <print>
 #include <vector>
 
 void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
@@ -77,6 +76,8 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 	if (forward != new_forward || left != new_left) {
 		struct LastCmd {
 			std::int32_t tick;
+			float forwardmove;
+			float leftmove;
 			Buttons buttons;
 		};
 		static std::optional<LastCmd> last_cmd = std::nullopt;
@@ -86,13 +87,16 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 			//		 Because these states are dependent on subticks, I think they are not verifiable by valve,
 			// 		 however I might be wrong because of subtick moves and input history vectors inside the command.
 			// 		 To do this very correctly I might have to add my own... I'm not sure if they are checking this already, however.
-			usercmd->fixup_buttons_for_move();
-			usercmd->fixup_button_changes(last_cmd->buttons);
+			//
+			// TODO: Changed some things, is it more correct now?
+			usercmd->fixup_buttons_for_move(last_cmd->forwardmove, last_cmd->leftmove, last_cmd->buttons);
 		}
 
 		if (!usercmd->has_been_predicted)
 			last_cmd = {
 				.tick = usercmd->csgo_usercmd.base().client_tick(),
+				.forwardmove = usercmd->csgo_usercmd.base().forwardmove(),
+				.leftmove = usercmd->csgo_usercmd.base().leftmove(),
 				.buttons = usercmd->buttons,
 			};
 	}

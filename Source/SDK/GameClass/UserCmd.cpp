@@ -121,17 +121,17 @@ void UserCmd::set_buttonstate3(std::uint64_t value)
 	buttons.buttonstate3 = value;
 }
 
-void UserCmd::fixup_buttons_for_move()
+void UserCmd::fixup_buttons_for_move(float last_forwardmove, float last_leftmove, const Buttons& last_buttons)
 {
 	std::uint64_t buttons = this->buttons.buttonstate1;
 
 	const float forward = csgo_usercmd.base().forwardmove();
 	const float left = csgo_usercmd.base().leftmove();
 
-	if (forward > 0.0F) {
+	if (forward > 0.0F && forward >= last_forwardmove) {
 		buttons |= IN_FORWARD;
 		buttons &= ~IN_BACK;
-	} else if (forward < 0.0F) {
+	} else if (forward < 0.0F && forward <= last_forwardmove) {
 		buttons |= IN_BACK;
 		buttons &= ~IN_FORWARD;
 	} else {
@@ -139,10 +139,10 @@ void UserCmd::fixup_buttons_for_move()
 		buttons &= ~IN_BACK;
 	}
 
-	if (left > 0.0F) {
+	if (left > 0.0F && left >= last_leftmove) {
 		buttons |= IN_MOVERIGHT;
 		buttons &= ~IN_MOVELEFT;
-	} else if (left < 0.0F) {
+	} else if (left < 0.0F && left <= last_leftmove) {
 		buttons |= IN_MOVELEFT;
 		buttons &= ~IN_MOVERIGHT;
 	} else {
@@ -151,9 +151,13 @@ void UserCmd::fixup_buttons_for_move()
 	}
 
 	set_buttonstate1(buttons);
+
+	static constexpr std::uint64_t MOVE_MASK = IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT;
+	const std::uint64_t last_move = last_buttons.buttonstate1 & MOVE_MASK;
+	const std::uint64_t next_move = this->buttons.buttonstate1 & MOVE_MASK;
+	const std::uint64_t changes = last_move ^ next_move;
+	set_buttonstate2(this->buttons.buttonstate2 | changes);
+
+	// TODO add subtick for changes
 }
 
-void UserCmd::fixup_button_changes(const Buttons& old_buttons)
-{
-	set_buttonstate2(buttons.buttonstate1 ^ old_buttons.buttonstate1);
-}

@@ -77,10 +77,9 @@ public:
 	void set_buttonstate2(std::uint64_t value);
 	void set_buttonstate3(std::uint64_t value);
 
-	// Takes forwardmove and leftmove and applies button inputs accordingly
-	void fixup_buttons_for_move();
+	// Applies button inputs according to forwardmove and leftmove
+	void fixup_buttons_for_move(float last_forwardmove, float last_leftmove, const Buttons& last_buttons);
 
-	void fixup_button_changes(const Buttons& old_buttons);
 };
 
 static_assert(sizeof(UserCmd) == 0x98);
