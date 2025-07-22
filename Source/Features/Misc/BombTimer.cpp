@@ -124,7 +124,11 @@ void BombTimer::update()
 
 		if (const CSPlayerPawn* defuser = c4->bomb_defuser().get(); defuser) {
 			const CSPlayerController* controller = defuser->original_controller().get();
-			defuse_info.defuser_name = controller->sanitized_name();
+			if (controller) {
+				const char* name = controller->sanitized_name();
+				if (name)
+					defuse_info.defuser_name = name;
+			}
 		}
 
 		defuse_info.end_time = c4->defuse_count_down();
