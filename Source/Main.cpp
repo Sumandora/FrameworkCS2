@@ -1,19 +1,15 @@
-#include <thread>
-
 #include "Features/Features.hpp"
 #include "GUI/GUI.hpp"
+#include "Hooks/Hooks.hpp"
 #include "Interfaces.hpp"
-
 #include "Libraries.hpp"
 #include "Memory.hpp"
-
-#include "Hooks/Hooks.hpp"
-
 #include "Serialization/Serialization.hpp"
-
 #include "Utils/Logging.hpp"
 #include "Utils/Protobuf.hpp"
 #include "Utils/SDL.hpp"
+
+#include <thread>
 
 static void initializer()
 {

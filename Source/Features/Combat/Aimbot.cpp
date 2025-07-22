@@ -2,6 +2,7 @@
 
 #include "../Feature.hpp"
 
+#include "../../Interfaces.hpp"
 #include "../../Memory.hpp"
 
 #include "../../SDK/EngineTrace/GameTrace.hpp"
@@ -10,7 +11,7 @@
 #include "../../SDK/Entities/Components/BodyComponentSkeletonInstance.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../SDK/Enums/LifeState.hpp"
-#include "../../SDK/GameClass/GameSceneNode.hpp"
+#include "../../SDK/GameClass/EngineToClient.hpp"
 #include "../../SDK/GameClass/SkeletonInstance.hpp"
 #include "../../SDK/GameClass/UserCmd.hpp"
 
@@ -23,7 +24,6 @@
 #include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
-#include "networkbasetypes.pb.h"
 
 #include <cfloat>
 #include <cmath>
@@ -66,7 +66,7 @@ void Aimbot::create_move(UserCmd* cmd)
 
 	const bool predicted = Prediction::begin(cmd);
 
-	const glm::vec3 from = Memory::local_player->gameSceneNode()->transform().m_Position + Memory::local_player->view_offset();
+	const glm::vec3 from = Interfaces::engine->get_network_client_info().local_data->eye_pos;
 
 	const glm::vec2 rotations{
 		cmd->csgo_usercmd.base().viewangles().x(),
@@ -147,7 +147,7 @@ void Aimbot::create_move(UserCmd* cmd)
 		base_viewangles->set_y(rots.y);
 
 		// TODO for silent aim, one must insert a single input history if there is none, then just remove the base view angles assignment.
-		
+
 		for (auto& input : *cmd->csgo_usercmd.mutable_input_history()) {
 			CMsgQAngle* qangle = input.mutable_view_angles();
 			qangle->set_x(rots.x);
@@ -161,10 +161,15 @@ void Aimbot::create_move(UserCmd* cmd)
 		new_step->set_button(IN_ATTACK);
 		new_step->set_pressed(true);
 
+		cmd->csgo_usercmd.set_attack1_start_history_index(0);
+
 		new_step = cmd->allocate_new_move_step(0.0001F);
 
 		new_step->set_button(IN_ATTACK);
 		new_step->set_pressed(false);
+
+		// This means released, technically true since both happened this tick...
+		cmd->csgo_usercmd.set_attack3_start_history_index(0);
 	}
 
 	if (predicted)

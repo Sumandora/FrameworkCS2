@@ -38,8 +38,7 @@ enum class TeamID : int {
 };
 
 // @schema MoveType_t
-enum MoveType : std::uint8_t
-{
+enum MoveType : std::uint8_t {
 	MOVETYPE_NONE = 0,
 	MOVETYPE_OBSOLETE = 1,
 	MOVETYPE_WALK = 2,
@@ -81,6 +80,8 @@ struct BaseEntity : public EntityInstance {
 
 	SCHEMA_VAR(MoveType, move_type, "m_nActualMoveType");
 
+	SCHEMA_VAR(float, simulation_time, "m_flSimulationTime");
+
 	// This type changes based on the entity type
 	EntitySubclassVDataBase* get_vdata()
 	{
@@ -101,8 +102,9 @@ struct BaseEntity : public EntityInstance {
 
 	[[nodiscard]] EntityHandle<BaseEntity> get_raw_handle() const;
 
-	template<typename Self>
-	auto get_handle(this const Self& self) -> EntityHandle<Self> {
+	template <typename Self>
+	auto get_handle(this const Self& self) -> EntityHandle<Self>
+	{
 		return EntityHandle<Self>{ self.get_raw_handle().raw() };
 	}
 
