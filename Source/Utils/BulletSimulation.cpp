@@ -23,6 +23,7 @@
 
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float3.hpp"
+#include "glm/geometric.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -61,6 +62,8 @@ struct TraceData {
 	OFFSET(int, count, 6176);
 	OFFSET(TraceElement*, elements, 6184);
 	OFFSET(OtherElem*, other_elements, 8);
+
+	OFFSET(glm::vec3, range_vec, 6404);
 };
 
 static_assert(sizeof(TraceData) >= 0x1850); // I don't know the real size
@@ -214,7 +217,7 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 		.penetration = vdata->penetration(),
 		.range_modifier = vdata->range_modifier(),
 		// .range = glm::distance(from, to),
-		.range = vdata->range(),
+		.range = glm::length(data.range_vec()),
 		.pen_count = 4,
 		.failed = false
 	};
@@ -227,6 +230,14 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 		TraceElement* elem = &data.elements()[i];
 		// if ((elem->handle_2 & 1) != 0)
 		// 	continue; // ???
+
+		const bool failed = handle_bullet_penetration(&data, &wep_data, &data.elements()[i], Memory::local_player->team_id(), nullptr);
+		BULLETSIM_DBG("intermediate dmg: {}", wep_data.damage);
+
+		damage = wep_data.damage;
+
+		if (failed)
+			break;
 
 		GameTrace game_trace = GameTrace::initialized();
 
@@ -259,14 +270,6 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 				return results;
 			}
 		}
-
-		if (handle_bullet_penetration(&data, &wep_data, &data.elements()[i], Memory::local_player->team_id(), nullptr)) {
-			BULLETSIM_DBG("end");
-			return {};
-		}
-		BULLETSIM_DBG("intermediate dmg: {}", wep_data.damage);
-
-		damage = wep_data.damage;
 	}
 
 	finalize_tracedata(&data);
