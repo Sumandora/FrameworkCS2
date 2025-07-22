@@ -52,6 +52,11 @@ static bool is_c4_relevant(const PlantedC4* c4)
 	if (c4->defused())
 		return false;
 
+	static constexpr float RELEVANCY_DELAY = 5.0F;
+	if (c4->c4_blow() + RELEVANCY_DELAY < (*Memory::globals)->current_time())
+		// NOLINTNEXTLINE(readability-simplify-boolean-expr)
+		return false; // Since the blow time is before the damage is applied, one should wait a little before removing the information
+
 	return true;
 }
 
