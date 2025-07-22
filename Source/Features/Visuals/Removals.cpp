@@ -57,6 +57,8 @@ void Removals::remove_ads_update() const
 		return;
 
 	UIPanel* ads_panel = engine->find_panel("JsLeftColumn");
-	engine->run_script(ads_panel, "$.GetContextPanel().SetHasClass('hidden', true);");
-	was_removing_ads = true;
+	if (ads_panel) {
+		engine->run_script(ads_panel, "$.GetContextPanel().SetHasClass('hidden', true);");
+		was_removing_ads = true;
+	}
 }
