@@ -8,6 +8,7 @@
 
 #include "Services/CSPlayerItemServices.hpp"
 #include "Services/CSPlayerMovementServices.hpp"
+#include "Services/CSPlayerWeaponServices.hpp"
 
 
 struct CSPlayerController;
@@ -19,6 +20,10 @@ struct CSPlayerPawnBase : public BasePlayerPawn {
 
 	SCHEMA_VAR(bool, gun_game_immunity, "m_bGunGameImmunity");
 
+	[[nodiscard]] CSPlayerWeaponServices* weapon_services() const
+	{
+		return static_cast<CSPlayerWeaponServices*>(BasePlayerPawn::weapon_services());
+	}
 	[[nodiscard]] CSPlayerMovementServices* movement_services() const
 	{
 		return static_cast<CSPlayerMovementServices*>(BasePlayerPawn::movement_services());

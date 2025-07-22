@@ -7,9 +7,12 @@
 
 #include "../../SDK/EngineTrace/GameTrace.hpp"
 #include "../../SDK/EngineTrace/TraceFilter.hpp"
+#include "../../SDK/Entities/BasePlayerWeapon.hpp"
 #include "../../SDK/Entities/Components/BodyComponent.hpp"
 #include "../../SDK/Entities/Components/BodyComponentSkeletonInstance.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
+#include "../../SDK/Entities/Services/CSPlayerWeaponServices.hpp"
+#include "../../SDK/Entities/VData/CSWeaponBaseVData.hpp"
 #include "../../SDK/Enums/LifeState.hpp"
 #include "../../SDK/GameClass/EngineToClient.hpp"
 #include "../../SDK/GameClass/SkeletonInstance.hpp"
@@ -55,13 +58,24 @@ void Aimbot::create_move(UserCmd* cmd)
 
 	// cmd->set_buttonstate1(cmd->buttons.buttonstate1 & ~IN_ATTACK);
 
-	auto* entity_list = GameEntitySystem::the();
-
-	const int highest = entity_list->getHighestEntityIndex();
-
 	if (!Memory::local_player)
 		return;
 	if (!Memory::local_player->gameSceneNode())
+		return;
+
+	const CSPlayerWeaponServices* weapon_services = Memory::local_player->weapon_services();
+
+	if (!weapon_services)
+		return;
+
+	BasePlayerWeapon* weapon = weapon_services->active_weapon().get();
+
+	const auto* vdata = static_cast<CSWeaponBaseVData*>(weapon->get_vdata());
+
+	if (!vdata->is_gun())
+		return;
+
+	if (!Memory::local_player->can_perform_primary_attack())
 		return;
 
 	const bool predicted = Prediction::begin(cmd);
@@ -75,6 +89,10 @@ void Aimbot::create_move(UserCmd* cmd)
 
 	glm::vec2 rots;
 	float fov = FLT_MAX;
+
+	auto* entity_list = GameEntitySystem::the();
+
+	const int highest = entity_list->getHighestEntityIndex();
 
 	for (int i = 0; i < highest; i++) { // TODO only players? can I limit to 64?
 		BaseEntity* ent = entity_list->getBaseEntity(i);

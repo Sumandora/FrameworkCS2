@@ -1,8 +1,19 @@
 #include "CSPlayerPawn.hpp"
 
-#include "Services/CSPlayerItemServices.hpp"
+#include "BasePlayerWeapon.hpp"
+#include "CSWeaponBase.hpp"
+#include "CSWeaponBaseGun.hpp"
+#include "WeaponRevolver.hpp"
 
 #include "../EngineTrace/GameTrace.hpp"
+
+#include "../../Memory.hpp"
+
+#include "../GameClass/GlobalVars.hpp"
+
+#include "Services/CSPlayerItemServices.hpp"
+#include "Services/CSPlayerWeaponServices.hpp"
+#include "Services/PlayerWeaponServices.hpp"
 
 bool CSPlayerPawn::is_armored_at(HitGroup hit_group) const
 {
@@ -90,4 +101,44 @@ float CSPlayerPawn::scale_damage_with_armor(float damage, float weapon_armor_rat
 	}
 
 	return damage;
+}
+
+// TODO This shouldn't be a member of CSPlayerPawn, because weapon_services and weapon should be acquired by the caller, but whatever...
+bool CSPlayerPawn::can_perform_primary_attack() const
+{
+	const CSPlayerWeaponServices* weapon_services = this->weapon_services();
+	if (!weapon_services)
+		return false;
+
+	BasePlayerWeapon* weapon = weapon_services->active_weapon().get();
+	if (!weapon)
+		return false;
+
+	if (weapon->clip1() <= 0)
+		return false;
+
+	const auto* cs_weapon = weapon->entity_cast<CSWeaponBase*>();
+	if (cs_weapon && cs_weapon->in_reload())
+		return false;
+
+	const float curtime = (*Memory::globals)->current_time();
+
+	if (weapon_services->next_attack() > curtime)
+		return false;
+
+	if (weapon->next_primary_attack_tick().as_time() > curtime)
+		return false;
+
+	if (cs_weapon
+		&& weapon->getSchemaType() == WeaponRevolver::classInfo()
+		&& cs_weapon->postpone_fire_ready_ticks().as_time() > curtime)
+		return false;
+
+	return true;
+}
+
+bool CSPlayerPawn::can_perform_secondary_attack() const
+{
+	// TODO
+	return true;
 }

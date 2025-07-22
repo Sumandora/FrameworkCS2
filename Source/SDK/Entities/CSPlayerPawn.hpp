@@ -31,4 +31,7 @@ struct CSPlayerPawn : public CSPlayerPawnBase {
 		float weapon_armor_ratio,
 		HitGroup hit_group,
 		bool* lost_armor = nullptr) const;
+
+	[[nodiscard]] bool can_perform_primary_attack() const;
+	[[nodiscard]] bool can_perform_secondary_attack() const;
 };
