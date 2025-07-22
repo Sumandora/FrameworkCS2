@@ -53,6 +53,9 @@ void AutoStrafer::create_move(UserCmd* cmd)
 	if (!local_player || !local_player->alive())
 		return;
 
+	if (local_player->move_type() != MOVETYPE_WALK)
+		return;
+
 	static std::optional<float> last_wish_direction = 0.0F;
 
 	const float forward = cmd->csgo_usercmd.base().forwardmove();

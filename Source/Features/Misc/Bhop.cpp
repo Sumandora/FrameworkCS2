@@ -23,6 +23,9 @@ void Bhop::create_move(UserCmd* cmd)
 	if (!enabled.get() || !Memory::local_player)
 		return;
 
+	if (Memory::local_player->move_type() != MOVETYPE_WALK)
+		return;
+
 	const bool holding_jump = cmd->buttons.buttonstate1 & IN_JUMP;
 
 	if (!holding_jump)
