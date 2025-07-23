@@ -44,4 +44,5 @@ public:
 	virtual void deserialize(const nlohmann::json& input_json) = 0;
 
 	void queue_position(ImVec2 position) { queued_position = position; }
+	[[nodiscard]] const std::optional<ImVec2>& get_queued_position() const { return queued_position; }
 };

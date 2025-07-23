@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <format>
 #include <functional>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -221,7 +222,10 @@ void NodeCircuit::serialize(nlohmann::json& output_json) const
 	auto& nodes = output_json["Nodes"];
 	for (const auto& [id, node] : ids) {
 		auto& node_json = nodes.emplace_back();
-		ImVec2 v = ImNodes::GetNodeGridSpacePos(id);
+		// If you serialize before looking at the node then it will still be queued...
+		ImVec2 v = node->get_queued_position()
+			.or_else([id] -> std::optional<ImVec2> { return ImNodes::GetNodeGridSpacePos(id); })
+			.value_or(ImVec2{});
 		node_json["Position"] = { v.x, v.y };
 		node_json["Node name"] = node->get_name();
 		node_json["Id"] = id;
