@@ -71,9 +71,9 @@ namespace Hooks::Game {
 		void hook_func(void* rdi, void* rsi);
 	}
 
-	namespace DrawArrayExt {
+	namespace DrawArrayExt { // TODO Rename, there are multiple DrawArrays, this one belongs to "CAnimatableSceneObjectDesc"
 		inline UninitializedObject<DetourHook<true>> hook;
-		void hook_func(void* animatable_scene_object_desc, void* render_context, MeshDrawPrimitive* mesh,
+		void hook_func(void* animatable_scene_object_desc, void* render_context, MeshDrawPrimitive* mesh_array,
 			int mesh_count, void* scene_view, void* scene_layer, void* scene_system_per_frame_stats, void* material);
 	}
 

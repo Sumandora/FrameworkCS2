@@ -1,7 +1,5 @@
 #include "../GameHook.hpp"
 
-#include "../../../SDK/GameClass/MeshDrawPrimitive.hpp"
-
 #include "../../../Features/Visuals/Chams/Chams.hpp"
 
 #include "RetAddrSpoofer.hpp"
