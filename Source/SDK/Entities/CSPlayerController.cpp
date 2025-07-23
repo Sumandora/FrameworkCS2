@@ -8,6 +8,7 @@
 
 #include "../../Utils/Logging.hpp"
 
+#include <cstddef>
 #include <cstdint>
 #include <ranges>
 #include <string>
@@ -40,7 +41,11 @@ void CSPlayerController::resolve_signatures()
 
 std::string CSPlayerController::get_decorated_player_name() const
 {
-	char chars[128];
-	::get_decorated_player_name(this, chars, 128, DecoratedPlayerNameFlag::DONT_MAKE_STRING_SAFE);
+	// Not sure if this is the actual max length, but it once was.
+	static constexpr std::size_t MAX_NETWORKID_LENGTH = 64;
+	static constexpr std::size_t MAX_DECORATED_PLAYER_NAME_LENGTH = MAX_NETWORKID_LENGTH * 10 + 20;
+
+	char chars[MAX_DECORATED_PLAYER_NAME_LENGTH];
+	::get_decorated_player_name(this, chars, std::ranges::size(chars), DecoratedPlayerNameFlag::DONT_MAKE_STRING_SAFE);
 	return std::string{ std::ranges::begin(chars), std::ranges::end(chars) };
 }
