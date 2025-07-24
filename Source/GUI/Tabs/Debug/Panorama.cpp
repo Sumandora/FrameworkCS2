@@ -16,11 +16,6 @@
 
 #include <string>
 
-/** TODO Make this a feature:
-var obj = $.GetContextPanel().FindChildTraverse("JsLeftColumn");
-obj.visible = false;
-*/
-
 void GUI::Tabs::Debug::draw_panorama()
 {
 	if (ImGui::BeginTabBar("#Panorama debug tabs", ImGuiTabBarFlags_Reorderable)) {
