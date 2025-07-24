@@ -137,20 +137,7 @@ void Aimbot::create_move(UserCmd* cmd)
 		glm::vec2 needed_rotations = needed_rots.xy();
 		needed_rotations.x = glm::clamp(needed_rotations.x, -89.0F, 89.0F); // TODO read convars
 
-		if (Memory::local_player->shots_fired() > 1) {
-			// TODO
-			// static auto* update_aim_punch_cache
-			// 	= BCRL::signature(
-			// 		Memory::mem_mgr,
-			// 		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 56 41 55 4C 8D 6D ? 41 54 4C 8D 75 ? 49 89 F4">(),
-			// 		BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
-			// 		  .expect<void (*)(CSPlayerPawn*, glm::vec3*, double, float)>("Couldn't find update_aim_punch_cache");
-			// glm::vec3 vec;
-			// update_aim_punch_cache(Memory::local_player, &vec, 0.0, 0.0F);
-			const glm::vec3 aim_punch_angle = Memory::local_player->aim_punch_cache().elements[Memory::local_player->aim_punch_cache().size - 1];
-			needed_rotations -= aim_punch_angle.xy() * 2.0F;
-			Logging::info("{}", aim_punch_angle.xyz());
-		}
+		needed_rotations -= Memory::local_player->get_aim_punch(); // TODO Use tick fraction...
 
 		glm::vec2 rot_diff = needed_rotations - rotations;
 		rot_diff.y = std::remainder(rot_diff.y, 360.0F);

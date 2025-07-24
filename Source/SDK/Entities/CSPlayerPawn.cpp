@@ -1,19 +1,21 @@
 #include "CSPlayerPawn.hpp"
 
+#include "../EngineTrace/GameTrace.hpp"
+#include "../GameClass/GlobalVars.hpp"
 #include "BasePlayerWeapon.hpp"
 #include "CSWeaponBase.hpp"
-#include "CSWeaponBaseGun.hpp"
-#include "WeaponRevolver.hpp"
-
-#include "../EngineTrace/GameTrace.hpp"
-
-#include "../../Memory.hpp"
-
-#include "../GameClass/GlobalVars.hpp"
-
 #include "Services/CSPlayerItemServices.hpp"
 #include "Services/CSPlayerWeaponServices.hpp"
 #include "Services/PlayerWeaponServices.hpp"
+#include "WeaponRevolver.hpp"
+
+#include "BCRL/SearchConstraints.hpp"
+#include "BCRL/Session.hpp"
+#include "SignatureScanner/PatternSignature.hpp"
+
+#include "../../Memory.hpp"
+
+#include "glm/ext/vector_float2.hpp"
 
 bool CSPlayerPawn::is_armored_at(HitGroup hit_group) const
 {
@@ -30,7 +32,7 @@ bool CSPlayerPawn::is_armored_at(HitGroup hit_group) const
 		break;
 	case HitGroup::HEAD:
 		if (auto* item_services = this->item_services();
-			item_services && static_cast<CSPlayerItemServices*>(item_services)->has_helmet())
+			item_services && item_services->has_helmet())
 			return true;
 		break;
 	default:
@@ -141,4 +143,17 @@ bool CSPlayerPawn::can_perform_secondary_attack() const
 {
 	// TODO
 	return true;
+}
+
+glm::vec2 CSPlayerPawn::get_aim_punch(float fraction)
+{
+	// TODO better signature (probably hard)
+	static auto* get_aim_punch
+		= BCRL::signature(
+			Memory::mem_mgr,
+			SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 56 41 55 4C 8D 6D ? 41 54 4C 8D 75 ? 49 89 FC 53">(),
+			BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .expect<glm::vec2 (*)(CSPlayerPawn*, float tick_fraction, char unk)>("Couldn't find GetAimPunch");
+
+	return get_aim_punch(this, fraction, 1);
 }
