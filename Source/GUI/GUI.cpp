@@ -177,6 +177,30 @@ bool GUI::is_menu_open()
 	return ::is_open;
 }
 
+inline static ImWchar* all_glyph_ranges()
+{
+	static const ImVector<ImWchar> RANGES = [] {
+		ImGuiIO& io = ImGui::GetIO();
+
+		ImFontGlyphRangesBuilder glyph_range_builder;
+		glyph_range_builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+		glyph_range_builder.AddRanges(io.Fonts->GetGlyphRangesGreek());
+		glyph_range_builder.AddRanges(io.Fonts->GetGlyphRangesKorean());
+		glyph_range_builder.AddRanges(io.Fonts->GetGlyphRangesJapanese());
+		glyph_range_builder.AddRanges(io.Fonts->GetGlyphRangesChineseFull());
+		glyph_range_builder.AddRanges(io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+		glyph_range_builder.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
+		glyph_range_builder.AddRanges(io.Fonts->GetGlyphRangesThai());
+		glyph_range_builder.AddRanges(io.Fonts->GetGlyphRangesVietnamese());
+
+		ImVector<ImWchar> glyph_ranges;
+		glyph_range_builder.BuildRanges(&glyph_ranges);
+		return glyph_ranges;
+	}();
+
+	return RANGES.Data;
+}
+
 static void create_font()
 {
 	// We are running straight into the multi monitor dpi issue here, but to my knowledge there is no appropriate solution to this when using ImGui
@@ -208,8 +232,9 @@ static void create_font()
 			 // Preferably load a system Noto Sans, but if we can't find one, then the game offers its own.
 			 "/usr/share/fonts/noto/NotoSans-Regular.ttf",
 			 "/usr/share/fonts/google-noto/NotoSans-Regular.ttf",
-			 "../../csgo/panorama/fonts/notosans-regular.ttf" }) {
-		if (access(path, F_OK) == 0 && io.Fonts->AddFontFromFileTTF(path, font_size)) {
+			 "../../csgo/panorama/fonts/notosans-regular.ttf", // This one probably wont support all glyph ranges...
+		 }) {
+		if (access(path, F_OK) == 0 && io.Fonts->AddFontFromFileTTF(path, font_size, nullptr, all_glyph_ranges())) {
 			loaded_font = true;
 			break;
 		}
@@ -218,6 +243,7 @@ static void create_font()
 	if (!loaded_font) {
 		ImFontConfig config;
 		config.SizePixels = font_size;
+		config.GlyphRanges = all_glyph_ranges();
 		io.Fonts->AddFontDefault(&config);
 	}
 }
