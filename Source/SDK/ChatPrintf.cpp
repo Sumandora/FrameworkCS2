@@ -14,7 +14,7 @@
 #include <format>
 #include <string>
 
-static int (*internal_chat_printf)(void*, const char*, int, const char*) = nullptr;
+static int (*internal_chat_printf)(void*, const char*, int, const char*, ...) __attribute__((format(printf, 4, 5))) = nullptr;
 
 void ChatPrintf::resolve_signatures()
 {
@@ -38,7 +38,7 @@ std::string ChatPrintf::to_html_rgba(const ImColor& color)
 void ChatPrintf::print(const std::string& text)
 {
 	if (internal_chat_printf) {
-		internal_chat_printf(nullptr, "\x01" /*Enable html markup*/, -1 /* team filter? */, text.c_str());
+		internal_chat_printf(nullptr, "\x01" /*Enable html markup*/, -1 /* team filter? */, "%s", text.c_str());
 		return;
 	}
 
