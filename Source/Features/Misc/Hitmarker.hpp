@@ -13,6 +13,8 @@
 
 #include "../../GUI/Elements/EnumCombo.hpp"
 
+#include "imgui.h"
+
 #include "magic_enum/magic_enum.hpp"
 
 #include <chrono>
@@ -24,6 +26,8 @@
 struct GameEvent;
 
 struct ImDrawList;
+
+// TODO consistency: rename file to have uppercase M in Hit*M*arker
 
 enum class HitMarkerSounds : std::uint8_t {
 	// NOLINTBEGIN(readability-identifier-naming)
@@ -47,6 +51,29 @@ struct EnumNames<HitMarkerSounds> {
 		  });
 };
 
+enum class HitLogsOutput : std::uint8_t {
+	// NOLINTBEGIN(readability-identifier-naming)
+	Notifications,
+	Chat,
+	Standard_Output,
+	// NOLINTEND(readability-identifier-naming)
+};
+
+template <>
+struct EnumNames<HitLogsOutput> {
+	static constexpr auto NAMES = magic_enum::enum_entries<HitLogsOutput>()
+		| std::ranges::views::transform([](const auto& pair) {
+			  std::string no_underscores{ pair.second };
+			  for (char& c : no_underscores) {
+				  if (c == '_')
+					  c = ' ';
+			  }
+			  return std::pair<HitLogsOutput, std::string>{ pair.first, no_underscores };
+		  });
+};
+
+struct CSPlayerPawn;
+
 class HitMarker : public Feature {
 	Section hit_marker{ this, "Hit marker" };
 	Checkbox hit_marker_enabled{ hit_marker, "Enabled", false };
@@ -61,7 +88,17 @@ class HitMarker : public Feature {
 	TextInput custom_sound_name{ hit_sound, "Custom sound name", "sounds/buttons/bell1" };
 	FloatSlider volume{ hit_sound, "Volume", 0.0F, 1.0F, 1.0F };
 
+	Section hit_logs{ this, "Hit logs" };
+	Checkbox hit_logs_enabled{ this, "Enabled", false };
+	Combo<HitLogsOutput> output{ this, "Output" };
+	Color player_color{ this, "Player color", ImColor{ 1.0F, 0.0F, 0.0F, 1.0F } };
+	Color damage_color{ this, "Damage color", ImColor{ 0.0F, 1.0F, 0.0F, 1.0F } };
+
 	std::string get_sound_path() const;
+	void do_hit_sound() const;
+
+	void do_hit_logs(CSPlayerPawn* victim, int damage) const;
+
 	std::chrono::system_clock::time_point last_hurt;
 
 public:

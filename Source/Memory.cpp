@@ -5,10 +5,10 @@
 
 #include "Interfaces.hpp"
 
+#include "SDK/ChatPrintf.hpp"
 #include "SDK/EngineTrace/EngineTrace.hpp"
 #include "SDK/Entities/CSPlayerController.hpp"
 #include "SDK/Entities/GameEntitySystem.hpp"
-#include "SDK/Entities/CSPlayerController.hpp"
 #include "SDK/GameClass/ClientModeCSNormal.hpp"
 #include "SDK/GameClass/CSGOInput.hpp"
 #include "SDK/GameClass/MemAlloc.hpp"
@@ -140,4 +140,5 @@ void Memory::create()
 
 	MovementQuantization::init();
 	CSPlayerController::resolve_signatures();
+	ChatPrintf::resolve_signatures();
 }

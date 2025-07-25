@@ -2,6 +2,7 @@
 
 #include "../Feature.hpp"
 
+#include "../../SDK/ChatPrintf.hpp"
 #include "../../SDK/ConVar/ConVar.hpp"
 #include "../../SDK/ConVar/EngineCvar.hpp"
 #include "../../SDK/Entities/CSPlayerController.hpp"
@@ -9,13 +10,17 @@
 #include "../../SDK/GameClass/EngineToClient.hpp"
 #include "../../SDK/GameClass/GameEvent.hpp"
 
+#include "../../Notifications/Notifications.hpp"
+
 #include "../../Interfaces.hpp"
 #include "../../Memory.hpp"
 
+#include "../../Utils/HTMLEscape.hpp"
 #include "../../Utils/Logging.hpp"
 
-#include "imgui.h"
 #include "magic_enum/magic_enum.hpp"
+
+#include "imgui.h"
 
 #include <array>
 #include <chrono>
@@ -33,6 +38,9 @@ HitMarker::HitMarker()
 	custom_sound_name.add_visible_condition([this] { return sound.get_raw() == HitMarkerSounds::Custom; });
 
 	::volume = Interfaces::engineCvar->findByName("volume");
+
+	player_color.add_visible_condition([this] { return output.get_raw() == HitLogsOutput::Chat; });
+	damage_color.add_visible_condition([this] { return output.get_raw() == HitLogsOutput::Chat; });
 }
 
 static constexpr std::array HIT_MARKER_SOUNDS{
@@ -51,10 +59,53 @@ std::string HitMarker::get_sound_path() const
 	return HIT_MARKER_SOUNDS[std::to_underlying(sound)];
 }
 
+void HitMarker::do_hit_sound() const
+{
+	// TODO: This is hacky, I would prefer to just call game functions
+	static constexpr std::format_string<const float&, const std::string&> COMMAND
+		= "snd_toolvolume {};"
+		  "play {}";
+
+	const float volume = this->volume.get() * ::volume->get_float(); // Since tool sounds don't seem to be scaled with the global volume, just do it ourselves.
+	const std::string sound_path = get_sound_path();
+
+	const std::string command = std::format(COMMAND, volume, sound_path);
+
+	Interfaces::engine->execute_client_cmd(command.c_str());
+}
+
+void HitMarker::do_hit_logs(CSPlayerPawn* victim, int damage) const
+{
+	CSPlayerController* controller = victim->original_controller().get();
+	if (!controller)
+		return;
+
+	switch (output.get()) {
+	case HitLogsOutput::Notifications: {
+		const std::string message = std::format("Hurt {} for {} hp", controller->get_decorated_player_name(), damage);
+		Notifications::create("Player hurt", message, Notifications::Severity::INFO);
+		break;
+	}
+	case HitLogsOutput::Chat: {
+		std::string victim_name = controller->get_decorated_player_name();
+
+		// This is printed into the panorama view, so it needs to be escaped
+		html_escape(victim_name);
+
+		ChatPrintf::print(R"(Hurt <font color="{}">{}</font> for <font color="{}">{}</font> hp)", ChatPrintf::to_html_rgba(player_color.get()), victim_name, ChatPrintf::to_html_rgba(damage_color.get()), damage);
+		break;
+	}
+	case HitLogsOutput::Standard_Output:
+		Logging::info("Hurt {} for {} hp", controller->get_decorated_player_name(), damage);
+		break;
+	}
+}
+
 void HitMarker::event_handler(GameEvent* game_event)
 {
 	const bool hit_sound_enabled = this->hit_sound_enabled.get();
-	if (!hit_marker_enabled.get() && !hit_sound_enabled)
+	const bool hit_logs_enabled = this->hit_logs_enabled.get();
+	if (!hit_marker_enabled.get() && !hit_sound_enabled && !hit_logs_enabled)
 		return;
 
 	if (std::strcmp(game_event->GetName(), "player_hurt") != 0)
@@ -71,25 +122,20 @@ void HitMarker::event_handler(GameEvent* game_event)
 	if (!victim)
 		return;
 
-	if (!victim->entity_cast<CSPlayerPawn*>())
+	if (victim == Memory::local_player)
+		return; // Should I leave those be? Setting perhaps (TODO)
+
+	auto* cs_player_pawn = victim->entity_cast<CSPlayerPawn*>();
+	if (!cs_player_pawn)
 		return;
 
 	last_hurt = std::chrono::system_clock::now();
 
-	if (!hit_sound_enabled)
-		return;
+	if (hit_sound_enabled)
+		do_hit_sound();
 
-	// TODO: This is hacky, I would prefer to just call game functions
-	static constexpr std::format_string<const float&, const std::string&> COMMAND
-		= "snd_toolvolume {};"
-		  "play {}";
-
-	const float volume = this->volume.get() * ::volume->get_float(); // Since tool sounds don't seem to be scaled with the global volume, just do it ourselves.
-	const std::string sound_path = get_sound_path();
-
-	const std::string command = std::format(COMMAND, volume, sound_path);
-
-	Interfaces::engine->execute_client_cmd(command.c_str());
+	if (hit_logs_enabled)
+		do_hit_logs(cs_player_pawn, game_event->get_int("dmg_health", 0));
 }
 
 void HitMarker::draw(ImDrawList* draw_list)

@@ -8,8 +8,10 @@
 
 #include "../../Utils/Logging.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <ranges>
 #include <string>
 
@@ -47,5 +49,11 @@ std::string CSPlayerController::get_decorated_player_name() const
 
 	char chars[MAX_DECORATED_PLAYER_NAME_LENGTH];
 	::get_decorated_player_name(this, chars, std::ranges::size(chars), DecoratedPlayerNameFlag::DONT_MAKE_STRING_SAFE);
-	return std::string{ std::ranges::begin(chars), std::ranges::end(chars) };
+
+	std::string s{ std::ranges::begin(chars), std::strlen(chars) };
+
+	// Some maps try to be funny by adding \r characters into bot names, notably aim_botz.
+	std::erase(s, '\r');
+
+	return s;
 }
