@@ -144,6 +144,12 @@ void Aimbot::create_move(UserCmd* cmd)
 			continue;
 
 		const BulletSimulation::Results results = BulletSimulation::simulate_bullet(from, to, cs_pawn);
+		if (results.hit_entity != cs_pawn)
+			continue;
+
+		if (disable_penetration.get() && results.penetration_count > 0)
+			continue;
+
 		if (results.scaled_damage < min_damage.get())
 			continue;
 

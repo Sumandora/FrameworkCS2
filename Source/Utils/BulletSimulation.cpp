@@ -200,7 +200,9 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 	glm::vec3 the_from = from;
 	glm::vec3 direction = to - from;
 
-	[[maybe_unused]] const glm::vec2 something = create_trace(&data, &the_from, &direction, &filter, 4 /* count of penetrations? */);
+	static constexpr int MAX_PENETRATION_COUNT = 4;
+
+	[[maybe_unused]] const glm::vec2 something = create_trace(&data, &the_from, &direction, &filter, MAX_PENETRATION_COUNT);
 
 	if (data.count() == 0)
 		return {};
@@ -218,7 +220,7 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 		.range_modifier = vdata->range_modifier(),
 		// .range = glm::distance(from, to),
 		.range = glm::length(data.range_vec()),
-		.pen_count = 4,
+		.pen_count = MAX_PENETRATION_COUNT,
 		.failed = false
 	};
 
@@ -226,6 +228,7 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 
 	auto damage = static_cast<float>(vdata->damage());
 	BULLETSIM_DBG("count: {}", data.count());
+
 	for (int i = 0; i < data.count(); i++) {
 		TraceElement* elem = &data.elements()[i];
 		// if ((elem->handle_2 & 1) != 0)
@@ -247,7 +250,7 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 		BULLETSIM_DBG("intermediate fraction: {}", game_trace.fraction);
 		BULLETSIM_DBG("trace from: {}, trace to: {}", game_trace.from, the_from + game_trace.to);
 
-		if (game_trace.hit_entity != nullptr && game_trace.hit_entity == entity) {
+		if (game_trace.hit_entity != nullptr && (!entity || game_trace.hit_entity == entity)) {
 			if (damage < 1.0F)
 				return {};
 
@@ -263,6 +266,8 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 					.scaled_damage = damage,
 					.hit_group = game_trace.hitbox_data->hitgroup,
 					.lost_armor = false,
+					.penetration_count = i,
+					.hit_entity = game_trace.hit_entity,
 				};
 
 				scale_damage(pawn, vdata, results);
