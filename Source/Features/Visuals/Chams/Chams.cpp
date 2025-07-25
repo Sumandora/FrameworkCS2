@@ -28,6 +28,7 @@
 #include <cstring>
 #include <format>
 #include <functional>
+#include <shared_mutex>
 #include <string>
 #include <unistd.h>
 
@@ -73,6 +74,8 @@ bool Chams::draw_object(MeshDrawPrimitive* meshes, int count, const std::functio
 {
 	if (!enabled.get())
 		return false;
+
+	const std::shared_lock layers_lock = layers.read_lock();
 
 	for (const Layer* layer : layers.get()) {
 		const ImColor tint_color = layer->tint.get();
