@@ -125,10 +125,6 @@ void Aimbot::create_move(UserCmd* cmd)
 
 		const glm::vec3 to = skeleton.bones[BONE_HEAD].pos;
 
-		const BulletSimulation::Results results = BulletSimulation::simulate_bullet(from, to, cs_pawn);
-		if (results.scaled_damage < min_damage.get())
-			continue;
-
 		const glm::vec3 delta = to - from;
 
 		glm::vec3 needed_rots;
@@ -143,6 +139,14 @@ void Aimbot::create_move(UserCmd* cmd)
 		rot_diff.y = std::remainder(rot_diff.y, 360.0F);
 
 		const float this_fov = glm::length(rot_diff);
+
+		if (this_fov > maximum_fov.get())
+			continue;
+
+		const BulletSimulation::Results results = BulletSimulation::simulate_bullet(from, to, cs_pawn);
+		if (results.scaled_damage < min_damage.get())
+			continue;
+
 		if (this_fov < fov) {
 			fov = this_fov;
 			rots = needed_rotations;
