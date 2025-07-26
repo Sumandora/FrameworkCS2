@@ -19,6 +19,7 @@ class Aimbot : public Feature {
 	Checkbox disable_penetration{ damage_subgroup, "Disable penetration", false };
 	Checkbox aim_between_shots{ this, "Aim between shots", false };
 	HelpMarker aim_between_shots_performance_warning{ this, "This implies that to aim at someone, that certain someone needs to be calculated. This may lead to a performance hit." };
+	Checkbox silent_aim{ this, "Silent aim", true };
 
 public:
 	Aimbot();

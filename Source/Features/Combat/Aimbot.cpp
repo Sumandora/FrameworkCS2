@@ -14,6 +14,7 @@
 #include "../../SDK/Entities/Services/CSPlayerWeaponServices.hpp"
 #include "../../SDK/Entities/VData/CSWeaponBaseVData.hpp"
 #include "../../SDK/Enums/LifeState.hpp"
+#include "../../SDK/GameClass/CSGOInput.hpp"
 #include "../../SDK/GameClass/EngineToClient.hpp"
 #include "../../SDK/GameClass/SkeletonInstance.hpp"
 #include "../../SDK/GameClass/UserCmd.hpp"
@@ -166,6 +167,11 @@ void Aimbot::create_move(UserCmd* cmd)
 		base_viewangles->set_x(rots.x);
 		base_viewangles->set_y(rots.y);
 
+		if (!silent_aim.get()) {
+			Memory::csgo_input->view_angles().x = rots.x;
+			Memory::csgo_input->view_angles().y = rots.y;
+		}
+
 		// TODO for silent aim, one must insert a single input history if there is none, then just remove the base view angles assignment.
 
 		for (auto& input : *cmd->csgo_usercmd.mutable_input_history()) {
@@ -203,5 +209,5 @@ void Aimbot::create_move(UserCmd* cmd)
 
 bool Aimbot::wants_silent_aim() const
 {
-	return enabled.get();
+	return enabled.get() && silent_aim.get();
 }
