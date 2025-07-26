@@ -1,6 +1,13 @@
-include(CheckCXXSourceCompiles)
-
 # This is mostly written as GCC requires linking against libatomic, while clang does not.
+
+option(USE_SHARED_ATOMIC "Force shared libatomic" OFF)
+
+if(USE_SHARED_ATOMIC)
+	target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE atomic)
+	return()
+endif()
+
+include(CheckCXXSourceCompiles)
 
 check_cxx_source_compiles("
 #include <atomic>

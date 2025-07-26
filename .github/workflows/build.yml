@@ -40,13 +40,18 @@ jobs:
         name: Setup dependencies
         run: |
           dnf update -y
-          dnf install -y git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel ccache
+          dnf install -y git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel ccache libatomic
       - if: matrix.distro == 'opensuse/tumbleweed'
         name: Setup dependencies
         run: |
           zypper refresh
-          zypper install -y git cmake make gcc-c++ binutils-devel vulkan-devel libXext-devel freetype2-devel ccache
+          zypper install -y git cmake make gcc-c++ binutils-devel vulkan-devel libXext-devel freetype2-devel ccache libatomic1
 
+      - if: matrix.distro == 'fedora:latest' || matrix.distro == 'opensuse/tumbleweed'
+        name: Disable static liibatomic
+        run: |
+          echo "DOCKER_IMAGE_NAME=my.docker.repo/awesome-image:release" >> $GITHUB_ENV
+ 
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -60,5 +65,9 @@ jobs:
           restore-keys: |
             ${{ matrix.distro }}
 
-      - name: Build
+      - if: matrix.distro != 'fedora:latest' && matrix.distro != 'opensuse/tumbleweed'
+        name: Build
         run: CCACHE_DIR="$(pwd)/.ccache" ./Build.sh
+      - if: matrix.distro == 'fedora:latest' || matrix.distro == 'opensuse/tumbleweed'
+        name: Build with shared libatomic
+        run: CCACHE_DIR="$(pwd)/.ccache" ./Build.sh -D USE_SHARED_ATOMIC=ON

@@ -74,7 +74,7 @@ The build script can be used to build the program.
 
 If you want to supply additional compiler arguments use `CXXFLAGS`.
 ```sh
-CXXFLAGS="-fstack-protector-strong" ./Build.sh
+./Build.sh -D CMAKE_CXX_FLAGS="-fstack-protector-strong"
 ```
 Some of these might break the resulting binary however.
 

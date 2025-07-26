@@ -13,7 +13,7 @@ echo "This can take up to a couple minutes on slow hardware"
 
 mkdir -p Build
 
-LANG=en cmake -B Build -D CMAKE_BUILD_TYPE=Release -D CMAKE_CXX_FLAGS_RELEASE="$CXXFLAGS" || error
+LANG=en cmake -B Build -D CMAKE_BUILD_TYPE=Release "$@" || error
 LANG=en cmake --build Build -j "$(nproc)" || error
 
 strip -x -s "Build/lib$(cat ProjectName).so" || error
