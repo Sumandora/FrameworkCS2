@@ -78,7 +78,9 @@ void Aimbot::create_move(UserCmd* cmd)
 	if (!vdata->is_gun())
 		return;
 
-	if (!Memory::local_player->can_perform_primary_attack())
+	const bool aim_between_shots = this->aim_between_shots.get();
+
+	if (!aim_between_shots && !Memory::local_player->can_perform_primary_attack())
 		return;
 
 	const bool predicted = Prediction::begin(cmd);
@@ -172,22 +174,27 @@ void Aimbot::create_move(UserCmd* cmd)
 			qangle->set_y(rots.y);
 		}
 
-		cmd->set_buttonstate2(cmd->buttons.buttonstate2 | IN_ATTACK);
+		// If we aren't aiming between shots, we never got here in the first place.
+		const bool should_shoot = !aim_between_shots || Memory::local_player->can_perform_primary_attack();
 
-		CSubtickMoveStep* new_step = cmd->allocate_new_move_step(0.0001F);
+		if (should_shoot) {
+			cmd->set_buttonstate2(cmd->buttons.buttonstate2 | IN_ATTACK);
 
-		new_step->set_button(IN_ATTACK);
-		new_step->set_pressed(true);
+			CSubtickMoveStep* new_step = cmd->allocate_new_move_step(0.0001F);
 
-		cmd->csgo_usercmd.set_attack1_start_history_index(0);
+			new_step->set_button(IN_ATTACK);
+			new_step->set_pressed(true);
 
-		new_step = cmd->allocate_new_move_step(0.0001F);
+			cmd->csgo_usercmd.set_attack1_start_history_index(0);
 
-		new_step->set_button(IN_ATTACK);
-		new_step->set_pressed(false);
+			new_step = cmd->allocate_new_move_step(0.0001F);
 
-		// This means released, technically true since both happened this tick...
-		cmd->csgo_usercmd.set_attack3_start_history_index(0);
+			new_step->set_button(IN_ATTACK);
+			new_step->set_pressed(false);
+
+			// This means released, technically true since both happened this tick...
+			cmd->csgo_usercmd.set_attack3_start_history_index(0);
+		}
 	}
 
 	if (predicted)

@@ -4,6 +4,7 @@
 
 #include "../Settings/Checkbox.hpp"
 #include "../Settings/FloatSlider.hpp"
+#include "../Settings/HelpMarker.hpp"
 #include "../Settings/Subgroup.hpp"
 
 #include "../../Utils/UninitializedObject.hpp"
@@ -16,6 +17,8 @@ class Aimbot : public Feature {
 	FloatSlider min_damage{ this, "Min damage", 0.0F, 100.0F, 50.0F };
 	Subgroup damage_subgroup{ this, "Damage subgroup", true };
 	Checkbox disable_penetration{ damage_subgroup, "Disable penetration", false };
+	Checkbox aim_between_shots{ this, "Aim between shots", false };
+	HelpMarker aim_between_shots_performance_warning{ this, "This implies that to aim at someone, that certain someone needs to be calculated. This may lead to a performance hit." };
 
 public:
 	Aimbot();
