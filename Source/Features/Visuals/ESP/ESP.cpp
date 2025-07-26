@@ -2,16 +2,12 @@
 
 #include <algorithm>
 #include <array>
-#include <concepts>
 #include <cstddef>
-#include <functional>
 #include <initializer_list>
 #include <limits>
-#include <optional>
 #include <ranges>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "../../../Memory.hpp"
 
@@ -98,21 +94,35 @@ void ESP::draw(ImDrawList* draw_list)
 				continue;
 
 			GameSceneNode* game_scene_node = entity->gameSceneNode();
-			auto& transform = game_scene_node->transform();
-			glm::vec3 vec = transform.m_Position;
+			if (!game_scene_node)
+				continue;
 
 			CollisionProperty* collision = entity->collision();
 			if (collision == nullptr)
 				continue;
-			glm::vec3 mins = collision->mins();
-			glm::vec3 maxs = collision->maxs();
 
-			// TODO Vector arithmetic
-			glm::vec3 final_mins = { vec[0] + mins[0], vec[1] + mins[1], vec[2] + mins[2] };
-			glm::vec3 final_maxs = { vec[0] + maxs[0], vec[1] + maxs[1], vec[2] + maxs[2] };
+			const glm::vec3 vec = game_scene_node->transform().m_Position;
 
-			// TODO This is just cartesian product
-			const glm::vec3 points[] = {
+			const glm::vec3 mins = collision->mins();
+			const glm::vec3 maxs = collision->maxs();
+
+			const glm::vec3 final_mins = vec + mins;
+			const glm::vec3 final_maxs = vec + maxs;
+
+#ifdef __cpp_lib_ranges_cartesian_product
+			const auto points = std::views::cartesian_product(
+									std::array{ final_mins.x, final_maxs.x },
+									std::array{ final_mins.y, final_maxs.y },
+									std::array{ final_mins.z, final_maxs.z })
+				| std::ranges::views::transform([](const auto& tuple) {
+					  return glm::vec3{
+						  std::get<0>(tuple),
+						  std::get<1>(tuple),
+						  std::get<2>(tuple),
+					  };
+				  });
+#else
+			const std::array points{
 				// Lower
 				glm::vec3{ final_mins[0], final_mins[1], final_mins[2] },
 				glm::vec3{ final_maxs[0], final_mins[1], final_mins[2] },
@@ -124,6 +134,7 @@ void ESP::draw(ImDrawList* draw_list)
 				glm::vec3{ final_maxs[0], final_maxs[1], final_maxs[2] },
 				glm::vec3{ final_mins[0], final_maxs[1], final_maxs[2] }
 			};
+#endif
 
 			glm::vec4 rectangle{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
 				std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest() };
