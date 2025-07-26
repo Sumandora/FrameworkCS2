@@ -4,9 +4,11 @@
 
 #include "MetaSetting.hpp"
 
-#include "imgui.h"
-
 #include "../../GUI/Elements/BoxedTabItem.hpp"
+
+#include "../../Utils/Logging.hpp"
+
+#include "imgui.h"
 #include "imgui_internal.h"
 
 #include <algorithm>
@@ -69,8 +71,6 @@ public:
 		// This works because the settings itself have a constant size, so you at worst read old data.
 		// However when the settings vector itself changes, then reading old data may result in SIGSEGV.
 
-		// TODO I'm aware that there are no atomics/mutexes here that make this behavior defined.
-
 		if (ImGui::BeginTabBar(get_name().c_str(), ImGuiTabBarFlags_Reorderable)) {
 			ImGuiTabBar* tab_bar = ImGui::GetCurrentTabBar();
 			ImGuiTabItem* tab_item = nullptr;
@@ -132,7 +132,8 @@ public:
 			if (input_json.size() < settings.size()) {
 				settings.erase(settings.begin() + input_json.size(), settings.begin() + settings.size());
 			} else {
-				for (std::size_t left = 0; left < input_json.size() - settings.size(); left++) {
+				std::size_t remaining = input_json.size() - settings.size(); // Evaluate before going into the for loop, because settings.size() will change.
+				for (std::size_t left = 0; left < remaining; left++) {
 					auto* new_element = new IndexedT{ this, child_name };
 					new_element->id = id_counter++;
 				}
