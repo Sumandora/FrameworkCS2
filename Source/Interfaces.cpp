@@ -137,4 +137,6 @@ void Interfaces::grab_interfaces()
 	INFO("VFileSystem", file_system);
 	::localize = localize.get_interface<Localize>("Localize_");
 	INFO("Localize", ::localize);
+	client_prediction = client.get_interface<Source2ClientPrediction>("Source2ClientPrediction");
+	INFO("Source2ClientPrediction", client_prediction);
 }

@@ -6,6 +6,7 @@
 #include "../SDK/GameClass/GlobalVars.hpp"
 #include "../SDK/GameClass/NetworkClientService.hpp"
 #include "../SDK/GameClass/NetworkGameClient.hpp"
+#include "../SDK/GameClass/Source2ClientPrediction.hpp"
 #include "../SDK/GameClass/UserCmd.hpp"
 
 #include "../Interfaces.hpp"
@@ -15,6 +16,12 @@
 static GlobalVars prev_globals{};
 static std::uint32_t prev_flags{};
 static std::uint32_t prev_tick_base{};
+static bool prev_has_been_predicted{};
+static bool prev_in_client_prediction{};
+static BaseEntity* prev_prediction_entity{};
+
+static UserCmd* prediction_cmd{};
+
 static bool in_prediction = false;
 
 bool Prediction::begin(UserCmd* cmd)
@@ -43,6 +50,14 @@ bool Prediction::begin(UserCmd* cmd)
 	prev_globals = **Memory::globals; // TODO only save what's needed
 	prev_flags = Memory::local_player->flags();
 	prev_tick_base = (*Memory::local_player_controller)->tick_base();
+	prev_has_been_predicted = cmd->has_been_predicted;
+
+	prediction_cmd = cmd;
+
+	prev_in_client_prediction = Interfaces::client_prediction->in_prediction();
+	Interfaces::client_prediction->in_prediction() = true;
+	prev_prediction_entity = Interfaces::client_prediction->prediction_entity();
+	Interfaces::client_prediction->prediction_entity() = Memory::local_player;
 
 	movement_services->set_prediction_command(cmd);
 	*(*Memory::local_player_controller)->get_current_command() = cmd;
@@ -61,6 +76,10 @@ void Prediction::end()
 	Memory::local_player->movement_services()->reset_prediction_command();
 	*(*Memory::local_player_controller)->get_current_command() = nullptr;
 
+	Interfaces::client_prediction->in_prediction() = prev_in_client_prediction;
+	Interfaces::client_prediction->prediction_entity() = prev_prediction_entity;
+
+	prediction_cmd->has_been_predicted = prev_has_been_predicted;
 	Memory::local_player->flags() = prev_flags;
 	(*Memory::local_player_controller)->tick_base() = prev_tick_base;
 	**Memory::globals = prev_globals;

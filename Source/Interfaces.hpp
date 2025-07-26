@@ -11,6 +11,7 @@ struct EngineToClient;
 struct PanoramaUIEngine;
 
 class Source2Client;
+class Source2ClientPrediction;
 class NetworkClientService;
 class MaterialSystem;
 class ResourceSystem;
@@ -22,6 +23,7 @@ namespace Interfaces {
 		std::unordered_map<const char*, void*> interfaces;
 
 		explicit InterfacedLibrary(std::unordered_map<const char*, void*> interfaces);
+
 	public:
 		static std::optional<InterfacedLibrary> create(const Libraries::Library& library);
 
@@ -46,6 +48,7 @@ namespace Interfaces {
 	inline ResourceSystem* resource_system;
 	inline FileSystem* file_system;
 	inline Localize* localize;
+	inline Source2ClientPrediction* client_prediction;
 
 	void grab_interfaces();
 
