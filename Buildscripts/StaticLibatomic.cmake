@@ -23,6 +23,14 @@ execute_process(
     OUTPUT_VARIABLE ATOMIC_LIBRARY_PATH
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-message("Compiler doesn't have builtin any-size atomics, using atomic library: ${ATOMIC_LIBRARY_PATH}")
+if(EXISTS ${ATOMIC_LIBRARY_PATH})
+	message("Compiler doesn't have builtin any-size atomics, using atomic library: ${ATOMIC_LIBRARY_PATH}")
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${ATOMIC_LIBRARY_PATH})
+	target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${ATOMIC_LIBRARY_PATH})
+
+	return()
+endif()
+
+message("Your system is missing a static libatomic. Using the dynamic one as a fallback.")
+
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE atomic)
