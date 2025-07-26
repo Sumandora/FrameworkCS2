@@ -11,6 +11,7 @@ class RawTextInput : public Setting {
 public:
 	RawTextInput(SettingsHolder* parent, std::string name, std::string default_value);
 
+	// TODO atomic
 	[[nodiscard]] const std::string& get() const { return value; }
 
 	void render() override;
