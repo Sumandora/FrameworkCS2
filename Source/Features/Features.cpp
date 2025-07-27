@@ -5,6 +5,7 @@
 #include "Misc/Bhop.hpp"
 #include "Misc/BombTimer.hpp"
 #include "Misc/Hitmarker.hpp"
+#include "Misc/VoteRevealer.hpp"
 #include "Visuals/Chams/Chams.hpp"
 #include "Visuals/ESP/ESP.hpp"
 #include "Visuals/ForceCrosshair.hpp"
@@ -33,12 +34,14 @@ void Features::create()
 	hit_marker.emplace();
 	force_third_person.emplace();
 	bomb_timer.emplace();
+	vote_revealer.emplace();
 
 	initialized = true;
 }
 
 void Features::destroy()
 {
+	vote_revealer.reset();
 	bomb_timer.reset();
 	force_third_person.reset();
 	hit_marker.reset();

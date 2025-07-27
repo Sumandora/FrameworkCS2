@@ -1,11 +1,14 @@
 #pragma once
 
 #include "../../SDK/Enums/ClientFrameStage.hpp"
+#include "../../SDK/NetMessages/NetMessagePB.hpp"
 
 #include "../../Utils/ThreadExecutor.hpp"
 #include "../../Utils/UninitializedObject.hpp"
 
 #include "../Hooks.hpp"
+
+#include "cstrike15_usermessages.pb.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -95,5 +98,10 @@ namespace Hooks::Game {
 	namespace UpdateBombRadius {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(MapInfo* thisptr, const char* key, const char* value);
+	}
+
+	namespace OnVoteStart {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(void* csgo_hud_vote, NetMessagePB<CCSUsrMsg_VoteStart>* net_message);
 	}
 }

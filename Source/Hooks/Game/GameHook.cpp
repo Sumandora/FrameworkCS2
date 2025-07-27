@@ -14,7 +14,6 @@
 #include "../../SDK/GameClass/ClientModeCSNormal.hpp"
 #include "../../SDK/GameClass/CSGOInput.hpp"
 #include "../../SDK/GameClass/Source2Client.hpp"
-#include "network_connection.pb.h"
 
 #include <csignal>
 #include <cstddef>
@@ -139,6 +138,17 @@ namespace Hooks::Game {
 				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 31 d2 48 89 e5">())
 				.expect<void*>("Couldn't find UpdateBombRadius"),
 			reinterpret_cast<void*>(UpdateBombRadius::hook_func));
+		OnVoteStart::hook.emplace(
+			Memory::emalloc,
+			BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"#Panorama_Vote_Server">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+				.find_xrefs(SignatureScanner::XRefTypes::relative(),
+					BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+				.expect<void*>("Couldn't find OnVoteStart"),
+			reinterpret_cast<void*>(OnVoteStart::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -153,10 +163,12 @@ namespace Hooks::Game {
 		EmitSound::hook->enable();
 		OverrideView::hook->enable();
 		UpdateBombRadius::hook->enable();
+		OnVoteStart::hook->enable();
 	}
 
 	void destroy()
 	{
+		OnVoteStart::hook.reset();
 		UpdateBombRadius::hook.reset();
 		OverrideView::hook.reset();
 		EmitSound::hook.reset();

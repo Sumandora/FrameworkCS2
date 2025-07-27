@@ -29,3 +29,4 @@ recurse_proto() {
 
 
 recurse_proto cs_usercmd.proto
+recurse_proto cstrike15_usermessages.proto
