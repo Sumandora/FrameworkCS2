@@ -103,8 +103,10 @@ void VoteRevealer::on_vote_start(NetMessagePB<CCSUsrMsg_VoteStart>* net_message)
 	}
 
 	if (from_controller)
-		ChatPrintf::print(R"(<font color="{}">{} (issued by {})</font>)",
-			ChatPrintf::to_html_rgba(announce_color.get()), localized, from_controller->get_decorated_player_name());
+		ChatPrintf::print(R"(<font color="{}">{} <font color="{}">(issued by <font color="{}">{}</font>)</font></font>)",
+			ChatPrintf::to_html_rgba(announce_color.get()), localized,
+			ChatPrintf::to_html_rgba(issued_by_color.get()),
+			ChatPrintf::to_html_rgba(player_highlight_color.get()), from_controller->get_decorated_player_name());
 	else
 		ChatPrintf::print(R"(<font color="{}">{}</font>)",
 			ChatPrintf::to_html_rgba(announce_color.get()), localized);
@@ -134,7 +136,8 @@ void VoteRevealer::event_handler(GameEvent* event)
 	const Color& color = vote_option == 0 ? yes_color : no_color;
 	const std::string_view text = vote_option == 0 ? "YES" : "NO";
 
-	ChatPrintf::print(R"(<font color="{}">{} voted <font color="{}">{}</font></font>)",
-		ChatPrintf::to_html_rgba(vote_cast_color.get()), player_name,
+	ChatPrintf::print(R"(<font color="{}"><font color="{}">{}</font> voted <font color="{}">{}</font></font>)",
+		ChatPrintf::to_html_rgba(vote_cast_color.get()),
+		ChatPrintf::to_html_rgba(player_highlight_color.get()), player_name,
 		ChatPrintf::to_html_rgba(color.get()), text);
 }
