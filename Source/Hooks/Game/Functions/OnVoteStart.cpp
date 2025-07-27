@@ -2,7 +2,7 @@
 
 #include "../../../SDK/NetMessages/NetMessagePB.hpp"
 
-#include "../../../Features/Misc/VoteRevealer.hpp"
+#include "../../../Features/Misc/VoteRevealer/VoteRevealer.hpp"
 
 #include "RetAddrSpoofer.hpp"
 

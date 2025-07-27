@@ -7,7 +7,7 @@
 #include "../../../SDK/GameClass/GameEvent.hpp"
 
 #include "../../../Features/Misc/Hitmarker.hpp"
-#include "../../../Features/Misc/VoteRevealer.hpp"
+#include "../../../Features/Misc/VoteRevealer/VoteRevealer.hpp"
 #include "../../../Features/Visuals/GrenadeHelper.hpp"
 
 void* Hooks::Game::FireEvent::hookFunc(void* game_event_manager, GameEvent* event, bool rdx, bool rcx)

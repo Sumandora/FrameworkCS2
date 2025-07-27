@@ -1,23 +1,23 @@
 #include "VoteRevealer.hpp"
 
-#include "../Feature.hpp"
+#include "../../Feature.hpp"
 
-#include "../Settings/Color.hpp"
+#include "../../Settings/Color.hpp"
 
-#include "../../SDK/ChatPrintf.hpp"
-#include "../../SDK/Entities/CSPlayerController.hpp"
-#include "../../SDK/Entities/CSPlayerPawnBase.hpp"
-#include "../../SDK/Entities/GameEntitySystem.hpp"
-#include "../../SDK/Entities/BaseEntity.hpp"
-#include "../../SDK/GameClass/GameEvent.hpp"
-#include "../../SDK/GameClass/Localize.hpp"
-#include "../../SDK/NetMessages/NetMessagePB.hpp"
+#include "../../../SDK/ChatPrintf.hpp"
+#include "../../../SDK/Entities/CSPlayerController.hpp"
+#include "../../../SDK/Entities/CSPlayerPawnBase.hpp"
+#include "../../../SDK/Entities/GameEntitySystem.hpp"
+#include "../../../SDK/Entities/BaseEntity.hpp"
+#include "../../../SDK/GameClass/GameEvent.hpp"
+#include "../../../SDK/GameClass/Localize.hpp"
+#include "../../../SDK/NetMessages/NetMessagePB.hpp"
 
-#include "../../Interfaces.hpp"
-#include "../../Memory.hpp"
+#include "../../../Interfaces.hpp"
+#include "../../../Memory.hpp"
 
-#include "../../Utils/HTMLEscape.hpp"
-#include "../../Utils/Logging.hpp"
+#include "../../../Utils/HTMLEscape.hpp"
+#include "../../../Utils/Logging.hpp"
 
 #include <cctype>
 #include <cstddef>

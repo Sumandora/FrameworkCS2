@@ -5,7 +5,7 @@
 #include "Misc/Bhop.hpp"
 #include "Misc/BombTimer.hpp"
 #include "Misc/Hitmarker.hpp"
-#include "Misc/VoteRevealer.hpp"
+#include "Misc/VoteRevealer/VoteRevealer.hpp"
 #include "Visuals/Chams/Chams.hpp"
 #include "Visuals/ESP/ESP.hpp"
 #include "Visuals/ForceCrosshair.hpp"

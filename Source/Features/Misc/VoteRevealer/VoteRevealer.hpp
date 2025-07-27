@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../Feature.hpp"
+#include "../../Feature.hpp"
 
-#include "../Settings/Checkbox.hpp"
-#include "../Settings/Color.hpp"
+#include "../../Settings/Checkbox.hpp"
+#include "../../Settings/Color.hpp"
 
-#include "../../Utils/UninitializedObject.hpp"
+#include "../../../Utils/UninitializedObject.hpp"
 
-#include "../../SDK/NetMessages/NetMessagePB.hpp"
+#include "../../../SDK/NetMessages/NetMessagePB.hpp"
 
 #include "cstrike15_usermessages.pb.h"
 
