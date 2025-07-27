@@ -147,6 +147,10 @@ namespace Hooks::Game {
 				.find_xrefs(SignatureScanner::XRefTypes::relative(),
 					BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
 				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+				.find_xrefs(SignatureScanner::XRefTypes::relative(),
+					BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+				.for_each([](const auto& ptr) { printf("%p", ptr.get_pointer()); })
 				.expect<void*>("Couldn't find OnVoteStart"),
 			reinterpret_cast<void*>(OnVoteStart::hook_func));
 
