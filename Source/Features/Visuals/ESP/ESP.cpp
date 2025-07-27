@@ -110,10 +110,11 @@ void ESP::draw(ImDrawList* draw_list)
 			const glm::vec3 final_maxs = vec + maxs;
 
 #ifdef __cpp_lib_ranges_cartesian_product
-			const auto points = std::views::cartesian_product(
-									std::array{ final_mins.x, final_maxs.x },
-									std::array{ final_mins.y, final_maxs.y },
-									std::array{ final_mins.z, final_maxs.z })
+			const auto points
+				= std::views::cartesian_product(
+					  std::array{ final_mins.x, final_maxs.x },
+					  std::array{ final_mins.y, final_maxs.y },
+					  std::array{ final_mins.z, final_maxs.z })
 				| std::ranges::views::transform([](const auto& tuple) {
 					  return glm::vec3{
 						  std::get<0>(tuple),
@@ -136,29 +137,25 @@ void ESP::draw(ImDrawList* draw_list)
 			};
 #endif
 
-			glm::vec4 rectangle{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+			ImRect rectangle{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
 				std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest() };
 
-			for (const auto& point : points) {
+			for (const glm::vec3& point : points) {
 				ImVec2 point_2d;
 
 				if (!Projection::project(point, point_2d)) {
 					goto next_ent;
 				}
 
-				if (point_2d.x < rectangle[0])
-					rectangle[0] = point_2d.x;
-				else if (point_2d.x > rectangle[2])
-					rectangle[2] = point_2d.x;
+				rectangle.Min.x = std::min(point_2d.x, rectangle.Min.x);
+				rectangle.Min.y = std::min(point_2d.y, rectangle.Min.y);
 
-				if (point_2d.y < rectangle[1])
-					rectangle[1] = point_2d.y;
-				else if (point_2d.y > rectangle[3])
-					rectangle[3] = point_2d.y;
+				rectangle.Max.x = std::max(point_2d.x, rectangle.Max.x);
+				rectangle.Max.y = std::max(point_2d.y, rectangle.Max.y);
 			}
 
 			{
-				GenericESP::UnionedRect unioned_rect{ ImRect{ rectangle[0], rectangle[1], rectangle[2], rectangle[3] } };
+				GenericESP::UnionedRect unioned_rect{ rectangle };
 				if (box_enabled.get())
 					box.draw(draw_list, entity, unioned_rect);
 				if (name_enabled.get()) {
