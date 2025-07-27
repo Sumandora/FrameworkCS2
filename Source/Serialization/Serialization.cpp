@@ -5,10 +5,12 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cstdlib>
 #include <expected>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -146,6 +148,14 @@ std::vector<std::filesystem::path> Serialization::get_available_configs()
 
 		configs.emplace_back(config_file);
 	}
+
+	std::ranges::sort(configs, std::greater{}, [](const std::filesystem::path& path) {
+		std::error_code last_modified_error;
+		const std::filesystem::file_time_type last_modified = std::filesystem::last_write_time(path, last_modified_error);
+		if (last_modified_error)
+			return std::chrono::file_clock::now(); // meh.
+		return last_modified;
+	});
 
 	return configs;
 }
