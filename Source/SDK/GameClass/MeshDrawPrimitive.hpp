@@ -2,20 +2,34 @@
 
 #include "../Padding.hpp"
 
-#include <cstdint>
-
 #include "../EntityHandle.hpp"
+
+#include <cstdint>
 
 struct BaseEntity;
 struct Material;
 
-struct SceneAnimatableObject {
+struct SceneObject { }; // TODO Don't know who owns what really...
+
+struct SceneAnimatableObject : public SceneObject {
 	PADDING(0xA8); // Determined through bruteforce, unfortunately
 	EntityHandle<BaseEntity> owner;
 };
 
+struct ParticleSystemDefinition {
+	void* vtable;
+	char** name;
+};
+
+struct ParticleCollection {
+	void* vtable;
+	PADDING(0x10);
+	ParticleSystemDefinition* particle_system_definition;
+};
+
 struct MeshDrawPrimitive {
-	PADDING(0x18);
+	ParticleCollection* particle_collection; // TODO Probably specific to particles draw array...
+	PADDING(0x10);
 	SceneAnimatableObject* scene_animatable_object;
 	Material* material;
 	PADDING(0x10);

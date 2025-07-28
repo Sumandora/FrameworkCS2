@@ -17,6 +17,8 @@
 
 #include <csignal>
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <string>
 #include <unistd.h>
 #include <vulkan/vulkan_core.h>
@@ -153,6 +155,39 @@ namespace Hooks::Game {
 				.expect<void*>("Couldn't find OnVoteStart"),
 			reinterpret_cast<void*>(OnVoteStart::hook_func));
 
+		// There is a relative offset at the beginning of this function
+		// TODO This needs to be addressed in DetourHooking, although I don't really want to...
+
+		void* particle_draw_array
+			= BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"CParticleObjectDesc">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libparticles.so"))
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::relative(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libparticles.so"))
+				  .sub(3)
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::absolute(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libparticles.so"))
+				  .add(8)
+				  .dereference()
+				  .expect<void*>("Couldn't find CParticleObjectDesc::DrawArray");
+
+		std::byte buf[13];
+		Memory::mem_mgr.read(reinterpret_cast<std::uintptr_t>(particle_draw_array), &buf, 13);
+		std::byte buf2[7];
+		std::memcpy(buf2, &buf[1], 7);
+		std::memcpy(&buf[1], &buf[8], 5);
+		std::memcpy(&buf[6], buf2, 7);
+		*reinterpret_cast<std::int32_t*>(buf + 9) -= 5;
+		Memory::mem_mgr.write(reinterpret_cast<std::uintptr_t>(particle_draw_array), &buf, 13);
+
+		ParticlesDrawArray::hook.emplace(
+			Memory::emalloc,
+			particle_draw_array,
+			reinterpret_cast<void*>(ParticlesDrawArray::hook_func));
+
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
 		FireEvent::hook->enable();
@@ -167,10 +202,12 @@ namespace Hooks::Game {
 		OverrideView::hook->enable();
 		UpdateBombRadius::hook->enable();
 		OnVoteStart::hook->enable();
+		ParticlesDrawArray::hook->enable();
 	}
 
 	void destroy()
 	{
+		ParticlesDrawArray::hook.reset();
 		OnVoteStart::hook.reset();
 		UpdateBombRadius::hook.reset();
 		OverrideView::hook.reset();

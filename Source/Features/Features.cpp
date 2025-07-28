@@ -16,6 +16,7 @@
 #include "Visuals/ModelChanger/ModelChanger.hpp"
 #include "Visuals/Radar.hpp"
 #include "Visuals/Removals.hpp"
+#include "Visuals/WorldColors.hpp"
 
 void Features::create()
 {
@@ -35,12 +36,14 @@ void Features::create()
 	force_third_person.emplace();
 	bomb_timer.emplace();
 	vote_revealer.emplace();
+	world_colors.emplace();
 
 	initialized = true;
 }
 
 void Features::destroy()
 {
+	world_colors.reset();
 	vote_revealer.reset();
 	bomb_timer.reset();
 	force_third_person.reset();

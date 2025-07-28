@@ -104,4 +104,10 @@ namespace Hooks::Game {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(void* csgo_hud_vote, NetMessagePB<CCSUsrMsg_VoteStart>* net_message);
 	}
+
+	namespace ParticlesDrawArray {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(void* particle_object_desc, void* render_context, MeshDrawPrimitive* mesh_array,
+			int mesh_count, void* scene_view, void* scene_layer, void* scene_system_per_frame_stats);
+	}
 }
