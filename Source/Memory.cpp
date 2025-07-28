@@ -5,6 +5,7 @@
 
 #include "Interfaces.hpp"
 
+#include "RetAddrSpoofer.hpp"
 #include "SDK/ChatPrintf.hpp"
 #include "SDK/EngineTrace/EngineTrace.hpp"
 #include "SDK/Entities/CSPlayerController.hpp"
@@ -13,7 +14,6 @@
 #include "SDK/GameClass/CSGOInput.hpp"
 #include "SDK/GameClass/MemAlloc.hpp"
 #include "SDK/GameClass/UserCmd.hpp"
-#include "SDK/GameClass/ViewRender.hpp"
 
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
@@ -25,6 +25,8 @@
 #include "Utils/Projection.hpp"
 
 const void* RetAddrSpoofer::leaveRet;
+
+static void* get_smoke_density_in_line = nullptr;
 
 void Memory::create()
 {
@@ -141,4 +143,40 @@ void Memory::create()
 	MovementQuantization::init();
 	CSPlayerController::resolve_signatures();
 	ChatPrintf::resolve_signatures();
+
+	::get_smoke_density_in_line
+		= (void*)BCRL::signature(
+			mem_mgr,
+			SignatureScanner::PatternSignature::for_literal_string<"*ZN11SmokeVolume21GetSmokeDensityInLineERK5Vec3DIfES3_PS1_EUlS3_jE_">(),
+			BCRL::everything(mem_mgr).with_flags("r--").with_name("libclient.so"))
+			  .find_xrefs(
+				  SignatureScanner::XRefTypes::absolute(),
+				  BCRL::everything(mem_mgr).with_flags("r--").with_name("libclient.so"))
+			  .sub(8)
+			  .find_xrefs(
+				  SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+			  .find_xrefs(
+				  SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+			  .find_xrefs(
+				  SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+			  // TODO Fix in BCRL: remove duplicates. (probably should use std::set instead of vector)
+			  // .expect<void*>("Couldn't find GetSmokeDensityInLine");
+			  .peek()
+			  .front()
+			  .get_pointer();
+}
+
+float Memory::get_smoke_density_in_line(const glm::vec3& from, const glm::vec3& to)
+{
+	// There is also GetSmokeDensityLOS, but that one does some weird remap where the return value is remapped from [0.0;0.2] to [0.0;1.0]
+	// This function seems to give the rawest result.
+	//
+	// TODO This function does not respect holes.
+	return RetAddrSpoofer::invoke<float>(::get_smoke_density_in_line, &from, &to, nullptr);
 }

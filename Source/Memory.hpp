@@ -2,6 +2,7 @@
 
 #include "MemoryManager/LinuxMemoryManager.hpp"
 #include "ExecutableMalloc/MemoryManagerAllocator.hpp"
+#include "glm/ext/vector_float3.hpp"
 
 struct BaseEntity;
 struct CSPlayerPawn;
@@ -33,4 +34,6 @@ namespace Memory {
 	inline ExecutableMalloc::MemoryManagerAllocator emalloc{mem_mgr};
 
 	void create();
+
+	float get_smoke_density_in_line(const glm::vec3& from, const glm::vec3& to);
 }

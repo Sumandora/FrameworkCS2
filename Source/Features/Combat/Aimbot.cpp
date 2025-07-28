@@ -35,6 +35,7 @@
 Aimbot::Aimbot()
 	: Feature("Combat", "Aimbot")
 {
+	max_smoke_density.add_visible_condition([this] { return smoke_check.get_raw(); });
 }
 
 // https://github.com/SwagSoftware/Kisak-Strike/blob/7df358a4599ba02a4e072f8167a65007c9d8d8c/mathlib/mathlib_base.cpp#L1108
@@ -144,6 +145,9 @@ void Aimbot::create_move(UserCmd* cmd)
 		const float this_fov = glm::length(rot_diff);
 
 		if (this_fov > maximum_fov.get())
+			continue;
+
+		if(smoke_check.get() && Memory::get_smoke_density_in_line(from, to) > max_smoke_density.get())
 			continue;
 
 		const BulletSimulation::Results results = BulletSimulation::simulate_bullet(from, to, cs_pawn);
