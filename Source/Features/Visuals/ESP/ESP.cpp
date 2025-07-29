@@ -83,6 +83,7 @@ void ESP::draw(ImDrawList* draw_list)
 			BaseEntity* entity = GameEntitySystem::the()->getBaseEntity(i);
 			if (entity == nullptr)
 				continue;
+
 			auto* player_pawn = entity->entity_cast<CSPlayerPawn*>();
 			if (!player_pawn)
 				continue;
@@ -98,7 +99,7 @@ void ESP::draw(ImDrawList* draw_list)
 				continue;
 
 			CollisionProperty* collision = entity->collision();
-			if (collision == nullptr)
+			if (!collision)
 				continue;
 
 			const glm::vec3 vec = game_scene_node->transform().m_Position;

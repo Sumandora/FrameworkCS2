@@ -1,4 +1,4 @@
-# This branch is still unfinished.
+# This branch is still unfinished, you can play with it but there are several minor bugs and features using the CreateMove hook wont work correctly.
 
 # FrameworkCS2
 A fully-featured training software for Counter Strike: 2, made for Linux.
