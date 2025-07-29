@@ -18,10 +18,11 @@ static int (*internal_chat_printf)(void*, const char*, int, const char*, ...) __
 
 void ChatPrintf::resolve_signatures()
 {
+	// TODO Use the string inside the function
 	internal_chat_printf
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 49 89 CF 41 56 41 89 D6 41 55 49 89 F5 41 54 48 81 EC D0 10 00 00">(),
+			SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 56 49 89 CE 41 55 41 89 D5 41 54 49 89 F4 53 48 81 EC D0 10 00 00">(),
 			BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
 			  .expect<decltype(internal_chat_printf)>("Couldn't find ChatPrintf");
 }
