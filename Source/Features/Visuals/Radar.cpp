@@ -12,7 +12,7 @@ Radar::Radar()
 }
 
 struct GameRadar {
-	PADDING(0x17808); // Take a look in the function that is hooked, the RadarUpdate one, you should find that offset by looking at the bitors.
+	PADDING(0x17800); // Take a look in the function that is hooked, the RadarUpdate one, you should find that offset by looking at the bitors.
 	std::uint8_t unk_bool;
 };
 
