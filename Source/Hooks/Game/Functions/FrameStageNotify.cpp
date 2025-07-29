@@ -37,7 +37,11 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		break;
 	}
 
-	case FRAME_NET_UPDATE_END: {
+	// TODO Ghetto fix, need to find new enum
+	case FRAME_SIMULATE_START: {
+		CSPlayerController* controller = *Memory::local_player_controller;
+		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
+
 		grenade_helper->update();
 		chams->update_pvs();
 		removals->remove_ads_update();
