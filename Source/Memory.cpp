@@ -126,11 +126,10 @@ void Memory::create()
 				  BCRL::everything(mem_mgr).with_flags("r-x").with_name("libclient.so"))
 			  .add(4)
 			  .filter([](const auto& ptr) {
-				  return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"0f 11 4d 90">());
+				  return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"0f 11 4d 97">());
 			  })
-			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 3d ? ? ? ? e8">())
-			  .add(1) // TODO This shouldn't be needed; fix in BCRL
-			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 3d ? ? ? ? e8">())
+			  // TODO From before update, but still valid: fix in BCRL: signatures should not count if you are matching right now.
+			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 35">())
 			  .add(3)
 			  .relative_to_absolute()
 			  .expect<ClientModeCSNormal*>("Couldn't find ClientModeCSNormal");
