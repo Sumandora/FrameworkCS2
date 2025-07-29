@@ -14,5 +14,5 @@ public:
 	OFFSET(bool, third_person, 0x261);
 	OFFSET(glm::vec3, third_person_angles, 0x268);
 	// 0x270 maybe thirdperson distance or something like that.
-	OFFSET(glm::vec3, view_angles, 0x4a0); // Found inside sync view angles function
+	OFFSET(glm::vec3, view_angles, 0x7c0); // Found inside sync view angles function
 };
