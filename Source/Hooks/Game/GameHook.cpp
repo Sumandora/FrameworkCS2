@@ -84,13 +84,11 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			BCRL::signature(
 				Memory::mem_mgr,
-				SignatureScanner::PatternSignature::for_literal_string<"sleeve_model">(),
+				SignatureScanner::PatternSignature::for_literal_string<"renderWithViewModels">(),
 				BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
 				.find_xrefs(SignatureScanner::XRefTypes::relative(),
 					BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
-				.sub(6)
-				.filter([](const auto& ptr) { return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"44 89 ff">()); })
-				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 31 c9 ba">())
+				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 				.expect<void*>("Couldn't find add sleeve model function"),
 			reinterpret_cast<void*>(AddSleeveModel::hook_func));
 		DrawArrayExt::hook.emplace(
