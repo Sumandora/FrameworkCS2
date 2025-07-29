@@ -36,50 +36,50 @@ static void* (*operator_delete)(void*, std::size_t) = nullptr;
 
 void CRC::resolve_signatures()
 {
-	create_new_base_cmd
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 48 8B 45 ? 83 8D ? ? ? ? 04">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .add(1)
-			  .relative_to_absolute()
-			  .expect<decltype(create_new_base_cmd)>("Couldn't find create_new_base_cmd");
-	serialize
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"41 56 41 55 41 89 D6 41 54 55 49 89 FC">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .expect<decltype(serialize)>("Couldn't find serialize");
-	write_message
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 48 8B 1D ? ? ? ? 48 8B 95">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .add(1)
-			  .relative_to_absolute()
-			  .expect<decltype(write_message)>("Couldn't find write_message");
-	set_message_data
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"41 56 41 55 41 54 55 48 89 FD 53 48 83 EC 10 F6 07 03">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .expect<decltype(set_message_data)>("Couldn't find set_message_data");
-	empty_str
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"48 8B 1D ? ? ? ? 48 8D 43 ? E9 ? ? ? ? 49 8B 46">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .add(3)
-			  .relative_to_absolute()
-			  .expect<decltype(empty_str)>("Couldn't find empty_str");
-	operator_delete
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? E9 ? ? ? ? ? ? ? ? ? ? ? 49 8B 56 ? 41 83 4E ? 01">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .add(1)
-			  .relative_to_absolute()
-			  .expect<decltype(operator_delete)>("Couldn't find operator_delete");
+	// create_new_base_cmd
+	// 	= BCRL::signature(
+	// 		Memory::mem_mgr,
+	// 		SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 48 8B 45 ? 83 8D ? ? ? ? 04">(),
+	// 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+	// 		  .add(1)
+	// 		  .relative_to_absolute()
+	// 		  .expect<decltype(create_new_base_cmd)>("Couldn't find create_new_base_cmd");
+	// serialize
+	// 	= BCRL::signature(
+	// 		Memory::mem_mgr,
+	// 		SignatureScanner::PatternSignature::for_array_of_bytes<"41 56 41 55 41 89 D6 41 54 55 49 89 FC">(),
+	// 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+	// 		  .expect<decltype(serialize)>("Couldn't find serialize");
+	// write_message
+	// 	= BCRL::signature(
+	// 		Memory::mem_mgr,
+	// 		SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 48 8B 1D ? ? ? ? 48 8B 95">(),
+	// 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+	// 		  .add(1)
+	// 		  .relative_to_absolute()
+	// 		  .expect<decltype(write_message)>("Couldn't find write_message");
+	// set_message_data
+	// 	= BCRL::signature(
+	// 		Memory::mem_mgr,
+	// 		SignatureScanner::PatternSignature::for_array_of_bytes<"41 56 41 55 41 54 55 48 89 FD 53 48 83 EC 10 F6 07 03">(),
+	// 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+	// 		  .expect<decltype(set_message_data)>("Couldn't find set_message_data");
+	// empty_str
+	// 	= BCRL::signature(
+	// 		Memory::mem_mgr,
+	// 		SignatureScanner::PatternSignature::for_array_of_bytes<"48 8B 1D ? ? ? ? 48 8D 43 ? E9 ? ? ? ? 49 8B 46">(),
+	// 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+	// 		  .add(3)
+	// 		  .relative_to_absolute()
+	// 		  .expect<decltype(empty_str)>("Couldn't find empty_str");
+	// operator_delete
+	// 	= BCRL::signature(
+	// 		Memory::mem_mgr,
+	// 		SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? E9 ? ? ? ? ? ? ? ? ? ? ? 49 8B 56 ? 41 83 4E ? 01">(),
+	// 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+	// 		  .add(1)
+	// 		  .relative_to_absolute()
+	// 		  .expect<decltype(operator_delete)>("Couldn't find operator_delete");
 }
 
 bool CRC::update_crc(UserCmd* usercmd)
