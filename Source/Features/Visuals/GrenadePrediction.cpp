@@ -59,7 +59,7 @@ GrenadePrediction::GrenadePrediction()
 			BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
 			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
 				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
-			  .sub(11)
+			  .sub(9)
 			  .relative_to_absolute();
 	calculate_initial_state
 		= convar_callback
