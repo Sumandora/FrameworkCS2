@@ -9,8 +9,8 @@
 #include "../../../SDK/Material/Material.hpp"
 #include "../../../SDK/Material/MaterialSystem.hpp"
 
-#include "../../../Utils/Logging.hpp"
 #include "../../../Utils/Interval.hpp"
+#include "../../../Utils/Logging.hpp"
 
 #include "../../../Memory.hpp"
 
@@ -44,7 +44,7 @@ Chams::Chams()
 			BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libengine2.so"))
 			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
 				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libengine2.so"))
-			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 89 05 ?? ?? ?? ?? 48">())
+			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 89 05 ?? ?? ?? ?? c7">())
 			  .add(3)
 			  .relative_to_absolute()
 			  .finalize<EnginePVSManager*>()
@@ -55,11 +55,15 @@ Chams::Chams()
 
 		disable_pvs.add_visible_condition([] { return false; });
 		pvs_help.add_visible_condition([] { return false; });
+	} else {
+		Logging::info("Found EnginePVSManager at {}", engine_pvs_manager);
 	}
 }
 
 void Chams::update_pvs() const
 {
+	if (!enabled.get())
+		return;
 	if (!engine_pvs_manager)
 		return;
 
