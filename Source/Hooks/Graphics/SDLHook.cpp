@@ -46,61 +46,49 @@ static UninitializedObject<Hooks::DetourHook<true>> hook;
 
 static int peep_events_hook(
 	// NOLINTBEGIN(readability-identifier-naming)
-	SDL_Event* events,
-	int numevents,
-	SDL_EventAction action,
-	Uint32 minType,
-	Uint32 maxType,
-	bool include_sentinel
+	SDL_Event* event
 	// NOLINTEND(readability-identifier-naming)
 )
 {
-	if (action == SDL_ADDEVENT && numevents > 0) {
-		[[gnu::aligned(16)]] std::vector<SDL_Event> filtered_events;
-		// This is wrong, it might be less, but I rather allocate a bit too much than doing a ton of allocations.
-		filtered_events.reserve(numevents);
+	bool swallowed = false;
 
-		for (int i = 0; i < numevents; ++i) {
-			const SDL_Event& event = events[i];
+	if (!ImGui::GetIO().BackendPlatformUserData) {
+		if (event->type < SDL_EVENT_WINDOW_FIRST || event->type > SDL_EVENT_WINDOW_LAST)
+			return RetAddrSpoofer::invoke<int>(reinterpret_cast<void*>(hook->get_trampoline()), event);
 
-			bool swallowed = false;
+		SDL_Window* window = SDL_GetWindowFromID(event->window.windowID);
 
-			if (!ImGui::GetIO().BackendPlatformUserData) {
-				if (event.type < SDL_EVENT_WINDOW_FIRST || event.type > SDL_EVENT_WINDOW_LAST)
-					// NOLINTNEXTLINE(hicpp-avoid-goto, cppcoreguidelines-avoid-goto)
-					goto next_event;
-
-				SDL_Window* window = SDL_GetWindowFromID(event.window.windowID);
-
-				ImGui_ImplSDL3_InitForVulkan(window);
-				GUI::provide_window(window);
-			} else {
-				swallowed = GUI::queue_event(&event);
-			}
-
-		next_event:
-			if (!swallowed) {
-				filtered_events.emplace_back(event);
-			}
-		}
-
-		return RetAddrSpoofer::invoke(reinterpret_cast<SDL_PeepEventsInternal>(hook->get_trampoline()), filtered_events.data(), static_cast<int>(filtered_events.size()), action, minType, maxType, include_sentinel);
+		ImGui_ImplSDL3_InitForVulkan(window);
+		GUI::provide_window(window);
+	} else {
+		swallowed = GUI::queue_event(event);
 	}
-	return RetAddrSpoofer::invoke(reinterpret_cast<SDL_PeepEventsInternal>(hook->get_trampoline()), events, numevents, action, minType, maxType, include_sentinel);
+
+	if (swallowed) {
+		return 1;
+	}
+
+	return RetAddrSpoofer::invoke<int>(reinterpret_cast<void*>(hook->get_trampoline()), event);
 }
 
 bool GraphicsHook::hookSDL()
 {
+	// void* peep_events_internal_ptr
+	// 	= BCRL::signature(
+	// 		Memory::mem_mgr,
+	// 		SignatureScanner::PatternSignature::for_literal_string<"Event queue is full (%d events)">(),
+	// 		BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libSDL3.so.0"))
+	// 		  .find_xrefs(
+	// 			  SignatureScanner::XRefTypes::relative(),
+	// 			  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libSDL3.so.0"))
+	// 		  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 fd">())
+	// 		  .expect<void*>("Failed to find backend function pointer for SDL_PeepEvents");
 	void* peep_events_internal_ptr
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_literal_string<"Event queue is full (%d events)">(),
+			SignatureScanner::PatternSignature::for_array_of_bytes<"41 54 55 48 89 FD 48 83 EC 08 48 83 7F ? 00">(),
 			BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libSDL3.so.0"))
-			  .find_xrefs(
-				  SignatureScanner::XRefTypes::relative(),
-				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libSDL3.so.0"))
-			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"41 57 41 89 f7">())
-			  .expect<void*>("Failed to find backend function pointer for SDL_PeepEventsInternal");
+			  .expect<void*>("Failed to find backend function pointer for SDL_PeepEvents");
 
 	hook.emplace(Memory::emalloc, peep_events_internal_ptr, reinterpret_cast<void*>(peep_events_hook));
 
