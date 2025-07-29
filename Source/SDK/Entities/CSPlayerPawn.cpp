@@ -151,7 +151,7 @@ glm::vec2 CSPlayerPawn::get_aim_punch(float fraction)
 	static auto* get_aim_punch
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 56 41 55 4C 8D 6D ? 41 54 4C 8D 75 ? 49 89 FC 53">(),
+			SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 66 41 0F 7E C7 41 56 4C 8D 75 ? 41 55 4C 8D 6D ? 41 54 49 89 FC">(),
 			BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
 			  .expect<glm::vec2 (*)(CSPlayerPawn*, float tick_fraction, char unk)>("Couldn't find GetAimPunch");
 
