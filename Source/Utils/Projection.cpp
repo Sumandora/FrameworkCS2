@@ -33,24 +33,7 @@ void Projection::resolve_signatures()
 			BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
 			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
 				  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
-			  .add(4)
-			  .repeater([](auto& ptr) {
-				  static std::size_t nth_call = 0;
-
-				  const BCRL::SafePointer next_instruction = ptr.clone().next_instruction();
-
-				  if (next_instruction.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()))
-					  nth_call++;
-
-				  if (nth_call >= 3) {
-					  // third call instruction is the ViewRender Constructor
-					  // The first argument is the pointer to g_ViewRender
-					  return false;
-				  }
-
-				  ptr = next_instruction;
-				  return true;
-			  })
+			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"4c 8d 3d">())
 			  .add(3)
 			  .relative_to_absolute()
 			  .expect<ViewRender*>("Couldn't find ViewRender structure");
