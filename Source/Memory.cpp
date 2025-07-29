@@ -42,11 +42,7 @@ void Memory::create()
 
 	shouldShowCrosshair = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"weapon_reticle_knife_show">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
 							  .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-							  .add(4)
-							  .repeater([](auto& ptr) {
-								  ptr.next_instruction();
-								  return !ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 3d">());
-							  })
+							  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"4c 8d 3d ? ? ? ? b9">())
 							  .add(3)
 							  .relative_to_absolute() // This is a ConVar instance (not the ConVar type in the SDK)
 							  .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
