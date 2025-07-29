@@ -17,7 +17,7 @@ struct ConVar {
 	char* description;
 	PADDING(8);
 	std::bitset<32> flags;
-	PADDING(8);
+	PADDING(16);
 	ConVarValue value;
 	ConVarValue value_backup;
 

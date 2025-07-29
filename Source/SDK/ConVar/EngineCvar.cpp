@@ -9,13 +9,10 @@
 ConVar* EngineCvar::findByName(const char* name)
 {
 	// TODO hashmap name -> ConVar
-	auto it = convarList.head;
-	while (it != convarList.INVALID_INDEX) {
-		auto& listElem = convarList.memory.memory[it];
+	for (int i = 0; i < (convar_count & 0x7fff); i++) {
+		auto& listElem = convarList.memory.memory[i];
 		if (std::strcmp(listElem.element->name, name) == 0)
 			return listElem.element;
-
-		it = listElem.next;
 	}
 
 	Logging::error("Failed to find convar '{}'", name);

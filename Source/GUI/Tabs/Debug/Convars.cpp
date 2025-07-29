@@ -17,39 +17,30 @@ void GUI::Tabs::Debug::draw_convars()
 	ImGui::Checkbox("Search backend", &searchBackend);
 
 	if (ImGui::Button("Remove dev protection")) {
-		auto& list = Interfaces::engineCvar->convarList;
-		auto it = list.head;
-		while (it != list.INVALID_INDEX) {
-			auto& listElem = list.memory.memory[it];
-			listElem.element->flags.set(1, false);
-
-			it = listElem.next;
+		for (int i = 0; i < Interfaces::engineCvar->convar_count; i++) {
+			auto& listElem = Interfaces::engineCvar->convarList.memory.memory[i];
+			if (listElem.element)
+				listElem.element->flags.set(1, false);
 		}
 	}
 
 	ImGui::SameLine();
 
 	if (ImGui::Button("Remove hidden state")) {
-		auto& list = Interfaces::engineCvar->convarList;
-		auto it = list.head;
-		while (it != list.INVALID_INDEX) {
-			auto& listElem = list.memory.memory[it];
-			listElem.element->flags.set(4, false);
-
-			it = listElem.next;
+		for (int i = 0; i < Interfaces::engineCvar->convar_count; i++) {
+			auto& listElem = Interfaces::engineCvar->convarList.memory.memory[i];
+			if (listElem.element)
+				listElem.element->flags.set(4, false);
 		}
 	}
 
 	ImGui::SameLine();
 
 	if (ImGui::Button("Remove cheat protection")) {
-		auto& list = Interfaces::engineCvar->convarList;
-		auto it = list.head;
-		while (it != list.INVALID_INDEX) {
-			auto& listElem = list.memory.memory[it];
-			listElem.element->flags.set(14, false);
-
-			it = listElem.next;
+		for (int i = 0; i < Interfaces::engineCvar->convar_count; i++) {
+			auto& listElem = Interfaces::engineCvar->convarList.memory.memory[i];
+			if (listElem.element)
+				listElem.element->flags.set(14, false);
 		}
 	}
 
@@ -88,14 +79,10 @@ void GUI::Tabs::Debug::draw_convars()
 		};
 
 		if (searchBackend) {
-			auto& list = Interfaces::engineCvar->convarList;
-			auto it = list.head;
-			while (it != list.INVALID_INDEX) {
-				auto& listElem = list.memory.memory[it];
+			for (int i = 0; i < Interfaces::engineCvar->convar_count; i++) {
+				auto& listElem = Interfaces::engineCvar->convarList.memory.memory[i];
 				if (!process(listElem.element))
 					break;
-
-				it = listElem.next;
 			}
 		} else {
 			for (auto it = Interfaces::engineCvar->getFirstCvarIterator(); it; it = Interfaces::engineCvar->getNextCvarIterator(it)) {
