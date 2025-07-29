@@ -15,7 +15,7 @@ GameTrace GameTrace::initialized()
 
 	static auto* init_game_trace = BCRL::signature(
 		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 48 8D 05 ? ? ? ? 48 8D 8D ? ? ? ? 48 C7 85 ? ? ? ? 00 00 00 00">(),
+		SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 41 0F B7 47 ? 48 89 DE">(),
 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 									   .add(1)
 									   .relative_to_absolute()
