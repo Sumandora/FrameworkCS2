@@ -87,27 +87,27 @@ static void (*finalize_tracedata)(TraceData*); // Haven't seen this function any
 void BulletSimulation::resolve_signatures()
 {
 	// TODO Find better signatures, this may be hard because all of these functions are in the penetration of FX_FireBullets
-	create_trace = BCRL::signature(
-		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 41 56 49 89 F6 41 55 49 89 FD 41 54 48 8D BD">(),
-		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-					   .expect<decltype(create_trace)>("Couldn't find CreateTrace");
+	// create_trace = BCRL::signature(
+	// 	Memory::mem_mgr,
+	// 	SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 41 56 49 89 F6 41 55 49 89 FD 41 54 48 8D BD">(),
+	// 	BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+	// 				   .expect<decltype(create_trace)>("Couldn't find CreateTrace");
 
-	handle_bullet_penetration = BCRL::signature(
-		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"55 66 0F EF F6 48 89 E5 41 57 41 56 41 55">(),
-		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-									.expect<decltype(handle_bullet_penetration)>("Couldn't find HandleBulletPenetration");
-	get_trace = BCRL::signature(
-		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 66 41 0F 7E C7 41 56 41 55 49 89 FD">(),
-		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-					.expect<decltype(get_trace)>("Couldn't find GetTrace");
-	finalize_tracedata = BCRL::signature(
-		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 53 48 89 FB 48 83 EC 08 8B 87 ? ? ? ? C7 87 ? ? ? ? 00 00 00 00 8B 8F">(),
-		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-							 .expect<decltype(finalize_tracedata)>("Couldn't find finalize_tracedata");
+	// handle_bullet_penetration = BCRL::signature(
+	// 	Memory::mem_mgr,
+	// 	SignatureScanner::PatternSignature::for_array_of_bytes<"55 66 0F EF F6 48 89 E5 41 57 41 56 41 55">(),
+	// 	BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+	// 								.expect<decltype(handle_bullet_penetration)>("Couldn't find HandleBulletPenetration");
+	// get_trace = BCRL::signature(
+	// 	Memory::mem_mgr,
+	// 	SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 66 41 0F 7E C7 41 56 41 55 49 89 FD">(),
+	// 	BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+	// 				.expect<decltype(get_trace)>("Couldn't find GetTrace");
+	// finalize_tracedata = BCRL::signature(
+	// 	Memory::mem_mgr,
+	// 	SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 53 48 89 FB 48 83 EC 08 8B 87 ? ? ? ? C7 87 ? ? ? ? 00 00 00 00 8B 8F">(),
+	// 	BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+	// 						 .expect<decltype(finalize_tracedata)>("Couldn't find finalize_tracedata");
 }
 
 static void scale_damage(CSPlayerPawn* entity, CSWeaponBaseVData* weapon_data, BulletSimulation::Results& results)
