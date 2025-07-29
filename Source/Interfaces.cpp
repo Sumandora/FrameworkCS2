@@ -38,8 +38,6 @@ std::optional<InterfacedLibrary> InterfacedLibrary::create(const Libraries::Libr
 
 	std::expected<InterfaceReg**, BCRL::FinalizationError> interface_list
 		= BCRL::pointer(Memory::mem_mgr, create_interface_fn)
-			  .add(1)
-			  .relative_to_absolute()
 			  .filter(
 				  BCRL::everything(Memory::mem_mgr)
 					  .with_flags("r-x")
