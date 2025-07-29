@@ -93,15 +93,19 @@ namespace Hooks::Game {
 			reinterpret_cast<void*>(AddSleeveModel::hook_func));
 		DrawArrayExt::hook.emplace(
 			Memory::emalloc,
-			// This function is CAnimatableSceneObjectDesc's 2nd vfunc, TODO maybe I should scan for that instead.
 			BCRL::signature(
 				Memory::mem_mgr,
-				// This is a 128-bit operand stored at a memory address, which is then accessed through relative reference
-				SignatureScanner::PatternSignature::for_array_of_bytes<"57 79 d4 09 57 79 d4 09 57 79 d4 09 57 79 d4 09">(),
-				BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libscenesystem.so"))
-				.find_xrefs(SignatureScanner::XRefTypes::relative(),
-					BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libscenesystem.so"))
-				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+				SignatureScanner::PatternSignature::for_literal_string<"CAnimatableSceneObjectDesc">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libscenesystem.so"))
+				.find_xrefs(
+					SignatureScanner::XRefTypes::relative(),
+					BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libscenesystem.so"))
+				.sub(3)
+				.find_xrefs(
+					SignatureScanner::XRefTypes::absolute(),
+					BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libscenesystem.so"))
+				.add(sizeof(void*) * 2)
+				.dereference()
 				.expect<void*>("Couldn't find draw object function"),
 			reinterpret_cast<void*>(DrawArrayExt::hook_func));
 		SyncViewAngles::hook.emplace(
