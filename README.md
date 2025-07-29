@@ -1,3 +1,5 @@
+# This branch is still unfinished.
+
 # FrameworkCS2
 A fully-featured training software for Counter Strike: 2, made for Linux.
 
