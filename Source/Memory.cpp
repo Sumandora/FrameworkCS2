@@ -109,7 +109,7 @@ void Memory::create()
 	CRC::resolve_signatures();
 	UserCmd::resolve_signatures();
 
-	globals = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_array_of_bytes<"48 8D 05 ? ? ? ? F3 41 0F 6F BF">(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+	globals = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 05 ? ? ? ? 48 8b 00 8b 50 ? 31 c0 e8 ? ? ? ? 48 8d 95">(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 				  .add(3)
 				  .relative_to_absolute()
 				  .expect<GlobalVars**>("Couldn't find global vars");
