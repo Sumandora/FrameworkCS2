@@ -56,7 +56,7 @@ enum MoveType : std::uint8_t {
 };
 
 struct BaseEntity : public EntityInstance {
-	VIRTUAL_METHOD(39, getSchemaType, SchemaClassInfo*, (), (this));
+	VIRTUAL_METHOD(43, getSchemaType, SchemaClassInfo*, (), (this));
 
 	CLASS_INFO("libclient.so", "C_BaseEntity");
 
