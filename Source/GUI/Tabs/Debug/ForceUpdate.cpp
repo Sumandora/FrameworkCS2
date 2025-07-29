@@ -22,7 +22,7 @@ void GUI::Tabs::Debug::draw_force_update()
 
 			// Reason doesn't seem to propagate any further down. It is only used to print a message.
 			// This is the same reason as the cl_fullupdate command.
-			network_game_client->force_full_update("forced by console");
+			network_game_client->delta_tick = -1;
 		});
 	}
 

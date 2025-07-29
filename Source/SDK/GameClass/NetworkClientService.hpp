@@ -5,7 +5,7 @@
 class NetworkGameClient;
 
 class NetworkClientService {
-	PADDING(0xB8);
+	PADDING(0xA0);
 
 public:
 	NetworkGameClient* network_game_client;

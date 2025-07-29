@@ -13,6 +13,7 @@
 #include "SDK/GameClass/ClientModeCSNormal.hpp"
 #include "SDK/GameClass/CSGOInput.hpp"
 #include "SDK/GameClass/MemAlloc.hpp"
+#include "SDK/GameClass/NetworkGameClient.hpp"
 #include "SDK/GameClass/UserCmd.hpp"
 
 #include "SignatureScanner/PatternSignature.hpp"
@@ -163,6 +164,8 @@ void Memory::create()
 			  .peek()
 			  .front()
 			  .get_pointer();
+
+	NetworkGameClient::resolve_signatures();
 }
 
 float Memory::get_smoke_density_in_line(const glm::vec3& from, const glm::vec3& to)

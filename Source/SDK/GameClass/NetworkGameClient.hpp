@@ -16,13 +16,13 @@ enum class PredictionStage : int {
 };
 
 class NetworkGameClient {
-	PADDING(0x264);
+	PADDING(0x254);
 
 public:
 	// NOLINTNEXTLINE(cppcoreguidelines-non-private-member-variables-in-classes)
 	int delta_tick;
 
-	void client_side_predict(PredictionStage stage);
+	static void resolve_signatures();
 
-	VIRTUAL_METHOD(28, force_full_update, void, (const char* reason), (this, reason));
+	void client_side_predict(PredictionStage stage);
 };
