@@ -9,11 +9,11 @@
 #include <cstring>
 #include <dlfcn.h>
 
-UtlBuffer::UtlBuffer(int grow_size, int init_size, int flags)
+UtlBuffer::UtlBuffer(int grow_size, int init_size, BufferFlags flags)
 {
 	std::memset(reinterpret_cast<void*>(this), 0, sizeof(*this));
 	static auto ctor = [] {
-		auto* symbol = Libraries::tier0->get_symbol<void (*)(UtlBuffer*, int, int, int)>("_ZN10CUtlBufferC1Eiii");
+		auto* symbol = Libraries::tier0->get_symbol<void (*)(UtlBuffer*, int, int, BufferFlags)>("_ZN10CUtlBufferC1EiiNS_13BufferFlags_tE");
 
 		if (symbol)
 			Logging::info("Found CUtlBuffer constructor at {}", reinterpret_cast<void*>(symbol));

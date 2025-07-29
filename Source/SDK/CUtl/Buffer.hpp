@@ -4,8 +4,14 @@
 
 #include "Byteswap.hpp"
 
+#include "../Padding.hpp"
+
+using BufferFlags = int;
+
 struct UtlBuffer {
 	using UtlBufferOverflowFunc = bool (UtlBuffer::*)(int size);
+
+	PADDING(0x8); // vtable probably?
 
 	CUtlMemory<unsigned char> memory;
 	int get;
@@ -24,10 +30,10 @@ struct UtlBuffer {
 
 	Byteswap byteswap;
 
-	explicit UtlBuffer(int grow_size = 0, int init_size = 0, int flags = 0);
+	explicit UtlBuffer(int grow_size = 0, int init_size = 0, BufferFlags flags = 0);
 	~UtlBuffer();
 
 	void ensure_capacity(int size);
 };
 
-static_assert(sizeof(UtlBuffer) == 0x50);
+static_assert(sizeof(UtlBuffer) == 0x58);
