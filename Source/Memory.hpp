@@ -22,7 +22,7 @@ namespace Memory {
 
 	inline CSGOInput* csgo_input;
 
-	inline CSPlayerPawn* local_player;
+	inline CSPlayerPawn* local_player = nullptr;
 
 	inline void* get_fun_loading;
 

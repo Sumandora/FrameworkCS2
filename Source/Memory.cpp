@@ -53,7 +53,7 @@ void Memory::create()
 
 	local_player_controller = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"cl_sim_grenade_trajectory">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
 								  .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
-								  .sub(10)
+								  .sub(9)
 								  .relative_to_absolute()
 								  .repeater([](auto& ptr) {
 									  ptr.next_instruction();
@@ -72,7 +72,7 @@ void Memory::create()
 								  .relative_to_absolute()
 								  .repeater([](auto& ptr) {
 									  ptr.next_instruction();
-									  return !ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 05">());
+									  return !ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8b 05">());
 								  })
 								  .add(3)
 								  .relative_to_absolute()
