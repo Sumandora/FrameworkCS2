@@ -36,9 +36,10 @@
 static void gather_default_models(std::vector<PlayerModelCombo::DefaultModel>& player_models)
 {
 	EconItemSchema* schema = Interfaces::source2_client->get_econ_item_system()->item_schema;
+	Logging::info("Found {} item definitions", schema->items.size);
 
-	for (int i = 0; i < schema->count; i++) {
-		EconItemDefinition* item = schema->items[i].econ_item_definition;
+	for (int i = 0; i < schema->items.size; i++) {
+		EconItemDefinition* item = schema->items.elements[i].econ_item_definition;
 		if (!item->type_name() || std::string_view{ item->type_name() } != "#Type_CustomPlayer")
 			continue;
 
@@ -64,8 +65,8 @@ static void gather_default_models(std::vector<PlayerModelCombo::DefaultModel>& p
 		}
 
 		std::vector<char> vec;
-		vec.resize(buf.memory.allocationCount);
-		std::memcpy(vec.data(), buf.memory.memory, buf.memory.allocationCount);
+		vec.resize(buf.memory.growSize);
+		std::memcpy(vec.data(), buf.memory.memory, buf.memory.growSize);
 
 		const GUI::TextureManager::RawImage image = VTexDecoder::decode(vec).value();
 
