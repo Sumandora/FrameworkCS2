@@ -25,7 +25,7 @@ private:
 public:
 
 	FieldData* fields;
-	StaticFieldData* staticFields;
+	// StaticFieldData* staticFields;
 	ParentData* parent;
 
 	// Checks if this class bases on the `other` class info (even if it is several base classes deep)
