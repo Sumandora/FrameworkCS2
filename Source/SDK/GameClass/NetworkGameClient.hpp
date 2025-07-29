@@ -24,5 +24,6 @@ public:
 
 	static void resolve_signatures();
 
+	void force_full_update();
 	void client_side_predict(PredictionStage stage);
 };

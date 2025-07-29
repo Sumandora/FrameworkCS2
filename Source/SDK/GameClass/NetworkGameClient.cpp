@@ -30,6 +30,11 @@ void NetworkGameClient::resolve_signatures()
 	Logging::info("Found CNetworkGameClient::ClientSidePredict at {}", ::client_side_predict);
 }
 
+void NetworkGameClient::force_full_update()
+{
+	delta_tick = -1;
+}
+
 void NetworkGameClient::client_side_predict(PredictionStage stage)
 {
 	::client_side_predict(this, stage);
