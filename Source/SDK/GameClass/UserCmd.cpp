@@ -11,6 +11,9 @@
 #include "RetAddrSpoofer.hpp"
 
 #include <cstdint>
+#include <format>
+#include <string>
+#include <string_view>
 
 static void** usercmd_list = nullptr;
 static int (*cmdlist_index_from_entity)(BasePlayerController*) = nullptr;
@@ -23,7 +26,7 @@ void UserCmd::resolve_signatures()
 	usercmd_list
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"48 8D 05 ? ? ? ? 4C 89 C7 4C 89 85 ? ? ? ? 4C 8B 28">(),
+			SignatureScanner::PatternSignature::for_array_of_bytes<"48 8D 05 ? ? ? ? 4C 89 EF 4C 8B 30 E8">(),
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(3)
 			  .relative_to_absolute()
@@ -31,7 +34,7 @@ void UserCmd::resolve_signatures()
 	cmdlist_index_from_entity
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 89 C6 31 C0 83 FE FF 0F 95 C0 4C 89 EF 29 C6 E8 ? ? ? ? 4C 8B 85">(),
+			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 89 C6 31 C0 83 FE FF 0F 95 C0 4C 89 F7 29 C6 E8 ? ? ? ? 4C 89 EF">(),
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(1)
 			  .relative_to_absolute()
@@ -39,7 +42,7 @@ void UserCmd::resolve_signatures()
 	get_usercmds
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 4C 8B 85 ? ? ? ? 44 8B B8">(),
+			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 4C 89 EF 49 89 C6 8B 80">(),
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(1)
 			  .relative_to_absolute()
@@ -47,7 +50,7 @@ void UserCmd::resolve_signatures()
 	get_usercmd
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 4C 8B 85 ? ? ? ? 49 89 C6 48 8D 05 ? ? ? ? 4D 85 F6">(),
+			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 49 89 C7 48 8B 05 ? ? ? ? 66 0F 6E 40">(),
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(1)
 			  .relative_to_absolute()
@@ -77,7 +80,7 @@ UserCmd* UserCmd::get_current_command(BasePlayerController* controller)
 
 	void* usercmds = RetAddrSpoofer::invoke(get_usercmds, *usercmd_list, static_cast<std::uint64_t>(list_index));
 
-	const int current_usercmd_index = *reinterpret_cast<int*>(reinterpret_cast<char*>(usercmds) + 0x5c00);
+	const int current_usercmd_index = *reinterpret_cast<int*>(reinterpret_cast<char*>(usercmds) + 0x59a8);
 
 	return RetAddrSpoofer::invoke(get_usercmd, controller, current_usercmd_index);
 }
