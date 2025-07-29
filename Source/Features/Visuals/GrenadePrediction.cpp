@@ -10,6 +10,7 @@
 
 #include "../../Memory.hpp"
 
+#include "../../Utils/Logging.hpp"
 #include "../../Utils/Projection.hpp"
 
 #include "glm/ext/vector_float3.hpp"
@@ -18,6 +19,7 @@
 
 #include "imgui.h"
 
+#include "../../SDK/CUtl/Vector.hpp"
 #include "../../SDK/Entities/BaseCSGrenade.hpp"
 #include "../../SDK/Entities/BasePlayerWeapon.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
@@ -35,14 +37,11 @@ struct GrenadePredictor {
 		PADDING(4);
 	};
 	static_assert(sizeof(Element) == 0x18);
-	PADDING(0xce8);
+	PADDING(0xe90);
 	int count;
-	PADDING(4);
-	struct Element* elements;
+	PADDING(0x4);
+	Element* elements;
 };
-
-static_assert(offsetof(GrenadePredictor, count) == 0xce8);
-static_assert(offsetof(GrenadePredictor, elements) == 0xcf0);
 
 static void (*calculate_initial_state)(BasePlayerWeapon* weapon, BaseEntity* player, glm::vec3* pos, glm::vec3* rot, bool jump_throw);
 static GrenadePredictor* (*make_grenade_predictor)(float time_to_render, int grenade_type, BaseCSGrenade* grenade);
@@ -118,6 +117,11 @@ GrenadePrediction::GrenadePrediction()
 			  .add(1)
 			  .relative_to_absolute()
 			  .expect<decltype(remove_entity)>("Failed to find remove_entity");
+
+	Logging::info("calculate_initial_state: {}", calculate_initial_state);
+	Logging::info("make_grenade_predictor: {}", make_grenade_predictor);
+	Logging::info("predict_grenade: {}", predict_grenade);
+	Logging::info("remove_entity: {}", remove_entity);
 }
 
 static std::vector<glm::vec3> points;
