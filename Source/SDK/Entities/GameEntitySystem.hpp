@@ -12,12 +12,15 @@ class GameEntitySystem {
 
 	static GameEntitySystem** find();
 
+	PADDING(0x2118);
+	int highest_entity_index;
+
 public:
 	static GameEntitySystem* the();
 
 	int getHighestEntityIndex()
 	{
-		return RetAddrSpoofer::invoke(get_highest_entity_index_ptr, this);
+		return 32768; // TODO ghetto
 	}
 
 	BaseEntity* getBaseEntity(int index)
