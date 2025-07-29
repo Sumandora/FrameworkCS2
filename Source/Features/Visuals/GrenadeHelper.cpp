@@ -11,6 +11,7 @@
 #include "../../SDK/Entities/Services/CSPlayerMovementServices.hpp"
 #include "../../SDK/Entities/Services/PlayerWeaponServices.hpp"
 #include "../../SDK/GameClass/GameEvent.hpp"
+#include "../../SDK/GameClass/GameSceneNode.hpp"
 
 #include "../../Utils/Logging.hpp"
 #include "../../Utils/Projection.hpp"
@@ -83,7 +84,15 @@ void GrenadeHelper::update_viewangles(const glm::vec3& viewangles)
 
 void GrenadeHelper::update()
 {
+	// TODO Disable when disabled?
+
 	if (!Memory::local_player) {
+		clear_current_grenades();
+		return;
+	}
+
+	GameSceneNode* game_scene_node = Memory::local_player->gameSceneNode();
+	if (!game_scene_node) {
 		clear_current_grenades();
 		return;
 	}
@@ -114,7 +123,7 @@ void GrenadeHelper::update()
 
 	const GrenadeType grenade_weapon = optional_weapon.value();
 
-	const glm::vec3 origin = Memory::local_player->old_origin();
+	const glm::vec3 origin = game_scene_node->transform().m_Position;
 
 	const float render_distance = this->render_distance.get();
 
