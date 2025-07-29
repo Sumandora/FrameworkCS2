@@ -180,7 +180,7 @@ namespace Hooks::Game {
 		ShouldShowCrosshair::hook->enable();
 		FireEvent::hook->enable();
 		GetFunLoading::hook->enable();
-		// CreateMove::hook->enable();
+		CreateMove::hook->enable();
 		RadarUpdate::hook->enable();
 		RenderLegs::hook->enable();
 		AddSleeveModel::hook->enable();
