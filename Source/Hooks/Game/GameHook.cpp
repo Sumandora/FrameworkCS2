@@ -158,38 +158,22 @@ namespace Hooks::Game {
 				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 				.expect<void*>("Couldn't find OnVoteStart"),
 			reinterpret_cast<void*>(OnVoteStart::hook_func));
-
-		// There is a relative offset at the beginning of this function
-		// TODO This needs to be addressed in DetourHooking, although I don't really want to...
-
-		void* particle_draw_array
-			= BCRL::signature(
+		ParticlesDrawArray::hook.emplace(
+			Memory::emalloc,
+			BCRL::signature(
 				Memory::mem_mgr,
 				SignatureScanner::PatternSignature::for_literal_string<"CParticleObjectDesc">(),
 				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libparticles.so"))
-				  .find_xrefs(
-					  SignatureScanner::XRefTypes::relative(),
-					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libparticles.so"))
-				  .sub(3)
-				  .find_xrefs(
-					  SignatureScanner::XRefTypes::absolute(),
-					  BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libparticles.so"))
-				  .add(8)
-				  .dereference()
-				  .expect<void*>("Couldn't find CParticleObjectDesc::DrawArray");
-
-		std::byte buf[13];
-		Memory::mem_mgr.read(reinterpret_cast<std::uintptr_t>(particle_draw_array), &buf, 13);
-		std::byte buf2[7];
-		std::memcpy(buf2, &buf[1], 7);
-		std::memcpy(&buf[1], &buf[8], 5);
-		std::memcpy(&buf[6], buf2, 7);
-		*reinterpret_cast<std::int32_t*>(buf + 9) -= 5;
-		Memory::mem_mgr.write(reinterpret_cast<std::uintptr_t>(particle_draw_array), &buf, 13);
-
-		ParticlesDrawArray::hook.emplace(
-			Memory::emalloc,
-			particle_draw_array,
+				.find_xrefs(
+					SignatureScanner::XRefTypes::relative(),
+					BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libparticles.so"))
+				.sub(3)
+				.find_xrefs(
+					SignatureScanner::XRefTypes::absolute(),
+					BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libparticles.so"))
+				.add(sizeof(void*))
+				.dereference()
+				.expect<void*>("Couldn't find CParticleObjectDesc::DrawArray"),
 			reinterpret_cast<void*>(ParticlesDrawArray::hook_func));
 
 		FrameStageNotify::hook->enable();
