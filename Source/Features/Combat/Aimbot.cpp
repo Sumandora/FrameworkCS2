@@ -87,7 +87,13 @@ void Aimbot::create_move(UserCmd* cmd)
 
 	const bool predicted = Prediction::begin(cmd);
 
-	const glm::vec3 from = Interfaces::engine->get_network_client_info().local_data->eye_pos;
+	const NetworkedClientInfo network_client_info = Interfaces::engine->get_network_client_info();
+
+	if (network_client_info.local_data == nullptr)
+		// TODO
+		return;
+
+	const glm::vec3 from = network_client_info.local_data->eye_pos;
 
 	const glm::vec2 rotations{
 		cmd->csgo_usercmd.base().viewangles().x(),
@@ -147,7 +153,7 @@ void Aimbot::create_move(UserCmd* cmd)
 		if (this_fov > maximum_fov.get())
 			continue;
 
-		if(smoke_check.get() && Memory::get_smoke_density_in_line(from, to) > max_smoke_density.get())
+		if (smoke_check.get() && Memory::get_smoke_density_in_line(from, to) > max_smoke_density.get())
 			continue;
 
 		const BulletSimulation::Results results = BulletSimulation::simulate_bullet(from, to, cs_pawn);
