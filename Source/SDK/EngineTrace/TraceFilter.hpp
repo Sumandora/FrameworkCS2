@@ -17,7 +17,7 @@ struct TraceFilter {
 	std::uint16_t unk3;
 	std::uint8_t unk4;
 	std::uint8_t unk5;
-	std::uint8_t unk6;
+	std::uint8_t unk6; // removed i think, TODO
 
 	static constexpr std::uint64_t MASK1 = 0x1c300b; // Penetration mask, no clue what it means.
 

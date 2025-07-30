@@ -42,14 +42,12 @@ struct GameTrace {
 	PADDING(95);
 	glm::vec3 from;
 	glm::vec3 to;
-	PADDING(28);
+	PADDING(24);
 	float fraction;
-	PADDING(4);
-	PADDING(7);
-	bool unk; // I think this indicates if the trace hit something...
-	PADDING(1);
+	PADDING(13);
+	PADDING(6969);
 
 	static GameTrace initialized();
 };
 
-static_assert(sizeof(GameTrace) == 0xc0);
+// static_assert(sizeof(GameTrace) == 0xc0);

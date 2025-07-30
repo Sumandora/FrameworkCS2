@@ -99,6 +99,8 @@ void Memory::create()
 					 .relative_to_absolute()
 					 .expect<CSGOInput*>("Couldn't find CCSGOInput");
 
+	Logging::info("CSGOInput: {}", csgo_input);
+
 	get_fun_loading = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"#LoadingProgress_CSFunLoading%d">(), BCRL::everything(mem_mgr).thats_readable().thats_not_executable().with_name("libclient.so"))
 						  .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 						  .sub(3)

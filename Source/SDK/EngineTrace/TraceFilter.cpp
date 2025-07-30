@@ -15,9 +15,9 @@ TraceFilter::TraceFilter(std::uint64_t mask)
 	, handles{ EntityHandle<BaseEntity>::invalid(), EntityHandle<BaseEntity>::invalid() }
 	, owners{ EntityHandle<BaseEntity>::invalid(), EntityHandle<BaseEntity>::invalid() }
 	, collisions{ 0, 0 }
-	, unk3(7)
-	, unk4(4)
-	, unk5(0x49)
+	, unk3(0x30f)
+	, unk4(0x49)
+	, unk5(0)
 	, unk6(0)
 {
 }

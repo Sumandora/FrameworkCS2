@@ -11,6 +11,7 @@
 #include "../SDK/Entities/Services/PlayerWeaponServices.hpp"
 #include "../SDK/Entities/VData/CSWeaponBaseVData.hpp"
 #include "../SDK/EntityHandle.hpp"
+#include "../SDK/GameClass/MemAlloc.hpp"
 #include "../SDK/Padding.hpp"
 
 #include "../Memory.hpp"
@@ -29,10 +30,11 @@
 #include <cstdint>
 #include <cstring>
 
+#include "Logging.hpp"
+
 // Reenable for debugging
 #ifdef DEBUG_BULLET_SIMULATION
 #include "../SDK/Entities/CSPlayerController.hpp"
-#include "Logging.hpp"
 #include "magic_enum/magic_enum.hpp"
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define BULLETSIM_DBG(...) Logging::debug(__VA_ARGS__)
@@ -83,6 +85,11 @@ static glm::vec2 (*create_trace)(TraceData*, glm::vec3*, glm::vec3*, TraceFilter
 static bool (*handle_bullet_penetration)(TraceData*, WeaponData*, void*, TeamID, void*);
 static void (*get_trace)(TraceData*, GameTrace*, void*, float);
 
+static ConVar* mp_damage_scale_ct_body;
+static ConVar* mp_damage_scale_t_body;
+static ConVar* mp_damage_scale_ct_head;
+static ConVar* mp_damage_scale_t_head;
+
 void BulletSimulation::resolve_signatures()
 {
 	// TODO Find better signatures, this may be hard because all of these functions are in the penetration of FX_FireBullets
@@ -101,6 +108,16 @@ void BulletSimulation::resolve_signatures()
 		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 66 41 0F 7E C7 41 56 41 55 49 89 FD 48 89 F7">(),
 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 					.expect<decltype(get_trace)>("Couldn't find GetTrace");
+
+	mp_damage_scale_ct_body = Interfaces::engineCvar->findByName("mp_damage_scale_ct_body");
+	mp_damage_scale_t_body = Interfaces::engineCvar->findByName("mp_damage_scale_t_body");
+	mp_damage_scale_ct_head = Interfaces::engineCvar->findByName("mp_damage_scale_ct_head");
+	mp_damage_scale_t_head = Interfaces::engineCvar->findByName("mp_damage_scale_t_head");
+
+	Logging::info("Found mp_damage_scale_ct_body at {}", mp_damage_scale_ct_body);
+	Logging::info("Found mp_damage_scale_t_body at {}", mp_damage_scale_t_body);
+	Logging::info("Found mp_damage_scale_ct_head at {}", mp_damage_scale_ct_head);
+	Logging::info("Found mp_damage_scale_t_head at {}", mp_damage_scale_t_head);
 }
 
 static void scale_damage(CSPlayerPawn* entity, CSWeaponBaseVData* weapon_data, BulletSimulation::Results& results)
@@ -111,11 +128,6 @@ static void scale_damage(CSPlayerPawn* entity, CSWeaponBaseVData* weapon_data, B
 	// 		However one should question if never shooting a riot shield is a good tactical decision,
 	// 			perhaps "wasting" a shot on destroying it would be justified
 	const bool hit_shield = false; // IsHittingShield(vecDir, ptr);
-
-	static ConVar* mp_damage_scale_ct_body = Interfaces::engineCvar->findByName("mp_damage_scale_ct_body");
-	static ConVar* mp_damage_scale_t_body = Interfaces::engineCvar->findByName("mp_damage_scale_t_body");
-	static ConVar* mp_damage_scale_ct_head = Interfaces::engineCvar->findByName("mp_damage_scale_ct_head");
-	static ConVar* mp_damage_scale_t_head = Interfaces::engineCvar->findByName("mp_damage_scale_t_head");
 
 	// NOTE: Game considers non-ct to be t here. Shouldn't matter, but should be noted.
 	const bool is_ct = entity->team_id() == TeamID::TEAM_COUNTER_TERRORIST;
@@ -183,8 +195,8 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 	*reinterpret_cast<void**>(indexer + 6184) = reinterpret_cast<void*>(indexer + 0x1838);
 
 	TraceFilter filter{ 0x1c300b };
-	filter.unk3 = 15;
-	filter.unk4 = 3;
+	// filter.unk3 = 0x30f;
+	// filter.unk4 = 3;
 
 	filter.add_skip(Memory::local_player);
 
@@ -192,6 +204,8 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 
 	glm::vec3 the_from = from;
 	glm::vec3 direction = to - from;
+
+	BULLETSIM_DBG("from: {}; to: {}; dir: {}", from, to, direction);
 
 	static constexpr int MAX_PENETRATION_COUNT = 4;
 
@@ -243,7 +257,7 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 			auto* pawn = game_trace.hit_entity->entity_cast<CSPlayerPawn*>(); // TODO don't recompute
 
 			if (pawn) {
-				BULLETSIM_DBG("player_name:\n{}", pawn->original_controller().get()->sanitized_name());
+				BULLETSIM_DBG("player_name: {}", pawn->original_controller().get()->sanitized_name());
 
 				BULLETSIM_DBG("hitgroup: {}", magic_enum::enum_name(game_trace.hitbox_data->hitgroup));
 
@@ -258,10 +272,17 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 
 				scale_damage(pawn, vdata, results);
 
+				BULLETSIM_DBG("scaled damage: {}", results.scaled_damage);
+
+				// TODO Finalize properly.
+				// MemAlloc::the()->deallocate(data.other_elements());
+				// MemAlloc::the()->deallocate(data.elements());
 				return results;
 			}
 		}
 	}
 
+	// MemAlloc::the()->deallocate(data.other_elements());
+	// MemAlloc::the()->deallocate(data.elements());
 	return {};
 }
