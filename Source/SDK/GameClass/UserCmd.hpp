@@ -8,6 +8,7 @@
 #include "usercmd.pb.h" // IWYU pragma: export
 
 #include <cstdint>
+#include <string>
 
 struct BasePlayerController;
 
@@ -48,7 +49,8 @@ struct Buttons {
 
 struct UserCmd {
 private:
-	PADDING(0x10); // uh...
+	void* vtable;
+	PADDING(0x8); // uh...
 
 public:
 	// NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-classes)
@@ -57,14 +59,14 @@ public:
 	// NOLINTEND(cppcoreguidelines-non-private-member-variables-in-classes)
 
 private:
-	PADDING(0x10);
+	PADDING(0x14);
 
 public:
 	// NOLINTNEXTLINE(cppcoreguidelines-non-private-member-variables-in-classes)
 	bool has_been_predicted;
 
 private:
-	PADDING(0xF);
+	PADDING(0xB);
 
 public:
 	static void resolve_signatures();
@@ -82,6 +84,8 @@ public:
 
 	// Takes old yaw and pitch and spreads out the movement over the subtick moves
 	void spread_out_rotation_changes(float old_yaw, float old_pitch);
+
+	std::string stringify() const;
 };
 
 static_assert(sizeof(UserCmd) == 0x98);

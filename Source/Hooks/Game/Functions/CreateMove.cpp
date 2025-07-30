@@ -12,7 +12,6 @@
 
 #include "../../../Utils/CRC.hpp"
 #include "../../../Utils/EmergencyCrash.hpp"
-#include "../../../Utils/Profiler.hpp"
 
 #include "../../../SDK/Entities/CSPlayerController.hpp" // IWYU pragma: keep
 #include "../../../SDK/GameClass/UserCmd.hpp"
