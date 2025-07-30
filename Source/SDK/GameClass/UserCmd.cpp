@@ -10,6 +10,8 @@
 
 #include "RetAddrSpoofer.hpp"
 
+#include "../../Utils/Logging.hpp"
+
 #include <cstdint>
 #include <format>
 #include <string>
@@ -67,6 +69,8 @@ void UserCmd::resolve_signatures()
 				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
 			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 			  .expect<decltype(allocate_subtick_move)>("Couldn't find allocate subtick move");
+
+	Logging::info("Found allocate_subtick_move at {}", allocate_subtick_move);
 }
 
 UserCmd* UserCmd::get_current_command(BasePlayerController* controller)
@@ -126,31 +130,37 @@ void UserCmd::set_buttonstate3(std::uint64_t value)
 
 void UserCmd::fixup_buttons_for_move(float last_forwardmove, float last_leftmove, const Buttons& last_buttons)
 {
+	// TODO The 28th July update made it that the forwardmove and leftmove are only processed when buttons are pressed
+	// This caused this function to get dumbed down a bit. I think this is wrong but currently the only way of getting
+	// forwardmove and leftmove to be accepted again.
+
 	std::uint64_t buttons = this->buttons.buttonstate1;
 
 	const float forward = csgo_usercmd.base().forwardmove();
 	const float left = csgo_usercmd.base().leftmove();
 
-	if (forward > 0.0F && forward >= last_forwardmove) {
+	if (forward > 0.0F) {
 		buttons |= IN_FORWARD;
 		buttons &= ~IN_BACK;
-	} else if (forward < 0.0F && forward <= last_forwardmove) {
+	} else if (forward < 0.0F) {
 		buttons |= IN_BACK;
 		buttons &= ~IN_FORWARD;
 	} else {
 		buttons &= ~IN_FORWARD;
 		buttons &= ~IN_BACK;
+		csgo_usercmd.mutable_base()->clear_forwardmove();
 	}
 
-	if (left > 0.0F && left >= last_leftmove) {
-		buttons |= IN_MOVERIGHT;
-		buttons &= ~IN_MOVELEFT;
-	} else if (left < 0.0F && left <= last_leftmove) {
+	if (left > 0.0F) {
 		buttons |= IN_MOVELEFT;
 		buttons &= ~IN_MOVERIGHT;
+	} else if (left < 0.0F) {
+		buttons &= ~IN_MOVELEFT;
+		buttons |= IN_MOVERIGHT;
 	} else {
 		buttons &= ~IN_MOVELEFT;
 		buttons &= ~IN_MOVERIGHT;
+		csgo_usercmd.mutable_base()->clear_leftmove();
 	}
 
 	set_buttonstate1(buttons);

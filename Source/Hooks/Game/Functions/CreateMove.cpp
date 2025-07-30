@@ -23,7 +23,7 @@
 #include <optional>
 #include <vector>
 
-void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
+void* Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl)
 {
 	void* ret = RetAddrSpoofer::invoke<void*>(reinterpret_cast<void*>(hook->get_trampoline()), csgo_input, esi, dl);
 
@@ -82,7 +82,7 @@ void* Hooks::Game::CreateMove::hook_func(void* csgo_input, int esi, char dl)
 		};
 		static std::optional<LastCmd> last_cmd = std::nullopt;
 
-		if (last_cmd && last_cmd->tick < usercmd->csgo_usercmd.base().client_tick()) {
+		if (last_cmd) {
 			// TODO: This is not accurate, but I think it is still better to do this incorrectly, than not at all.
 			//		 Because these states are dependent on subticks, I think they are not verifiable by valve,
 			// 		 however I might be wrong because of subtick moves and input history vectors inside the command.
