@@ -77,7 +77,7 @@ void ESP::draw(ImDrawList* draw_list)
 {
 	if (!enabled.get())
 		return;
-	const int highest = GameEntitySystem::the()->getHighestEntityIndex();
+	const int highest = GameEntitySystem::the()->highest_entity_index();
 	if (highest > -1)
 		for (int i = 0; i <= highest; i++) {
 			BaseEntity* entity = GameEntitySystem::the()->getBaseEntity(i);

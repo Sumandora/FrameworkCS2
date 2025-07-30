@@ -12,7 +12,7 @@
 
 void GUI::Tabs::Debug::draw_entity_list()
 {
-	const int highest = GameEntitySystem::the()->getHighestEntityIndex();
+	const int highest = GameEntitySystem::the()->highest_entity_index();
 	ImGui::Text("%d entities", highest);
 	static bool only_players = false;
 	ImGui::Checkbox("Only players", &only_players);

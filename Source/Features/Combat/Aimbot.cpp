@@ -105,7 +105,7 @@ void Aimbot::create_move(UserCmd* cmd)
 
 	auto* entity_list = GameEntitySystem::the();
 
-	const int highest = entity_list->getHighestEntityIndex();
+	const int highest = entity_list->highest_entity_index();
 
 	for (int i = 0; i < highest; i++) { // TODO only players? can I limit to 64?
 		BaseEntity* ent = entity_list->getBaseEntity(i);

@@ -12,16 +12,11 @@ class GameEntitySystem {
 
 	static GameEntitySystem** find();
 
-	PADDING(0x2118);
-	int highest_entity_index;
-
 public:
 	static GameEntitySystem* the();
 
-	int getHighestEntityIndex()
-	{
-		return 32768; // TODO ghetto
-	}
+	// Better ghetto fix, TODO Read this entire thing manually at some point, externals already do this.
+	[[nodiscard]] int highest_entity_index() const { return 16384; }
 
 	BaseEntity* getBaseEntity(int index)
 	{
@@ -30,7 +25,7 @@ public:
 
 	template<typename Ent>
 	Ent* find_first_entity_of_type() {
-		const int highest = getHighestEntityIndex();
+		const int highest = highest_entity_index();
 		for (int i = 0; i < highest; i++) {
 			BaseEntity* base_entity = getBaseEntity(i);
 			if (!base_entity)

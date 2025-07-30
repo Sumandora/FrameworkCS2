@@ -79,7 +79,7 @@ void BombTimer::update()
 	// NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
 	if (!planted_c4.has_entity() || (c4 = planted_c4.get()) == nullptr) {
 		GameEntitySystem* game_entity_system = GameEntitySystem::the();
-		const int highest = game_entity_system->getHighestEntityIndex();
+		const int highest = game_entity_system->highest_entity_index();
 		for (int i = 0; i < highest; i++) {
 			BaseEntity* base_entity = game_entity_system->getBaseEntity(i);
 			if (!base_entity)
