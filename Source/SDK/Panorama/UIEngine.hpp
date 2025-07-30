@@ -18,12 +18,12 @@ private:
 		PADDING(0x8);
 	};
 	static_assert(sizeof(PanelNode) == 0x20);
-	OFFSET(int, count, 0x1c0)
-	OFFSET(PanelNode*, panels, 0x1b0);
+	OFFSET(int, count, 0x310)
+	OFFSET(PanelNode*, panels, 0x308);
 
 public:
-	VIRTUAL_METHOD(32, is_valid_panel, bool, (UIPanel * panel), (this, panel));
-	VIRTUAL_METHOD(80, run_script, void, (UIPanel * panel, const char* source_code, const char* context, int64_t unk2), (this, panel, source_code, context, unk2));
+	VIRTUAL_METHOD(33, is_valid_panel, bool, (UIPanel * panel), (this, panel));
+	VIRTUAL_METHOD(81, run_script, void, (UIPanel * panel, const char* source_code, const char* context, int64_t unk2), (this, panel, source_code, context, unk2));
 
 	// TODO actually traverse this data structure
 	template <typename F>
