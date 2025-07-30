@@ -15,6 +15,7 @@ std::int32_t SchemaSystem::findOffset(SchemaClassInfo* classInfo, const char* fi
 			return field.offset;
 		}
 	}
+	// TODO This is too suttle, I don't see it most of the time
 	Logging::error("Failed to find offset for {}", fieldName);
 	return 0;
 }
