@@ -54,30 +54,28 @@ bool Prediction::begin(UserCmd* cmd)
 
 	prediction_cmd = cmd;
 
+	::in_prediction = true;
+
 	prev_in_client_prediction = Interfaces::client_prediction->in_prediction();
 	Interfaces::client_prediction->in_prediction() = true;
-	prev_prediction_entity = Interfaces::client_prediction->prediction_entity();
-	Interfaces::client_prediction->prediction_entity() = Memory::local_player;
 
 	movement_services->set_prediction_command(cmd);
 	*(*Memory::local_player_controller)->get_current_command() = cmd;
 	network_game_client->client_side_predict(PredictionStage::CLIENT_COMMAND_TICK);
 
-	::in_prediction = true;
 	return true;
 }
 
 void Prediction::end()
 {
-	::in_prediction = false;
-
 	// Since in the header, we declared that end may not be called when begin returned false, we can assume that all the variables are non-null.
 
 	Memory::local_player->movement_services()->reset_prediction_command();
 	*(*Memory::local_player_controller)->get_current_command() = nullptr;
 
+	::in_prediction = false;
+
 	Interfaces::client_prediction->in_prediction() = prev_in_client_prediction;
-	Interfaces::client_prediction->prediction_entity() = prev_prediction_entity;
 
 	prediction_cmd->has_been_predicted = prev_has_been_predicted;
 	Memory::local_player->flags() = prev_flags;
