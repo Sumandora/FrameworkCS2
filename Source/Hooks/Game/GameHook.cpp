@@ -122,7 +122,7 @@ namespace Hooks::Game {
 				.find_xrefs(SignatureScanner::XRefTypes::relative(),
 					BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
 				// This is not the beginning of the function, but it doesn't matter.
-				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+				.prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 b8 00 00 00 00 ff ff ff ff">())
 				.expect<void*>("Couldn't find EmitSound"),
 			reinterpret_cast<void*>(EmitSound::hook_func));
 		OverrideView::hook.emplace(
@@ -185,7 +185,7 @@ namespace Hooks::Game {
 		AddSleeveModel::hook->enable();
 		DrawArrayExt::hook->enable();
 		SyncViewAngles::hook->enable();
-		// EmitSound::hook->enable();
+		EmitSound::hook->enable();
 		OverrideView::hook->enable();
 		UpdateBombRadius::hook->enable();
 		OnVoteStart::hook->enable();

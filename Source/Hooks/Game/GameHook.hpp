@@ -87,7 +87,7 @@ namespace Hooks::Game {
 
 	namespace EmitSound {
 		inline UninitializedObject<DetourHook<true>> hook;
-		std::uint64_t hook_func(void* recipient_filter, int entity_index, void* emitsound);
+		void* hook_func(void* return_value, void* recipient_filter, int entity_index, void* emitsound);
 	}
 
 	namespace OverrideView {
