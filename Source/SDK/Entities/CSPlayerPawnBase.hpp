@@ -18,7 +18,12 @@ struct CSPlayerPawnBase : public BasePlayerPawn {
 
 	SCHEMA_VAR(EntityHandle<CSPlayerController>, original_controller, "m_hOriginalController");
 
-	SCHEMA_VAR(bool, gun_game_immunity, "m_bGunGameImmunity");
+	bool gun_game_immunity() const {
+		// TODO This used to be a schema var, but seemingly removed by 28th july update
+		return false;
+	}
+
+	// SCHEMA_VAR(bool, gun_game_immunity, "m_bGunGameImmunity");
 
 	[[nodiscard]] CSPlayerWeaponServices* weapon_services() const
 	{
