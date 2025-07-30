@@ -174,3 +174,20 @@ void UserCmd::fixup_buttons_for_move(float last_forwardmove, float last_leftmove
 	// TODO add subtick for changes
 }
 
+void UserCmd::spread_out_rotation_changes(float old_yaw, float old_pitch)
+{
+	const float pitch = csgo_usercmd.base().viewangles().x();
+	const float yaw = csgo_usercmd.base().viewangles().y();
+
+	const float delta_yaw = yaw - old_yaw;
+	const float delta_pitch = pitch - old_pitch;
+
+	const float delta_yaw_per_subtick = delta_yaw / static_cast<float>(csgo_usercmd.base().subtick_moves_size());
+	const float delta_pitch_per_subtick = delta_pitch / static_cast<float>(csgo_usercmd.base().subtick_moves_size());
+
+	for (CSubtickMoveStep& move_step : *csgo_usercmd.mutable_base()->mutable_subtick_moves()) {
+		move_step.set_analog_yaw_delta(delta_yaw_per_subtick);
+		move_step.set_analog_pitch_delta(delta_pitch_per_subtick);
+	}
+}
+

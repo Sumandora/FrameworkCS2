@@ -12,6 +12,7 @@
 
 #include "../../../Utils/CRC.hpp"
 #include "../../../Utils/EmergencyCrash.hpp"
+#include "../../../Utils/Profiler.hpp"
 
 #include "../../../SDK/Entities/CSPlayerController.hpp" // IWYU pragma: keep
 #include "../../../SDK/GameClass/UserCmd.hpp"
@@ -66,6 +67,9 @@ void* Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl
 	const float forward = usercmd->csgo_usercmd.base().forwardmove();
 	const float left = usercmd->csgo_usercmd.base().leftmove();
 
+	const float pitch = usercmd->csgo_usercmd.base().viewangles().x();
+	const float yaw = usercmd->csgo_usercmd.base().viewangles().y();
+
 	bhop->create_move(usercmd);
 	auto_strafer->create_move(usercmd);
 	aimbot->create_move(usercmd);
@@ -73,16 +77,23 @@ void* Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl
 	const float new_forward = usercmd->csgo_usercmd.base().forwardmove();
 	const float new_left = usercmd->csgo_usercmd.base().leftmove();
 
-	if (forward != new_forward || left != new_left) {
-		struct LastCmd {
-			std::int32_t tick;
-			float forwardmove;
-			float leftmove;
-			Buttons buttons;
-		};
-		static std::optional<LastCmd> last_cmd = std::nullopt;
+	const float new_pitch = usercmd->csgo_usercmd.base().viewangles().x();
+	const float new_yaw = usercmd->csgo_usercmd.base().viewangles().y();
 
-		if (last_cmd) {
+	struct LastCmd {
+		std::int32_t tick;
+		float forwardmove;
+		float leftmove;
+
+		float pitch;
+		float yaw;
+
+		Buttons buttons;
+	};
+	static std::optional<LastCmd> last_cmd = std::nullopt;
+
+	if (last_cmd) {
+		if (forward != new_forward || left != new_left)
 			// TODO: This is not accurate, but I think it is still better to do this incorrectly, than not at all.
 			//		 Because these states are dependent on subticks, I think they are not verifiable by valve,
 			// 		 however I might be wrong because of subtick moves and input history vectors inside the command.
@@ -90,16 +101,24 @@ void* Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl
 			//
 			// TODO: Changed some things, is it more correct now?
 			usercmd->fixup_buttons_for_move(last_cmd->forwardmove, last_cmd->leftmove, last_cmd->buttons);
-		}
 
-		if (!usercmd->has_been_predicted)
-			last_cmd = {
-				.tick = usercmd->csgo_usercmd.base().client_tick(),
-				.forwardmove = usercmd->csgo_usercmd.base().forwardmove(),
-				.leftmove = usercmd->csgo_usercmd.base().leftmove(),
-				.buttons = usercmd->buttons,
-			};
+		if (yaw != new_yaw || pitch != new_pitch)
+			// Not sure if this is good, but I feel like it.
+			usercmd->spread_out_rotation_changes(last_cmd->yaw, last_cmd->pitch);
 	}
+
+	if (!usercmd->has_been_predicted)
+		last_cmd = {
+			.tick = usercmd->csgo_usercmd.base().client_tick(),
+			.forwardmove = usercmd->csgo_usercmd.base().forwardmove(),
+			.leftmove = usercmd->csgo_usercmd.base().leftmove(),
+			.pitch = usercmd->csgo_usercmd.base().viewangles().x(),
+			.yaw = usercmd->csgo_usercmd.base().viewangles().y(),
+			.buttons = usercmd->buttons,
+		};
+
+	// if (!usercmd->has_been_predicted)
+	// 	std::cout << usercmd->stringify() << std::endl;
 
 	// Update the CRC stored in the UserCmd to accommodate our changes.
 	if (usercmd->csgo_usercmd.has_base() && usercmd->csgo_usercmd.base().has_move_crc()) {

@@ -80,6 +80,8 @@ public:
 	// Applies button inputs according to forwardmove and leftmove
 	void fixup_buttons_for_move(float last_forwardmove, float last_leftmove, const Buttons& last_buttons);
 
+	// Takes old yaw and pitch and spreads out the movement over the subtick moves
+	void spread_out_rotation_changes(float old_yaw, float old_pitch);
 };
 
 static_assert(sizeof(UserCmd) == 0x98);
