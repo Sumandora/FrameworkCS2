@@ -27,8 +27,6 @@ struct EngineToClient {
 		execute_client_cmd(0, command, 1);
 	}
 
-	VIRTUAL_METHOD(93, get_local_player_index, int, (), (this));
-
 	NetworkedClientInfo get_network_client_info()
 	{
 		NetworkedClientInfo d;
@@ -37,7 +35,7 @@ struct EngineToClient {
 	}
 
 private:
-	VIRTUAL_METHOD(45, execute_client_cmd, void, (std::uint64_t rdi, const char* command, std::uint64_t rdx), (this, rdi, command, rdx));
+	VIRTUAL_METHOD(47, execute_client_cmd, void, (std::uint64_t rdi, const char* command, std::uint64_t rdx), (this, rdi, command, rdx));
 
-	STATIC_VIRTUAL_METHOD(178, get_network_client_info, NetworkedClientInfo*, (NetworkedClientInfo * info), (this, info));
+	STATIC_VIRTUAL_METHOD(180, get_network_client_info, NetworkedClientInfo*, (NetworkedClientInfo * info), (this, info));
 };
