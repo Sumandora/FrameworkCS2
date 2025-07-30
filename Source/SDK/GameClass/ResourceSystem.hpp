@@ -8,10 +8,8 @@
 
 class ResourceSystem {
 public:
-	VIRTUAL_METHOD(2, query_interface, void*, (const char* name), (this, name));
-
-	VIRTUAL_METHOD(47, load_resource, void*, (BufferString * string, std::uint64_t unk1), (this, string, unk1));
-	VIRTUAL_METHOD(79, delete_resource, void, (void* resource), (this, resource));
+	VIRTUAL_METHOD(45, load_resource, void*, (BufferString * string, std::uint64_t unk1), (this, string, unk1));
+	VIRTUAL_METHOD(87, delete_resource, void, (void* resource), (this, resource));
 
 	void precache(const char* resource_path)
 	{
