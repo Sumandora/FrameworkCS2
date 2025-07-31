@@ -53,7 +53,6 @@ void GUI::Tabs::About::draw_configs()
 		const std::string name = path.stem();
 		if (ImGui::BeginChild(("##" + name).c_str(), {},
 				ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysAutoResize)) {
-			// NOLINTNEXTLINE(cppcoreguidelines-avoid-do-while)
 			do {
 				std::error_code last_modified_error;
 				const std::filesystem::file_time_type last_modified = std::filesystem::last_write_time(path, last_modified_error);

@@ -78,18 +78,7 @@ void BombTimer::update()
 	const PlantedC4* c4 = nullptr;
 	// NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
 	if (!planted_c4.has_entity() || (c4 = planted_c4.get()) == nullptr) {
-		GameEntitySystem* game_entity_system = GameEntitySystem::the();
-		const int highest = game_entity_system->highest_entity_index();
-		for (int i = 0; i < highest; i++) {
-			BaseEntity* base_entity = game_entity_system->getBaseEntity(i);
-			if (!base_entity)
-				continue;
-
-			if (base_entity->getSchemaType() != PlantedC4::classInfo())
-				continue;
-
-			auto* potential_c4 = static_cast<PlantedC4*>(base_entity);
-
+		for (PlantedC4* potential_c4 : GameEntitySystem::the()->entities_of_type<PlantedC4>()) {
 			if (!is_c4_relevant(potential_c4))
 				continue;
 

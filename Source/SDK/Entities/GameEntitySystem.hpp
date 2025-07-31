@@ -2,40 +2,100 @@
 
 #include "../../Memory.hpp"
 
-#include "RetAddrSpoofer.hpp"
+#include "../Padding.hpp"
+
+#include "EntityIdentity.hpp"
 
 #include "BaseEntity.hpp"
 
-class GameEntitySystem {
-	static int (*get_highest_entity_index_ptr)(GameEntitySystem* thisptr);
-	static BaseEntity* (*get_base_entity_ptr)(GameEntitySystem* thisptr, int index);
+#include <concepts>
+#include <type_traits>
 
-	static GameEntitySystem** find();
-
-public:
-	static GameEntitySystem* the();
-
-	// Better ghetto fix, TODO Read this entire thing manually at some point, externals already do this.
-	[[nodiscard]] int highest_entity_index() const { return 16384; }
-
-	BaseEntity* getBaseEntity(int index)
+template <typename T>
+	requires std::is_base_of_v<BaseEntity, T>
+struct EntityRange {
+	EntityIdentity* first;
+	explicit EntityRange(EntityIdentity* first)
+		: first(first)
 	{
-		return RetAddrSpoofer::invoke(get_base_entity_ptr, this, index);
 	}
 
-	template<typename Ent>
-	Ent* find_first_entity_of_type() {
-		const int highest = highest_entity_index();
-		for (int i = 0; i < highest; i++) {
-			BaseEntity* base_entity = getBaseEntity(i);
-			if (!base_entity)
-				continue;
-
-			if (base_entity->getSchemaType() != Ent::classInfo())
-				continue;
-
-			return static_cast<Ent*>(base_entity);
+	class EntityIterator {
+		bool valid(EntityIdentity* identity)
+		{
+			return identity->instance
+				&& (std::same_as<BaseEntity, T>
+					|| static_cast<BaseEntity*>(identity->instance)->getSchemaType() == T::classInfo());
 		}
-		return nullptr;
+
+		EntityIdentity* curr;
+
+	public:
+		explicit EntityIterator(EntityIdentity* first)
+			: curr(first)
+		{
+			while (curr && !valid(curr)) {
+				curr = curr->next();
+			}
+		}
+
+		T* operator*()
+		{
+			return curr ? static_cast<T*>(curr->instance) : nullptr;
+		}
+
+		EntityIterator& operator++()
+		{
+			while (true) {
+				curr = curr->next();
+
+				if (!curr)
+					break;
+
+				if (!valid(curr))
+					continue;
+
+				break;
+			}
+
+			return *this;
+		}
+
+		bool operator==(const EntityIterator& other) const
+		{
+			return curr == other.curr;
+		}
+	};
+
+	EntityIterator begin()
+	{
+		return EntityIterator{ first };
+	}
+
+	EntityIterator end()
+	{
+		return EntityIterator{ nullptr };
+	}
+};
+
+class GameEntitySystem {
+public:
+	static void resolve_signatures();
+	static GameEntitySystem* the();
+
+	BaseEntity* get_entity_by_index(int index);
+
+	// shoutout cl_showents
+	OFFSET(EntityIdentity*, first_networked_entity, 0x210);
+
+	EntityRange<BaseEntity> entities()
+	{
+		return EntityRange<BaseEntity>{ first_networked_entity() };
+	}
+
+	template <typename T>
+	EntityRange<T> entities_of_type()
+	{
+		return EntityRange<T>{ first_networked_entity() };
 	}
 };

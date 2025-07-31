@@ -82,7 +82,7 @@ void VoteRevealer::on_vote_start(NetMessagePB<CCSUsrMsg_VoteStart>* net_message)
 
 	std::string localized = Interfaces::localize->translate(other_team);
 
-	auto* from_controller = static_cast<CSPlayerController*>(GameEntitySystem::the()->getBaseEntity(net_message->pb.player_slot() + 1));
+	auto* from_controller = static_cast<CSPlayerController*>(GameEntitySystem::the()->get_entity_by_index(net_message->pb.player_slot() + 1));
 
 	std::erase_if(localized, [](char c) {
 		return !isprint(c);
@@ -93,7 +93,7 @@ void VoteRevealer::on_vote_start(NetMessagePB<CCSUsrMsg_VoteStart>* net_message)
 
 	const std::size_t pos = localized.find(PLAYER_NAME_REPLACE);
 	if (pos != std::string::npos) {
-		auto* to_controller = static_cast<CSPlayerController*>(GameEntitySystem::the()->getBaseEntity(net_message->pb.player_slot_target() + 1));
+		auto* to_controller = static_cast<CSPlayerController*>(GameEntitySystem::the()->get_entity_by_index(net_message->pb.player_slot_target() + 1));
 
 		std::string player_name = to_controller ? to_controller->get_decorated_player_name() : details;
 		html_escape(player_name);
@@ -120,7 +120,7 @@ void VoteRevealer::event_handler(GameEvent* event)
 	if (std::string_view{ event->GetName() } != "vote_cast")
 		return;
 
-	auto* controller = static_cast<CSPlayerController*>(GameEntitySystem::the()->getBaseEntity(event->get_userid("userid", -2) + 1));
+	auto* controller = static_cast<CSPlayerController*>(GameEntitySystem::the()->get_entity_by_index(event->get_userid("userid", -2) + 1));
 	if (!controller)
 		return;
 

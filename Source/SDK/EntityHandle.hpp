@@ -29,7 +29,7 @@ public:
 		if (!has_entity())
 			return nullptr;
 
-		return static_cast<Ent*>(GameEntitySystem::the()->getBaseEntity(index & ENTITY_LIST_INDEX_MASK));
+		return static_cast<Ent*>(GameEntitySystem::the()->get_entity_by_index(index & ENTITY_LIST_INDEX_MASK));
 	}
 
 	[[nodiscard]] int get_index() const

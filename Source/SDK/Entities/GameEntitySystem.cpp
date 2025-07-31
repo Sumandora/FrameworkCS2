@@ -5,16 +5,18 @@
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
-
 #include "SignatureScanner/PatternSignature.hpp"
-#include "SignatureScanner/XRefSignature.hpp"
 
-int (*GameEntitySystem::get_highest_entity_index_ptr)(GameEntitySystem* thisptr) = nullptr;
-BaseEntity* (*GameEntitySystem::get_base_entity_ptr)(GameEntitySystem* thisptr, int index) = nullptr;
+#include "RetAddrSpoofer.hpp"
 
-GameEntitySystem** GameEntitySystem::find()
+#include "BaseEntity.hpp"
+
+static GameEntitySystem** game_entity_system;
+static BaseEntity* (*get_entity_by_index)(GameEntitySystem* thisptr, int index) = nullptr;
+
+void GameEntitySystem::resolve_signatures()
 {
-	auto** game_entity_system
+	game_entity_system
 		= BCRL::signature(
 			Memory::mem_mgr,
 			SignatureScanner::PatternSignature::for_array_of_bytes<"48 8D 05 ? ? ? ? 55 83 C6 01">(),
@@ -22,19 +24,24 @@ GameEntitySystem** GameEntitySystem::find()
 			  .add(3)
 			  .relative_to_absolute()
 			  .expect<GameEntitySystem**>("Couldn't find GameEntitySystem");
-	get_base_entity_ptr
+	Logging::info("Found GameEntitySystem at: {}", game_entity_system);
+
+	::get_entity_by_index
 		= BCRL::signature(
 			Memory::mem_mgr,
 			SignatureScanner::PatternSignature::for_array_of_bytes<"31 C0 81 FE FE 7F 00 00 77 ? 89 F0">(),
 			BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
-			  .expect<decltype(get_base_entity_ptr)>("Couldn't find getBaseEntity");
-	Logging::info("Found getBaseEntity at: {}", get_base_entity_ptr);
-
-	return game_entity_system;
+			  .expect<decltype(::get_entity_by_index)>("Couldn't find getBaseEntity");
+	Logging::info("Found get_entity_by_index at: {}", ::get_entity_by_index);
 }
 
 GameEntitySystem* GameEntitySystem::the()
 {
-	static GameEntitySystem** game_entity_system = find();
 	return *game_entity_system;
+}
+
+BaseEntity* GameEntitySystem::get_entity_by_index(int index)
+{
+	// TODO rebuild
+	return RetAddrSpoofer::invoke(::get_entity_by_index, this, index);
 }

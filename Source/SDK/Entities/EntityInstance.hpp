@@ -2,7 +2,7 @@
 
 #include "../Schema/FieldOffset.hpp"
 
-#include "EntityIdentity.hpp"
+struct EntityIdentity;
 
 struct EntityInstance {
 	CLASS_INFO("libclient.so", "CEntityInstance");

@@ -5,8 +5,6 @@
 #include "../../Interfaces.hpp"
 #include "../../Memory.hpp"
 
-#include "../../SDK/EngineTrace/GameTrace.hpp"
-#include "../../SDK/EngineTrace/TraceFilter.hpp"
 #include "../../SDK/Entities/BasePlayerWeapon.hpp"
 #include "../../SDK/Entities/Components/BodyComponent.hpp"
 #include "../../SDK/Entities/Components/BodyComponentSkeletonInstance.hpp"
@@ -20,7 +18,6 @@
 #include "../../SDK/GameClass/UserCmd.hpp"
 
 #include "../../Utils/BulletSimulation.hpp"
-#include "../../Utils/Logging.hpp"
 #include "../../Utils/Prediction.hpp"
 
 #include "glm/common.hpp"
@@ -103,26 +100,14 @@ void Aimbot::create_move(UserCmd* cmd)
 	glm::vec2 rots;
 	float fov = FLT_MAX;
 
-	auto* entity_list = GameEntitySystem::the();
-
-	const int highest = entity_list->highest_entity_index();
-
-	for (int i = 0; i < highest; i++) { // TODO only players? can I limit to 64?
-		BaseEntity* ent = entity_list->getBaseEntity(i);
-		if (!ent)
-			continue;
-
-		auto* cs_pawn = ent->entity_cast<CSPlayerPawn*>();
-		if (!cs_pawn)
-			continue;
-
+	for (CSPlayerPawn* cs_pawn : GameEntitySystem::the()->entities_of_type<CSPlayerPawn>()) { // TODO only players? can I limit to 64?
 		if (cs_pawn->health() <= 0 || cs_pawn->life_state() != LIFE_ALIVE)
 			continue;
 
 		if (cs_pawn->team_id() == Memory::local_player->team_id())
 			continue;
 
-		BodyComponent* body_component = ent->body_component();
+		BodyComponent* body_component = cs_pawn->body_component();
 		if (!body_component)
 			continue;
 

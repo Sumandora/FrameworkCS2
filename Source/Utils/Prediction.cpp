@@ -18,7 +18,6 @@ static std::uint32_t prev_flags{};
 static std::uint32_t prev_tick_base{};
 static bool prev_has_been_predicted{};
 static bool prev_in_client_prediction{};
-static BaseEntity* prev_prediction_entity{};
 
 static UserCmd* prediction_cmd{};
 

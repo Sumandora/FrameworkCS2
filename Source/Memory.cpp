@@ -39,7 +39,7 @@ void Memory::create()
 	Projection::resolve_signatures();
 
 	// Make classes run their searches
-	GameEntitySystem::the();
+	GameEntitySystem::resolve_signatures();
 
 	shouldShowCrosshair = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_literal_string<"weapon_reticle_knife_show">(), BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
 							  .find_xrefs(SignatureScanner::XRefTypes::relative(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))

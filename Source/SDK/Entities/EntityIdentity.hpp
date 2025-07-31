@@ -7,13 +7,21 @@
 #include <cstddef>
 #include <cstdint>
 
+struct EntityInstance;
+
 struct EntityIdentity {
 	CLASS_INFO("libclient.so", "CEntityIdentity");
 
-	PADDING(0x10);
+	EntityInstance* instance;
+	PADDING(0x8);
 	std::uint32_t entry_index;
 
 	SCHEMA_VAR(std::uint32_t, flags, "m_flags");
+
+	SCHEMA_VAR(EntityIdentity*, prev, "m_pPrev");
+	SCHEMA_VAR(EntityIdentity*, next, "m_pNext");
+	SCHEMA_VAR(EntityIdentity*, prev_by_class, "m_pPrevByClass");
+	SCHEMA_VAR(EntityIdentity*, next_by_class, "m_pNextByClass");
 };
 
 static_assert(offsetof(EntityIdentity, entry_index) == 0x10);

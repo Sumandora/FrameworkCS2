@@ -42,7 +42,8 @@ Checks: [
   '-readability-magic-numbers',
   '-readability-math-missing-parentheses',
   '-readability-named-parameter',
-  '-*-special-member-functions']
+  '-*-special-member-functions',
+  '-cppcoreguidelines-avoid-do-while']
 
 CheckOptions:
   # classes
