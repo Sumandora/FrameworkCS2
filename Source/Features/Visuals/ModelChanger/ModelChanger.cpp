@@ -44,7 +44,7 @@ ModelChanger::ModelChanger()
 			  .add(8)
 			  .relative_to_absolute()
 			  .filter(BCRL::everything(Memory::mem_mgr).with_flags("r-x"))
-			  .expect<decltype(set_model)>("Couldn't find set model function");
+			  .BCRL_EXPECT(decltype(set_model), set_model);
 }
 
 void ModelChanger::update_model()

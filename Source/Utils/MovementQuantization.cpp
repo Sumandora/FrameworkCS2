@@ -6,9 +6,9 @@
 
 #include "../Interfaces.hpp"
 
-#include "glm/trigonometric.hpp"
+#include "../Memory.hpp"
 
-#include "Logging.hpp"
+#include "glm/trigonometric.hpp"
 
 #include <cmath>
 
@@ -17,7 +17,7 @@ static ConVar* sv_quantize_movement_input = nullptr;
 void MovementQuantization::init()
 {
 	sv_quantize_movement_input = Interfaces::engineCvar->findByName("sv_quantize_movement_input");
-	Logging::info("sv_quantize_movement_input: {}", sv_quantize_movement_input);
+	MEM_ACCEPT(sv_quantize_movement_input);
 }
 
 bool MovementQuantization::is_movement_quantized()

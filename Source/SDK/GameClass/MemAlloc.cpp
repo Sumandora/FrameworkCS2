@@ -1,23 +1,21 @@
 #include "MemAlloc.hpp"
 
-#include "../../Utils/Logging.hpp"
+#include "../../Memory.hpp"
 
 #include "../../Libraries.hpp"
 
 #include <dlfcn.h>
 
+static MemAlloc** global_allocator = nullptr;
+
+void MemAlloc::resolve_signatures()
+{
+	global_allocator = Libraries::tier0->get_symbol<MemAlloc**>("g_pMemAlloc");
+
+	MEM_ACCEPT(global_allocator);
+}
+
 MemAlloc* MemAlloc::the()
 {
-	static MemAlloc** global_allocator = [] {
-		auto** global_allocator = Libraries::tier0->get_symbol<MemAlloc**>("g_pMemAlloc");
-
-		if (global_allocator)
-			Logging::info("Found global allocator at {} => {}", global_allocator, *global_allocator);
-		else
-			Logging::error("Couldn't find global allocator!");
-
-		return global_allocator;
-	}();
-
 	return *global_allocator;
 }

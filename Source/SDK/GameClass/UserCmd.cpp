@@ -32,7 +32,7 @@ void UserCmd::resolve_signatures()
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(3)
 			  .relative_to_absolute()
-			  .expect<decltype(usercmd_list)>("Couldn't find UserCmd list");
+			  .BCRL_EXPECT(decltype(usercmd_list), usercmd_list);
 	cmdlist_index_from_entity
 		= BCRL::signature(
 			Memory::mem_mgr,
@@ -40,7 +40,7 @@ void UserCmd::resolve_signatures()
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<decltype(cmdlist_index_from_entity)>("Couldn't find cmdlist_index_from_entity");
+			  .BCRL_EXPECT(decltype(cmdlist_index_from_entity), cmdlist_index_from_entity);
 	get_usercmds
 		= BCRL::signature(
 			Memory::mem_mgr,
@@ -48,7 +48,7 @@ void UserCmd::resolve_signatures()
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<decltype(get_usercmds)>("Couldn't find get_usercmds");
+			  .BCRL_EXPECT(decltype(get_usercmds), get_usercmds);
 	get_usercmd
 		= BCRL::signature(
 			Memory::mem_mgr,
@@ -56,7 +56,7 @@ void UserCmd::resolve_signatures()
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<decltype(get_usercmd)>("Couldn't find get_usercmd");
+			  .BCRL_EXPECT(decltype(get_usercmd), get_usercmd);
 	allocate_subtick_move
 		= BCRL::signature(
 			Memory::mem_mgr,
@@ -68,9 +68,7 @@ void UserCmd::resolve_signatures()
 			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
 				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
 			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
-			  .expect<decltype(allocate_subtick_move)>("Couldn't find allocate subtick move");
-
-	Logging::info("Found allocate_subtick_move at {}", allocate_subtick_move);
+			  .BCRL_EXPECT(decltype(allocate_subtick_move), allocate_subtick_move);
 }
 
 UserCmd* UserCmd::get_current_command(BasePlayerController* controller)

@@ -1,8 +1,8 @@
 #include "BufferString.hpp"
 
-#include "../../Utils/Logging.hpp"
-
 #include "../../Libraries.hpp"
+
+#include "../../Memory.hpp"
 
 #include <dlfcn.h>
 #include <link.h>
@@ -29,12 +29,7 @@ void BufferString::purge(int unk1)
 {
 	static auto fptr = [] {
 		auto* symbol = Libraries::tier0->get_symbol<void (*)(BufferString*, int)>("_ZN13CBufferString5PurgeEi");
-
-		if (symbol)
-			Logging::info("Found CBufferString::Purge at {}", reinterpret_cast<void*>(symbol));
-		else
-			Logging::error("Couldn't find CBufferString::Purge!");
-
+		Memory::accept("CBufferString::Purge", symbol);
 		return symbol;
 	}();
 
@@ -45,12 +40,7 @@ void BufferString::insert(int unk1, const char* str, int unk2, bool unk3)
 {
 	static auto fptr = [] {
 		auto* symbol = Libraries::tier0->get_symbol<void (*)(BufferString*, int, const char*, int, bool)>("_ZN13CBufferString6InsertEiPKcib");
-
-		if (symbol)
-			Logging::info("Found CBufferString::Insert at {}", reinterpret_cast<void*>(symbol));
-		else
-			Logging::error("Couldn't find CBufferString::Insert!");
-
+		Memory::accept("CBufferString::Insert", symbol);
 		return symbol;
 	}();
 

@@ -36,9 +36,7 @@ void CSPlayerController::resolve_signatures()
 			Memory::mem_mgr,
 			SignatureScanner::PatternSignature::for_array_of_bytes<"55 89 C8 48 89 E5 41 57 83 E0 20">(),
 			BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
-			  .expect<decltype(::get_decorated_player_name)>("Couldn't find GetDecoratedPlayerName");
-
-	Logging::info("Found GetDecoratedPlayerName at {}", ::get_decorated_player_name);
+			  .BCRL_EXPECT(decltype(::get_decorated_player_name), ::get_decorated_player_name);
 }
 
 std::string CSPlayerController::get_decorated_player_name() const

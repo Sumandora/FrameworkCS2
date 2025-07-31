@@ -36,5 +36,6 @@ struct CSPlayerPawn : public CSPlayerPawnBase {
 	[[nodiscard]] bool can_perform_primary_attack() const;
 	[[nodiscard]] bool can_perform_secondary_attack() const;
 
+	static void resolve_signatures();
 	[[nodiscard]] glm::vec2 get_aim_punch(float fraction = 0.0F);
 };

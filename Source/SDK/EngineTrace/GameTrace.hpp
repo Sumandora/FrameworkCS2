@@ -47,6 +47,7 @@ struct GameTrace {
 	PADDING(13);
 	PADDING(6969);
 
+	static void resolve_signatures();
 	static GameTrace initialized();
 };
 

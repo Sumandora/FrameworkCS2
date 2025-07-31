@@ -7,8 +7,6 @@
 
 #include "../../Memory.hpp"
 
-#include "../../Utils/Logging.hpp"
-
 static void (*client_side_predict)(NetworkGameClient*, PredictionStage) = nullptr;
 
 void NetworkGameClient::resolve_signatures()
@@ -25,9 +23,7 @@ void NetworkGameClient::resolve_signatures()
 			  //   return;
 			  // }
 			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
-			  .expect<decltype(::client_side_predict)>("Couldn't find NetworkGameClient::ClientSidePredict");
-
-	Logging::info("Found CNetworkGameClient::ClientSidePredict at {}", ::client_side_predict);
+			  .BCRL_EXPECT(decltype(::client_side_predict), ::client_side_predict);
 }
 
 void NetworkGameClient::force_full_update()

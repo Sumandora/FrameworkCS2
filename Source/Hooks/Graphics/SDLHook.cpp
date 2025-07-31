@@ -88,7 +88,7 @@ bool GraphicsHook::hookSDL()
 			Memory::mem_mgr,
 			SignatureScanner::PatternSignature::for_array_of_bytes<"41 54 55 48 89 FD 48 83 EC 08 48 83 7F ? 00">(),
 			BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libSDL3.so.0"))
-			  .expect<void*>("Failed to find backend function pointer for SDL_PeepEvents");
+			  .BCRL_EXPECT(void*, peep_events_internal_ptr);
 
 	hook.emplace(Memory::emalloc, peep_events_internal_ptr, reinterpret_cast<void*>(peep_events_hook));
 

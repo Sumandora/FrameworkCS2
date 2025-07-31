@@ -36,9 +36,7 @@ void Projection::resolve_signatures()
 			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"4c 8d 3d">())
 			  .add(3)
 			  .relative_to_absolute()
-			  .expect<ViewRender*>("Couldn't find ViewRender structure");
-
-	Logging::info("Found ViewRender at: {}", view_render);
+			  .BCRL_EXPECT(ViewRender*, view_render);
 
 	//  CRenderGameSystem::GetMatricesForView
 	//            (_g_pRenderGameSystem,(CViewSetup *)(CFrustum *)(this + 0x10),(VMatrix *)&g_WorldToView,
@@ -49,9 +47,7 @@ void Projection::resolve_signatures()
 			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"4c 8d 05">())
 			  .add(3)
 			  .relative_to_absolute()
-			  .expect<glm::mat4x4*>("Couldn't find WorldToProjection matrix");
-
-	Logging::info("Found WorldToProjection matrix at: {}", world_to_projection_matrix);
+			  .BCRL_EXPECT(glm::mat4x4*, world_to_projection_matrix);
 }
 
 bool Projection::project(const glm::vec3& world, ImVec2& screen)

@@ -41,13 +41,13 @@ void CRC::resolve_signatures()
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<decltype(create_new_base_cmd)>("Couldn't find create_new_base_cmd");
+			  .BCRL_EXPECT(decltype(create_new_base_cmd), create_new_base_cmd);
 	set_message_data
 		= BCRL::signature(
 			Memory::mem_mgr,
 			SignatureScanner::PatternSignature::for_array_of_bytes<"41 56 41 55 41 54 55 48 89 FD 53 48 83 EC 10 F6 07 03">(),
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .expect<decltype(set_message_data)>("Couldn't find set_message_data");
+			  .BCRL_EXPECT(decltype(set_message_data), set_message_data);
 }
 
 bool CRC::update_crc(UserCmd* usercmd)

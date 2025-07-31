@@ -6,6 +6,7 @@
 
 class MemAlloc {
 public:
+	static void resolve_signatures();
 	static MemAlloc* the();
 	
 	VIRTUAL_METHOD(2, allocate, void*, (std::size_t len), (this, len));

@@ -95,6 +95,7 @@ namespace Hooks::Game {
 		void hook_func(ViewRender* thisptr, ViewSetup* view_setup);
 	}
 
+	// TODO now that the entity list can actually find mapinfo, this is no longer needed
 	namespace UpdateBombRadius {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(MapInfo* thisptr, const char* key, const char* value);

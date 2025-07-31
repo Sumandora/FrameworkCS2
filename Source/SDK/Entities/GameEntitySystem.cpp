@@ -1,7 +1,6 @@
 #include "GameEntitySystem.hpp"
 
 #include "../../Memory.hpp"
-#include "../../Utils/Logging.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
@@ -11,7 +10,7 @@
 
 #include "BaseEntity.hpp"
 
-static GameEntitySystem** game_entity_system;
+static GameEntitySystem** game_entity_system = nullptr;
 static BaseEntity* (*get_entity_by_index)(GameEntitySystem* thisptr, int index) = nullptr;
 
 void GameEntitySystem::resolve_signatures()
@@ -23,16 +22,14 @@ void GameEntitySystem::resolve_signatures()
 			BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
 			  .add(3)
 			  .relative_to_absolute()
-			  .expect<GameEntitySystem**>("Couldn't find GameEntitySystem");
-	Logging::info("Found GameEntitySystem at: {}", game_entity_system);
+			  .BCRL_EXPECT(GameEntitySystem**, game_entity_system);
 
 	::get_entity_by_index
 		= BCRL::signature(
 			Memory::mem_mgr,
 			SignatureScanner::PatternSignature::for_array_of_bytes<"31 C0 81 FE FE 7F 00 00 77 ? 89 F0">(),
 			BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
-			  .expect<decltype(::get_entity_by_index)>("Couldn't find getBaseEntity");
-	Logging::info("Found get_entity_by_index at: {}", ::get_entity_by_index);
+			  .BCRL_EXPECT(decltype(::get_entity_by_index), ::get_entity_by_index);
 }
 
 GameEntitySystem* GameEntitySystem::the()

@@ -50,13 +50,13 @@ Chams::Chams()
 			  .finalize<EnginePVSManager*>()
 			  .value_or(nullptr);
 
+	MEM_ACCEPT(engine_pvs_manager);
+
 	if (!engine_pvs_manager) {
 		Logging::error("Couldn't find EnginePVSManager. Chams will not be able to disable it.");
 
 		disable_pvs.add_visible_condition([] { return false; });
 		pvs_help.add_visible_condition([] { return false; });
-	} else {
-		Logging::info("Found EnginePVSManager at {}", engine_pvs_manager);
 	}
 }
 

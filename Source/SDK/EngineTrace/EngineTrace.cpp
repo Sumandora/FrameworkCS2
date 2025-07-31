@@ -10,8 +10,8 @@
 
 #include "../../Memory.hpp"
 
-static EngineTrace** engine_trace;
-static bool (*trace_shape)(EngineTrace* thisptr, Ray* ray, const glm::vec3* from, const glm::vec3* to, TraceFilter* filter, GameTrace* trace);
+static EngineTrace** engine_trace = nullptr;
+static bool (*trace_shape)(EngineTrace* thisptr, Ray* ray, const glm::vec3* from, const glm::vec3* to, TraceFilter* filter, GameTrace* trace) = nullptr;
 
 void EngineTrace::resolve_signatures()
 {
@@ -22,7 +22,7 @@ void EngineTrace::resolve_signatures()
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(3)
 			  .relative_to_absolute()
-			  .expect<EngineTrace**>("Couldn't find engine trace");
+			  .BCRL_EXPECT(EngineTrace**, engine_trace);
 
 	::trace_shape
 		= BCRL::signature(
@@ -31,13 +31,11 @@ void EngineTrace::resolve_signatures()
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<decltype(::trace_shape)>("Couldn't find trace shape");
+			  .BCRL_EXPECT(decltype(::trace_shape), ::trace_shape);
 }
 
 EngineTrace* EngineTrace::the()
 {
-	if (!engine_trace)
-		return nullptr;
 	return *engine_trace;
 }
 

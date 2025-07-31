@@ -77,7 +77,7 @@ GrenadePrediction::GrenadePrediction()
 			  .next_instruction()
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<decltype(calculate_initial_state)>("Failed to find calculate_initial_state");
+			  .BCRL_EXPECT(decltype(calculate_initial_state), calculate_initial_state);
 	make_grenade_predictor
 		= convar_callback
 			  .clone()
@@ -90,7 +90,7 @@ GrenadePrediction::GrenadePrediction()
 			  })
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<decltype(make_grenade_predictor)>("Failed to find make_grenade_predictor");
+			  .BCRL_EXPECT(decltype(make_grenade_predictor), make_grenade_predictor);
 	predict_grenade
 		= convar_callback
 			  .clone()
@@ -103,7 +103,7 @@ GrenadePrediction::GrenadePrediction()
 			  })
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<decltype(predict_grenade)>("Failed to find predict_grenade");
+			  .BCRL_EXPECT(decltype(predict_grenade), predict_grenade);
 	remove_entity
 		= convar_callback
 			  .clone()
@@ -116,12 +116,7 @@ GrenadePrediction::GrenadePrediction()
 			  })
 			  .add(1)
 			  .relative_to_absolute()
-			  .expect<decltype(remove_entity)>("Failed to find remove_entity");
-
-	Logging::info("calculate_initial_state: {}", calculate_initial_state);
-	Logging::info("make_grenade_predictor: {}", make_grenade_predictor);
-	Logging::info("predict_grenade: {}", predict_grenade);
-	Logging::info("remove_entity: {}", remove_entity);
+			  .BCRL_EXPECT(decltype(remove_entity), remove_entity);
 }
 
 static std::vector<glm::vec3> points;

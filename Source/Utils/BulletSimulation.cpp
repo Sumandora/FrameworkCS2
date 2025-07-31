@@ -11,7 +11,6 @@
 #include "../SDK/Entities/Services/PlayerWeaponServices.hpp"
 #include "../SDK/Entities/VData/CSWeaponBaseVData.hpp"
 #include "../SDK/EntityHandle.hpp"
-#include "../SDK/GameClass/MemAlloc.hpp"
 #include "../SDK/Padding.hpp"
 
 #include "../Memory.hpp"
@@ -29,8 +28,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-
-#include "Logging.hpp"
 
 // Reenable for debugging
 #ifdef DEBUG_BULLET_SIMULATION
@@ -81,14 +78,14 @@ struct WeaponData {
 
 // The following names are the ones that the Windows community seems to have agreed upon,
 // I don't fully agree with them, but in the spirit of comparability I will use them as well.
-static glm::vec2 (*create_trace)(TraceData*, glm::vec3*, glm::vec3*, TraceFilter*, int); // Interesting, but non-essential return type.
-static bool (*handle_bullet_penetration)(TraceData*, WeaponData*, void*, TeamID, void*);
-static void (*get_trace)(TraceData*, GameTrace*, void*, float);
+static glm::vec2 (*create_trace)(TraceData*, glm::vec3*, glm::vec3*, TraceFilter*, int) = nullptr; // Interesting, but non-essential return type.
+static bool (*handle_bullet_penetration)(TraceData*, WeaponData*, void*, TeamID, void*) = nullptr;
+static void (*get_trace)(TraceData*, GameTrace*, void*, float) = nullptr;
 
-static ConVar* mp_damage_scale_ct_body;
-static ConVar* mp_damage_scale_t_body;
-static ConVar* mp_damage_scale_ct_head;
-static ConVar* mp_damage_scale_t_head;
+static ConVar* mp_damage_scale_ct_body = nullptr;
+static ConVar* mp_damage_scale_t_body = nullptr;
+static ConVar* mp_damage_scale_ct_head = nullptr;
+static ConVar* mp_damage_scale_t_head = nullptr;
 
 void BulletSimulation::resolve_signatures()
 {
@@ -97,27 +94,26 @@ void BulletSimulation::resolve_signatures()
 		Memory::mem_mgr,
 		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 49 89 CF 41 56 49 89 F6 41 55 41 54">(),
 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-					   .expect<decltype(create_trace)>("Couldn't find CreateTrace");
+					   .BCRL_EXPECT(decltype(create_trace), create_trace);
 	handle_bullet_penetration = BCRL::signature(
 		Memory::mem_mgr,
 		SignatureScanner::PatternSignature::for_array_of_bytes<"55 66 0F EF D2 48 89 E5 41 57 41 56 41 55 49 89 F5">(),
 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-									.expect<decltype(handle_bullet_penetration)>("Couldn't find HandleBulletPenetration");
+									.BCRL_EXPECT(decltype(handle_bullet_penetration), handle_bullet_penetration);
 	get_trace = BCRL::signature(
 		Memory::mem_mgr,
 		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 66 41 0F 7E C7 41 56 41 55 49 89 FD 48 89 F7">(),
 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-					.expect<decltype(get_trace)>("Couldn't find GetTrace");
+					.BCRL_EXPECT(decltype(get_trace), get_trace);
 
 	mp_damage_scale_ct_body = Interfaces::engineCvar->findByName("mp_damage_scale_ct_body");
+	MEM_ACCEPT(mp_damage_scale_ct_body);
 	mp_damage_scale_t_body = Interfaces::engineCvar->findByName("mp_damage_scale_t_body");
+	MEM_ACCEPT(mp_damage_scale_t_body);
 	mp_damage_scale_ct_head = Interfaces::engineCvar->findByName("mp_damage_scale_ct_head");
+	MEM_ACCEPT(mp_damage_scale_ct_head);
 	mp_damage_scale_t_head = Interfaces::engineCvar->findByName("mp_damage_scale_t_head");
-
-	Logging::info("Found mp_damage_scale_ct_body at {}", mp_damage_scale_ct_body);
-	Logging::info("Found mp_damage_scale_t_body at {}", mp_damage_scale_t_body);
-	Logging::info("Found mp_damage_scale_ct_head at {}", mp_damage_scale_ct_head);
-	Logging::info("Found mp_damage_scale_t_head at {}", mp_damage_scale_t_head);
+	MEM_ACCEPT(mp_damage_scale_t_head);
 }
 
 static void scale_damage(CSPlayerPawn* entity, CSWeaponBaseVData* weapon_data, BulletSimulation::Results& results)
