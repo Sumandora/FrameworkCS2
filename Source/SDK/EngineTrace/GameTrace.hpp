@@ -45,10 +45,9 @@ struct GameTrace {
 	PADDING(24);
 	float fraction;
 	PADDING(13);
-	PADDING(6969);
 
 	static void resolve_signatures();
 	static GameTrace initialized();
 };
 
-// static_assert(sizeof(GameTrace) == 0xc0);
+static_assert(sizeof(GameTrace) >= 0xb9); // TODO weird alignment?
