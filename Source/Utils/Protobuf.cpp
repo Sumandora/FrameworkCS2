@@ -30,6 +30,8 @@ void Protobuf::verify_version()
 		std::uint32_t version_in_game = *version.value();
 		if (version_in_game != PROTOBUF_VERSION)
 			Logging::error("Protobuf version mismatch. Expected {} but got {}", PROTOBUF_VERSION, version_in_game);
+		else
+			Logging::debug("Protobuf version: {}", version_in_game);
 	} else
 		Logging::error("Failed to verify protobuf version");
 }
