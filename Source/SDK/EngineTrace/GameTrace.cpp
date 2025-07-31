@@ -8,6 +8,7 @@
 #include "RetAddrSpoofer.hpp"
 
 #include "../../Memory.hpp"
+#include "SignatureScanner/XRefSignature.hpp"
 
 static void (*init_game_trace)(GameTrace*) = nullptr;
 
@@ -16,10 +17,11 @@ void GameTrace::resolve_signatures()
 	init_game_trace
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 41 0F B7 47 ? 48 89 DE">(),
-			BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
-			  .add(1)
-			  .relative_to_absolute()
+			SignatureScanner::PatternSignature::for_literal_string<"invalid_hitbox">(),
+			BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 			  .BCRL_EXPECT(decltype(init_game_trace), init_game_trace);
 }
 
