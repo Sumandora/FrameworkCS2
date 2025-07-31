@@ -262,8 +262,13 @@ static constexpr float exp_decay(float a, float b, float decay)
 	return b + (a - b) * std::exp(-decay * dt);
 }
 
+static std::mutex render_mutex;
+
 void GUI::render()
 {
+	// Since ImGUI does not like rendering multiple frames at once, this is needed...
+	const std::lock_guard render_lock{ render_mutex };
+
 	ImGuiIO& io = ImGui::GetIO();
 
 	io.MouseDrawCursor = is_open && SDL_GetWindowMouseGrab(window);
