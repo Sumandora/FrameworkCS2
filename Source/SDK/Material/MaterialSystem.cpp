@@ -1,18 +1,8 @@
 #include "MaterialSystem.hpp"
 
-#include "RetAddrSpoofer.hpp"
-
-#include "../VirtualMethod.hpp"
-
 #include "../GameClass/KeyValues3.hpp"
 
 #include <cstring>
-
-void MaterialSystem::create_material(Material*** out_material, const char* material_name, KeyValues3* key_values, std::uint32_t unk1, std::uint8_t unk2)
-{
-	// No `this` pointer, WTF???
-	RetAddrSpoofer::invoke<void>(VirtualMethod::get_vtable(this)[28], out_material, nullptr, material_name, key_values, unk1, unk2);
-}
 
 Material** MaterialSystem::create_material(const char* name, const char* kv_text_buffer)
 {
