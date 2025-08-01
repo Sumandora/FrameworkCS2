@@ -13,6 +13,7 @@ public:
 		std::string agent_name;
 		std::string model_path;
 		GUI::TextureManager::RawImage image;
+		bool is_localized; // Some models don't have a localization, in this case the agent_name will be the localization key
 	};
 
 private:

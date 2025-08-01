@@ -70,10 +70,14 @@ static void gather_default_models(std::vector<PlayerModelCombo::DefaultModel>& p
 
 		const GUI::TextureManager::RawImage image = VTexDecoder::decode(vec).value();
 
-		const char* localized_name = Interfaces::localize->translate(item->internal_name());
-		// TODO How should I deal with the unlocalized models? I think those are mainly map based ones, but I would still like to offer the user the option to force themselves to them...
+		std::optional<const char*> localized_name = Interfaces::localize->try_translate(item->internal_name());
+		bool has_localization = true;
+		if (!localized_name.has_value()) {
+			localized_name = item->internal_name();
+			has_localization = false;
+		}
 
-		player_models.emplace_back(localized_name, item->model_path(), image);
+		player_models.emplace_back(localized_name.value(), item->model_path(), image, has_localization);
 	}
 }
 
@@ -158,8 +162,10 @@ inline void PlayerModelCombo::draw_fancy_model_selection()
 		if (selected)
 			ImGui::PopStyleColor();
 
-		// TODO handle untranslated
-		ImGui::SetItemTooltip("%s", model.agent_name.c_str());
+		// Sadly I have no idea what I should do with models that don't have a localization...
+		// On one hand I would like to show the internal name, but I feel like it breaks the user experience a bit
+		if (model.is_localized)
+			ImGui::SetItemTooltip("%s", model.agent_name.c_str());
 	}
 }
 
@@ -208,4 +214,6 @@ void PlayerModelCombo::serialize(nlohmann::json& output_json) const
 void PlayerModelCombo::deserialize(const nlohmann::json& input_json)
 {
 	player_model = input_json;
+
+	// TODO if this model no longer exists, perhaps we should just default to the first default model...
 }
