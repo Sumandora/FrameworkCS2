@@ -189,3 +189,201 @@ void UserCmd::spread_out_rotation_changes(float old_yaw, float old_pitch)
 	}
 }
 
+// Because protobufs DebugString() has issues beyond my comprehension and I can't be bothered fixing filthy google software, here we go:
+
+#define PRETTY_PRINT(member) pretty_print(s, depth + 1, #member, value.member)
+#define PRETTY_PRINT_BITMASK(member) pretty_print_bitmask(s, depth + 1, #member, value.member)
+#define PRETTY_PRINT_PROTO_VEC(member) pretty_print(s, depth + 1, #member, value.member())
+#define PRETTY_PRINT_PROTO(member) \
+	if (value.has_##member())      \
+	pretty_print(s, depth + 1, #member, value.member())
+#define PRETTY_PRINT_PROTO_BITMASK(member) \
+	if (value.has_##member())              \
+	pretty_print_bitmask(s, depth + 1, #member, value.member())
+
+static void pretty_print(std::string& s, int depth, std::string_view name, bool value)
+{
+	s += std::format("{}{}: {}\n", std::string(depth, '\t'), name, value);
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, int value)
+{
+	s += std::format("{}{}: {}\n", std::string(depth, '\t'), name, value);
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, std::uint32_t value)
+{
+	s += std::format("{}{}: {}\n", std::string(depth, '\t'), name, value);
+};
+
+static void pretty_print_bitmask(std::string& s, int depth, std::string_view name, std::uint64_t value)
+{
+	// TODO perhaps our knowledge of the inputbitmask enum, would allow us to find some names for each bit
+	s += std::format("{}{}: {:b}\n", std::string(depth, '\t'), name, value);
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, float value)
+{
+	s += std::format("{}{}: {}\n", std::string(depth, '\t'), name, value);
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, const CMsgQAngle& value)
+{
+	s += std::format("{}{}: ({};{};{})\n", std::string(depth, '\t'), name, value.x(), value.y(), value.z());
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, const CMsgVector& value)
+{
+	s += std::format("{}{}: ({};{};{})\n", std::string(depth, '\t'), name, value.x(), value.y(), value.z());
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, const CSGOInterpolationInfoPB_CL& value)
+{
+	if (value.has_frac())
+		pretty_print(s, depth, name, value.frac());
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, const CSGOInterpolationInfoPB& value)
+{
+	s += std::format("{}{} {{\n", std::string(depth, '\t'), name);
+
+	PRETTY_PRINT_PROTO(frac);
+	PRETTY_PRINT_PROTO(src_tick);
+	PRETTY_PRINT_PROTO(dst_tick);
+
+	s += std::format("{}}}\n", std::string(depth, '\t'));
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, const CSGOInputHistoryEntryPB& value)
+{
+	s += std::format("{}{} {{\n", std::string(depth, '\t'), name);
+
+	PRETTY_PRINT_PROTO(view_angles);
+	PRETTY_PRINT_PROTO(cl_interp);
+	PRETTY_PRINT_PROTO(sv_interp0);
+	PRETTY_PRINT_PROTO(sv_interp1);
+	PRETTY_PRINT_PROTO(player_interp);
+	PRETTY_PRINT_PROTO(shoot_position);
+	PRETTY_PRINT_PROTO(target_head_pos_check);
+	PRETTY_PRINT_PROTO(target_abs_pos_check);
+	PRETTY_PRINT_PROTO(target_abs_ang_check);
+	PRETTY_PRINT_PROTO(render_tick_count);
+	PRETTY_PRINT_PROTO(render_tick_fraction);
+	PRETTY_PRINT_PROTO(player_tick_count);
+	PRETTY_PRINT_PROTO(player_tick_fraction);
+	PRETTY_PRINT_PROTO(frame_number);
+	PRETTY_PRINT_PROTO(target_ent_index);
+
+	s += std::format("{}}}\n", std::string(depth, '\t'));
+};
+
+template <typename T>
+static void pretty_print(std::string& s, int depth, std::string_view name, const google::protobuf::RepeatedPtrField<T>& value)
+{
+	s += std::format("{}{} {{\n", std::string(depth, '\t'), name);
+
+	int i = 0;
+
+	for (const T& input : value) {
+		pretty_print(s, depth + 1, std::to_string(i), input);
+		i++;
+	}
+
+	s += std::format("{}}}\n", std::string(depth, '\t'));
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, const CSubtickMoveStep& value)
+{
+	s += std::format("{}{} {{\n", std::string(depth, '\t'), name);
+
+	PRETTY_PRINT_PROTO_BITMASK(button);
+	PRETTY_PRINT_PROTO(pressed);
+	PRETTY_PRINT_PROTO(when);
+	PRETTY_PRINT_PROTO(analog_forward_delta);
+	PRETTY_PRINT_PROTO(analog_left_delta);
+	PRETTY_PRINT_PROTO(analog_pitch_delta);
+	PRETTY_PRINT_PROTO(analog_yaw_delta);
+
+	s += std::format("{}}}\n", std::string(depth, '\t'));
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, const CInButtonStatePB& value)
+{
+	s += std::format("{}{} {{\n", std::string(depth, '\t'), name);
+
+	PRETTY_PRINT_PROTO_BITMASK(buttonstate1);
+	PRETTY_PRINT_PROTO_BITMASK(buttonstate2);
+	PRETTY_PRINT_PROTO_BITMASK(buttonstate3);
+
+	s += std::format("{}}}\n", std::string(depth, '\t'));
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, const Buttons& value)
+{
+	s += std::format("{}{} {{\n", std::string(depth, '\t'), name);
+
+	PRETTY_PRINT_BITMASK(buttonstate1);
+	PRETTY_PRINT_BITMASK(buttonstate2);
+	PRETTY_PRINT_BITMASK(buttonstate3);
+
+	s += std::format("{}}}\n", std::string(depth, '\t'));
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, const CBaseUserCmdPB& value)
+{
+	s += std::format("{}{} {{\n", std::string(depth, '\t'), name);
+
+	PRETTY_PRINT_PROTO_VEC(subtick_moves);
+	// PRETTY_PRINT_PROTO(move_crc);
+	PRETTY_PRINT_PROTO(buttons_pb);
+	PRETTY_PRINT_PROTO(viewangles);
+	PRETTY_PRINT_PROTO(legacy_command_number);
+	PRETTY_PRINT_PROTO(client_tick);
+	PRETTY_PRINT_PROTO(forwardmove);
+	PRETTY_PRINT_PROTO(leftmove);
+	PRETTY_PRINT_PROTO(upmove);
+	PRETTY_PRINT_PROTO(impulse);
+	PRETTY_PRINT_PROTO(weaponselect);
+	PRETTY_PRINT_PROTO(random_seed);
+	PRETTY_PRINT_PROTO(mousedx);
+	PRETTY_PRINT_PROTO(mousedy);
+	PRETTY_PRINT_PROTO(prediction_offset_ticks_x256);
+	PRETTY_PRINT_PROTO(consumed_server_angle_changes);
+	PRETTY_PRINT_PROTO(cmd_flags);
+	PRETTY_PRINT_PROTO(pawn_entity_handle);
+
+	s += std::format("{}}}\n", std::string(depth, '\t'));
+};
+
+static void pretty_print(std::string& s, int depth, std::string_view name, const CSGOUserCmdPB& value)
+{
+	s += std::format("{}{} {{\n", std::string(depth, '\t'), name);
+
+	PRETTY_PRINT_PROTO_VEC(input_history);
+	PRETTY_PRINT_PROTO(base);
+	PRETTY_PRINT_PROTO(left_hand_desired);
+	PRETTY_PRINT_PROTO(is_predicting_body_shot_fx);
+	PRETTY_PRINT_PROTO(is_predicting_head_shot_fx);
+	PRETTY_PRINT_PROTO(is_predicting_kill_ragdolls);
+	PRETTY_PRINT_PROTO(attack1_start_history_index);
+	PRETTY_PRINT_PROTO(attack2_start_history_index);
+	PRETTY_PRINT_PROTO(attack3_start_history_index);
+
+	s += std::format("{}}}\n", std::string(depth, '\t'));
+};
+
+std::string UserCmd::stringify() const
+{
+	std::string s;
+
+	const int depth = 0;
+	const auto& value = *this;
+
+	s += "usercmd {\n";
+	PRETTY_PRINT(csgo_usercmd);
+	PRETTY_PRINT(buttons);
+	PRETTY_PRINT(has_been_predicted);
+	s += "}\n";
+
+	return s;
+}
