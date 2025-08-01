@@ -2,10 +2,13 @@
 
 #include "../../Setting.hpp"
 
+#include <string>
+
 struct Material;
 
 class MaterialCombo : public Setting {
-	std::string material_name;
+	std::string material_name; // Empty = Unchanged
+
 	mutable Material** material = nullptr;
 	mutable bool material_has_changed;
 

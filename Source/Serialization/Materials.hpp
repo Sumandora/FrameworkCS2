@@ -14,5 +14,6 @@ namespace Serialization::Materials {
 	// Creates directory and provides a few default materials
 	void initialize_directory(const std::filesystem::path& config_dir);
 
+	// TODO RWLock
 	const std::vector<Material>& get_materials(); // Don't store this vector or its contents, re-request them.
 }

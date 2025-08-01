@@ -25,6 +25,8 @@
 #include <unistd.h>
 #include <utility>
 
+static constexpr const char* UNCHANGED = "Unchanged";
+
 static void delete_material(Material** material)
 {
 	Interfaces::resource_system->delete_resource(reinterpret_cast<void*>(material));
@@ -62,6 +64,7 @@ bool MaterialCombo::update_material() const
 		return true;
 	}
 
+	// Clone here because this function needs a consistent view
 	auto materials = Serialization::Materials::get_materials();
 	auto it = std::ranges::find(
 		materials,
@@ -90,15 +93,17 @@ bool MaterialCombo::update_material() const
 
 	material = Interfaces::material_system->create_material(material_name.c_str(), kv3.c_str());
 
-	if (material)
-		Logging::info("Created material '{}' at {} -> {}", material_name, material, *material);
-	else {
+	if (!material) {
 		Notifications::create(
 			"Material Creation",
 			std::format("Failed to create material '{}'", material_name),
 			Notifications::Severity::ERROR);
+		// Fallback to unchanged.
+		material = nullptr;
+		return false;
 	}
 
+	Logging::info("Created material '{}' at {} -> {}", material_name, material, *material);
 	return true;
 }
 
@@ -115,7 +120,6 @@ Material* MaterialCombo::get() const
 
 void MaterialCombo::render()
 {
-	static constexpr const char* UNCHANGED = "Unchanged";
 	if (ImGui::BeginCombo(get_name().c_str(), material_name.empty() ? UNCHANGED : material_name.c_str(), ImGuiComboFlags_None)) {
 		if (ImGui::Selectable(UNCHANGED, material_name.empty())) {
 			material_name = {};
@@ -134,12 +138,29 @@ void MaterialCombo::render()
 		ImGui::EndCombo();
 	}
 }
+
 void MaterialCombo::serialize(nlohmann::json& output_json) const
 {
 	output_json = material_name;
 }
+
 void MaterialCombo::deserialize(const nlohmann::json& input_json)
 {
 	material_name = input_json;
+
+	const auto& materials = Serialization::Materials::get_materials();
+	const bool has_material = std::ranges::contains(
+		materials,
+		material_name,
+		[](const Serialization::Materials::Material& material) { return material.name; });
+
+	if (!has_material) {
+		// I don't want to create Notifications here, because this error might happen several times and I don't want to tell the user the same thing over and over and over again.
+		// TODO Here notifications that stack would be nice, e.g. if there is a notification with the same title, message, severity and,
+		// 		so on then just renew the timer on that one and perhaps add a "2x" indicator...
+		Logging::error("Attempted to load config with material '{}', but it doesn't exist; replacing with '{}'.", material_name, UNCHANGED);
+		material_name = {};
+	}
+
 	material_has_changed = true;
 }
