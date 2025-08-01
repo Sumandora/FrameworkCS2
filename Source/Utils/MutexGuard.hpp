@@ -26,6 +26,12 @@ public:
 	T& operator*() const noexcept { return *value; }
 	T* operator->() const noexcept { return value; }
 
+	// NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+	operator T*()
+	{
+		return value;
+	}
+
 	MutexGuard(const MutexGuard&) = delete;
 	MutexGuard& operator=(const MutexGuard&) = delete;
 

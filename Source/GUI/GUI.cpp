@@ -5,6 +5,7 @@
 #include "Theme.hpp"
 
 #include "backends/imgui_impl_sdl3.h"
+#include "backends/imgui_impl_vulkan.h"
 #include "imgui.h"
 
 #include "SDL3/SDL_events.h"
@@ -12,17 +13,19 @@
 #include "SDL3/SDL_video.h"
 
 #include "../Utils/Logging.hpp"
+#include "../Utils/MutexGuard.hpp"
 
+#include <atomic>
 #include <cfloat>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <mutex>
-#include <string.h>
 #include <unistd.h>
 #include <utility>
 #include <vector>
+#include <vulkan/vulkan_core.h>
 
 #include "Tabs/Tabs.hpp"
 
@@ -147,10 +150,15 @@ static std::vector<OwningSDLEvent> event_queue{};
 
 static bool is_open = true;
 
-static SDL_Window* window;
+static std::atomic<SDL_Window*> window = nullptr;
 
 static float scale = 1.0F;
 static float font_size = 12.0F;
+
+// These are used by the overlay:
+static std::mutex draw_list_mutex;
+static ImDrawList* draw_list = nullptr;
+static ImDrawListSharedData* draw_list_shared_data = nullptr;
 
 void GUI::init(const std::filesystem::path& config_directory)
 {
@@ -168,6 +176,9 @@ void GUI::init(const std::filesystem::path& config_directory)
 
 void GUI::destroy()
 {
+	delete draw_list;
+	delete draw_list_shared_data;
+
 	get_texture_manager().purge_all_textures();
 	ImGui::DestroyContext();
 }
@@ -201,7 +212,7 @@ inline static ImWchar* all_glyph_ranges()
 	return RANGES.Data;
 }
 
-static void create_font()
+static void create_font(SDL_Window* window)
 {
 	// We are running straight into the multi monitor dpi issue here, but to my knowledge there is no appropriate solution to this when using ImGui
 	const SDL_DisplayID display_index = SDL_GetDisplayForWindow(window);
@@ -250,9 +261,9 @@ static void create_font()
 
 void GUI::provide_window(SDL_Window* window)
 {
-	::window = window;
+	create_font(window);
 
-	create_font();
+	::window = window;
 }
 
 // https://www.youtube.com/watch?v=LSNQuFEDOyQ
@@ -262,16 +273,21 @@ static constexpr float exp_decay(float a, float b, float decay)
 	return b + (a - b) * std::exp(-decay * dt);
 }
 
-static std::mutex render_mutex;
-
-void GUI::render()
+void GUI::render(VkCommandBuffer command_buffer)
 {
-	// Since ImGUI does not like rendering multiple frames at once, this is needed...
-	const std::lock_guard render_lock{ render_mutex };
+	SDL_Window* window = ::window.load(std::memory_order::acquire);
+
+	if (!window)
+		return;
+
+	GUI::flush_events();
 
 	ImGuiIO& io = ImGui::GetIO();
 
 	io.MouseDrawCursor = is_open && SDL_GetWindowMouseGrab(window);
+
+	ImGui_ImplVulkan_NewFrame();
+	ImGui_ImplSDL3_NewFrame();
 
 	ImGui::NewFrame();
 	get_input_manager().update_states();
@@ -299,6 +315,19 @@ void GUI::render()
 	}
 
 	ImGui::Render();
+
+	ImDrawData* draw_data = ImGui::GetDrawData();
+
+	const std::lock_guard<std::mutex> lock(draw_list_mutex);
+	if (draw_list == nullptr) {
+		draw_list_shared_data = new ImDrawListSharedData(*ImGui::GetDrawListSharedData());
+		draw_list = new ImDrawList(draw_list_shared_data);
+	}
+	draw_data->AddDrawList(draw_list);
+
+	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);
+
+	draw_data->Clear();
 }
 
 bool GUI::queue_event(const SDL_Event* event)
@@ -343,7 +372,7 @@ bool GUI::is_using_wayland()
 		return driver;
 	}();
 
-	return strcmp(driver, "wayland") == 0;
+	return std::strcmp(driver, "wayland") == 0;
 }
 
 float GUI::get_scale()
@@ -354,4 +383,10 @@ float GUI::get_scale()
 float GUI::get_base_font_size()
 {
 	return font_size;
+}
+
+MutexGuard<ImDrawList*> GUI::get_draw_list()
+{
+	draw_list_mutex.lock();
+	return MutexGuard{ &draw_list, &draw_list_mutex };
 }

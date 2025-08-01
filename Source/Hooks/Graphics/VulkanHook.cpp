@@ -14,6 +14,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include <vulkan/vulkan.h>
@@ -28,23 +29,6 @@
 #include "../../Utils/UninitializedObject.hpp"
 
 #include "../Hooks.hpp"
-
-static VkQueue GetGraphicQueue()
-{
-	for (uint32_t i = 0; i < g_QueueFamilies.size(); ++i) {
-		const VkQueueFamilyProperties& family = g_QueueFamilies[i];
-		for (uint32_t j = 0; j < family.queueCount; ++j) {
-			VkQueue it = VK_NULL_HANDLE;
-			vkGetDeviceQueue(g_Device, i, j, &it);
-
-			if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-				return it;
-			}
-		}
-	}
-
-	return VK_NULL_HANDLE;
-}
 
 static void CreateDevice()
 {
@@ -290,19 +274,19 @@ static void CleanupDevice()
 	g_Device = nullptr;
 }
 
-static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* pPresentInfo)
+static std::mutex render_mutex;
+
+static void RenderImGui(VkQueue queue, const VkPresentInfoKHR* pPresentInfo)
 {
 	if (!ImGui::GetCurrentContext() || !g_Device)
 		return;
 	if (!ImGui::GetIO().BackendPlatformUserData)
 		return;
 
-	VkQueue graphicQueue = GetGraphicQueue();
-	current_queue = graphicQueue;
-	if (!graphicQueue) {
-		Logging::error("No queue that has VK_QUEUE_GRAPHICS_BIT has been found!");
-		return;
-	}
+	current_queue = queue;
+
+	// Since ImGUI does not like rendering multiple frames at once, this is needed...
+	const std::lock_guard render_lock{ render_mutex };
 
 	for (uint32_t i = 0; i < pPresentInfo->swapchainCount; ++i) {
 		VkSwapchainKHR swapchain = pPresentInfo->pSwapchains[i];
@@ -340,7 +324,7 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 			init_info.PhysicalDevice = g_PhysicalDevice;
 			init_info.Device = g_Device;
 			init_info.QueueFamily = g_QueueFamily;
-			init_info.Queue = graphicQueue;
+			init_info.Queue = queue;
 			init_info.PipelineCache = g_PipelineCache;
 			init_info.DescriptorPool = g_DescriptorPool;
 			init_info.Subpass = 0;
@@ -353,25 +337,7 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 			ImGui_ImplVulkan_Init(&init_info);
 		}
 
-		GUI::flush_events();
-
-		ImGui_ImplVulkan_NewFrame();
-		ImGui_ImplSDL3_NewFrame();
-
-		GUI::render();
-
-		auto* draw_data = ImGui::GetDrawData();
-		{
-			const std::lock_guard<std::mutex> lock(GraphicsHook::espMutex);
-			if (GraphicsHook::espDrawList != nullptr) {
-				draw_data->AddDrawList(GraphicsHook::espDrawList.get());
-			} else {
-				GraphicsHook::espDrawListSharedData = std::make_unique<ImDrawListSharedData>(*ImGui::GetDrawListSharedData());
-				GraphicsHook::espDrawList = std::make_unique<ImDrawList>(GraphicsHook::espDrawListSharedData.get());
-			}
-
-			ImGui_ImplVulkan_RenderDrawData(draw_data, fd->CommandBuffer);
-		}
+		GUI::render(fd->CommandBuffer);
 
 		vkCmdEndRenderPass(fd->CommandBuffer);
 		vkEndCommandBuffer(fd->CommandBuffer);
@@ -386,7 +352,7 @@ static void RenderImGui([[maybe_unused]] VkQueue queue, const VkPresentInfoKHR* 
 			info.commandBufferCount = 1;
 			info.pCommandBuffers = &fd->CommandBuffer;
 
-			vkQueueSubmit(graphicQueue, 1, &info, VK_NULL_HANDLE);
+			vkQueueSubmit(queue, 1, &info, VK_NULL_HANDLE);
 		}
 	}
 }

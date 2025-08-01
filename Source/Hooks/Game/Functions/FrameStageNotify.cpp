@@ -1,9 +1,5 @@
 #include "../GameHook.hpp"
 
-#include "../../Graphics/GraphicsHook.hpp"
-
-#include "../../../Memory.hpp"
-
 #include "RetAddrSpoofer.hpp"
 
 #include "../../../Features/Misc/BombTimer.hpp"
@@ -17,6 +13,14 @@
 
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Enums/ClientFrameStage.hpp"
+
+#include "../../../GUI/GUI.hpp"
+
+#include "../../../Memory.hpp"
+
+#include "../../../Utils/MutexGuard.hpp"
+
+#include "imgui.h"
 
 #include <mutex>
 
@@ -47,14 +51,15 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		removals->remove_ads_update();
 		bomb_timer->update();
 
-		const std::lock_guard<std::mutex> lock(GraphicsHook::espMutex);
-		if (GraphicsHook::espDrawList != nullptr) { // it was not yet initialized by the other thread
-			GraphicsHook::espDrawList->_ResetForNewFrame();
-			GraphicsHook::espDrawList->PushClipRectFullScreen();
-			GraphicsHook::espDrawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
-			esp->draw(GraphicsHook::espDrawList.get());
-			grenade_prediction->draw(GraphicsHook::espDrawList.get());
-			hit_marker->draw(GraphicsHook::espDrawList.get());
+		const MutexGuard<ImDrawList*> draw_list_guard = GUI::get_draw_list();
+		ImDrawList* draw_list = *draw_list_guard;
+		if (draw_list != nullptr) { // it was not yet initialized by the other thread
+			draw_list->_ResetForNewFrame();
+			draw_list->PushClipRectFullScreen();
+			draw_list->PushTextureID(ImGui::GetIO().Fonts->TexID);
+			esp->draw(draw_list);
+			grenade_prediction->draw(draw_list);
+			hit_marker->draw(draw_list);
 		}
 		break;
 	}
