@@ -19,16 +19,4 @@ public:
 		PADDING(0x8);
 	};
 	UtlVector<ItemEntry> items;
-	// int count;
-	// static_assert(sizeof(ItemEntry) == 0x18);
-	// ItemEntry* items;
-
-// private:
-// 	PADDING(0x10);
-
-// public:
-	// int count;
 };
-
-// static_assert(offsetof(EconItemSchema, items) == 0x108);
-// static_assert(offsetof(EconItemSchema, count) == 0x100);
