@@ -4,7 +4,7 @@
 
 #include "RetAddrSpoofer.hpp"
 
-void Hooks::Game::DrawArrayExt::hook_func(void* animatable_scene_object_desc, void* render_context, MeshDrawPrimitive* mesh_array,
+void __attribute((optimize("O0"))) Hooks::Game::DrawArrayExt::hook_func(void* animatable_scene_object_desc, void* render_context, MeshDrawPrimitive* mesh_array,
 	int mesh_count, void* scene_view, void* scene_layer, void* scene_system_per_frame_stats, void* material)
 {
 	bool hide_original = false;

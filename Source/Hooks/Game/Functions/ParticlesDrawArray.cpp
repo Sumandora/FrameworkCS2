@@ -6,7 +6,7 @@
 
 #include "RetAddrSpoofer.hpp"
 
-void Hooks::Game::ParticlesDrawArray::hook_func(void* particle_object_desc, void* render_context, MeshDrawPrimitive* mesh_array,
+void __attribute((optimize("O0"))) Hooks::Game::ParticlesDrawArray::hook_func(void* particle_object_desc, void* render_context, MeshDrawPrimitive* mesh_array,
 	int mesh_count, void* scene_view, void* scene_layer, void* scene_system_per_frame_stats)
 {
 	world_colors->handle_particle(mesh_array, mesh_count);
