@@ -36,9 +36,9 @@ MaterialCombo::MaterialCombo(SettingsHolder* parent, std::string name)
 	: Setting(parent, std::move(name))
 	, material_has_changed(false)
 {
-	const auto& materials = Serialization::Materials::get_materials();
-	if (!materials.empty()) {
-		material_name = materials.at(0).name;
+	auto materials_guard = Serialization::Materials::get_materials();
+	if (!materials_guard->empty()) {
+		material_name = materials_guard->at(0).name;
 		material_has_changed = true;
 	}
 }
@@ -65,13 +65,13 @@ bool MaterialCombo::update_material() const
 	}
 
 	// Clone here because this function needs a consistent view
-	auto materials = Serialization::Materials::get_materials();
+	auto materials_guard = Serialization::Materials::get_materials();
 	auto it = std::ranges::find(
-		materials,
+		*materials_guard,
 		material_name,
 		[](const Serialization::Materials::Material& material) { return material.name; });
 
-	if (it == materials.end()) {
+	if (it == materials_guard->end()) {
 		Notifications::create(
 			"Material Creation",
 			std::format("Attempted to load material '{}', but material is no longer available...", material_name),
@@ -125,7 +125,9 @@ void MaterialCombo::render()
 			material_name = {};
 			material_has_changed = true;
 		}
-		for (const Serialization::Materials::Material& material : Serialization::Materials::get_materials()) {
+
+		auto materials_guard = Serialization::Materials::get_materials();
+		for (const Serialization::Materials::Material& material : *materials_guard) {
 			const bool selected = material.name == material_name;
 			if (ImGui::Selectable(material.name.c_str(), selected)) {
 				material_name = material.name;
@@ -148,9 +150,9 @@ void MaterialCombo::deserialize(const nlohmann::json& input_json)
 {
 	material_name = input_json;
 
-	const auto& materials = Serialization::Materials::get_materials();
+	auto materials_guard = Serialization::Materials::get_materials();
 	const bool has_material = std::ranges::contains(
-		materials,
+		*materials_guard,
 		material_name,
 		[](const Serialization::Materials::Material& material) { return material.name; });
 

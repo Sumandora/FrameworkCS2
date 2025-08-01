@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Utils/MutexGuard.hpp"
+
 #include <filesystem>
 #include <functional>
 #include <string>
@@ -14,6 +16,6 @@ namespace Serialization::Materials {
 	// Creates directory and provides a few default materials
 	void initialize_directory(const std::filesystem::path& config_dir);
 
-	// TODO RWLock
-	const std::vector<Material>& get_materials(); // Don't store this vector or its contents, re-request them.
+	// Don't store this guard for an extended period of time. Treat this structure like a std::lock_guard.
+	MutexGuard<std::vector<Material>> get_materials();
 }

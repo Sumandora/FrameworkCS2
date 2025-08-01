@@ -1,7 +1,8 @@
 #include "Materials.hpp"
 
-#include "../Utils/Logging.hpp"
 #include "../Utils/Interval.hpp"
+#include "../Utils/Logging.hpp"
+#include "../Utils/MutexGuard.hpp"
 
 #include <array>
 #include <chrono>
@@ -9,6 +10,7 @@
 #include <format>
 #include <fstream>
 #include <iterator>
+#include <mutex>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -106,15 +108,20 @@ void Serialization::Materials::initialize_directory(const std::filesystem::path&
 	available = true;
 }
 
-const std::vector<Serialization::Materials::Material>& Serialization::Materials::get_materials()
+static std::mutex materials_mutex;
+
+auto Serialization::Materials::get_materials() -> MutexGuard<std::vector<Material>>
 {
 	if (!available) {
-		return materials;
+		materials_mutex.lock();
+		return MutexGuard{ &materials, &materials_mutex };
 	}
 
 	// Don't update it every time, that would probably cause hard drive failure in the long term.
 	static Interval<std::chrono::seconds, 5> refresh_interval;
 	if (refresh_interval.passed()) {
+		const std::lock_guard guard{ materials_mutex };
+
 		materials.clear();
 		for (const std::filesystem::path& path : std::filesystem::directory_iterator{ materials_dir }) {
 			if (path.extension() != ".kv3")
@@ -132,5 +139,6 @@ const std::vector<Serialization::Materials::Material>& Serialization::Materials:
 		}
 	}
 
-	return materials;
+	materials_mutex.lock();
+	return MutexGuard{ &materials, &materials_mutex };
 }
