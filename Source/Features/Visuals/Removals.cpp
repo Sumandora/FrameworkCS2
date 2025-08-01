@@ -22,11 +22,6 @@ bool Removals::should_remove_legs() const
 	return remove_legs.get();
 }
 
-bool Removals::should_remove_sleeves() const
-{
-	return remove_sleeves.get();
-}
-
 void Removals::remove_ads_update() const
 {
 	if (!Interfaces::panorama_ui_engine)

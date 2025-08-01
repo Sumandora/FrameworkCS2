@@ -114,16 +114,6 @@ namespace Hooks::Game {
 				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 				  .BCRL_EXPECT(void*, render_legs);
 
-		void* add_sleeve_model
-			= BCRL::signature(
-				Memory::mem_mgr,
-				SignatureScanner::PatternSignature::for_literal_string<"renderWithViewModels">(),
-				BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
-				  .find_xrefs(SignatureScanner::XRefTypes::relative(),
-					  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
-				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
-				  .BCRL_EXPECT(void*, add_sleeve_model);
-
 		void* draw_array_ext
 			= BCRL::signature(
 				Memory::mem_mgr,
@@ -231,10 +221,6 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			render_legs,
 			reinterpret_cast<void*>(RenderLegs::hook_func));
-		AddSleeveModel::hook.emplace(
-			Memory::emalloc,
-			add_sleeve_model,
-			reinterpret_cast<void*>(AddSleeveModel::hook_func));
 		DrawArrayExt::hook.emplace(
 			Memory::emalloc,
 			draw_array_ext,
@@ -271,7 +257,6 @@ namespace Hooks::Game {
 		CreateMove::hook->enable();
 		RadarUpdate::hook->enable();
 		RenderLegs::hook->enable();
-		AddSleeveModel::hook->enable();
 		DrawArrayExt::hook->enable();
 		SyncViewAngles::hook->enable();
 		EmitSound::hook->enable();
@@ -290,7 +275,6 @@ namespace Hooks::Game {
 		EmitSound::hook.reset();
 		SyncViewAngles::hook.reset();
 		DrawArrayExt::hook.reset();
-		AddSleeveModel::hook.reset();
 		RenderLegs::hook.reset();
 		RadarUpdate::hook.reset();
 		CreateMove::hook.reset();
