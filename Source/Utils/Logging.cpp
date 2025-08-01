@@ -2,10 +2,10 @@
 
 #include <cctype>
 #include <iostream>
+#include <print>
 #include <string_view>
 
 void Logging::detail::print_raw(std::string_view color, std::string_view line, std::ostream& stream)
 {
-	// NOLINTNEXTLINE(performance-avoid-endl)
-	stream << color << "[+] " << CLEAR << line << std::endl;
+	std::println(stream, "{}[+]{} {}", color, CLEAR, line);
 }
