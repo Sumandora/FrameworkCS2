@@ -6,6 +6,7 @@ FetchContent_Declare(imgui
 	GIT_SHALLOW TRUE
 	PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/Patches/ImGUI/FullyRoundedTabs.patch
 							${CMAKE_CURRENT_SOURCE_DIR}/Patches/ImGUI/RoundedImageButtons.patch
+							${CMAKE_CURRENT_SOURCE_DIR}/Patches/ImGUI/PrependDrawList.patch
 	UPDATE_DISCONNECTED TRUE)
 FetchContent_MakeAvailable(imgui)
 

@@ -323,7 +323,7 @@ void GUI::render(VkCommandBuffer command_buffer)
 		draw_list_shared_data = new ImDrawListSharedData(*ImGui::GetDrawListSharedData());
 		draw_list = new ImDrawList(draw_list_shared_data);
 	}
-	draw_data->AddDrawList(draw_list);
+	draw_data->AddDrawList(draw_list, true);
 
 	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);
 

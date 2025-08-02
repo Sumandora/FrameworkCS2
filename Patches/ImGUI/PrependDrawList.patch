@@ -1,0 +1,60 @@
+diff -Naur a/imgui_draw.cpp b/imgui_draw.cpp
+--- a/imgui_draw.cpp	2025-07-28 17:00:28.744181563 +0200
++++ b/imgui_draw.cpp	2025-08-02 02:32:16.586926466 +0200
+@@ -2225,7 +2225,7 @@
+ 
+ // Important: 'out_list' is generally going to be draw_data->CmdLists, but may be another temporary list
+ // as long at it is expected that the result will be later merged into draw_data->CmdLists[].
+-void ImGui::AddDrawListToDrawDataEx(ImDrawData* draw_data, ImVector<ImDrawList*>* out_list, ImDrawList* draw_list)
++void ImGui::AddDrawListToDrawDataEx(ImDrawData* draw_data, ImVector<ImDrawList*>* out_list, ImDrawList* draw_list, bool prepend)
+ {
+     if (draw_list->CmdBuffer.Size == 0)
+         return;
+@@ -2264,17 +2264,20 @@
+                 cmd.UserCallbackData = draw_list->_CallbacksDataBuf.Data + cmd.UserCallbackDataOffset;
+ 
+     // Add to output list + records state in ImDrawData
+-    out_list->push_back(draw_list);
++    if (prepend)
++        out_list->push_front(draw_list);
++    else
++        out_list->push_back(draw_list);
+     draw_data->CmdListsCount++;
+     draw_data->TotalVtxCount += draw_list->VtxBuffer.Size;
+     draw_data->TotalIdxCount += draw_list->IdxBuffer.Size;
+ }
+ 
+-void ImDrawData::AddDrawList(ImDrawList* draw_list)
++void ImDrawData::AddDrawList(ImDrawList* draw_list, bool prepend)
+ {
+     IM_ASSERT(CmdLists.Size == CmdListsCount);
+     draw_list->_PopUnusedDrawCmd();
+-    ImGui::AddDrawListToDrawDataEx(this, &CmdLists, draw_list);
++    ImGui::AddDrawListToDrawDataEx(this, &CmdLists, draw_list, prepend);
+ }
+ 
+ // For backward compatibility: convert all buffers from indexed to de-indexed, in case you cannot render indexed. Note: this is slow and most likely a waste of resources. Always prefer indexed rendering!
+diff -Naur a/imgui.h b/imgui.h
+--- a/imgui.h	2025-07-28 17:00:28.738181637 +0200
++++ b/imgui.h	2025-08-02 02:30:59.426723780 +0200
+@@ -3223,7 +3223,7 @@
+     // Functions
+     ImDrawData()    { Clear(); }
+     IMGUI_API void  Clear();
+-    IMGUI_API void  AddDrawList(ImDrawList* draw_list);     // Helper to add an external draw list into an existing ImDrawData.
++    IMGUI_API void  AddDrawList(ImDrawList* draw_list, bool prepend = false);     // Helper to add an external draw list into an existing ImDrawData.
+     IMGUI_API void  DeIndexAllBuffers();                    // Helper to convert all buffers from indexed to non-indexed, in case you cannot render indexed. Note: this is slow and most likely a waste of resources. Always prefer indexed rendering!
+     IMGUI_API void  ScaleClipRects(const ImVec2& fb_scale); // Helper to scale the ClipRect field of each ImDrawCmd. Use if your final output buffer is at a different scale than Dear ImGui expects, or if there is a difference between your window resolution and framebuffer resolution.
+ };
+diff -Naur a/imgui_internal.h b/imgui_internal.h
+--- a/imgui_internal.h	2025-07-28 17:00:28.746181538 +0200
++++ b/imgui_internal.h	2025-08-02 02:31:20.619505166 +0200
+@@ -3007,7 +3007,7 @@
+     inline ImDrawList*      GetForegroundDrawList(ImGuiWindow* window) { IM_UNUSED(window); return GetForegroundDrawList(); } // This seemingly unnecessary wrapper simplifies compatibility between the 'master' and 'docking' branches.
+     IMGUI_API ImDrawList*   GetBackgroundDrawList(ImGuiViewport* viewport);                     // get background draw list for the given viewport. this draw list will be the first rendering one. Useful to quickly draw shapes/text behind dear imgui contents.
+     IMGUI_API ImDrawList*   GetForegroundDrawList(ImGuiViewport* viewport);                     // get foreground draw list for the given viewport. this draw list will be the last rendered one. Useful to quickly draw shapes/text over dear imgui contents.
+-    IMGUI_API void          AddDrawListToDrawDataEx(ImDrawData* draw_data, ImVector<ImDrawList*>* out_list, ImDrawList* draw_list);
++    IMGUI_API void          AddDrawListToDrawDataEx(ImDrawData* draw_data, ImVector<ImDrawList*>* out_list, ImDrawList* draw_list, bool prepend = false);
+ 
+     // Init
+     IMGUI_API void          Initialize();
