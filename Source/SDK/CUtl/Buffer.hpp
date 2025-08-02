@@ -30,6 +30,8 @@ struct UtlBuffer {
 
 	Byteswap byteswap;
 
+	static void resolve_functions();
+
 	explicit UtlBuffer(int grow_size = 0, int init_size = 0, BufferFlags flags = 0);
 	~UtlBuffer();
 

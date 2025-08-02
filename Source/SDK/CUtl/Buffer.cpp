@@ -5,19 +5,26 @@
 #include "../../Libraries.hpp"
 #include "../../Memory.hpp"
 
+#include "RetAddrSpoofer.hpp"
+
 #include <cstring>
 #include <dlfcn.h>
+
+static void (*ctor)(UtlBuffer*, int, int, BufferFlags) = nullptr;
+static void (*ensure_capacity)(UtlBuffer*, int) = nullptr;
+
+void UtlBuffer::resolve_functions()
+{
+	ctor = Libraries::tier0->get_symbol<decltype(ctor)>("_ZN10CUtlBufferC1EiiNS_13BufferFlags_tE");
+	MEM_ACCEPT(ctor);
+	::ensure_capacity = Libraries::tier0->get_symbol<decltype(::ensure_capacity)>("_ZN10CUtlBuffer14EnsureCapacityEi");
+	Memory::accept("CUtlBuffer::EnsureCapacity", ::ensure_capacity);
+}
 
 UtlBuffer::UtlBuffer(int grow_size, int init_size, BufferFlags flags)
 {
 	std::memset(reinterpret_cast<void*>(this), 0, sizeof(*this));
-	static auto ctor = [] {
-		auto* symbol = Libraries::tier0->get_symbol<void (*)(UtlBuffer*, int, int, BufferFlags)>("_ZN10CUtlBufferC1EiiNS_13BufferFlags_tE");
-		Memory::accept("CUtlBuffer::CUtlBuffer", symbol);
-		return symbol;
-	}();
-
-	ctor(this, grow_size, init_size, flags);
+	RetAddrSpoofer::invoke(ctor, this, grow_size, init_size, flags);
 }
 
 UtlBuffer::~UtlBuffer()
@@ -31,11 +38,5 @@ UtlBuffer::~UtlBuffer()
 
 void UtlBuffer::ensure_capacity(int size)
 {
-	static auto fptr = [] {
-		auto* symbol = Libraries::tier0->get_symbol<void (*)(UtlBuffer*, int)>("_ZN10CUtlBuffer14EnsureCapacityEi");
-		Memory::accept("CUtlBuffer::EnsureCapacity", symbol);
-		return symbol;
-	}();
-
-	fptr(this, size);
+	RetAddrSpoofer::invoke(::ensure_capacity, this, size);
 }

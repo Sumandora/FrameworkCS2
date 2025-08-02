@@ -8,13 +8,15 @@
 
 struct UtlString;
 
+static void* (*load_kv3)(KeyValues3*, UtlString*, const char*, KV3ID const*, const char*, unsigned int) = nullptr;
+
+void KeyValues3::resolve_functions()
+{
+	::load_kv3 = Libraries::tier0->get_symbol<decltype(::load_kv3)>("_Z7LoadKV3P10KeyValues3P10CUtlStringPKcRK7KV3ID_tS4_j");
+	Memory::accept("LoadKV3", ::load_kv3);
+}
+
 void KeyValues3::load_kv3(const char* text, const KV3ID& kv3_id)
 {
-	static auto fptr = [] {
-		auto* symbol = Libraries::tier0->get_symbol<void* (*)(KeyValues3*, UtlString*, char const*, KV3ID const*, char const*, unsigned int)>("_Z7LoadKV3P10KeyValues3P10CUtlStringPKcRK7KV3ID_tS4_j");
-		Memory::accept("LoadKV3", symbol);
-		return symbol;
-	}();
-
-	fptr(this, nullptr, text, &kv3_id, "", 0 /* TODO what is this int, it got added in an update */);
+	::load_kv3(this, nullptr, text, &kv3_id, "", 0 /* TODO what is this int, it got added in an update */);
 }

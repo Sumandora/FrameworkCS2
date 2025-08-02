@@ -7,12 +7,15 @@
 
 #include "RetAddrSpoofer.hpp"
 #include "SDK/ChatPrintf.hpp"
+#include "SDK/CUtl/Buffer.hpp"
+#include "SDK/CUtl/BufferString.hpp"
 #include "SDK/EngineTrace/EngineTrace.hpp"
 #include "SDK/EngineTrace/GameTrace.hpp"
 #include "SDK/Entities/CSPlayerController.hpp"
 #include "SDK/Entities/GameEntitySystem.hpp"
 #include "SDK/GameClass/ClientModeCSNormal.hpp"
 #include "SDK/GameClass/CSGOInput.hpp"
+#include "SDK/GameClass/KeyValues3.hpp"
 #include "SDK/GameClass/MemAlloc.hpp"
 #include "SDK/GameClass/NetworkGameClient.hpp"
 #include "SDK/GameClass/UserCmd.hpp"
@@ -24,6 +27,8 @@
 #include "Utils/CRC.hpp"
 #include "Utils/MovementQuantization.hpp"
 #include "Utils/Projection.hpp"
+
+#include "glm/ext/vector_float3.hpp"
 
 const void* RetAddrSpoofer::leaveRet;
 
@@ -93,10 +98,14 @@ void Memory::create()
 	CRC::resolve_signatures();
 	UserCmd::resolve_signatures();
 
-	globals = BCRL::signature(mem_mgr, SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 05 ? ? ? ? 48 8b 00 8b 50 ? 31 c0 e8 ? ? ? ? 48 8d 95">(), BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-				  .add(3)
-				  .relative_to_absolute()
-				  .BCRL_EXPECT(GlobalVars**, globals);
+	globals
+		= BCRL::signature(
+			mem_mgr,
+			SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 05 ? ? ? ? 48 8b 00 8b 50 ? 31 c0 e8 ? ? ? ? 48 8d 95">(),
+			BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+			  .add(3)
+			  .relative_to_absolute()
+			  .BCRL_EXPECT(GlobalVars**, globals);
 
 	EngineTrace::resolve_signatures();
 	GameTrace::resolve_signatures();
@@ -153,6 +162,10 @@ void Memory::create()
 
 	NetworkGameClient::resolve_signatures();
 	CSPlayerPawn::resolve_signatures();
+
+	UtlBuffer::resolve_functions();
+	BufferString::resolve_functions();
+	KeyValues3::resolve_functions();
 }
 
 float Memory::get_smoke_density_in_line(const glm::vec3& from, const glm::vec3& to)

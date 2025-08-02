@@ -81,6 +81,7 @@ void* Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl
 
 	struct LastCmd {
 		std::int32_t tick;
+
 		float forwardmove;
 		float leftmove;
 

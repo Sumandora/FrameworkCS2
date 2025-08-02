@@ -1,6 +1,7 @@
 #pragma once
 
 struct BufferString {
+	static void resolve_functions();
 	static BufferString just(const char* str);
 
 	~BufferString();

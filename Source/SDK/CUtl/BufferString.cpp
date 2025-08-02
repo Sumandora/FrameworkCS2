@@ -7,6 +7,17 @@
 #include <dlfcn.h>
 #include <link.h>
 
+static void (*purge)(BufferString*, int) = nullptr;
+static void (*insert)(BufferString*, int, const char*, int, bool) = nullptr;
+
+void BufferString::resolve_functions()
+{
+	::purge = Libraries::tier0->get_symbol<decltype(::purge)>("_ZN13CBufferString5PurgeEi");
+	Memory::accept("CBufferString::Purge", ::purge);
+	::insert = Libraries::tier0->get_symbol<decltype(::insert)>("_ZN13CBufferString6InsertEiPKcib");
+	Memory::accept("CBufferString::Insert", ::insert);
+}
+
 BufferString BufferString::just(const char* str)
 {
 	BufferString string{
@@ -27,22 +38,10 @@ BufferString::~BufferString()
 
 void BufferString::purge(int unk1)
 {
-	static auto fptr = [] {
-		auto* symbol = Libraries::tier0->get_symbol<void (*)(BufferString*, int)>("_ZN13CBufferString5PurgeEi");
-		Memory::accept("CBufferString::Purge", symbol);
-		return symbol;
-	}();
-
-	fptr(this, unk1);
+	::purge(this, unk1);
 }
 
 void BufferString::insert(int unk1, const char* str, int unk2, bool unk3)
 {
-	static auto fptr = [] {
-		auto* symbol = Libraries::tier0->get_symbol<void (*)(BufferString*, int, const char*, int, bool)>("_ZN13CBufferString6InsertEiPKcib");
-		Memory::accept("CBufferString::Insert", symbol);
-		return symbol;
-	}();
-
-	fptr(this, unk1, str, unk2, unk3);
+	::insert(this, unk1, str, unk2, unk3);
 }
