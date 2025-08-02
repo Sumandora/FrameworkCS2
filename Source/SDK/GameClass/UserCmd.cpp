@@ -1,6 +1,7 @@
 #include "UserCmd.hpp"
 
 #include "../../Memory.hpp"
+#include "../GameClass/Source2Client.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
@@ -11,6 +12,7 @@
 #include "RetAddrSpoofer.hpp"
 
 #include "../../Utils/Logging.hpp"
+#include "../../Interfaces.hpp"
 
 #include <cstdint>
 #include <format>
@@ -73,17 +75,8 @@ void UserCmd::resolve_signatures()
 
 UserCmd* UserCmd::get_current_command(BasePlayerController* controller)
 {
-	int list_index = RetAddrSpoofer::invoke(cmdlist_index_from_entity, controller);
-
-	if (list_index == -1)
-		return nullptr;
-
-	list_index -= 1;
-
-	void* usercmds = RetAddrSpoofer::invoke(get_usercmds, *usercmd_list, static_cast<std::uint64_t>(list_index));
-
-	const int current_usercmd_index = *reinterpret_cast<int*>(reinterpret_cast<char*>(usercmds) + 0x59a8);
-
+	// Controller could be a different slot, but eh, who cares...
+	const int current_usercmd_index = Interfaces::source2_client->get_command_index(0);
 	return RetAddrSpoofer::invoke(get_usercmd, controller, current_usercmd_index);
 }
 
