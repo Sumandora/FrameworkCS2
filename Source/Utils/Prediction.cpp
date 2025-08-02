@@ -11,13 +11,13 @@
 
 #include "../Interfaces.hpp"
 #include "../Memory.hpp"
+
 #include <cstdint>
 
 static GlobalVars prev_globals{};
 static std::uint32_t prev_flags{};
 static std::uint32_t prev_tick_base{};
 static bool prev_has_been_predicted{};
-static bool prev_in_client_prediction{};
 
 static UserCmd* prediction_cmd{};
 
@@ -55,9 +55,6 @@ bool Prediction::begin(UserCmd* cmd)
 
 	::in_prediction = true;
 
-	prev_in_client_prediction = Interfaces::client_prediction->in_prediction();
-	Interfaces::client_prediction->in_prediction() = true;
-
 	movement_services->set_prediction_command(cmd);
 	*(*Memory::local_player_controller)->get_current_command() = cmd;
 	network_game_client->client_side_predict(PredictionStage::CLIENT_COMMAND_TICK);
@@ -73,8 +70,6 @@ void Prediction::end()
 	*(*Memory::local_player_controller)->get_current_command() = nullptr;
 
 	::in_prediction = false;
-
-	Interfaces::client_prediction->in_prediction() = prev_in_client_prediction;
 
 	prediction_cmd->has_been_predicted = prev_has_been_predicted;
 	Memory::local_player->flags() = prev_flags;
