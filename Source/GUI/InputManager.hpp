@@ -2,12 +2,9 @@
 
 #include "imgui.h"
 
-#include "nlohmann/json.hpp"
-
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <type_traits>
 #include <vector>
 
 namespace GUI {
@@ -24,14 +21,13 @@ namespace GUI {
 			};
 
 			std::string name;
-			Method method : 1;
-			Type type : 1;
-			bool active : 1;
-			// Which ever type may be bigger is taken here.
 			union {
 				ImGuiKey key;
 				ImGuiMouseButton mouse_button;
 			};
+			Method method : 1;
+			Type type : 1;
+			bool active : 1;
 
 			template <typename BasicJsonType>
 			friend void to_json(BasicJsonType& json, const Key& key)
@@ -40,7 +36,7 @@ namespace GUI {
 				json["Method"] = key.method;
 				json["Type"] = key.type;
 				json["Active"] = key.active;
-				switch(key.method) {
+				switch (key.method) {
 				case InputManager::Key::Method::KEY:
 					json["Key"] = key.key;
 					break;
@@ -57,7 +53,7 @@ namespace GUI {
 				key.type = json["Type"];
 				key.active = json["Active"];
 
-				switch(key.method) {
+				switch (key.method) {
 				case InputManager::Key::Method::KEY:
 					json.at("Key").get_to(key.key);
 					break;
