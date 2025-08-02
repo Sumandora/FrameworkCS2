@@ -33,18 +33,21 @@ void Bhop::create_move(UserCmd* cmd)
 
 	const bool predicted = Prediction::begin(cmd);
 
+	cmd->buttons.buttonstate1 &= ~IN_JUMP;
+	cmd->buttons.buttonstate2 &= ~IN_JUMP;
+
 	if (Memory::local_player->flags() & FL_ONGROUND) {
 		// TODO like all the timings are wrong here...
 		// I should probably add like a "Humanized inputs" option
-		cmd->buttons.buttonstate1 &= ~IN_JUMP;
+		cmd->buttons.buttonstate1 |= IN_JUMP;
 		cmd->buttons.buttonstate2 |= IN_JUMP;
 
-		CSubtickMoveStep* new_step = cmd->allocate_new_move_step(0.0001F);
+		CSubtickMoveStep* new_step = cmd->allocate_new_move_step(1.0F);
 
 		new_step->set_button(IN_JUMP);
 		new_step->set_pressed(true);
 
-		new_step = cmd->allocate_new_move_step(0.0001F);
+		new_step = cmd->allocate_new_move_step(1.0F);
 
 		new_step->set_button(IN_JUMP);
 		new_step->set_pressed(false);

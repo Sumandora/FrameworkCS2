@@ -72,7 +72,8 @@ public:
 	static void resolve_signatures();
 	static UserCmd* get_current_command(BasePlayerController* controller);
 
-	CSubtickMoveStep* allocate_new_move_step(float when);
+	// When completely_empty is turned off, then this function may hijack an existing subtick if it didn't have any button data.
+	CSubtickMoveStep* allocate_new_move_step(float when, bool completely_empty = false);
 
 	// Sets button state inside Buttons and in CInButtonStatePB
 	void set_buttonstate1(std::uint64_t value);

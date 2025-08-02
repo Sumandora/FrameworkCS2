@@ -6,6 +6,7 @@
 #include "../../SDK/ConVar/EngineCvar.hpp"
 #include "../../SDK/Entities/BaseEntity.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
+#include "../../SDK/GameClass/Source2ClientPrediction.hpp"
 #include "../../SDK/GameClass/UserCmd.hpp"
 
 #include "../../Memory.hpp"
@@ -13,6 +14,7 @@
 #include "../../Interfaces.hpp"
 
 #include "../../Utils/MovementQuantization.hpp"
+#include "../../Utils/Prediction.hpp"
 
 #include "glm/common.hpp"
 #include "glm/ext/vector_float2.hpp"
@@ -61,12 +63,14 @@ void AutoStrafer::create_move(UserCmd* cmd)
 	const float forward = cmd->csgo_usercmd.base().forwardmove();
 	const float left = cmd->csgo_usercmd.base().leftmove();
 
-	if (local_player->flags() & FL_ONGROUND && !(cmd->buttons.buttonstate1 & IN_JUMP)) {
-		// Only abort if we are not going to be in air again (if bhopping don't abort)
-		if (forward == 0.0F && left == 0.0F)
-			last_wish_direction.reset(); // We have no direction to move to.
-		else
-			last_wish_direction = glm::atan(left, forward);
+	if (local_player->flags() & FL_ONGROUND) {
+		if (!(cmd->buttons.buttonstate1 & IN_JUMP)) {
+			// Only abort if we are not going to be in air again (if bhopping don't abort)
+			if (forward == 0.0F && left == 0.0F)
+				last_wish_direction.reset(); // We have no direction to move to.
+			else
+				last_wish_direction = glm::atan(left, forward);
+		}
 		return;
 	}
 

@@ -1,21 +1,23 @@
 #include "UserCmd.hpp"
 
-#include "../../Memory.hpp"
 #include "../GameClass/Source2Client.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
-
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
 
 #include "RetAddrSpoofer.hpp"
 
-#include "../../Utils/Logging.hpp"
 #include "../../Interfaces.hpp"
+#include "../../Memory.hpp"
 
+#include <algorithm>
 #include <cstdint>
+#include <cstdlib>
 #include <format>
+#include <memory>
+#include <ranges>
 #include <string>
 #include <string_view>
 
@@ -80,20 +82,37 @@ UserCmd* UserCmd::get_current_command(BasePlayerController* controller)
 	return RetAddrSpoofer::invoke(get_usercmd, controller, current_usercmd_index);
 }
 
-CSubtickMoveStep* UserCmd::allocate_new_move_step(float when)
+CSubtickMoveStep* UserCmd::allocate_new_move_step(float when, bool completely_empty)
 {
 	if (!csgo_usercmd.has_base())
 		return nullptr;
 
 	auto* subtick_moves = csgo_usercmd.mutable_base()->mutable_subtick_moves();
 
-	CSubtickMoveStep* new_step = RetAddrSpoofer::invoke(allocate_subtick_move, subtick_moves->GetArena());
+	CSubtickMoveStep* new_step = nullptr;
+
+	if (!completely_empty && !subtick_moves->empty()) {
+		auto it
+			= *subtick_moves
+			| std::ranges::views::filter([](CSubtickMoveStep& move_step) {
+				  return !move_step.has_button();
+			  });
+
+		if (!it.empty()) {
+			auto closest = std::ranges::min_element(it, {}, [when](CSubtickMoveStep& move_step) { return std::abs(when - move_step.when()); });
+			new_step = std::to_address(closest);
+		}
+	}
+
+	// Didn't find anything yet? Fine okay let's allocate one.
+	if (!new_step) {
+		new_step = RetAddrSpoofer::invoke(allocate_subtick_move, subtick_moves->GetArena());
+		subtick_moves->AddAllocated(new_step);
+	}
 
 	new_step->set_when(when);
 
-	// TODO: Reorder move steps when the 'when' lies in between other move steps, e.g. when whens look like this 0.1, 0.2, 0.15, they should be reordered to 0.1, 0.15, 0.2
-
-	subtick_moves->AddAllocated(new_step);
+	std::ranges::stable_sort(*subtick_moves, {}, [](const CSubtickMoveStep& move_step) { return move_step.when(); });
 
 	return new_step;
 }
@@ -160,9 +179,44 @@ void UserCmd::fixup_buttons_for_move(float last_forwardmove, float last_leftmove
 	const std::uint64_t last_move = last_buttons.buttonstate1 & MOVE_MASK;
 	const std::uint64_t next_move = this->buttons.buttonstate1 & MOVE_MASK;
 	const std::uint64_t changes = last_move ^ next_move;
-	set_buttonstate2(this->buttons.buttonstate2 | changes);
+	set_buttonstate2((this->buttons.buttonstate2 & ~MOVE_MASK) | changes);
 
-	// TODO add subtick for changes
+	auto* list = csgo_usercmd.mutable_base()->mutable_subtick_moves();
+
+	while (true) {
+		auto it = std::ranges::find_if(*list,
+			[](CSubtickMoveStep& move_step) { return move_step.button() & MOVE_MASK; });
+		if (it == list->end())
+			break;
+		list->erase(it);
+	}
+
+	// TODO randomize timings
+
+	// The reason why I'm doing this in this odd order is to keep the important buttons at the top of the list of subticks, so that if we exceed
+	// the maximum subtick moves, the most important movements are still processed.
+
+	// Let's enable the buttons that are newly pressed
+	for (const std::uint64_t bit : { IN_FORWARD, IN_BACK, IN_MOVELEFT, IN_MOVERIGHT }) {
+		if (!(this->buttons.buttonstate2 & bit))
+			continue; // unchanged
+		if (!(buttons & bit))
+			continue;
+		CSubtickMoveStep* step = allocate_new_move_step(0.005F);
+		step->set_pressed(true);
+		step->set_button(bit);
+	}
+
+	// Now let's disable the buttons that are no longer pressed
+	for (const std::uint64_t bit : { IN_FORWARD, IN_BACK, IN_MOVELEFT, IN_MOVERIGHT }) {
+		if (!(this->buttons.buttonstate2 & bit))
+			continue; // unchanged
+		if (!(buttons & bit))
+			continue;
+		CSubtickMoveStep* step = allocate_new_move_step(0.005F);
+		step->set_pressed(false);
+		step->set_button(bit);
+	}
 }
 
 void UserCmd::spread_out_rotation_changes(float old_yaw, float old_pitch)
