@@ -27,7 +27,6 @@ void Removals::remove_ads_update() const
 	if (!Interfaces::panorama_ui_engine)
 		return;
 
-	// Because we don't only check for equality on the pointer and never dereference it, it is fine for it to get outdated every now and then...
 	static Interval<std::chrono::seconds, 1> update_interval;
 	if (!update_interval.passed())
 		return;
@@ -42,7 +41,9 @@ void Removals::remove_ads_update() const
 				return;
 
 			UIPanel* ads_panel = engine->find_panel("JsLeftColumn");
-			engine->run_script(ads_panel, "$.GetContextPanel().SetHasClass('hidden', false);");
+			if (ads_panel) {
+				engine->run_script(ads_panel, "$.GetContextPanel().SetHasClass('hidden', false);");
+			}
 		}
 		return;
 	}
