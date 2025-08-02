@@ -1,8 +1,9 @@
 #include "KeyValues3.hpp"
 
 #include "../../Libraries.hpp"
-
 #include "../../Memory.hpp"
+
+#include "RetAddrSpoofer.hpp"
 
 #include <dlfcn.h>
 
@@ -18,5 +19,5 @@ void KeyValues3::resolve_functions()
 
 void KeyValues3::load_kv3(const char* text, const KV3ID& kv3_id)
 {
-	::load_kv3(this, nullptr, text, &kv3_id, "", 0 /* TODO what is this int, it got added in an update */);
+	RetAddrSpoofer::invoke(::load_kv3, this, static_cast<UtlString*>(nullptr), text, &kv3_id, "", 0U /* TODO what is this int, it got added in an update */);
 }

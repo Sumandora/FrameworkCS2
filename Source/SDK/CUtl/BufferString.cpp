@@ -4,6 +4,8 @@
 
 #include "../../Memory.hpp"
 
+#include "RetAddrSpoofer.hpp"
+
 #include <dlfcn.h>
 #include <link.h>
 
@@ -38,10 +40,10 @@ BufferString::~BufferString()
 
 void BufferString::purge(int unk1)
 {
-	::purge(this, unk1);
+	RetAddrSpoofer::invoke(::purge, this, unk1);
 }
 
 void BufferString::insert(int unk1, const char* str, int unk2, bool unk3)
 {
-	::insert(this, unk1, str, unk2, unk3);
+	RetAddrSpoofer::invoke(::insert, this, unk1, str, unk2, unk3);
 }
