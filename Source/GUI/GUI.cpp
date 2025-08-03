@@ -307,12 +307,16 @@ void GUI::render(VkCommandBuffer command_buffer)
 	}
 	get_texture_manager().purge_old_textures();
 
-	Notifications::render();
 
 	if (Features::initialized) {
-		grenade_helper->draw();
+		// The order here matters, all of these features move their window back so the order is basically reversed,
+		// the first thing becomes the top-most out of the other ones.
 		bomb_timer->draw();
+		grenade_helper->draw();
 	}
+
+	// Notifications move their windows to the front
+	Notifications::render();
 
 	ImGui::Render();
 
