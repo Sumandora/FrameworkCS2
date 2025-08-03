@@ -4,16 +4,18 @@
 #include "../Schema/SchemaClassInfo.hpp"
 #include "../Schema/SchemaSystem.hpp"
 
+#include "../VirtualMethod.hpp"
+
 #include "../../Memory.hpp"
 
 #include "../Enums/LifeState.hpp"
+#include "../Enums/TeamID.hpp"
 
 #include "EntityInstance.hpp"
 
 #include "glm/ext/vector_float3.hpp"
 
 #include <cstdint>
-#include <type_traits>
 
 struct CollisionProperty;
 struct GameSceneNode;
@@ -26,16 +28,6 @@ class EntityHandle;
 
 constexpr std::uint32_t FL_ONGROUND = 1 << 0;
 constexpr std::uint32_t FL_DUCKING = 1 << 1;
-
-// NOLINTNEXTLINE(performance-enum-size)
-enum class TeamID : int {
-	TEAM_INVALID = -1,
-	TEAM_ANY = -1,
-	TEAM_UNASSIGNED = 0,
-	TEAM_SPECTATOR = 1,
-	TEAM_TERRORIST = 2,
-	TEAM_COUNTER_TERRORIST = 3,
-};
 
 // @schema MoveType_t
 enum MoveType : std::uint8_t {
