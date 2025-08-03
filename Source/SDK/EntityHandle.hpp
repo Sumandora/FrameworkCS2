@@ -46,4 +46,9 @@ public:
 	{
 		return index;
 	}
+
+	auto operator<=>(const EntityHandle<Ent>& other) const
+	{
+		return index <=> other.index;
+	}
 };

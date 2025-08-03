@@ -17,6 +17,7 @@
 #include "Visuals/Radar.hpp"
 #include "Visuals/Removals.hpp"
 #include "Visuals/WorldColors.hpp"
+#include "PlayerList/PlayerList.hpp"
 
 void Features::create()
 {
@@ -37,12 +38,14 @@ void Features::create()
 	bomb_timer.emplace();
 	vote_revealer.emplace();
 	world_colors.emplace();
+	player_list.emplace();
 
 	initialized = true;
 }
 
 void Features::destroy()
 {
+	player_list.reset();
 	world_colors.reset();
 	vote_revealer.reset();
 	bomb_timer.reset();

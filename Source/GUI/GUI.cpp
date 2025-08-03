@@ -33,6 +33,7 @@
 
 #include "../Features/Features.hpp"
 #include "../Features/Misc/BombTimer.hpp"
+#include "../Features/PlayerList/PlayerList.hpp"
 #include "../Features/Visuals/GrenadeHelper.hpp"
 
 class OwningSDLEvent {
@@ -307,10 +308,10 @@ void GUI::render(VkCommandBuffer command_buffer)
 	}
 	get_texture_manager().purge_old_textures();
 
-
 	if (Features::initialized) {
 		// The order here matters, all of these features move their window back so the order is basically reversed,
 		// the first thing becomes the top-most out of the other ones.
+		player_list->draw();
 		bomb_timer->draw();
 		grenade_helper->draw();
 	}

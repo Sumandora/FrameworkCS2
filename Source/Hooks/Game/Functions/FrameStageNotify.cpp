@@ -4,6 +4,7 @@
 
 #include "../../../Features/Misc/BombTimer.hpp"
 #include "../../../Features/Misc/Hitmarker.hpp"
+#include "../../../Features/PlayerList/PlayerList.hpp"
 #include "../../../Features/Visuals/Chams/Chams.hpp"
 #include "../../../Features/Visuals/ESP/ESP.hpp"
 #include "../../../Features/Visuals/GrenadeHelper.hpp"
@@ -50,6 +51,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		chams->update_pvs();
 		removals->remove_ads_update();
 		bomb_timer->update();
+		player_list->update();
 
 		const MutexGuard<ImDrawList*> draw_list_guard = GUI::get_draw_list();
 		ImDrawList* draw_list = *draw_list_guard;
