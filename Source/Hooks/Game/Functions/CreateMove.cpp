@@ -27,7 +27,7 @@ void* Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl
 {
 	void* ret = RetAddrSpoofer::invoke<void*>(reinterpret_cast<void*>(hook->get_trampoline()), csgo_input, esi, dl);
 
-	if (!Memory::local_player_controller)
+	if (!Memory::local_player_controller || !*Memory::local_player_controller)
 		return ret;
 
 	UserCmd* usercmd = UserCmd::get_current_command(*Memory::local_player_controller);
