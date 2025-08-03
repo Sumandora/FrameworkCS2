@@ -78,6 +78,10 @@ void GUI::Theme::anti_purple_theme()
 	colors[ImGuiCol_TabUnfocused] = BACKGROUND3;
 	colors[ImGuiCol_TabUnfocusedActive] = BACKGROUND3;
 
+	colors[ImGuiCol_TableHeaderBg] = BACKGROUND3;
+	colors[ImGuiCol_TableBorderLight] = with_alpha(BORDER, 128);
+	colors[ImGuiCol_TableBorderStrong] = with_alpha(BORDER, 128);
+
 	style.WindowBorderSize = style.ChildBorderSize = style.PopupBorderSize = style.FrameBorderSize = style.TabBorderSize = 2;
 
 	style.WindowRounding = style.ChildRounding = style.FrameRounding = style.PopupRounding = style.ScrollbarRounding = style.GrabRounding = style.TabRounding = 6;
