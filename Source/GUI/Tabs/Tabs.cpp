@@ -20,19 +20,28 @@ void GUI::Tabs::render()
 
 		if (ImGui::BeginTabBar("#Top level tabs", ImGuiTabBarFlags_Reorderable)) {
 			for (auto& [category, vector] : Features::features) {
-				if (ImGuiExt::BeginBoxedTabItem(category.c_str(), remaining_size)) {
-					std::string tag = category;
-					tag.insert(0, 1, '#');
-					if (ImGui::BeginTabBar(tag.c_str(), ImGuiTabBarFlags_Reorderable)) {
-						for (Feature* feature : vector) {
-							if (ImGuiExt::BeginBoxedTabItem(feature->get_name().c_str(), ImGui::GetContentRegionAvail())) {
-								feature->render_all_childs();
-								ImGuiExt::EndBoxedTabItem();
-							}
-						}
-						ImGui::EndTabBar();
+				if (vector.size() == 1) {
+					// There's only one feature, no point in doing this weird indirection, just show the thing.
+					Feature* feature = vector.at(0);
+					if (ImGuiExt::BeginBoxedTabItem(feature->get_name().c_str(), remaining_size)) {
+						feature->render_all_childs();
+						ImGuiExt::EndBoxedTabItem();
 					}
-					ImGuiExt::EndBoxedTabItem();
+				} else {
+					if (ImGuiExt::BeginBoxedTabItem(category.c_str(), remaining_size)) {
+						std::string tag = category;
+						tag.insert(0, 1, '#');
+						if (ImGui::BeginTabBar(tag.c_str(), ImGuiTabBarFlags_Reorderable)) {
+							for (Feature* feature : vector) {
+								if (ImGuiExt::BeginBoxedTabItem(feature->get_name().c_str(), ImGui::GetContentRegionAvail())) {
+									feature->render_all_childs();
+									ImGuiExt::EndBoxedTabItem();
+								}
+							}
+							ImGui::EndTabBar();
+						}
+						ImGuiExt::EndBoxedTabItem();
+					}
 				}
 			}
 
