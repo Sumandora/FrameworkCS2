@@ -21,38 +21,11 @@
 #include <string>
 #include <string_view>
 
-static void** usercmd_list = nullptr;
-static int (*cmdlist_index_from_entity)(BasePlayerController*) = nullptr;
-static void* (*get_usercmds)(void*, uint64_t) = nullptr;
 static UserCmd* (*get_usercmd)(BasePlayerController*, int) = nullptr;
 static CSubtickMoveStep* (*allocate_subtick_move)(google::protobuf::Arena* arena) = nullptr;
 
 void UserCmd::resolve_signatures()
 {
-	usercmd_list
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"48 8D 05 ? ? ? ? 4C 89 EF 4C 8B 30 E8">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .add(3)
-			  .relative_to_absolute()
-			  .BCRL_EXPECT(decltype(usercmd_list), usercmd_list);
-	cmdlist_index_from_entity
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 89 C6 31 C0 83 FE FF 0F 95 C0 4C 89 F7 29 C6 E8 ? ? ? ? 4C 89 EF">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .add(1)
-			  .relative_to_absolute()
-			  .BCRL_EXPECT(decltype(cmdlist_index_from_entity), cmdlist_index_from_entity);
-	get_usercmds
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 4C 89 EF 49 89 C6 8B 80">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .add(1)
-			  .relative_to_absolute()
-			  .BCRL_EXPECT(decltype(get_usercmds), get_usercmds);
 	get_usercmd
 		= BCRL::signature(
 			Memory::mem_mgr,
