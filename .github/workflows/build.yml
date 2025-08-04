@@ -46,11 +46,6 @@ jobs:
         run: |
           zypper refresh
           zypper install -y git cmake make gcc-c++ binutils-devel vulkan-devel libXext-devel freetype2-devel ccache libatomic1
-
-      - if: matrix.distro == 'fedora:latest' || matrix.distro == 'opensuse/tumbleweed'
-        name: Disable static liibatomic
-        run: |
-          echo "DOCKER_IMAGE_NAME=my.docker.repo/awesome-image:release" >> $GITHUB_ENV
  
       - uses: actions/checkout@v4
         with:

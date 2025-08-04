@@ -42,7 +42,7 @@ A fully-featured training software for Counter Strike: 2, made for Linux.
   <summary> Fedora </summary>
 
   ```sh
-  dnf install gdb git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel
+  dnf install gdb git cmake make gcc-c++ vulkan-loader-devel vulkan-headers libXext-devel libatomic
   ```
 </details>
 
@@ -50,7 +50,7 @@ A fully-featured training software for Counter Strike: 2, made for Linux.
   <summary> OpenSUSE </summary>
 
   ```sh
-  zypper install -y git cmake make gcc-c++ binutils-devel vulkan-devel libXext-devel freetype2-devel ccache
+  zypper install -y git cmake make gcc-c++ binutils-devel vulkan-devel libXext-devel freetype2-devel ccache libatomic1
   ```
 
   Only Tumbleweed is being tested, Leap installs a very outdated GCC version by default.
