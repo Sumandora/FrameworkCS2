@@ -204,8 +204,15 @@ void UserCmd::spread_out_rotation_changes(float old_yaw, float old_pitch)
 	const float delta_pitch_per_subtick = delta_pitch / static_cast<float>(csgo_usercmd.base().subtick_moves_size());
 
 	for (CSubtickMoveStep& move_step : *csgo_usercmd.mutable_base()->mutable_subtick_moves()) {
-		move_step.set_analog_yaw_delta(delta_yaw_per_subtick);
-		move_step.set_analog_pitch_delta(delta_pitch_per_subtick);
+		if (delta_yaw_per_subtick == 0.0F)
+			move_step.clear_analog_yaw_delta();
+		else
+			move_step.set_analog_yaw_delta(delta_yaw_per_subtick);
+
+		if (delta_pitch_per_subtick == 0.0F)
+			move_step.clear_analog_pitch_delta();
+		else
+			move_step.set_analog_pitch_delta(delta_pitch_per_subtick);
 	}
 }
 
