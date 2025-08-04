@@ -42,7 +42,7 @@ struct GameTrace {
 	PADDING(95);
 	glm::vec3 from;
 	glm::vec3 to;
-	PADDING(24);
+	PADDING(28);
 	float fraction;
 	PADDING(13);
 
@@ -50,4 +50,4 @@ struct GameTrace {
 	static GameTrace initialized();
 };
 
-static_assert(sizeof(GameTrace) >= 0xb9); // TODO weird alignment?
+static_assert(sizeof(GameTrace) >= 0xb9);
