@@ -23,8 +23,6 @@
 
 #include "imgui.h"
 
-#include <mutex>
-
 void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, ClientFrameStage stage)
 {
 	switch (stage) {
@@ -43,7 +41,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 	}
 
 	// TODO Ghetto fix, need to find new enum
-	case FRAME_SIMULATE_START: {
+	case FRAME_NET_UPDATE_END: {
 		CSPlayerController* controller = *Memory::local_player_controller;
 		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
 
