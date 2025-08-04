@@ -6,6 +6,8 @@
 #include "Misc/BombTimer.hpp"
 #include "Misc/Hitmarker.hpp"
 #include "Misc/VoteRevealer/VoteRevealer.hpp"
+#include "PlayerList/PlayerList.hpp"
+#include "Visuals/BulletTracers.hpp"
 #include "Visuals/Chams/Chams.hpp"
 #include "Visuals/ESP/ESP.hpp"
 #include "Visuals/ForceCrosshair.hpp"
@@ -17,7 +19,6 @@
 #include "Visuals/Radar.hpp"
 #include "Visuals/Removals.hpp"
 #include "Visuals/WorldColors.hpp"
-#include "PlayerList/PlayerList.hpp"
 
 void Features::create()
 {
@@ -39,12 +40,14 @@ void Features::create()
 	vote_revealer.emplace();
 	world_colors.emplace();
 	player_list.emplace();
+	bullet_tracers.emplace();
 
 	initialized = true;
 }
 
 void Features::destroy()
 {
+	bullet_tracers.reset();
 	player_list.reset();
 	world_colors.reset();
 	vote_revealer.reset();

@@ -7,6 +7,7 @@
 #include "../../../Features/Misc/Bhop.hpp"
 #include "../../../Features/Visuals/ForceThirdPerson.hpp"
 #include "../../../Features/Visuals/GrenadeHelper.hpp"
+#include "../../../Features/Visuals/BulletTracers.hpp"
 
 #include "../../../Memory.hpp"
 
@@ -61,6 +62,7 @@ void* Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl
 		const glm::vec3 vec = glm::vec3(viewangles.x(), viewangles.y(), viewangles.z());
 		grenade_helper->update_viewangles(vec);
 		force_third_person->update_viewangles(vec);
+		bullet_tracers->update_viewangles(vec);
 	}
 
 	const float forward = usercmd->csgo_usercmd.base().forwardmove();
