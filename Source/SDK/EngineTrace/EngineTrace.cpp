@@ -2,9 +2,10 @@
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
+#include "SignatureScanner/PatternSignature.hpp"
+#include "SignatureScanner/XRefSignature.hpp"
 
 #include "RetAddrSpoofer.hpp"
-#include "SignatureScanner/PatternSignature.hpp"
 
 #include "glm/ext/vector_float3.hpp"
 
@@ -27,10 +28,11 @@ void EngineTrace::resolve_signatures()
 	::trace_shape
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? F3 0F 10 05 ? ? ? ? 0F 2F 45 ? 77 ? 80 7D ? 00 0F 84 ? ? ? ? F3 0F 10 4D">(),
-			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .add(1)
-			  .relative_to_absolute()
+			SignatureScanner::PatternSignature::for_literal_string<"Physics/TraceShape (Client)">(),
+			BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 			  .BCRL_EXPECT(decltype(::trace_shape), ::trace_shape);
 }
 

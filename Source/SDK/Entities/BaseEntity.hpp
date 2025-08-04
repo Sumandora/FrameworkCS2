@@ -6,8 +6,6 @@
 
 #include "../VirtualMethod.hpp"
 
-#include "../../Memory.hpp"
-
 #include "../Enums/LifeState.hpp"
 #include "../Enums/TeamID.hpp"
 
