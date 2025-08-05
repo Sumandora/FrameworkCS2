@@ -155,16 +155,6 @@ namespace Hooks::Game {
 				ClientModeCSNormal::override_view_index)
 				  .BCRL_EXPECT(void*, override_view);
 
-		void* update_bomb_radius
-			= BCRL::signature(
-				Memory::mem_mgr,
-				SignatureScanner::PatternSignature::for_literal_string<"bombradius">(),
-				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
-				  .find_xrefs(SignatureScanner::XRefTypes::relative(),
-					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
-				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 31 d2 48 89 e5">())
-				  .BCRL_EXPECT(void*, update_bomb_radius);
-
 		void* on_vote_start
 			= BCRL::signature(
 				Memory::mem_mgr,
@@ -237,10 +227,6 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			override_view,
 			reinterpret_cast<void*>(OverrideView::hook_func));
-		UpdateBombRadius::hook.emplace(
-			Memory::emalloc,
-			update_bomb_radius,
-			reinterpret_cast<void*>(UpdateBombRadius::hook_func));
 		OnVoteStart::hook.emplace(
 			Memory::emalloc,
 			on_vote_start,
@@ -261,7 +247,6 @@ namespace Hooks::Game {
 		SyncViewAngles::hook->enable();
 		EmitSound::hook->enable();
 		OverrideView::hook->enable();
-		UpdateBombRadius::hook->enable();
 		OnVoteStart::hook->enable();
 		ParticlesDrawArray::hook->enable();
 	}
@@ -270,7 +255,6 @@ namespace Hooks::Game {
 	{
 		ParticlesDrawArray::hook.reset();
 		OnVoteStart::hook.reset();
-		UpdateBombRadius::hook.reset();
 		OverrideView::hook.reset();
 		EmitSound::hook.reset();
 		SyncViewAngles::hook.reset();

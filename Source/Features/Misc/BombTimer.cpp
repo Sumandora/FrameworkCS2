@@ -6,6 +6,7 @@
 #include "../../SDK/Entities/CSPlayerController.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../SDK/Entities/GameEntitySystem.hpp"
+#include "../../SDK/Entities/MapInfo.hpp"
 #include "../../SDK/Entities/PlantedC4.hpp"
 #include "../../SDK/EntityHandle.hpp"
 #include "../../SDK/GameClass/GameSceneNode.hpp"
@@ -60,14 +61,8 @@ static bool is_c4_relevant(const PlantedC4* c4)
 	return true;
 }
 
-void BombTimer::update()
+PlantedC4* BombTimer::update_planted_c4()
 {
-	if (!enabled.get() || !Memory::local_player) {
-		const std::lock_guard lock{ bomb_info_lock };
-		bomb_info.reset();
-		return;
-	}
-
 	if (planted_c4.has_entity()) {
 		const PlantedC4* old_c4 = planted_c4.get();
 		if (old_c4 && !is_c4_relevant(old_c4)) {
@@ -75,7 +70,7 @@ void BombTimer::update()
 		}
 	}
 
-	const PlantedC4* c4 = nullptr;
+	PlantedC4* c4 = nullptr;
 	// NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
 	if (!planted_c4.has_entity() || (c4 = planted_c4.get()) == nullptr) {
 		for (PlantedC4* potential_c4 : GameEntitySystem::the()->entities_of_type<PlantedC4>()) {
@@ -88,19 +83,57 @@ void BombTimer::update()
 	}
 
 	if (!c4) {
-		const std::lock_guard lock{ bomb_info_lock };
-		bomb_info.reset();
+		return nullptr;
+	}
+
+	planted_c4 = c4->get_handle();
+	return c4;
+}
+
+MapInfo* BombTimer::update_map_info()
+{
+	MapInfo* map_info = nullptr;
+	// NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
+	if (!this->map_info.has_entity() || (map_info = this->map_info.get()) == nullptr) {
+		map_info = *GameEntitySystem::the()->entities_of_type<MapInfo>().begin();
+	}
+
+	return map_info;
+}
+
+void BombTimer::clear_bomb_info()
+{
+	const std::lock_guard lock{ bomb_info_lock };
+	bomb_info.reset();
+}
+
+void BombTimer::update()
+{
+	if (!enabled.get() || !Memory::local_player) {
+		clear_bomb_info();
+		return;
+	}
+
+	PlantedC4* c4 = update_planted_c4();
+	if (!c4) {
+		clear_bomb_info();
 		planted_c4 = EntityHandle<PlantedC4>::invalid();
 		return;
 	}
 
-	planted_c4 = c4->get_handle();
+	MapInfo* map_info = update_map_info();
+	if (!map_info) {
+		this->map_info = EntityHandle<MapInfo>::invalid();
+	}
+
+	float bomb_radius = 500.0F; // Default value
+	if (map_info && map_info->bomb_radius() != 0)
+		bomb_radius = map_info->bomb_radius();
 
 	const GameSceneNode* local_node = Memory::local_player->gameSceneNode();
 	const GameSceneNode* c4_node = c4->gameSceneNode();
 	if (!local_node || !c4_node) {
-		const std::lock_guard lock{ bomb_info_lock };
-		bomb_info.reset();
+		clear_bomb_info();
 		return;
 	}
 
@@ -205,10 +238,4 @@ void BombTimer::draw()
 		ImGui::BringWindowToDisplayBack(ImGui::GetCurrentWindow());
 
 	ImGui::End();
-}
-
-void BombTimer::update_bomb_radius(float radius)
-{
-	Logging::debug("Updating bomb radius to {}", radius);
-	this->bomb_radius = radius;
 }

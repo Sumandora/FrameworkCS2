@@ -6,8 +6,8 @@
 
 #include "../../Utils/UninitializedObject.hpp"
 
-#include "../../SDK/Entities/PlantedC4.hpp"
 #include "../../SDK/Entities/MapInfo.hpp"
+#include "../../SDK/Entities/PlantedC4.hpp"
 #include "../../SDK/EntityHandle.hpp"
 
 #include <cstdint>
@@ -19,7 +19,10 @@ class BombTimer : public Feature {
 	Checkbox enabled{ this, "Enabled", false };
 
 	EntityHandle<PlantedC4> planted_c4 = EntityHandle<PlantedC4>::invalid();
-	float bomb_radius = 500.0F;
+	PlantedC4* update_planted_c4();
+
+	EntityHandle<MapInfo> map_info = EntityHandle<MapInfo>::invalid();
+	MapInfo* update_map_info();
 
 	struct BombInfo {
 		float current_time;
@@ -38,13 +41,13 @@ class BombTimer : public Feature {
 	std::optional<BombInfo> bomb_info;
 	std::mutex bomb_info_lock;
 
+	void clear_bomb_info();
+
 public:
 	BombTimer();
 
 	void update();
 	void draw();
-
-	void update_bomb_radius(float radius);
 };
 
 inline UninitializedObject<BombTimer> bomb_timer;
