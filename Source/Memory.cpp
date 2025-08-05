@@ -19,6 +19,7 @@
 #include "SDK/GameClass/MemAlloc.hpp"
 #include "SDK/GameClass/NetworkGameClient.hpp"
 #include "SDK/GameClass/UserCmd.hpp"
+#include "SDK/Particles/GameParticleManager.hpp"
 
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
@@ -166,6 +167,8 @@ void Memory::create()
 	UtlBuffer::resolve_functions();
 	BufferString::resolve_functions();
 	KeyValues3::resolve_functions();
+
+	GameParticleManager::resolve_signatures();
 }
 
 float Memory::get_smoke_density_in_line(const glm::vec3& from, const glm::vec3& to)
