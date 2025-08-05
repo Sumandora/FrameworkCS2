@@ -33,4 +33,5 @@ namespace GUI {
 	float get_base_font_size();
 
 	MutexGuard<ImDrawList*> get_draw_list();
+	ImDrawListSharedData* get_draw_list_shared_data();
 }

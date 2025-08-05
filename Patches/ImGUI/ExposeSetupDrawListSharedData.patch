@@ -1,0 +1,57 @@
+diff '--color=auto' -Naur -x .git imgui-src/imgui.cpp imgui2-src/imgui.cpp
+--- imgui-src/imgui.cpp	2025-08-03 17:33:49.320616336 +0200
++++ imgui2-src/imgui.cpp	2025-08-05 23:13:34.272107306 +0200
+@@ -5086,24 +5086,24 @@
+ }
+ 
+ // Called once a frame. Followed by SetCurrentFont() which sets up the remaining data.
+-static void SetupDrawListSharedData()
++void ImGui::SetupDrawListSharedData(ImDrawListSharedData* data)
+ {
+     ImGuiContext& g = *GImGui;
+     ImRect virtual_space(FLT_MAX, FLT_MAX, -FLT_MAX, -FLT_MAX);
+     for (ImGuiViewportP* viewport : g.Viewports)
+         virtual_space.Add(viewport->GetMainRect());
+-    g.DrawListSharedData.ClipRectFullscreen = virtual_space.ToVec4();
+-    g.DrawListSharedData.CurveTessellationTol = g.Style.CurveTessellationTol;
+-    g.DrawListSharedData.SetCircleTessellationMaxError(g.Style.CircleTessellationMaxError);
+-    g.DrawListSharedData.InitialFlags = ImDrawListFlags_None;
++    data->ClipRectFullscreen = virtual_space.ToVec4();
++    data->CurveTessellationTol = g.Style.CurveTessellationTol;
++    data->SetCircleTessellationMaxError(g.Style.CircleTessellationMaxError);
++    data->InitialFlags = ImDrawListFlags_None;
+     if (g.Style.AntiAliasedLines)
+-        g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AntiAliasedLines;
++        data->InitialFlags |= ImDrawListFlags_AntiAliasedLines;
+     if (g.Style.AntiAliasedLinesUseTex && !(g.IO.Fonts->Flags & ImFontAtlasFlags_NoBakedLines))
+-        g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AntiAliasedLinesUseTex;
++        data->InitialFlags |= ImDrawListFlags_AntiAliasedLinesUseTex;
+     if (g.Style.AntiAliasedFill)
+-        g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AntiAliasedFill;
++        data->InitialFlags |= ImDrawListFlags_AntiAliasedFill;
+     if (g.IO.BackendFlags & ImGuiBackendFlags_RendererHasVtxOffset)
+-        g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AllowVtxOffset;
++        data->InitialFlags |= ImDrawListFlags_AllowVtxOffset;
+ }
+ 
+ void ImGui::NewFrame()
+@@ -5148,7 +5148,7 @@
+ 
+     // Setup current font and draw list shared data
+     g.IO.Fonts->Locked = true;
+-    SetupDrawListSharedData();
++    SetupDrawListSharedData(&g.DrawListSharedData);
+     SetCurrentFont(GetDefaultFont());
+     IM_ASSERT(g.Font->IsLoaded());
+ 
+diff '--color=auto' -Naur -x .git imgui-src/imgui.h imgui2-src/imgui.h
+--- imgui-src/imgui.h	2025-08-03 17:33:49.450614842 +0200
++++ imgui2-src/imgui.h	2025-08-05 23:12:32.614707641 +0200
+@@ -1056,6 +1056,7 @@
+     IMGUI_API void*         MemAlloc(size_t size);
+     IMGUI_API void          MemFree(void* ptr);
+ 
++    void SetupDrawListSharedData(ImDrawListSharedData* data);
+ } // namespace ImGui
+ 
+ //-----------------------------------------------------------------------------

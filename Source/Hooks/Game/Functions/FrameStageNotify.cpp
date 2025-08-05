@@ -54,6 +54,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		const MutexGuard<ImDrawList*> draw_list_guard = GUI::get_draw_list();
 		ImDrawList* draw_list = *draw_list_guard;
 		if (draw_list != nullptr) { // it was not yet initialized by the other thread
+			ImGui::SetupDrawListSharedData(GUI::get_draw_list_shared_data());
 			draw_list->_ResetForNewFrame();
 			draw_list->PushClipRectFullScreen();
 			draw_list->PushTextureID(ImGui::GetIO().Fonts->TexID);

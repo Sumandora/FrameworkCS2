@@ -395,3 +395,8 @@ MutexGuard<ImDrawList*> GUI::get_draw_list()
 	draw_list_mutex.lock();
 	return MutexGuard{ &draw_list, &draw_list_mutex };
 }
+
+ImDrawListSharedData* GUI::get_draw_list_shared_data()
+{
+	return draw_list_shared_data;
+}

@@ -7,6 +7,7 @@ FetchContent_Declare(imgui
 	PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/Patches/ImGUI/FullyRoundedTabs.patch
 							${CMAKE_CURRENT_SOURCE_DIR}/Patches/ImGUI/RoundedImageButtons.patch
 							${CMAKE_CURRENT_SOURCE_DIR}/Patches/ImGUI/PrependDrawList.patch
+							${CMAKE_CURRENT_SOURCE_DIR}/Patches/ImGUI/ExposeSetupDrawListSharedData.patch
 	UPDATE_DISCONNECTED TRUE)
 FetchContent_MakeAvailable(imgui)
 
