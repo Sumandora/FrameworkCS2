@@ -7,6 +7,8 @@
 
 #include "../../Memory.hpp"
 
+#include "RetAddrSpoofer.hpp"
+
 #include "Particle.hpp"
 #include "ParticleEffect.hpp"
 #include "ParticleSnapshot.hpp"
@@ -93,15 +95,15 @@ GameParticleManager* GameParticleManager::get()
 
 Particle* GameParticleManager::create_particle(ParticleEffect* effect)
 {
-	return ::create_particle(this, effect);
+	return RetAddrSpoofer::invoke(::create_particle, this, effect);
 }
 
 void GameParticleManager::modify_particle(float unk, Particle* particle, int control_point_id, void* data)
 {
-	::modify_particle(unk, this, particle, control_point_id, data);
+	RetAddrSpoofer::invoke(::modify_particle, unk, this, particle, control_point_id, data);
 }
 
 void GameParticleManager::attach_particle_to_snapshot(Particle* particle, int unk, ParticleSnapshot** snapshot)
 {
-	::attach_particle_to_snapshot(this, particle, unk, snapshot);
+	RetAddrSpoofer::invoke(::attach_particle_to_snapshot, this, particle, unk, snapshot);
 }
