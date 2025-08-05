@@ -11,6 +11,7 @@
 #include "../SDK/Entities/Services/PlayerWeaponServices.hpp"
 #include "../SDK/Entities/VData/CSWeaponBaseVData.hpp"
 #include "../SDK/EntityHandle.hpp"
+#include "../SDK/Enums/TeamID.hpp"
 #include "../SDK/Padding.hpp"
 
 #include "../Memory.hpp"
@@ -270,15 +271,10 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 
 				BULLETSIM_DBG("scaled damage: {}", results.scaled_damage);
 
-				// TODO Finalize properly.
-				// MemAlloc::the()->deallocate(data.other_elements());
-				// MemAlloc::the()->deallocate(data.elements());
 				return results;
 			}
 		}
 	}
 
-	// MemAlloc::the()->deallocate(data.other_elements());
-	// MemAlloc::the()->deallocate(data.elements());
 	return {};
 }
