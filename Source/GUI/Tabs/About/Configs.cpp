@@ -13,7 +13,6 @@
 #include <filesystem>
 #include <string>
 #include <system_error>
-#include <vector>
 
 static constexpr const char* CONFIG_CREATION_FAILED_POPUP_ID = "Config creation failed.";
 static constexpr const char* CONFIG_LOAD_FAILED_POPUP_ID = "Config load failed.";
@@ -22,13 +21,17 @@ static constexpr const char* CONFIG_OVERWRITE_POPUP_ID = "Overwrite existing con
 
 void GUI::Tabs::About::draw_configs()
 {
+	static std::string config_name;
+
+	static std::expected<void, std::string> config_creation_result;
+	static std::error_code config_load_result;
+	static std::error_code config_delete_result;
+
 	if (!Serialization::are_configs_available()) {
 		ImGui::Text("Configs aren't available. Check standard output.");
 		return;
 	}
 
-	static std::string config_name;
-	static std::expected<void, std::string> config_creation_result;
 	if (ImGui::Button("Save config")) {
 		do {
 			if (Serialization::is_reserved_name(config_name)) {
@@ -47,38 +50,9 @@ void GUI::Tabs::About::draw_configs()
 		} while (0);
 	}
 
-	if (ImGui::BeginPopupModal(CONFIG_OVERWRITE_POPUP_ID, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("Config '%s' already exists. Do you want to overwrite it?", config_name.c_str());
-		ImGui::Separator();
-
-		if (ImGui::Button("Yes", ImVec2(120, 0))) {
-			ImGui::CloseCurrentPopup();
-			config_creation_result = Serialization::create_config(config_name);
-			if (!config_creation_result.has_value())
-				ImGui::OpenPopup(CONFIG_CREATION_FAILED_POPUP_ID);
-		}
-		ImGui::SetItemDefaultFocus();
-		ImGui::SameLine();
-		if (ImGui::Button("No", ImVec2(120, 0))) {
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::EndPopup();
-	}
-
 	ImGui::SameLine();
 
 	ImGui::InputText("Config name", &config_name);
-
-	const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5F, 0.5F));
-
-	if (ImGui::BeginPopupModal(CONFIG_CREATION_FAILED_POPUP_ID, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::TextUnformatted(config_creation_result.error().c_str());
-		ImGui::EndPopup();
-	}
-
-	static std::error_code config_load_result;
-	static std::error_code config_delete_result;
 
 	// TODO At some point this should probably be cached and only re-read every now and then, but it's not performance-heavy and I don't feel like making this all lazy
 	for (const std::filesystem::path& path : Serialization::get_available_configs()) {
@@ -141,14 +115,43 @@ void GUI::Tabs::About::draw_configs()
 		ImGui::EndChild();
 	}
 
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5F, 0.5F));
+	const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 
-	if (ImGui::BeginPopupModal(CONFIG_LOAD_FAILED_POPUP_ID, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5F, 0.5F));
+	if (ImGui::BeginPopupModal(CONFIG_OVERWRITE_POPUP_ID, nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings)) {
+		ImGui::Text("Config '%s' already exists. Do you want to overwrite it?", config_name.c_str());
+		ImGui::Separator();
+
+		const float width = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x) / 2.0F;
+
+		if (ImGui::Button("Yes", { width, 0.0F })) {
+			ImGui::CloseCurrentPopup();
+			config_creation_result = Serialization::create_config(config_name);
+			if (!config_creation_result.has_value())
+				ImGui::OpenPopup(CONFIG_CREATION_FAILED_POPUP_ID);
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("No", { width, 0.0F })) {
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5F, 0.5F));
+	if (ImGui::BeginPopupModal(CONFIG_CREATION_FAILED_POPUP_ID, nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings)) {
+		ImGui::TextUnformatted(config_creation_result.error().c_str());
+		ImGui::EndPopup();
+	}
+
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5F, 0.5F));
+	if (ImGui::BeginPopupModal(CONFIG_LOAD_FAILED_POPUP_ID, nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings)) {
 		ImGui::TextUnformatted(config_load_result.message().c_str());
 		ImGui::EndPopup();
 	}
 
-	if (ImGui::BeginPopupModal(CONFIG_DELETION_FAILED_POPUP_ID, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5F, 0.5F));
+	if (ImGui::BeginPopupModal(CONFIG_DELETION_FAILED_POPUP_ID, nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings)) {
 		ImGui::TextUnformatted(config_delete_result.message().c_str());
 		ImGui::EndPopup();
 	}
