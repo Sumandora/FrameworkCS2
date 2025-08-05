@@ -2,7 +2,6 @@
 
 #include "../Feature.hpp"
 
-#include "../../SDK/CUtl/Vector.hpp"
 #include "../../SDK/EngineTrace/EngineTrace.hpp"
 #include "../../SDK/EngineTrace/Ray.hpp"
 #include "../../SDK/Entities/BasePlayerWeapon.hpp"
@@ -18,6 +17,7 @@
 #include "BCRL/Session.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
 
+#include "../../Interfaces.hpp"
 #include "../../Memory.hpp"
 
 #include "glm/ext/vector_float3.hpp"
@@ -47,29 +47,28 @@ static_assert(sizeof(ParticleEffect) == 0x48);
 
 struct Particle;
 
-struct ParticleManager { // TODO check the actual name
+struct GameParticleManager {
 	VIRTUAL_METHOD(4, show_particle, void, (Particle * particle), (this, particle));
 };
 
 struct ParticleSnapshot {
 };
 
-static ParticleManager* (*get_particles)() = nullptr;
-static Particle* (*create_particle)(ParticleManager* thisptr, ParticleEffect* effect) = nullptr;
-static void (*modify_particle)(float unk, ParticleManager* thisptr, Particle* particle, int control_point_id, void* data) = nullptr;
-static void (*attach_particle_to_snapshot)(ParticleManager* thisptr, Particle* particle, int unk, ParticleSnapshot** snapshot) = nullptr;
+static GameParticleManager* (*get_particles)() = nullptr;
+static Particle* (*create_particle)(GameParticleManager* thisptr, ParticleEffect* effect) = nullptr;
+static void (*modify_particle)(float unk, GameParticleManager* thisptr, Particle* particle, int control_point_id, void* data) = nullptr;
+static void (*attach_particle_to_snapshot)(GameParticleManager* thisptr, Particle* particle, int unk, ParticleSnapshot** snapshot) = nullptr;
 
-struct ParticleManager2 { // TODO check actual name
+class ParticleSystemMgr {
+public:
 	STATIC_VIRTUAL_METHOD(41, create_particle_snapshot, void,
-		(ParticleSnapshot * *snapshot, ParticleManager2* manager, std::uint64_t* unk),
-		(this, snapshot, manager, unk));
+		(ParticleSnapshot * *snapshot, std::uint64_t* unk),
+		(this, snapshot, this, unk));
 
 	VIRTUAL_METHOD(42, show_particle, void,
 		(ParticleSnapshot * *snapshot, int count, void* data),
 		(this, snapshot, count, data));
 };
-
-static ParticleManager2** particle_manager2 = nullptr;
 
 BulletTracers::BulletTracers()
 	: Feature("Visuals", "Bullet tracers")
@@ -107,15 +106,6 @@ BulletTracers::BulletTracers()
 			  .add(1)
 			  .relative_to_absolute()
 			  .BCRL_EXPECT(decltype(attach_particle_to_snapshot), attach_particle_to_snapshot);
-	particle_manager2
-		= BCRL::signature(
-			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"4C 8D 3D ? ? ? ? 0F 84 ? ? ? ? 48 8D 85">(),
-
-			BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
-			  .add(3)
-			  .relative_to_absolute()
-			  .BCRL_EXPECT(ParticleManager2**, particle_manager2);
 }
 
 void BulletTracers::update_viewangles(const glm::vec3& view_angles)
@@ -157,7 +147,7 @@ void BulletTracers::event_handler(GameEvent* event)
 	if (!vdata->is_gun())
 		return;
 
-	ParticleManager* mgr = get_particles();
+	GameParticleManager* mgr = get_particles();
 
 	const glm::vec3 from = Memory::local_player->gameSceneNode()->transform().m_Position + Memory::local_player->view_offset();
 	const float pitch = glm::radians(view_angles.x);
@@ -223,9 +213,9 @@ void BulletTracers::event_handler(GameEvent* event)
 	data.positions = positions.data();
 
 	std::uint64_t unk = 0;
-	(*particle_manager2)->create_particle_snapshot(&snapshot, *particle_manager2, &unk);
+	Interfaces::particle_system_mgr->create_particle_snapshot(&snapshot, &unk);
 
 	attach_particle_to_snapshot(mgr, particle, 0, &snapshot);
 
-	(*particle_manager2)->show_particle(&snapshot, static_cast<int>(positions.size()), &data);
+	Interfaces::particle_system_mgr->show_particle(&snapshot, static_cast<int>(positions.size()), &data);
 }

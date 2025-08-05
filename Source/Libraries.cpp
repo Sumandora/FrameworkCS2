@@ -43,10 +43,12 @@ void Libraries::create()
 	resourcesystem.emplace("libresourcesystem.so");
 	filesystem.emplace("libfilesystem_stdio.so");
 	localize.emplace("liblocalize.so");
+	particles.emplace("libparticles.so");
 }
 
 void Libraries::destroy()
 {
+	particles.reset();
 	localize.reset();
 	filesystem.reset();
 	resourcesystem.reset();

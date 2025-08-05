@@ -107,6 +107,7 @@ void Interfaces::grab_interfaces()
 	auto resourcesystem = InterfacedLibrary::create(Libraries::resourcesystem).value();
 	auto filesystem = InterfacedLibrary::create(Libraries::filesystem).value();
 	auto localize = InterfacedLibrary::create(Libraries::localize).value();
+	auto particles = InterfacedLibrary::create(Libraries::particles).value();
 
 	constexpr static auto INFO = [](std::string_view name, void* ptr) {
 		if (ptr)
@@ -137,4 +138,6 @@ void Interfaces::grab_interfaces()
 	INFO("Localize", ::localize);
 	client_prediction = client.get_interface<Source2ClientPrediction>("Source2ClientPrediction");
 	INFO("Source2ClientPrediction", client_prediction);
+	particle_system_mgr = particles.get_interface<ParticleSystemMgr>("ParticleSystemMgr");
+	INFO("ParticleSystemMgr", particle_system_mgr);
 }

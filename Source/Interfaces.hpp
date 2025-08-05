@@ -17,6 +17,7 @@ class MaterialSystem;
 class ResourceSystem;
 class FileSystem;
 class Localize;
+class ParticleSystemMgr;
 
 namespace Interfaces {
 	class InterfacedLibrary {
@@ -49,6 +50,7 @@ namespace Interfaces {
 	inline FileSystem* file_system;
 	inline Localize* localize;
 	inline Source2ClientPrediction* client_prediction;
+	inline ParticleSystemMgr* particle_system_mgr;
 
 	void grab_interfaces();
 

@@ -34,6 +34,7 @@ namespace Libraries {
 	inline UninitializedObject<Library> resourcesystem;
 	inline UninitializedObject<Library> filesystem;
 	inline UninitializedObject<Library> localize;
+	inline UninitializedObject<Library> particles;
 
 	void create();
 	void destroy();
