@@ -3,6 +3,14 @@
 #include "GrenadeSerialization.hpp"
 #include "Materials.hpp"
 
+#include "../Features/Feature.hpp"
+#include "../Features/Features.hpp"
+
+#include "../Utils/Logging.hpp"
+
+#include "nlohmann/json.hpp"
+#include "nlohmann/json_fwd.hpp"
+
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -17,14 +25,6 @@
 #include <system_error>
 #include <unistd.h>
 #include <vector>
-
-#include "../Features/Feature.hpp"
-#include "../Features/Features.hpp"
-
-#include "../Utils/Logging.hpp"
-
-#include "nlohmann/json.hpp"
-#include "nlohmann/json_fwd.hpp"
 
 static bool is_first_launch = false;
 static bool available = true;
@@ -73,20 +73,22 @@ void Serialization::shutdown()
 	// Save config temporarily...
 }
 
-std::expected<void, std::string> Serialization::create_config(std::string_view name, bool overwrite)
+bool Serialization::has_config(std::string_view name)
 {
-	// NOTE: Despite it saying '+=', this does not affect the name variable itself, only the path
 	const std::filesystem::path config_file{ get_config_directory() / name += ".json" };
-
-	if (std::ranges::contains(RESERVED_CONFIG_NAMES, config_file.filename()))
-		return std::unexpected("Config name is reserved.");
-
 	std::error_code status;
-	if (std::filesystem::exists(config_file, status)) {
-		if (!overwrite)
-			return std::unexpected("File exists.");
-	} else if (status)
-		return std::unexpected(status.message());
+	return std::filesystem::exists(config_file, status);
+}
+
+bool Serialization::is_reserved_name(const std::string& name)
+{
+	return std::ranges::contains(RESERVED_CONFIG_NAMES, name + ".json");
+}
+
+std::expected<void, std::string> Serialization::create_config(std::string_view name)
+{
+	if (is_reserved_name(std::string{ name }))
+		return std::unexpected("Config name is reserved.");
 
 	nlohmann::json j;
 	for (const auto& [category, features] : Features::features) {
@@ -97,6 +99,7 @@ std::expected<void, std::string> Serialization::create_config(std::string_view n
 		}
 	}
 
+	const std::filesystem::path config_file{ get_config_directory() / name += ".json" };
 	std::ofstream stream{ config_file };
 	stream << j.dump(2); // pretty print
 	stream.close();

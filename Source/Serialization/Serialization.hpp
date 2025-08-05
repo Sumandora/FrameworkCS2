@@ -13,7 +13,9 @@ namespace Serialization {
 	void create_config_directory();
 	void shutdown();
 
-	std::expected<void, std::string> create_config(std::string_view name, bool overwrite = false);
+	bool has_config(std::string_view name);
+	bool is_reserved_name(const std::string& name);
+	std::expected<void, std::string> create_config(std::string_view name);
 	bool load_config(std::string_view name, std::error_code& status);
 
 	std::vector<std::filesystem::path> get_available_configs();

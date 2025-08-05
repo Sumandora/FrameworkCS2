@@ -2,6 +2,8 @@
 
 #include "../../../Serialization/Serialization.hpp"
 
+#include "../../../Notifications/Notifications.hpp"
+
 #include "imgui.h"
 #include "misc/cpp/imgui_stdlib.h"
 
@@ -16,6 +18,7 @@
 static constexpr const char* CONFIG_CREATION_FAILED_POPUP_ID = "Config creation failed.";
 static constexpr const char* CONFIG_LOAD_FAILED_POPUP_ID = "Config load failed.";
 static constexpr const char* CONFIG_DELETION_FAILED_POPUP_ID = "Config deletion failed.";
+static constexpr const char* CONFIG_OVERWRITE_POPUP_ID = "Overwrite existing config?";
 
 void GUI::Tabs::About::draw_configs()
 {
@@ -27,10 +30,39 @@ void GUI::Tabs::About::draw_configs()
 	static std::string config_name;
 	static std::expected<void, std::string> config_creation_result;
 	if (ImGui::Button("Save config")) {
-		config_creation_result = Serialization::create_config(config_name, true /* TODO */);
-		if (!config_creation_result.has_value()) {
-			ImGui::OpenPopup(CONFIG_CREATION_FAILED_POPUP_ID);
+		do {
+			if (Serialization::is_reserved_name(config_name)) {
+				Notifications::create("Config creation", "Config name is reserved", Notifications::Severity::ERROR);
+				break;
+			}
+
+			if (Serialization::has_config(config_name)) {
+				ImGui::OpenPopup(CONFIG_OVERWRITE_POPUP_ID);
+				break;
+			}
+
+			config_creation_result = Serialization::create_config(config_name);
+			if (!config_creation_result.has_value())
+				ImGui::OpenPopup(CONFIG_CREATION_FAILED_POPUP_ID);
+		} while (0);
+	}
+
+	if (ImGui::BeginPopupModal(CONFIG_OVERWRITE_POPUP_ID, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		ImGui::Text("Config '%s' already exists. Do you want to overwrite it?", config_name.c_str());
+		ImGui::Separator();
+
+		if (ImGui::Button("Yes", ImVec2(120, 0))) {
+			ImGui::CloseCurrentPopup();
+			config_creation_result = Serialization::create_config(config_name);
+			if (!config_creation_result.has_value())
+				ImGui::OpenPopup(CONFIG_CREATION_FAILED_POPUP_ID);
 		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("No", ImVec2(120, 0))) {
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
 	}
 
 	ImGui::SameLine();
