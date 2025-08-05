@@ -80,7 +80,7 @@ void VoteRevealer::on_vote_start(NetMessagePB<CCSUsrMsg_VoteStart>* net_message)
 		return;
 	}
 
-	std::string localized = Interfaces::localize->translate(other_team);
+	std::string localized = Interfaces::localize->find_safe(other_team);
 
 	auto* from_controller = static_cast<CSPlayerController*>(GameEntitySystem::the()->get_entity_by_index(net_message->pb.player_slot() + 1));
 

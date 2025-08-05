@@ -27,7 +27,7 @@ struct TeamColumn {
 		if (localization.has_value() && last_teamid == pawn->team_id())
 			return; // Work was already done.
 		last_teamid = pawn->team_id();
-		localization = Interfaces::localize->translate(get_localization_key(pawn->team_id()));
+		localization = Interfaces::localize->find_safe(get_localization_key(pawn->team_id()));
 	}
 
 	void fill() const
