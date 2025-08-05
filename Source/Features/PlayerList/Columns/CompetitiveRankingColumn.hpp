@@ -40,7 +40,7 @@ struct CompetitiveRankingColumn {
 		} else {
 			// Actual ranks:
 			const std::string rank_name = std::format("RankName_{}", controller->competitive_ranking());
-			const std::optional<std::string> localized = Interfaces::localize->try_translate(rank_name.c_str());
+			const std::optional<std::string> localized = Interfaces::localize->try_localize(rank_name.c_str());
 
 			if (localized.has_value()) {
 				rank = localized.value();

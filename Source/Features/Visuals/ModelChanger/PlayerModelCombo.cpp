@@ -70,7 +70,7 @@ static void gather_default_models(std::vector<PlayerModelCombo::DefaultModel>& p
 
 		const GUI::TextureManager::RawImage image = VTexDecoder::decode(vec).value();
 
-		std::optional<const char*> localized_name = Interfaces::localize->try_translate(item->internal_name());
+		std::optional<const char*> localized_name = Interfaces::localize->try_localize(item->internal_name());
 		bool has_localization = true;
 		if (!localized_name.has_value()) {
 			localized_name = item->internal_name();
