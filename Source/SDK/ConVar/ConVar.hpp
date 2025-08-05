@@ -30,4 +30,8 @@ struct ConVar {
 	{
 		return value.boolean;
 	}
+	[[nodiscard]] int get_int() const
+	{
+		return value.integer;
+	}
 };

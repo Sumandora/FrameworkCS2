@@ -4,16 +4,17 @@
 
 #include "../Settings/Button.hpp"
 #include "../Settings/Checkbox.hpp"
-#include "../Settings/FloatSlider.hpp"
 
 #include "../../Utils/UninitializedObject.hpp"
 
 #include "PlayerListWidget.hpp"
 
 #include <cstddef>
+#include <mutex>
 
 struct CSPlayerController;
 struct PlayerData;
+struct GameEvent;
 
 class PlayerList : public Feature {
 	PlayerListWidget widget{ this, "Widget", this };
@@ -26,9 +27,13 @@ class PlayerList : public Feature {
 	std::size_t render_player_list();
 	void invalidate_caches();
 
+	std::mutex mutex;
+
 public:
 	PlayerList();
+
 	void update();
+	void event_handler(GameEvent* event);
 	void draw();
 };
 

@@ -14,6 +14,8 @@
 #include "Columns/HealthColumn.hpp"
 #include "Columns/NameColumn.hpp"
 #include "Columns/TeamColumn.hpp"
+#include "Columns/TeamDamageColumn.hpp"
+#include "Columns/TeamKillsColumn.hpp"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -35,7 +37,9 @@ using Columns
 		CompetitiveRankingColumn,
 		CompetitiveRankingAfterWinColumn,
 		CompetitiveRankingAfterLossColumn,
-		CompetitiveRankingAfterTieColumn>;
+		CompetitiveRankingAfterTieColumn,
+		TeamDamageColumn,
+		TeamKillsColumn>;
 
 struct PlayerData {
 	Columns columns;
@@ -43,11 +47,11 @@ struct PlayerData {
 };
 
 static std::map<EntityHandle<CSPlayerController>, PlayerData> player_data_map;
-static std::mutex mutex;
 
 PlayerList::PlayerList()
 	: Feature("Intelligence", "Player list")
 {
+	TeamDamageColumn::resolve_convars();
 }
 
 template <typename T, T... Ints>
@@ -122,6 +126,31 @@ void PlayerList::update()
 	}
 
 	std::erase_if(player_data_map, [](const auto& pair) { return pair.second.invalid; });
+}
+
+static void update_column(auto& column, CSPlayerPawn* pawn, GameEvent* event)
+{
+	if constexpr (UpdateColoumnWithGameEvent<decltype(column)>) {
+		column.update(pawn, event);
+	}
+}
+
+void PlayerList::event_handler(GameEvent* event)
+{
+	const std::lock_guard guard{ mutex };
+
+	GameEntitySystem* entity_system = GameEntitySystem::the();
+
+	if (!entity_system)
+		// Don't clear the entries, this function doesn't need to concern itself with that
+		return;
+
+	for (CSPlayerController* controller : entity_system->entities_of_type<CSPlayerController>()) {
+		PlayerData& data = player_data_map[controller->get_handle()];
+		CSPlayerPawn* pawn = controller->player_pawn().get();
+
+		std::apply([event, pawn](auto&... columns) { (update_column(columns, pawn, event), ...); }, data.columns);
+	}
 }
 
 void PlayerList::draw()
