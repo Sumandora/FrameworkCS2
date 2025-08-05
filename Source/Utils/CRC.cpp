@@ -86,6 +86,9 @@ bool CRC::update_crc(UserCmd* usercmd)
 		char data[1]; // VLA
 	};
 
+	// Mistake in game here: Since flexible array members aren't standard in C++, we generally use that array of 1 element at the end of the struct.
+	// The game does this too, but here Valve did sizeof(GameString) + size, which is wrong because char[1] shouldn't be counted here.
+	// Anyways, kept for imitation purposes.
 	auto* puVar20 = static_cast<GameString*>(MemAlloc::the()->allocate(crc_size + 0x19));
 	puVar20->size = crc_size;
 	puVar20->size2 = crc_size;
