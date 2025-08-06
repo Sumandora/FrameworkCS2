@@ -31,16 +31,18 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		CSPlayerController* controller = *Memory::local_player_controller;
 		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
 
-		const MutexGuard<ImDrawList*> draw_list_guard = GUI::get_draw_list();
-		ImDrawList* draw_list = *draw_list_guard;
-		if (draw_list != nullptr) { // it was not yet initialized by the other thread
-			ImGui::SetupDrawListSharedData(GUI::get_draw_list_shared_data());
-			draw_list->_ResetForNewFrame();
-			draw_list->PushClipRectFullScreen();
-			draw_list->PushTextureID(ImGui::GetIO().Fonts->TexID);
-			esp->draw(draw_list);
-			grenade_prediction->draw(draw_list);
-			hit_marker->draw(draw_list);
+		{
+			const MutexGuard<ImDrawList*> draw_list_guard = GUI::get_draw_list();
+			ImDrawList* draw_list = *draw_list_guard;
+			if (draw_list != nullptr) { // it was not yet initialized by the other thread
+				ImGui::SetupDrawListSharedData(GUI::get_draw_list_shared_data());
+				draw_list->_ResetForNewFrame();
+				draw_list->PushClipRectFullScreen();
+				draw_list->PushTextureID(ImGui::GetIO().Fonts->TexID);
+				esp->draw(draw_list);
+				grenade_prediction->draw(draw_list);
+				hit_marker->draw(draw_list);
+			}
 		}
 
 		thread_executor.run_all_queued_functions();
