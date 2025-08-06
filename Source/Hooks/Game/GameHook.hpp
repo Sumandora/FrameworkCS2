@@ -22,6 +22,7 @@ struct MeshDrawPrimitive;
 struct ViewSetup;
 struct ViewRender;
 struct MapInfo;
+struct SceneLightObject;
 
 class CSGOInput;
 
@@ -99,5 +100,10 @@ namespace Hooks::Game {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(void* particle_object_desc, void* render_context, MeshDrawPrimitive* mesh_array,
 			int mesh_count, void* scene_view, void* scene_layer, void* scene_system_per_frame_stats);
+	}
+
+	namespace LightBinner {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(void* thisptr, SceneLightObject* scene_light_object, void* rdx);
 	}
 }

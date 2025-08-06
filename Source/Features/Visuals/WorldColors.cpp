@@ -2,12 +2,15 @@
 
 #include "../../Features/Feature.hpp"
 
+#include "../../SDK/GameClass/GameEvent.hpp"
 #include "../../SDK/GameClass/MeshDrawPrimitive.hpp"
+#include "../../SDK/GameClass/SceneLightObject.hpp"
 
 #include "imgui.h"
 
 #include <cstring>
 #include <optional>
+#include <string_view>
 
 WorldColors::WorldColors()
 	: Feature("Visuals", "World colors")
@@ -52,4 +55,45 @@ void WorldColors::handle_particle(MeshDrawPrimitive* particle_draw_primitives, i
 			continue;
 		}
 	}
+}
+
+void WorldColors::handle_light(SceneLightObject* scene_light_object)
+{
+	if (!change_light_color.get()) {
+		if (auto it = original_light_colors.find(scene_light_object);
+			it != original_light_colors.end()) {
+			scene_light_object->r = it->second.r;
+			scene_light_object->g = it->second.g;
+			scene_light_object->b = it->second.b;
+			original_light_colors.erase(it);
+		}
+		return;
+	}
+
+	const ImColor color = light_color.get();
+
+	original_light_colors.try_emplace(scene_light_object,
+		RGB{
+			.r = scene_light_object->r,
+			.g = scene_light_object->g,
+			.b = scene_light_object->b,
+		});
+
+	// Since light can't really be transparent, we can reuse alpha as a sort of intensity modifier, at least it doesn't go unused this way.
+	scene_light_object->r = color.Value.x * color.Value.w;
+	scene_light_object->g = color.Value.y * color.Value.w;
+	scene_light_object->b = color.Value.z * color.Value.w;
+}
+
+void WorldColors::event_handler(GameEvent* event)
+{
+	if (original_light_colors.empty())
+		return;
+
+	// TODO No clue where to write this down, but I should probably stop call GetName() all the time...
+	if (std::string_view{ event->GetName() } != "game_newmap")
+		return;
+
+	// New map... well our old lights wont matter on the new one, so dump them.
+	original_light_colors.clear();
 }

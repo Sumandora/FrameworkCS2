@@ -14,6 +14,7 @@
 #include "../../SDK/GameClass/ClientModeCSNormal.hpp"
 #include "../../SDK/GameClass/CSGOInput.hpp"
 #include "../../SDK/GameClass/Source2Client.hpp"
+#include "../../SDK/GameClass/LightBinnerGPU.hpp"
 
 #include <csignal>
 #include <cstddef>
@@ -183,6 +184,24 @@ namespace Hooks::Game {
 				  .dereference()
 				  .BCRL_EXPECT(void*, particles_draw_array);
 
+		void* light_binner
+			= BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"15CLightBinnerGPU">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libscenesystem.so"))
+				  .find_xrefs(SignatureScanner::XRefTypes::absolute(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libscenesystem.so"))
+				  .sub(8)
+				  .find_xrefs(SignatureScanner::XRefTypes::absolute(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libscenesystem.so"))
+				  .add(sizeof(void*)) // skip pointer to rtti
+				  .add(LightBinnerGPU::process_lights_index * sizeof(void*))
+				  .dereference()
+				  // Unfortunate jmp:
+				  .add(1)
+				  .relative_to_absolute()
+				  .BCRL_EXPECT(void*, light_binner);
+
 		FrameStageNotify::hook.emplace(
 			Memory::emalloc,
 			frame_stage_notify,
@@ -235,6 +254,10 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			particles_draw_array,
 			reinterpret_cast<void*>(ParticlesDrawArray::hook_func));
+		LightBinner::hook.emplace(
+			Memory::emalloc,
+			light_binner,
+			reinterpret_cast<void*>(LightBinner::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -249,10 +272,12 @@ namespace Hooks::Game {
 		OverrideView::hook->enable();
 		OnVoteStart::hook->enable();
 		ParticlesDrawArray::hook->enable();
+		LightBinner::hook->enable();
 	}
 
 	void destroy()
 	{
+		LightBinner::hook.reset();
 		ParticlesDrawArray::hook.reset();
 		OnVoteStart::hook.reset();
 		OverrideView::hook.reset();
