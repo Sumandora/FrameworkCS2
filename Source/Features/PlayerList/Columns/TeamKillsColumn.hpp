@@ -11,7 +11,7 @@
 
 // TODO When controlling bots, then the bot is taken to account for the team damage, this is wrong.
 struct TeamKillsColumn {
-	static constexpr const char* NAME = "Team kills";
+	static constexpr const char* NAME = "Team Kills";
 	static constexpr bool HIDDEN_BY_DEFAULT = true;
 
 	// TODO is this something the game determines dynamically? Because there is no convar for it...

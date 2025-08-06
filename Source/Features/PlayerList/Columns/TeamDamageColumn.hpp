@@ -15,7 +15,7 @@
 
 // TODO When controlling bots, then the bot is taken to account for the team damage, this is wrong.
 struct TeamDamageColumn {
-	static constexpr const char* NAME = "Team damage";
+	static constexpr const char* NAME = "Team Damage";
 	static constexpr bool HIDDEN_BY_DEFAULT = true;
 
 	static int max_team_damage_before_warn;

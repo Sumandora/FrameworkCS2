@@ -13,6 +13,8 @@
 #include "Columns/CompetitiveWinsColumn.hpp"
 #include "Columns/HealthColumn.hpp"
 #include "Columns/NameColumn.hpp"
+#include "Columns/ObserveeColumn.hpp"
+#include "Columns/ObserverModeColumn.hpp"
 #include "Columns/TeamColumn.hpp"
 #include "Columns/TeamDamageColumn.hpp"
 #include "Columns/TeamKillsColumn.hpp"
@@ -39,7 +41,9 @@ using Columns
 		CompetitiveRankingAfterLossColumn,
 		CompetitiveRankingAfterTieColumn,
 		TeamDamageColumn,
-		TeamKillsColumn>;
+		TeamKillsColumn,
+		ObserveeColumn,
+		ObserverModeColumn>;
 
 struct PlayerData {
 	Columns columns;

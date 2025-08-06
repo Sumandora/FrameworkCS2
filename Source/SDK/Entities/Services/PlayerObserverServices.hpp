@@ -6,6 +6,7 @@
 
 #include "../BaseEntity.hpp"
 
+#include <array>
 #include <cstdint>
 
 // @schema ObserverMode_t
@@ -19,6 +20,17 @@ enum ObserverMode : std::uint32_t {
 	OBS_MODE_DIRECTED = 5,
 	NUM_OBSERVER_MODES = 6,
 };
+
+static constexpr std::array OBSERVER_MODE_NAMES{
+	"None",
+	"Fixed",
+	"In Eye",
+	"Chase",
+	"Roaming",
+	"Directed",
+};
+
+static_assert(OBSERVER_MODE_NAMES.size() == NUM_OBSERVER_MODES);
 
 struct PlayerObserverServices : public PlayerPawnComponent {
 	CLASS_INFO("libclient.so", "CPlayer_ObserverServices");

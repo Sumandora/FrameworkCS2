@@ -51,4 +51,8 @@ public:
 	{
 		return index <=> other.index;
 	}
+
+	bool operator==(const EntityHandle<Ent>& other) const {
+		return index == other.index;
+	}
 };
