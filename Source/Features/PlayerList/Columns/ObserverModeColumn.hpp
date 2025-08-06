@@ -29,23 +29,27 @@ struct ObserverModeColumn {
 	{
 		if (!enabled) {
 			observer_mode_name.clear();
+			last_mode = NUM_OBSERVER_MODES;
 			return;
 		}
 
 		const BasePlayerPawn* pawn = controller->pawn().get();
 		if (!pawn) {
 			observer_mode_name.clear();
+			last_mode = NUM_OBSERVER_MODES;
 			return;
 		}
 
 		const PlayerObserverServices* observer_services = pawn->observer_services();
 		if (!observer_services) {
 			observer_mode_name.clear();
+			last_mode = NUM_OBSERVER_MODES;
 			return;
 		}
 
 		if (!observer_services->observer_target().has_entity()) {
 			observer_mode_name.clear();
+			last_mode = NUM_OBSERVER_MODES;
 			return;
 		}
 
