@@ -12,10 +12,11 @@
 struct NameColumn {
 	static constexpr const char* NAME = "Name";
 	std::optional<std::string> cached_name;
+	bool enabled = false;
 
 	void update(CSPlayerController* controller)
 	{
-		if (!cached_name.has_value()) {
+		if (enabled && !cached_name.has_value()) {
 			cached_name = controller->get_decorated_player_name();
 		}
 	}

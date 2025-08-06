@@ -31,6 +31,11 @@ concept UpdateColoumnWithGameEvent = requires(Column column, CSPlayerPawn* pawn,
 };
 
 template <typename Column>
+concept ColumnHasEnabled = requires(Column column) {
+	{ column.enabled } -> std::convertible_to<bool>;
+};
+
+template <typename Column>
 concept HasHiddenByDefault = requires() {
 	{ Column::HIDDEN_BY_DEFAULT } -> std::convertible_to<bool>;
 };

@@ -57,7 +57,19 @@ PlayerList::PlayerList()
 template <typename T, T... Ints>
 static void create_columns(std::integer_sequence<T, Ints...> /*nums*/)
 {
-	(ImGui::TableSetupColumn(std::tuple_element_t<Ints, Columns>::NAME, is_hidden_by_default<std::tuple_element_t<Ints, Columns>>() ? ImGuiTableColumnFlags_DefaultHide : 0), ...);
+	(ImGui::TableSetupColumn(std::tuple_element_t<Ints, Columns>::NAME,
+		 is_hidden_by_default<std::tuple_element_t<Ints, Columns>>()
+			 ? ImGuiTableColumnFlags_DefaultHide
+			 : 0),
+		...);
+}
+
+static void update_visible(auto& column)
+{
+	if constexpr (ColumnHasEnabled<decltype(column)>) {
+		const bool enabled = ImGui::TableGetColumnFlags() & ImGuiTableColumnFlags_IsEnabled;
+		column.enabled = enabled;
+	}
 }
 
 std::size_t PlayerList::render_player_list()
@@ -74,9 +86,12 @@ std::size_t PlayerList::render_player_list()
 
 		{
 			const std::lock_guard guard{ mutex };
-			for (const PlayerData& data : player_data_map | std::ranges::views::values) {
+			for (PlayerData& data : player_data_map | std::ranges::views::values) {
 				ImGui::TableNextRow();
-				std::apply([](const auto&... column) { ((ImGui::TableNextColumn(), column.fill()), ...); }, data.columns);
+				std::apply([](auto&... column) {
+					((ImGui::TableNextColumn(), update_visible(column), column.fill()), ...);
+				},
+					data.columns);
 			}
 			count = player_data_map.size();
 		}
