@@ -31,26 +31,6 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		CSPlayerController* controller = *Memory::local_player_controller;
 		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
 
-		thread_executor.run_all_queued_functions();
-		break;
-	}
-
-	case FRAME_NET_UPDATE_POSTDATAUPDATE_END: {
-		model_changer->update_model();
-		break;
-	}
-
-	// TODO Ghetto fix, need to find new enum
-	case FRAME_NET_UPDATE_END: {
-		CSPlayerController* controller = *Memory::local_player_controller;
-		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
-
-		grenade_helper->update();
-		chams->update_pvs();
-		removals->remove_ads_update();
-		bomb_timer->update();
-		player_list->update();
-
 		const MutexGuard<ImDrawList*> draw_list_guard = GUI::get_draw_list();
 		ImDrawList* draw_list = *draw_list_guard;
 		if (draw_list != nullptr) { // it was not yet initialized by the other thread
@@ -62,6 +42,25 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 			grenade_prediction->draw(draw_list);
 			hit_marker->draw(draw_list);
 		}
+
+		thread_executor.run_all_queued_functions();
+		break;
+	}
+
+	case FRAME_NET_UPDATE_POSTDATAUPDATE_END: {
+		model_changer->update_model();
+		break;
+	}
+
+	case FRAME_NET_UPDATE_END: {
+		CSPlayerController* controller = *Memory::local_player_controller;
+		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
+
+		grenade_helper->update();
+		chams->update_pvs();
+		removals->remove_ads_update();
+		bomb_timer->update();
+		player_list->update();
 		break;
 	}
 
