@@ -212,6 +212,52 @@ namespace Hooks::Game {
 				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 66 0f ef c0 48 89 e5">())
 				  .BCRL_EXPECT(void*, draw_hud_overlay);
 
+		void* calculate_viewmodel_position
+			= BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"Viewmodel FOV">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::relative(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 05">())
+				  .add(3)
+				  .relative_to_absolute() // viewmodel_fov convar
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::relative(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				  .add(4)
+				  .filter([](const auto& ptr) { return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()); })
+				  .repeater([](auto& ptr) {
+					  ptr.next_instruction();
+					  static int i = 0;
+					  if (ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()))
+						  i++;
+					  return i != 2;
+				  })
+				  .add(1)
+				  .relative_to_absolute()
+				  .BCRL_EXPECT(void*, calculate_viewmodel_position);
+
+		void* get_fov
+			= BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"fov_cs_debug">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::relative(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 05">())
+				  .add(3)
+				  .relative_to_absolute() // viewmodel_fov convar
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::relative(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				  .add(4)
+				  .filter([](const auto& ptr) { return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"be ff ff ff ff">()); })
+				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+				  .BCRL_EXPECT(void*, get_fov);
+
 		FrameStageNotify::hook.emplace(
 			Memory::emalloc,
 			frame_stage_notify,
@@ -272,6 +318,14 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			draw_hud_overlay,
 			reinterpret_cast<void*>(DrawHudOverlay::hook_func));
+		CalculateViewModelPosition::hook.emplace(
+			Memory::emalloc,
+			calculate_viewmodel_position,
+			reinterpret_cast<void*>(CalculateViewModelPosition::hook_func));
+		GetFov::hook.emplace(
+			Memory::emalloc,
+			get_fov,
+			reinterpret_cast<void*>(GetFov::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -288,10 +342,14 @@ namespace Hooks::Game {
 		ParticlesDrawArray::hook->enable();
 		LightBinner::hook->enable();
 		DrawHudOverlay::hook->enable();
+		CalculateViewModelPosition::hook->enable();
+		GetFov::hook->enable();
 	}
 
 	void destroy()
 	{
+		GetFov::hook.reset();
+		CalculateViewModelPosition::hook.reset();
 		DrawHudOverlay::hook.reset();
 		LightBinner::hook.reset();
 		ParticlesDrawArray::hook.reset();

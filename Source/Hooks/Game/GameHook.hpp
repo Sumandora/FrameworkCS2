@@ -9,6 +9,7 @@
 #include "../Hooks.hpp"
 
 #include "cstrike15_usermessages.pb.h"
+#include "glm/ext/vector_float3.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -111,5 +112,15 @@ namespace Hooks::Game {
 	namespace DrawHudOverlay {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void* hook_func(void* rdi, void* rsi, void* rdx, void* rcx, HudOverlayData* r8);
+	}
+
+	namespace CalculateViewModelPosition {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(void* thisptr, glm::vec3* position, float* fov);
+	}
+
+	namespace GetFov {
+		inline UninitializedObject<DetourHook<true>> hook;
+		float hook_func(void* thisptr);
 	}
 }

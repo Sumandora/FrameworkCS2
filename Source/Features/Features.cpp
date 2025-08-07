@@ -10,6 +10,7 @@
 #include "Visuals/BulletTracers.hpp"
 #include "Visuals/Chams/Chams.hpp"
 #include "Visuals/ESP/ESP.hpp"
+#include "Visuals/FieldOfView.hpp"
 #include "Visuals/ForceCrosshair.hpp"
 #include "Visuals/ForceThirdPerson.hpp"
 #include "Visuals/GrenadeHelper.hpp"
@@ -41,12 +42,14 @@ void Features::create()
 	world_colors.emplace();
 	player_list.emplace();
 	bullet_tracers.emplace();
+	field_of_view.emplace();
 
 	initialized = true;
 }
 
 void Features::destroy()
 {
+	field_of_view.reset();
 	bullet_tracers.reset();
 	player_list.reset();
 	world_colors.reset();
