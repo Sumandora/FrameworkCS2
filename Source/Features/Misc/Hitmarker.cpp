@@ -28,6 +28,7 @@
 #include <cstring>
 #include <format>
 #include <string>
+#include <string_view>
 #include <utility>
 
 static ConVar* volume = nullptr;
@@ -108,7 +109,7 @@ void HitMarker::event_handler(GameEvent* game_event)
 	if (!hit_marker_enabled.get() && !hit_sound_enabled && !hit_logs_enabled)
 		return;
 
-	if (std::strcmp(game_event->GetName(), "player_hurt") != 0)
+	if (std::string_view{ game_event->GetName() } == "player_hurt")
 		return;
 
 	BaseEntity* attacker = game_event->get_entity("attacker");

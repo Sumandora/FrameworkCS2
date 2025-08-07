@@ -3,6 +3,7 @@
 #include "Libraries.hpp"
 
 #include <optional>
+#include <string_view>
 #include <unordered_map>
 
 struct SchemaSystem;
@@ -21,22 +22,22 @@ class ParticleSystemMgr;
 
 namespace Interfaces {
 	class InterfacedLibrary {
-		std::unordered_map<const char*, void*> interfaces;
+		std::unordered_map<std::string_view, void*> interfaces;
 
-		explicit InterfacedLibrary(std::unordered_map<const char*, void*> interfaces);
+		explicit InterfacedLibrary(std::unordered_map<std::string_view, void*> interfaces);
 
 	public:
 		static std::optional<InterfacedLibrary> create(const Libraries::Library& library);
 
-		void* get_interface(const char* name) const;
+		void* get_interface(std::string_view name) const;
 
 		template <typename T>
-		T* get_interface(const char* name) const
+		T* get_interface(std::string_view name) const
 		{
 			return static_cast<T*>(get_interface(name));
 		}
 
-		const std::unordered_map<const char*, void*>& get_interfaces() { return interfaces; }
+		const std::unordered_map<std::string_view, void*>& get_interfaces() { return interfaces; }
 	};
 
 	inline Source2Client* source2_client;

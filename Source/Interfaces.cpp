@@ -25,7 +25,7 @@
 
 using namespace Interfaces;
 
-InterfacedLibrary::InterfacedLibrary(std::unordered_map<const char*, void*> interfaces)
+InterfacedLibrary::InterfacedLibrary(std::unordered_map<std::string_view, void*> interfaces)
 	: interfaces(std::move(interfaces))
 {
 }
@@ -60,7 +60,7 @@ std::optional<InterfacedLibrary> InterfacedLibrary::create(const Libraries::Libr
 	if (!interface_list.has_value())
 		return std::nullopt;
 
-	std::unordered_map<const char*, void*> interfaces;
+	std::unordered_map<std::string_view, void*> interfaces;
 	for (InterfaceReg* interface = *interface_list.value(); interface; interface = interface->m_pNext) {
 		interfaces[interface->m_pName] = interface->m_CreateFn;
 	}
@@ -68,10 +68,10 @@ std::optional<InterfacedLibrary> InterfacedLibrary::create(const Libraries::Libr
 	return InterfacedLibrary{ interfaces };
 }
 
-void* InterfacedLibrary::get_interface(const char* name) const
+void* InterfacedLibrary::get_interface(std::string_view name) const
 {
 	for (const auto& [interfaceName, createFn] : interfaces) {
-		if (std::strncmp(name, interfaceName, std::strlen(interfaceName) - 3 /*Ignore the version*/) == 0)
+		if (interfaceName.substr(0, interfaceName.length() - 3 /*Ignore the version*/) == name)
 			return Interfaces::uncover_create_function(createFn);
 	}
 	return nullptr;

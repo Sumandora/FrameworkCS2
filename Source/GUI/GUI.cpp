@@ -22,6 +22,7 @@
 #include <cstring>
 #include <filesystem>
 #include <mutex>
+#include <string_view>
 #include <unistd.h>
 #include <utility>
 #include <vector>
@@ -371,13 +372,13 @@ void GUI::flush_events()
 
 bool GUI::is_using_wayland()
 {
-	static const char* driver = []() {
+	static const std::string_view DRIVER = []() {
 		const char* driver = SDL_GetCurrentVideoDriver();
 		Logging::info("SDL Video Driver: {}", driver);
 		return driver;
 	}();
 
-	return std::strcmp(driver, "wayland") == 0;
+	return DRIVER == "wayland";
 }
 
 float GUI::get_scale()

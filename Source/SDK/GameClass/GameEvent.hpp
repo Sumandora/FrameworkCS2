@@ -2,10 +2,8 @@
 
 #include "../VirtualMethod.hpp"
 
-#include "../EntityHandle.hpp"
-
 #include <cstddef>
-#include <cstdint>
+#include <string_view>
 
 struct BufferString;
 struct BaseEntity;
@@ -13,10 +11,10 @@ struct BaseEntity;
 struct GameEvent {
 	VIRTUAL_METHOD(2, GetName, char*, (), (this));
 
-	int get_int(const char* key_name, int default_value) const;
-	const char* get_string(const char* key_name, const char* default_value) const;
-	int get_userid(const char* key_name, int default_value) const;
-	BaseEntity* get_entity(const char* key_name) const;
+	[[nodiscard]] int get_int(std::string_view key_name, int default_value) const;
+	[[nodiscard]] const char* get_string(std::string_view key_name, const char* default_value) const;
+	[[nodiscard]] int get_userid(std::string_view key_name, int default_value) const;
+	[[nodiscard]] BaseEntity* get_entity(std::string_view key_name) const;
 
 private:
 	VIRTUAL_METHOD(8, get_int_with_hash, int, (const void* hashed_string, int default_value) const, (this, hashed_string, default_value));

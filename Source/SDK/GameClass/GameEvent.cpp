@@ -1,16 +1,15 @@
 #include "GameEvent.hpp"
 
-#include "../EntityHandle.hpp"
-
 #include "murmurhash/MurmurHash2.h"
 
 #include <alloca.h>
 #include <cstdint>
 #include <cstring>
+#include <string_view>
 
 static constexpr std::uint32_t STRINGTOKEN_SEED = 0x31415926;
 
-int GameEvent::get_int(const char* key_name, int default_value) const
+int GameEvent::get_int(std::string_view key_name, int default_value) const
 {
 	struct HashedName {
 		std::uint32_t hash;
@@ -19,12 +18,12 @@ int GameEvent::get_int(const char* key_name, int default_value) const
 
 	HashedName hashed;
 
-	hashed.hash = MurmurHash2(key_name, static_cast<int>(strlen(key_name)), STRINGTOKEN_SEED);
-	hashed.string = key_name;
+	hashed.hash = MurmurHash2(key_name.data(), static_cast<int>(key_name.length()), STRINGTOKEN_SEED);
+	hashed.string = key_name.data();
 	return get_int_with_hash(&hashed, default_value);
 }
 
-const char* GameEvent::get_string(const char* key_name, const char* default_value) const
+const char* GameEvent::get_string(std::string_view key_name, const char* default_value) const
 {
 	struct HashedName {
 		std::uint32_t hash;
@@ -33,12 +32,12 @@ const char* GameEvent::get_string(const char* key_name, const char* default_valu
 
 	HashedName hashed;
 
-	hashed.hash = MurmurHash2(key_name, static_cast<int>(strlen(key_name)), STRINGTOKEN_SEED);
-	hashed.string = key_name;
+	hashed.hash = MurmurHash2(key_name.data(), static_cast<int>(key_name.length()), STRINGTOKEN_SEED);
+	hashed.string = key_name.data();
 	return get_string_with_hash(&hashed, default_value);
 }
 
-int GameEvent::get_userid(const char* key_name, int default_value) const
+int GameEvent::get_userid(std::string_view key_name, int default_value) const
 {
 	struct HashedName {
 		std::uint32_t hash;
@@ -47,13 +46,13 @@ int GameEvent::get_userid(const char* key_name, int default_value) const
 
 	HashedName hashed;
 
-	hashed.hash = MurmurHash2(key_name, static_cast<int>(strlen(key_name)), STRINGTOKEN_SEED);
-	hashed.string = key_name;
+	hashed.hash = MurmurHash2(key_name.data(), static_cast<int>(key_name.length()), STRINGTOKEN_SEED);
+	hashed.string = key_name.data();
 
 	return get_userid_with_hash(&hashed, default_value);
 }
 
-BaseEntity* GameEvent::get_entity(const char* key_name) const
+BaseEntity* GameEvent::get_entity(std::string_view key_name) const
 {
 	struct HashedName {
 		std::uint32_t hash;
@@ -62,8 +61,8 @@ BaseEntity* GameEvent::get_entity(const char* key_name) const
 
 	HashedName hashed;
 
-	hashed.hash = MurmurHash2(key_name, static_cast<int>(strlen(key_name)), STRINGTOKEN_SEED);
-	hashed.string = key_name;
+	hashed.hash = MurmurHash2(key_name.data(), static_cast<int>(key_name.length()), STRINGTOKEN_SEED);
+	hashed.string = key_name.data();
 
 	return get_entity_with_hash(&hashed);
 }

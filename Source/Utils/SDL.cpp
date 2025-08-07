@@ -5,6 +5,7 @@
 #include "SDL3/SDL_version.h"
 
 #include <cstring>
+#include <string_view>
 
 void SDL::verify_version()
 {
@@ -13,7 +14,7 @@ void SDL::verify_version()
 	// I'm keeping this in hope that they at some point return to the original behavior,
 	// I use the latest release as of right now in the meantime...
 	const char* revision = SDL_GetRevision();
-	if (strcmp(revision, FW_SDL_REVISION) != 0) {
+	if (std::string_view{ revision } != FW_SDL_REVISION) {
 		Logging::error("Wrong SDL version! Expected '{}', got '{}'.", FW_SDL_REVISION, revision);
 	}
 }

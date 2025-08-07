@@ -1,5 +1,4 @@
-#include <cstdio>
-#include <cstring>
+#include "FieldOffset.hpp"
 
 #include "SchemaClassInfo.hpp"
 #include "SchemaSystem.hpp"
@@ -7,15 +6,20 @@
 
 #include "../../Utils/Logging.hpp"
 
-std::int32_t SchemaSystem::findOffset(SchemaClassInfo* classInfo, const char* fieldName)
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+#include <string_view>
+
+std::int32_t SchemaSystem::findOffset(SchemaClassInfo* class_info, const char* field_name)
 {
-	for (std::size_t i = 0; i < classInfo->fieldsCount; i++) {
-		FieldData& field = classInfo->fields[i];
-		if (strcmp(field.fieldName, fieldName) == 0) {
+	for (std::size_t i = 0; i < class_info->fieldsCount; i++) {
+		const FieldData& field = class_info->fields[i];
+		if (std::string_view{ field.fieldName } == field_name) {
 			return field.offset;
 		}
 	}
 	// TODO This is too suttle, I don't see it most of the time
-	Logging::error("Failed to find offset for {}", fieldName);
+	Logging::error("Failed to find offset for {}", field_name);
 	return 0;
 }

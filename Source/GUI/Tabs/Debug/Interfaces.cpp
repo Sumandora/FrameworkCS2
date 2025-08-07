@@ -40,9 +40,9 @@ void GUI::Tabs::Debug::draw_interfaces()
 			if(!interfaced_library.has_value())
 				return 0;
 
-			auto& interfaces = *reinterpret_cast<std::unordered_map<std::string, std::unordered_map<const char*, InterfaceData>>*>(data);
+			auto& interfaces = *reinterpret_cast<std::unordered_map<std::string, std::unordered_map<std::string, InterfaceData>>*>(data);
 			for(const auto& [name, create_fn] : interfaced_library->get_interfaces()) {
-				interfaces[info->dlpi_name][name] = InterfaceData{ .create_fn = create_fn};
+				interfaces[info->dlpi_name][std::string{name}] = InterfaceData{ .create_fn = create_fn};
 			}
 			
 			return 0; }, &interfaces);
