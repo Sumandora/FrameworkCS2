@@ -13,11 +13,13 @@ class Removals : public Feature {
 	Checkbox remove_legs{ this, "Remove legs", false };
 	Checkbox remove_ads{ this, "Remove ads", false };
 	HelpMarker ads_explanation{ this, "Removes ads on the left side of the main menu." };
+	Checkbox remove_scope{ this, "Remove scope", false };
 
 public:
 	Removals();
 
 	[[nodiscard]] bool should_remove_legs() const;
+	[[nodiscard]] bool should_remove_scope() const;
 
 	void remove_ads_update() const;
 };

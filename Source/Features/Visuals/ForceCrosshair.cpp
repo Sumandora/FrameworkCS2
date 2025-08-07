@@ -2,8 +2,11 @@
 
 #include "../Feature.hpp"
 
-#include "../../Memory.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
+
+#include "Removals.hpp"
+
+#include "../../Memory.hpp"
 
 ForceCrosshair::ForceCrosshair()
 	: Feature("Visuals", "Force crosshair")
@@ -16,5 +19,5 @@ bool ForceCrosshair::should_force() const
 		return false;
 
 	auto* player = Memory::local_player;
-	return player != nullptr && player->health() > 0 && !player->isScoped();
+	return player != nullptr && player->health() > 0 && (!player->isScoped() || removals->should_remove_scope());
 }

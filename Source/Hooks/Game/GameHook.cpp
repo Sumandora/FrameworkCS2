@@ -13,8 +13,8 @@
 
 #include "../../SDK/GameClass/ClientModeCSNormal.hpp"
 #include "../../SDK/GameClass/CSGOInput.hpp"
-#include "../../SDK/GameClass/Source2Client.hpp"
 #include "../../SDK/GameClass/LightBinnerGPU.hpp"
+#include "../../SDK/GameClass/Source2Client.hpp"
 
 #include <csignal>
 #include <cstddef>
@@ -202,6 +202,16 @@ namespace Hooks::Game {
 				  .relative_to_absolute()
 				  .BCRL_EXPECT(void*, light_binner);
 
+		void* draw_hud_overlay
+			= BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"Health Boost Effect">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+				  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 66 0f ef c0 48 89 e5">())
+				  .BCRL_EXPECT(void*, draw_hud_overlay);
+
 		FrameStageNotify::hook.emplace(
 			Memory::emalloc,
 			frame_stage_notify,
@@ -258,6 +268,10 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			light_binner,
 			reinterpret_cast<void*>(LightBinner::hook_func));
+		DrawHudOverlay::hook.emplace(
+			Memory::emalloc,
+			draw_hud_overlay,
+			reinterpret_cast<void*>(DrawHudOverlay::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -273,10 +287,12 @@ namespace Hooks::Game {
 		OnVoteStart::hook->enable();
 		ParticlesDrawArray::hook->enable();
 		LightBinner::hook->enable();
+		DrawHudOverlay::hook->enable();
 	}
 
 	void destroy()
 	{
+		DrawHudOverlay::hook.reset();
 		LightBinner::hook.reset();
 		ParticlesDrawArray::hook.reset();
 		OnVoteStart::hook.reset();

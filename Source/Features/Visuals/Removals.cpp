@@ -22,6 +22,11 @@ bool Removals::should_remove_legs() const
 	return remove_legs.get();
 }
 
+bool Removals::should_remove_scope() const
+{
+	return remove_scope.get();
+}
+
 void Removals::remove_ads_update() const
 {
 	if (!Interfaces::panorama_ui_engine)

@@ -23,6 +23,7 @@ struct ViewSetup;
 struct ViewRender;
 struct MapInfo;
 struct SceneLightObject;
+struct HudOverlayData;
 
 class CSGOInput;
 
@@ -105,5 +106,10 @@ namespace Hooks::Game {
 	namespace LightBinner {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(void* thisptr, SceneLightObject* scene_light_object, void* rdx);
+	}
+
+	namespace DrawHudOverlay {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void* hook_func(void* rdi, void* rsi, void* rdx, void* rcx, HudOverlayData* r8);
 	}
 }
