@@ -21,7 +21,9 @@
 #include <cstdint>
 #include <cstring>
 #include <string>
+#include <type_traits>
 #include <unistd.h>
+#include <vector>
 #include <vulkan/vulkan_core.h>
 
 namespace Hooks::Game {
@@ -258,6 +260,64 @@ namespace Hooks::Game {
 				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 				  .BCRL_EXPECT(void*, get_fov);
 
+		auto apply_glow_session
+			= BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"22ISceneObjectController">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::absolute(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+				  .sub(sizeof(char*))
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::relative(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+				  .flat_map([](const auto& ptr) {
+					  auto ptrs = ptr.find_xrefs(
+						  SignatureScanner::XRefTypes::relative(),
+						  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"));
+					  if (ptrs.size() > 1) {
+						  return std::vector<std::remove_cvref_t<decltype(ptr)>>{};
+					  }
+					  return ptrs;
+				  })
+				  // Here is a basic block which is invoked right after the function that we want.
+				  .sub(7)
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::relative(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				  // Now we are in the right basic block
+				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"e8 ? ? ? ? 49">())
+				  .add(1)
+				  // What a journey...
+				  .relative_to_absolute();
+
+		void* is_glowing
+			= apply_glow_session
+				  .clone()
+				  .repeater([](auto& ptr) {
+					  ptr.next_instruction();
+					  return !ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">());
+				  })
+				  .add(1)
+				  .relative_to_absolute()
+				  .BCRL_EXPECT(void*, is_glowing);
+
+		void* get_glow_color
+			= apply_glow_session
+				  .clone()
+				  .repeater([](auto& ptr) {
+					  ptr.next_instruction();
+					  static int i = 0;
+					  if (ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">()))
+						  i++;
+					  return i != 3;
+				  })
+				  .add(1)
+				  .relative_to_absolute()
+				  .BCRL_EXPECT(void*, get_glow_color);
+
 		FrameStageNotify::hook.emplace(
 			Memory::emalloc,
 			frame_stage_notify,
@@ -326,6 +386,14 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			get_fov,
 			reinterpret_cast<void*>(GetFov::hook_func));
+		IsGlowing::hook.emplace(
+			Memory::emalloc,
+			is_glowing,
+			reinterpret_cast<void*>(IsGlowing::hook_func));
+		GetGlowColor::hook.emplace(
+			Memory::emalloc,
+			get_glow_color,
+			reinterpret_cast<void*>(GetGlowColor::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -344,10 +412,14 @@ namespace Hooks::Game {
 		DrawHudOverlay::hook->enable();
 		CalculateViewModelPosition::hook->enable();
 		GetFov::hook->enable();
+		IsGlowing::hook->enable();
+		GetGlowColor::hook->enable();
 	}
 
 	void destroy()
 	{
+		GetGlowColor::hook.reset();
+		IsGlowing::hook.reset();
 		GetFov::hook.reset();
 		CalculateViewModelPosition::hook.reset();
 		DrawHudOverlay::hook.reset();

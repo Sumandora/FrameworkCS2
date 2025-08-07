@@ -13,6 +13,7 @@
 #include "Visuals/FieldOfView.hpp"
 #include "Visuals/ForceCrosshair.hpp"
 #include "Visuals/ForceThirdPerson.hpp"
+#include "Visuals/Glow.hpp"
 #include "Visuals/GrenadeHelper.hpp"
 #include "Visuals/GrenadePrediction.hpp"
 #include "Visuals/LoadingTextChanger.hpp"
@@ -43,12 +44,14 @@ void Features::create()
 	player_list.emplace();
 	bullet_tracers.emplace();
 	field_of_view.emplace();
+	glow.emplace();
 
 	initialized = true;
 }
 
 void Features::destroy()
 {
+	glow.reset();
 	field_of_view.reset();
 	bullet_tracers.reset();
 	player_list.reset();

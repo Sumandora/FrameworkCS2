@@ -25,6 +25,7 @@ struct ViewRender;
 struct MapInfo;
 struct SceneLightObject;
 struct HudOverlayData;
+struct GlowProperty;
 
 class CSGOInput;
 
@@ -122,5 +123,15 @@ namespace Hooks::Game {
 	namespace GetFov {
 		inline UninitializedObject<DetourHook<true>> hook;
 		float hook_func(void* thisptr);
+	}
+
+	namespace IsGlowing {
+		inline UninitializedObject<DetourHook<true>> hook;
+		bool hook_func(GlowProperty* glow_property);
+	}
+
+	namespace GetGlowColor {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(GlowProperty* glow_property, float color[4]);
 	}
 }
