@@ -12,21 +12,9 @@ namespace VirtualMethod {
 	}
 
 	template <typename Ret, std::size_t Index, typename... Args>
-	inline Ret invoke(void* game_class, Args... args)
-	{
-		return RetAddrSpoofer::invoke<Ret, decltype(game_class), Args...>(get_vtable(game_class)[Index], game_class, args...);
-	}
-
-	template <typename Ret, std::size_t Index, typename... Args>
 	inline Ret invoke(const void* game_class, Args... args)
 	{
 		return RetAddrSpoofer::invoke<Ret, decltype(game_class), Args...>(get_vtable(game_class)[Index], game_class, args...);
-	}
-
-	template <typename Ret, std::size_t Index, typename... Args>
-	inline Ret invoke_static(void* game_class, Args... args)
-	{
-		return RetAddrSpoofer::invoke<Ret, Args...>(get_vtable(game_class)[Index], args...);
 	}
 
 	template <typename Ret, std::size_t Index, typename... Args>
