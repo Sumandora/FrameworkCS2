@@ -32,7 +32,6 @@ public:
 	bool modifies_viewmodel();
 	void modify_viewmodel_fov(float* fov);
 	void modify_viewmodel_position(glm::vec3* position);
-	void modify_viewmodel_rotation(glm::vec3* rotation);
 };
 
 inline UninitializedObject<FieldOfView> field_of_view;
