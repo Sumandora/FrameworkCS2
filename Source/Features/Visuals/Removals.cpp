@@ -1,5 +1,7 @@
 #include "Removals.hpp"
 
+#include "../../SDK/GameClass/CSGOInput.hpp"
+#include "../../SDK/GameClass/ViewSetup.hpp"
 #include "../../SDK/Panorama/PanoramaUIEngine.hpp"
 #include "../../SDK/Panorama/UIEngine.hpp"
 #include "../../SDK/Panorama/UIPanel.hpp"
@@ -7,6 +9,7 @@
 #include "../../Utils/Interval.hpp"
 
 #include "../../Interfaces.hpp"
+#include "../../Memory.hpp"
 
 #include "../Feature.hpp"
 
@@ -30,6 +33,16 @@ bool Removals::should_remove_scope() const
 bool Removals::should_remove_flash_overlay() const
 {
 	return remove_flash_overlay.get();
+}
+
+void Removals::override_view(ViewSetup* view_setup)
+{
+	if (!remove_punch.get())
+		return;
+
+	// TODO at some point I would like to separate those but I feel like those would amount to 3 hooks...
+	// This implicitly removes any kind of view offsets, like view punch, aim punch, screen shake and so on...
+	view_setup->view_angles() = Memory::csgo_input->view_angles();
 }
 
 void Removals::remove_ads_update() const

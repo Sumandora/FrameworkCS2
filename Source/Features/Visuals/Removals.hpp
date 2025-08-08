@@ -8,6 +8,7 @@
 #include "../../Utils/UninitializedObject.hpp"
 
 struct UIPanel;
+struct ViewSetup;
 
 class Removals : public Feature {
 	Checkbox remove_legs{ this, "Remove legs", false };
@@ -15,6 +16,7 @@ class Removals : public Feature {
 	HelpMarker ads_explanation{ this, "Removes ads on the left side of the main menu." };
 	Checkbox remove_scope{ this, "Remove scope", false };
 	Checkbox remove_flash_overlay{ this, "Remove flash overlay", false };
+	Checkbox remove_punch{ this, "Remove punch", false };
 
 public:
 	Removals();
@@ -22,6 +24,8 @@ public:
 	[[nodiscard]] bool should_remove_legs() const;
 	[[nodiscard]] bool should_remove_scope() const;
 	[[nodiscard]] bool should_remove_flash_overlay() const;
+
+	void override_view(ViewSetup* view_setup);
 
 	void remove_ads_update() const;
 };
