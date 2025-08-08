@@ -241,7 +241,7 @@ BulletSimulation::Results BulletSimulation::simulate_bullet(const glm::vec3& fro
 
 		GameTrace game_trace = GameTrace::initialized();
 
-		void* arg3 = reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(data.other_elements()) + static_cast<std::uintptr_t>(0x30 * (elem->handle_1_2 & ENTITY_LIST_INDEX_MASK)));
+		void* arg3 = reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(data.other_elements()) + static_cast<std::uintptr_t>(0x30 * (elem->handle_1_2 & GameEntitySystem::ENTITY_LIST_INDEX_MASK)));
 		get_trace(&data, &game_trace, arg3, 0.0F);
 
 		BULLETSIM_DBG("intermediate fraction: {}", game_trace.fraction);

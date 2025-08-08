@@ -7,8 +7,11 @@
 #include "EntityIdentity.hpp"
 
 #include "BaseEntity.hpp"
+#include "EntityInstance.hpp"
 
 #include <concepts>
+#include <cstddef>
+#include <cstdint>
 #include <type_traits>
 
 template <typename T>
@@ -80,10 +83,20 @@ struct EntityRange {
 
 class GameEntitySystem {
 public:
+	static constexpr std::size_t ENTITY_SERIAL_BITS_COUNT = 15;
+	static constexpr std::uint32_t ENTITY_LIST_INDEX_MASK = (1 << ENTITY_SERIAL_BITS_COUNT) - 1;
+	static constexpr std::uint32_t INVALID_ENTITY_HANDLE = 0xFFFFFFFF;
+
 	static void resolve_signatures();
 	static GameEntitySystem* the();
 
-	BaseEntity* get_entity_by_index(int index);
+	constexpr EntityIdentity** entity_buckets()
+	{
+		// Offset obtained from get_entity_by_index
+		return reinterpret_cast<EntityIdentity**>(reinterpret_cast<std::byte*>(this) + 0x10);
+	}
+
+	BaseEntity* get_entity_by_index(unsigned int index);
 
 	// shoutout cl_showents
 	OFFSET(EntityIdentity*, first_networked_entity, 0x210);

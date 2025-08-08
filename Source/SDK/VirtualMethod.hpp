@@ -1,7 +1,10 @@
 #pragma once
 
 #include "RetAddrSpoofer.hpp"
+
+#include <concepts>
 #include <cstddef>
+#include <string_view>
 
 // Inspired by danielkrupinski/Osiris
 
