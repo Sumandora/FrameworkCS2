@@ -84,9 +84,7 @@ void GrenadeHelper::update_viewangles(const glm::vec3& viewangles)
 
 void GrenadeHelper::update()
 {
-	// TODO Disable when disabled?
-
-	if (!Memory::local_player) {
+	if (!enabled.get() || !Memory::local_player) {
 		clear_current_grenades();
 		return;
 	}

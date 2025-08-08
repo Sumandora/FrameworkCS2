@@ -20,7 +20,6 @@ struct GameEvent;
 class VoteRevealer : public Feature {
 	Checkbox enabled{ this, "Enabled", false };
 
-	// TODO This is very overwhelming... (Preview maybe?)
 	Color announce_color{ this, "Announce color", ImColor{ 1.0F, 0.0F, 0.0F, 1.0F } };
 	Color issued_by_color{ this, "Issued-by color", ImColor{ 1.0F, 1.0F, 1.0F, 1.0F } };
 	Color vote_cast_color{ this, "Vote color", ImColor{ 1.0F, 1.0F, 1.0F, 1.0F } };
