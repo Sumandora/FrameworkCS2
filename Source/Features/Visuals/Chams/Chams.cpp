@@ -30,6 +30,7 @@
 #include <functional>
 #include <shared_mutex>
 #include <string>
+#include <string_view>
 #include <unistd.h>
 
 static EnginePVSManager* engine_pvs_manager = nullptr;
@@ -89,22 +90,32 @@ bool Chams::draw_object(MeshDrawPrimitive* meshes, int count, const std::functio
 		for (int i = 0; i < count; i++) {
 			// TODO ideally it would cache if a MeshDrawPrimitive is eligible for enhancement
 			MeshDrawPrimitive& mesh_draw_primitive = meshes[i];
+
+			static constexpr std::string_view GLOWPROPERTY_NAME = "materials/dev/glowproperty.vmat";
+			if (mesh_draw_primitive.material && GLOWPROPERTY_NAME == mesh_draw_primitive.material->get_name())
+				continue;
+
 			if (!mesh_draw_primitive.scene_animatable_object)
 				continue;
+
 			const EntityHandle<BaseEntity> owner = mesh_draw_primitive.scene_animatable_object->owner;
 			if (!owner.has_entity())
 				continue;
+
 			BaseEntity* ent = owner.get();
 			// TODO When changing the material of the player while in first person, the legs and shadow disappear
 			if (!ent || Memory::local_player == ent)
 				continue;
+
 			if (!ent->entity_cast<CSPlayerPawn*>())
 				continue;
+
 			previous_materials[i] = mesh_draw_primitive.material;
+
 			Material* material = layer->material.get();
-			if (material) {
+			if (material)
 				mesh_draw_primitive.material = material;
-			}
+
 			mesh_draw_primitive.color = tint_color;
 		}
 
