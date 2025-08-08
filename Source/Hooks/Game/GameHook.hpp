@@ -29,7 +29,7 @@ struct HudOverlayData;
 struct GlowProperty;
 
 class CSGOInput;
-class SceneView;
+class RenderingPipelineCsgoPostHud;
 
 namespace Hooks::Game {
 	void create();
@@ -139,6 +139,6 @@ namespace Hooks::Game {
 
 	namespace AddLayersPostHud {
 		inline UninitializedObject<DetourHook<true>> hook;
-		void hook_func(void* rdi, void* rsi, void* rdx, void* rcx, void* r8, void* r9);
+		void hook_func(RenderingPipelineCsgoPostHud* rdi, void* rsi, void* rdx, void* rcx, void* r8, void* r9);
 	}
 }

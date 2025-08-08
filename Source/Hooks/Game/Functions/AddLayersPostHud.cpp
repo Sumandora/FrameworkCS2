@@ -4,11 +4,13 @@
 
 #include "../../../Features/Visuals/Removals.hpp"
 
+#include "../../../SDK/GameClass/RenderingPipelineCsgoPostHud.hpp"
+
 // TODO This hook annoys me because I remove the entire "PostHud" render pipeline,
 // which right now only contains the flash effect from what I can tell, but in the future it might include more.
 // Right now I would remove these new things as well, I might want to change this in the future...
 void Hooks::Game::AddLayersPostHud::hook_func(
-	void* rdi, void* rsi, void* rdx, void* rcx, void* r8, void* r9)
+	RenderingPipelineCsgoPostHud* rdi, void* rsi, void* rdx, void* rcx, void* r8, void* r9)
 {
 	if (removals->should_remove_flash_overlay())
 		return;
