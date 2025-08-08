@@ -109,7 +109,7 @@ void HitMarker::event_handler(GameEvent* game_event)
 	if (!hit_marker_enabled.get() && !hit_sound_enabled && !hit_logs_enabled)
 		return;
 
-	if (std::string_view{ game_event->GetName() } == "player_hurt")
+	if (std::string_view{ game_event->GetName() } != "player_hurt")
 		return;
 
 	BaseEntity* attacker = game_event->get_entity("attacker");
