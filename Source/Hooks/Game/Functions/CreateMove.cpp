@@ -5,14 +5,15 @@
 #include "../../../Features/Combat/Aimbot.hpp"
 #include "../../../Features/Misc/AutoStrafer.hpp"
 #include "../../../Features/Misc/Bhop.hpp"
+#include "../../../Features/Visuals/BulletTracers.hpp"
 #include "../../../Features/Visuals/ForceThirdPerson.hpp"
 #include "../../../Features/Visuals/GrenadeHelper.hpp"
-#include "../../../Features/Visuals/BulletTracers.hpp"
 
 #include "../../../Memory.hpp"
 
 #include "../../../Utils/CRC.hpp"
 #include "../../../Utils/EmergencyCrash.hpp"
+#include "../../../Utils/Prediction.hpp"
 
 #include "../../../SDK/Entities/CSPlayerController.hpp" // IWYU pragma: keep
 #include "../../../SDK/GameClass/UserCmd.hpp"
@@ -71,9 +72,13 @@ void* Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl
 	const float pitch = usercmd->csgo_usercmd.base().viewangles().x();
 	const float yaw = usercmd->csgo_usercmd.base().viewangles().y();
 
-	bhop->create_move(usercmd);
 	auto_strafer->create_move(usercmd);
+
+	const bool predicted = Prediction::begin(usercmd);
+	bhop->create_move(usercmd);
 	aimbot->create_move(usercmd);
+	if (predicted)
+		Prediction::end();
 
 	const float new_forward = usercmd->csgo_usercmd.base().forwardmove();
 	const float new_left = usercmd->csgo_usercmd.base().leftmove();

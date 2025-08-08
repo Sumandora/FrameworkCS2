@@ -31,8 +31,6 @@ void Bhop::create_move(UserCmd* cmd)
 	if (!holding_jump)
 		return;
 
-	const bool predicted = Prediction::begin(cmd);
-
 	cmd->buttons.buttonstate1 &= ~IN_JUMP;
 	cmd->buttons.buttonstate2 &= ~IN_JUMP;
 
@@ -52,7 +50,4 @@ void Bhop::create_move(UserCmd* cmd)
 		new_step->set_button(IN_JUMP);
 		new_step->set_pressed(false);
 	}
-
-	if (predicted)
-		Prediction::end();
 }

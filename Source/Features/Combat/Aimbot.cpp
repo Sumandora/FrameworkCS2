@@ -82,8 +82,6 @@ void Aimbot::create_move(UserCmd* cmd)
 	if (!aim_between_shots && !Memory::local_player->can_perform_primary_attack())
 		return;
 
-	const bool predicted = Prediction::begin(cmd);
-
 	const NetworkedClientInfo network_client_info = Interfaces::engine->get_network_client_info();
 
 	if (network_client_info.local_data == nullptr)
@@ -197,9 +195,6 @@ void Aimbot::create_move(UserCmd* cmd)
 			cmd->csgo_usercmd.set_attack3_start_history_index(0);
 		}
 	}
-
-	if (predicted)
-		Prediction::end();
 }
 
 bool Aimbot::wants_silent_aim() const
