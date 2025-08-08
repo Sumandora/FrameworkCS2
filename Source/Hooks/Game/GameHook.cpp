@@ -14,6 +14,7 @@
 #include "../../SDK/GameClass/ClientModeCSNormal.hpp"
 #include "../../SDK/GameClass/CSGOInput.hpp"
 #include "../../SDK/GameClass/LightBinnerGPU.hpp"
+#include "../../SDK/GameClass/RenderingPipelineCsgoPostHud.hpp"
 #include "../../SDK/GameClass/Source2Client.hpp"
 
 #include <csignal>
@@ -318,6 +319,23 @@ namespace Hooks::Game {
 				  .relative_to_absolute()
 				  .BCRL_EXPECT(void*, get_glow_color);
 
+		void* add_layers_post_hud
+			= BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"29CRenderingPipelineCsgoPostHud">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::absolute(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+				  .sub(sizeof(char*))
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::absolute(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+				  .add(sizeof(void*))
+				  .add(sizeof(void*) * RenderingPipelineCsgoPostHud::add_layers_index)
+				  .dereference()
+				  .BCRL_EXPECT(void*, add_layers_post_hud);
+
 		FrameStageNotify::hook.emplace(
 			Memory::emalloc,
 			frame_stage_notify,
@@ -394,6 +412,10 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			get_glow_color,
 			reinterpret_cast<void*>(GetGlowColor::hook_func));
+		AddLayersPostHud::hook.emplace(
+			Memory::emalloc,
+			add_layers_post_hud,
+			reinterpret_cast<void*>(AddLayersPostHud::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -414,10 +436,12 @@ namespace Hooks::Game {
 		GetFov::hook->enable();
 		IsGlowing::hook->enable();
 		GetGlowColor::hook->enable();
+		AddLayersPostHud::hook->enable();
 	}
 
 	void destroy()
 	{
+		AddLayersPostHud::hook.reset();
 		GetGlowColor::hook.reset();
 		IsGlowing::hook.reset();
 		GetFov::hook.reset();

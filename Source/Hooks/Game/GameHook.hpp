@@ -9,6 +9,7 @@
 #include "../Hooks.hpp"
 
 #include "cstrike15_usermessages.pb.h"
+
 #include "glm/ext/vector_float3.hpp"
 
 #include <cstddef>
@@ -28,6 +29,7 @@ struct HudOverlayData;
 struct GlowProperty;
 
 class CSGOInput;
+class SceneView;
 
 namespace Hooks::Game {
 	void create();
@@ -133,5 +135,10 @@ namespace Hooks::Game {
 	namespace GetGlowColor {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(GlowProperty* glow_property, float color[4]);
+	}
+
+	namespace AddLayersPostHud {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void hook_func(void* rdi, void* rsi, void* rdx, void* rcx, void* r8, void* r9);
 	}
 }

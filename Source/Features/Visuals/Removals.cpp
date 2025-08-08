@@ -27,6 +27,11 @@ bool Removals::should_remove_scope() const
 	return remove_scope.get();
 }
 
+bool Removals::should_remove_flash_overlay() const
+{
+	return remove_flash_overlay.get();
+}
+
 void Removals::remove_ads_update() const
 {
 	if (!Interfaces::panorama_ui_engine)
