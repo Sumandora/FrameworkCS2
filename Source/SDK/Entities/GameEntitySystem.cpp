@@ -4,11 +4,11 @@
 
 #include "BaseEntity.hpp"
 #include "EntityIdentity.hpp"
-#include "EntityInstance.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
+#include "SignatureScanner/XRefSignature.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -20,8 +20,12 @@ void GameEntitySystem::resolve_signatures()
 	game_entity_system
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"48 8D 05 ? ? ? ? 55 83 C6 01">(),
-			BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			SignatureScanner::PatternSignature::for_literal_string<"client_entities">(),
+			BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+			  .find_xrefs(
+				  SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 89 1d">())
 			  .add(3)
 			  .relative_to_absolute()
 			  .BCRL_EXPECT(GameEntitySystem**, game_entity_system);
