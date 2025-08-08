@@ -426,7 +426,7 @@ namespace Hooks::Game {
 		RenderLegs::hook->enable();
 		DrawArrayExt::hook->enable();
 		SyncViewAngles::hook->enable();
-		EmitSound::hook->enable();
+		// EmitSound::hook->enable();
 		OverrideView::hook->enable();
 		OnVoteStart::hook->enable();
 		ParticlesDrawArray::hook->enable();
@@ -451,7 +451,7 @@ namespace Hooks::Game {
 		ParticlesDrawArray::hook.reset();
 		OnVoteStart::hook.reset();
 		OverrideView::hook.reset();
-		EmitSound::hook.reset();
+		// EmitSound::hook.reset();
 		SyncViewAngles::hook.reset();
 		DrawArrayExt::hook.reset();
 		RenderLegs::hook.reset();
