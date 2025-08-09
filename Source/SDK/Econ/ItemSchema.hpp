@@ -14,7 +14,8 @@ private:
 
 public:
 	struct ItemEntry {
-		PADDING(0x8);
+		int id;
+		PADDING(0x4);
 		EconItemDefinition* econ_item_definition;
 		PADDING(0x8);
 	};

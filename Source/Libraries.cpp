@@ -44,10 +44,12 @@ void Libraries::create()
 	filesystem.emplace("libfilesystem_stdio.so");
 	localize.emplace("liblocalize.so");
 	particles.emplace("libparticles.so");
+	matchmaking.emplace("libmatchmaking.so");
 }
 
 void Libraries::destroy()
 {
+	matchmaking.reset();
 	particles.reset();
 	localize.reset();
 	filesystem.reset();

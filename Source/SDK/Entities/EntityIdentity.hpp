@@ -2,6 +2,8 @@
 
 #include "../Schema/FieldOffset.hpp"
 
+#include "../CUtl/SymbolLarge.hpp"
+
 #include "../Padding.hpp"
 
 #include <cstddef>
@@ -15,6 +17,8 @@ struct EntityIdentity {
 	EntityInstance* instance;
 	PADDING(0x8);
 	std::uint32_t entry_index;
+
+	SCHEMA_VAR(UtlSymbolLarge, designer_name, "m_designerName");
 
 	SCHEMA_VAR(std::uint32_t, flags, "m_flags");
 

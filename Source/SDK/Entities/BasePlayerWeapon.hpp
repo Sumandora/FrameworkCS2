@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BaseEntity.hpp"
+#include "EconEntity.hpp"
 
 #include "../Schema/FieldOffset.hpp"
 
@@ -8,7 +8,7 @@
 
 #include <cstdint>
 
-struct BasePlayerWeapon : public BaseEntity {
+struct BasePlayerWeapon : public EconEntity {
 	CLASS_INFO("libclient.so", "C_BasePlayerWeapon");
 
 	SCHEMA_VAR(GameTick, next_primary_attack_tick,"m_nNextPrimaryAttackTick");

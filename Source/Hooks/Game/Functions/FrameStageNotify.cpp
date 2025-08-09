@@ -4,6 +4,7 @@
 
 #include "../../../Features/Misc/BombTimer.hpp"
 #include "../../../Features/Misc/Hitmarker.hpp"
+#include "../../../Features/Misc/Griefing.hpp"
 #include "../../../Features/PlayerList/PlayerList.hpp"
 #include "../../../Features/Visuals/Chams/Chams.hpp"
 #include "../../../Features/Visuals/ESP/ESP.hpp"
@@ -63,6 +64,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		removals->remove_ads_update();
 		bomb_timer->update();
 		player_list->update();
+		griefing->update();
 		break;
 	}
 

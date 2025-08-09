@@ -6,6 +6,7 @@
 
 #include <cstdint>
 
+// @schema CSWeaponType
 // NOLINTNEXTLINE(performance-enum-size)
 enum CSWeaponType : std::uint32_t {
 	WEAPONTYPE_KNIFE = 0x0,
@@ -30,11 +31,34 @@ enum CSWeaponType : std::uint32_t {
 	WEAPONTYPE_UNKNOWN = 0x13,
 };
 
+// @schema gear_slot_t
+enum GearSlot : std::uint32_t {
+	GEAR_SLOT_INVALID = 0xffffffff,
+	GEAR_SLOT_RIFLE = 0x0,
+	GEAR_SLOT_PISTOL = 0x1,
+	GEAR_SLOT_KNIFE = 0x2,
+	GEAR_SLOT_GRENADES = 0x3,
+	GEAR_SLOT_C4 = 0x4,
+	GEAR_SLOT_RESERVED_SLOT6 = 0x5,
+	GEAR_SLOT_RESERVED_SLOT7 = 0x6,
+	GEAR_SLOT_RESERVED_SLOT8 = 0x7,
+	GEAR_SLOT_RESERVED_SLOT9 = 0x8,
+	GEAR_SLOT_RESERVED_SLOT10 = 0x9,
+	GEAR_SLOT_RESERVED_SLOT11 = 0xa,
+	GEAR_SLOT_BOOSTS = 0xb,
+	GEAR_SLOT_UTILITY = 0xc,
+	GEAR_SLOT_COUNT = 0xd,
+	GEAR_SLOT_FIRST = 0x0,
+	GEAR_SLOT_LAST = 0xc,
+};
+
 struct CSWeaponBaseVData : public BasePlayerWeaponVData {
 	CLASS_INFO("libclient.so", "CCSWeaponBaseVData");
 
 	SCHEMA_VAR(CSWeaponType, weapon_type, "m_WeaponType");
+	SCHEMA_VAR(GearSlot, gear_slot, "m_GearSlot");
 
+	SCHEMA_VAR(int, price, "m_nPrice");
 	SCHEMA_VAR(int, damage, "m_nDamage");
 	SCHEMA_VAR(float, penetration, "m_flPenetration");
 	SCHEMA_VAR(float, range, "m_flRange");

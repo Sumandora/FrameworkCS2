@@ -5,6 +5,7 @@
 template<typename T>
 struct UtlVector {
 	int size;
+	int alloc;
 	T* elements;
 
 	~UtlVector() {

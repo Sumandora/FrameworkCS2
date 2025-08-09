@@ -19,6 +19,7 @@ class ResourceSystem;
 class FileSystem;
 class Localize;
 class ParticleSystemMgr;
+class GameTypes;
 
 namespace Interfaces {
 	class InterfacedLibrary {
@@ -52,6 +53,7 @@ namespace Interfaces {
 	inline Localize* localize;
 	inline Source2ClientPrediction* client_prediction;
 	inline ParticleSystemMgr* particle_system_mgr;
+	inline GameTypes* game_types;
 
 	void grab_interfaces();
 

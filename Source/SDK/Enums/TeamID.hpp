@@ -1,7 +1,9 @@
 #pragma once
 
+#include <cstdint>
+
 // NOLINTNEXTLINE(performance-enum-size)
-enum class TeamID : int {
+enum class TeamID : std::int32_t {
 	TEAM_INVALID = -1,
 	TEAM_ANY = -1,
 	TEAM_UNASSIGNED = 0,

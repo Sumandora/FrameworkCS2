@@ -24,6 +24,8 @@ struct CSPlayerPawn : public CSPlayerPawnBase {
 
 	SCHEMA_VAR(std::int32_t, armor_value, "m_ArmorValue");
 
+	SCHEMA_VAR(bool, in_buy_zone, "m_bInBuyZone");
+
 	[[nodiscard]] bool is_armored_at(HitGroup hit_group) const;
 	[[nodiscard]] bool has_heavy_armor() const;
 
