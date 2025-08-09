@@ -25,17 +25,17 @@
 #include <optional>
 #include <vector>
 
-void* Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl)
+void Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl)
 {
-	void* ret = RetAddrSpoofer::invoke<void*>(reinterpret_cast<void*>(hook->get_trampoline()), csgo_input, esi, dl);
+	RetAddrSpoofer::invoke<void>(reinterpret_cast<void*>(hook->get_trampoline()), csgo_input, esi, dl);
 
 	if (!Memory::local_player_controller || !*Memory::local_player_controller)
-		return ret;
+		return;
 
 	UserCmd* usercmd = UserCmd::get_current_command(*Memory::local_player_controller);
 
 	if (!usercmd)
-		return ret;
+		return;
 
 #ifndef DISABLE_CRC_VALIDATE
 	if (usercmd->csgo_usercmd.has_base() && usercmd->csgo_usercmd.base().has_move_crc()) {
@@ -131,6 +131,4 @@ void* Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl
 	if (usercmd->csgo_usercmd.has_base() && usercmd->csgo_usercmd.base().has_move_crc()) {
 		emergency_crash_if(!CRC::update_crc(usercmd), "Couldn't update CRC (post-cm)!");
 	}
-
-	return ret;
 }
