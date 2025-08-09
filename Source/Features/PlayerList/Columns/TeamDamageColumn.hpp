@@ -44,7 +44,7 @@ struct TeamDamageColumn {
 			return;
 
 		BaseEntity* victim = event->get_entity("userid");
-		if (!victim)
+		if (!victim || victim == attacker)
 			return;
 
 		if (pawn->team_id() != victim->team_id())
