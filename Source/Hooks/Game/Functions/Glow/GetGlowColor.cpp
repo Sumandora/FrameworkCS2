@@ -11,7 +11,7 @@
 void Hooks::Game::GetGlowColor::hook_func(GlowProperty* glow_property, float* color)
 {
 	if (!glow->wants_modify(glow_property->entity())) {
-		RetAddrSpoofer::invoke<void>(reinterpret_cast<void*>(hook->get_trampoline()), glow_property);
+		RetAddrSpoofer::invoke<void>(reinterpret_cast<void*>(hook->get_trampoline()), glow_property, color);
 		return;
 	}
 
