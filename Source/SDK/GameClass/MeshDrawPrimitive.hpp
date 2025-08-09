@@ -30,7 +30,7 @@ struct ParticleCollection {
 struct MeshDrawPrimitive {
 	ParticleCollection* particle_collection; // TODO Probably specific to particles draw array...
 	PADDING(0x10);
-	SceneAnimatableObject* scene_animatable_object;
+	SceneAnimatableObject* scene_animatable_object; // TODO This changes based on the DrawArray function
 	Material* material;
 	PADDING(0x10);
 	PADDING(0x18);

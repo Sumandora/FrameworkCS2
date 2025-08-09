@@ -336,6 +336,22 @@ namespace Hooks::Game {
 				  .dereference()
 				  .BCRL_EXPECT(void*, add_layers_post_hud);
 
+		void* sky_box_draw_array
+			= BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"CSkyBoxObjectDesc">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libscenesystem.so"))
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::relative(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libscenesystem.so"))
+				  .sub(3)
+				  .find_xrefs(
+					  SignatureScanner::XRefTypes::absolute(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libscenesystem.so"))
+				  .add(sizeof(void*))
+				  .dereference()
+				  .BCRL_EXPECT(void*, particles_draw_array);
+
 		FrameStageNotify::hook.emplace(
 			Memory::emalloc,
 			frame_stage_notify,
@@ -416,6 +432,10 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			add_layers_post_hud,
 			reinterpret_cast<void*>(AddLayersPostHud::hook_func));
+		SkyBoxDrawArray::hook.emplace(
+			Memory::emalloc,
+			sky_box_draw_array,
+			reinterpret_cast<void*>(SkyBoxDrawArray::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -437,10 +457,12 @@ namespace Hooks::Game {
 		IsGlowing::hook->enable();
 		GetGlowColor::hook->enable();
 		AddLayersPostHud::hook->enable();
+		SkyBoxDrawArray::hook->enable();
 	}
 
 	void destroy()
 	{
+		SkyBoxDrawArray::hook.reset();
 		AddLayersPostHud::hook.reset();
 		GetGlowColor::hook.reset();
 		IsGlowing::hook.reset();

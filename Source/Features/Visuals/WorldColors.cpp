@@ -2,13 +2,18 @@
 
 #include "../../Features/Feature.hpp"
 
+#include "../../SDK/Color.hpp"
 #include "../../SDK/GameClass/GameEvent.hpp"
 #include "../../SDK/GameClass/MeshDrawPrimitive.hpp"
 #include "../../SDK/GameClass/SceneLightObject.hpp"
+#include "../../SDK/Padding.hpp"
 
 #include "imgui.h"
 
+#include "gch/small_vector.hpp"
+
 #include <cstring>
+#include <functional>
 #include <optional>
 #include <string_view>
 
@@ -17,7 +22,7 @@ WorldColors::WorldColors()
 {
 }
 
-void WorldColors::handle_particle(MeshDrawPrimitive* particle_draw_primitives, int count)
+void WorldColors::handle_particle(MeshDrawPrimitive* particle_draw_primitives, int count) const
 {
 	if (!change_inferno_color.get())
 		return;
@@ -83,6 +88,45 @@ void WorldColors::handle_light(SceneLightObject* scene_light_object)
 	scene_light_object->r = color.Value.x * color.Value.w;
 	scene_light_object->g = color.Value.y * color.Value.w;
 	scene_light_object->b = color.Value.z * color.Value.w;
+}
+
+bool WorldColors::handle_sky(MeshDrawPrimitive* sky_draw_primitives, int count,
+	const std::function<void(MeshDrawPrimitive*, int)>& draw_mesh) const
+{
+	if (!change_sky_color.get())
+		return false;
+
+	const ImColor color = sky_color.get();
+
+	gch::small_vector<ImColor, 4> previous_colors(count);
+
+	struct SkyBoxObject {
+		// string xref: "SkyTint"
+		PADDING(0x120);
+		float r, g, b, a;
+	};
+
+	for (int i = 0; i < count; i++) {
+		auto* sky_box_object = reinterpret_cast<SkyBoxObject*>(sky_draw_primitives[i].scene_animatable_object);
+		previous_colors[i] = { sky_box_object->r, sky_box_object->g, sky_box_object->b, sky_box_object->a };
+		sky_box_object->r = color.Value.x;
+		sky_box_object->g = color.Value.y;
+		sky_box_object->b = color.Value.z;
+		sky_box_object->a = color.Value.w;
+	}
+
+	draw_mesh(sky_draw_primitives, count);
+
+	for (int i = 0; i < count; i++) {
+		auto* sky_box_object = reinterpret_cast<SkyBoxObject*>(sky_draw_primitives[i].scene_animatable_object);
+		const ImColor& original_color = previous_colors[i];
+		sky_box_object->r = original_color.Value.x;
+		sky_box_object->g = original_color.Value.y;
+		sky_box_object->b = original_color.Value.z;
+		sky_box_object->a = original_color.Value.w;
+	}
+
+	return true;
 }
 
 void WorldColors::event_handler(GameEvent* event)

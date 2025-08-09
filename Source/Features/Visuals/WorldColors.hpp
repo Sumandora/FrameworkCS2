@@ -10,6 +10,7 @@
 
 #include "imgui.h"
 
+#include <functional>
 #include <unordered_map>
 
 struct SceneLightObject;
@@ -26,6 +27,10 @@ class WorldColors : public Feature {
 	Checkbox change_light_color{ lights, "Change light color", false };
 	Color light_color{ lights, "Light color", ImColor{ 1.0F, 1.0F, 1.0F, 1.0F } };
 
+	Section sky{this, "Sky"};
+	Checkbox change_sky_color{ sky, "Change sky color", false };
+	Color sky_color{ sky, "Sky color", ImColor{ 1.0F, 1.0F, 1.0F, 1.0F } };
+
 	struct RGB {
 		float r, g, b;
 	};
@@ -35,8 +40,9 @@ class WorldColors : public Feature {
 public:
 	WorldColors();
 
-	void handle_particle(MeshDrawPrimitive* particle_draw_primitives, int count);
+	void handle_particle(MeshDrawPrimitive* particle_draw_primitives, int count) const;
 	void handle_light(SceneLightObject* scene_light_object);
+	bool handle_sky(MeshDrawPrimitive* sky_draw_primitives, int count, const std::function<void(MeshDrawPrimitive*, int)>& draw_mesh) const;
 	void event_handler(GameEvent* event);
 };
 
