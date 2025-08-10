@@ -1,4 +1,4 @@
-#include "Griefing.hpp"
+#include "AutoPickup.hpp"
 
 #include "../Feature.hpp"
 
@@ -38,8 +38,8 @@
 static CSGameRules** game_rules = nullptr;
 static bool (*do_game_rules_prevent_pickup)(CSGameRules*) = nullptr;
 
-Griefing::Griefing()
-	: Feature("Misc", "Griefing")
+AutoPickup::AutoPickup()
+	: Feature("Griefing", "Auto pickup")
 {
 	auto collect_ground_weapons_session
 		= BCRL::signature(
@@ -75,7 +75,7 @@ Griefing::Griefing()
 			  .BCRL_EXPECT(decltype(do_game_rules_prevent_pickup), do_game_rules_prevent_pickup);
 }
 
-void Griefing::update()
+void AutoPickup::update()
 {
 	if (!auto_pickup.get())
 		return;
@@ -180,7 +180,7 @@ void Griefing::update()
 		}
 
 		// TODO since this is subject to ping, maybe the notification should only be printed every multiple of the ping?
-		Notifications::create(auto_pickup.get_name() /* <- consistency right there*/,
+		Notifications::create(auto_pickup->get_name() /* <- consistency right there*/,
 			std::format("Attempted to pick up '{}'", name), Notifications::Severity::INFO);
 	}
 }

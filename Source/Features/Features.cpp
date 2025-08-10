@@ -1,10 +1,10 @@
 #include "Features.hpp"
 
 #include "Combat/Aimbot.hpp"
+#include "Griefing/AutoPickup.hpp"
 #include "Misc/AutoStrafer.hpp"
 #include "Misc/Bhop.hpp"
 #include "Misc/BombTimer.hpp"
-#include "Misc/Griefing.hpp"
 #include "Misc/Hitmarker.hpp"
 #include "Misc/VoteRevealer/VoteRevealer.hpp"
 #include "PlayerList/PlayerList.hpp"
@@ -46,14 +46,14 @@ void Features::create()
 	bullet_tracers.emplace();
 	field_of_view.emplace();
 	glow.emplace();
-	griefing.emplace();
+	auto_pickup.emplace();
 
 	initialized = true;
 }
 
 void Features::destroy()
 {
-	griefing.reset();
+	auto_pickup.reset();
 	glow.reset();
 	field_of_view.reset();
 	bullet_tracers.reset();
