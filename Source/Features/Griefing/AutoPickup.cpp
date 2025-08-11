@@ -77,7 +77,7 @@ AutoPickup::AutoPickup()
 
 void AutoPickup::update()
 {
-	if (!auto_pickup.get())
+	if (!enabled.get())
 		return;
 
 	if (!Memory::local_player)
