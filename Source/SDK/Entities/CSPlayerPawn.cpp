@@ -108,6 +108,9 @@ float CSPlayerPawn::scale_damage_with_armor(float damage, float weapon_armor_rat
 // TODO This shouldn't be a member of CSPlayerPawn, because weapon_services and weapon should be acquired by the caller, but whatever...
 bool CSPlayerPawn::can_perform_primary_attack() const
 {
+	if (wait_for_no_attack())
+		return false;
+
 	const CSPlayerWeaponServices* weapon_services = this->weapon_services();
 	if (!weapon_services)
 		return false;
