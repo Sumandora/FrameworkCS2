@@ -66,7 +66,8 @@ struct BaseEntity : public EntityInstance {
 
 	SCHEMA_VAR(TeamID, team_id, "m_iTeamNum");
 
-	SCHEMA_VAR(glm::vec3, velocity, "m_vecAbsVelocity");
+	SCHEMA_VAR(glm::vec3, abs_velocity, "m_vecAbsVelocity");
+	SCHEMA_VAR(glm::vec3, velocity, "m_vecVelocity");
 
 	SCHEMA_VAR(MoveType, move_type, "m_nActualMoveType");
 
