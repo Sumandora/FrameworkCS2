@@ -181,5 +181,5 @@ void AutoStrafer::create_move(UserCmd* cmd)
 
 bool AutoStrafer::wants_silent_aim() const
 {
-	return MovementQuantization::is_movement_quantized();
+	return enabled.get() && MovementQuantization::is_movement_quantized();
 }
