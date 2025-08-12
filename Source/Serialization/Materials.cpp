@@ -113,8 +113,7 @@ static std::mutex materials_mutex;
 auto Serialization::Materials::get_materials() -> MutexGuard<std::vector<Material>>
 {
 	if (!available) {
-		materials_mutex.lock();
-		return MutexGuard{ &materials, &materials_mutex };
+		return MutexGuard{ &materials, materials_mutex };
 	}
 
 	// Don't update it every time, that would probably cause hard drive failure in the long term.
@@ -139,6 +138,5 @@ auto Serialization::Materials::get_materials() -> MutexGuard<std::vector<Materia
 		}
 	}
 
-	materials_mutex.lock();
-	return MutexGuard{ &materials, &materials_mutex };
+	return MutexGuard{ &materials, materials_mutex };
 }

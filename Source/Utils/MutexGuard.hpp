@@ -1,35 +1,45 @@
 #pragma once
 
 #include <mutex>
+#include <optional>
 
 // Inspired by https://github.com/p-avital/cpp-mutex-guard
 // Don't want to include it directly as a dependency, because the Mutex wrapper type is something I don't really need...
 // TODO special thanks sections for proper attribution
 
-template <typename T>
+template <typename T, typename Lock = std::lock_guard<std::mutex>>
 class MutexGuard {
 	T* value;
-	std::mutex* mutex;
+	std::optional<Lock> lock;
 
 public:
-	explicit MutexGuard(T* value, std::mutex* mutex)
+	explicit MutexGuard(T* value, Lock lock)
 		: value(value)
-		, mutex(mutex)
+		, lock(std::move(lock))
 	{
 	}
 
-	~MutexGuard()
+	// TODO remove pointer on mutex
+	explicit MutexGuard(T* value, Lock::mutex_type& mutex)
+		: value(value)
+		, lock(mutex)
 	{
-		mutex->unlock();
 	}
+
+	~MutexGuard() = default;
 
 	T& operator*() const noexcept { return *value; }
 	T* operator->() const noexcept { return value; }
 
 	// NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-	operator T*()
+	operator T*() noexcept
 	{
 		return value;
+	}
+
+	T* get(this auto&& self) noexcept
+	{
+		return self.value;
 	}
 
 	MutexGuard(const MutexGuard&) = delete;
@@ -37,16 +47,16 @@ public:
 
 	MutexGuard(MutexGuard&& other) noexcept
 		: value(other.value)
-		, mutex(other.mutex)
+		, lock(other.lock)
 	{
 		other.value = nullptr;
-		other.mutex = nullptr;
+		other.lock.reset();
 	}
 
 	MutexGuard& operator=(MutexGuard&& guard) noexcept
 	{
 		value = guard.value;
-		mutex = guard.mutex;
-		guard.mutex = nullptr;
+		lock = guard.lock;
+		guard.lock.reset();
 	}
 };

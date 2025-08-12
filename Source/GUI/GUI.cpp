@@ -393,8 +393,7 @@ float GUI::get_base_font_size()
 
 MutexGuard<ImDrawList*> GUI::get_draw_list()
 {
-	draw_list_mutex.lock();
-	return MutexGuard{ &draw_list, &draw_list_mutex };
+	return MutexGuard{ &draw_list, draw_list_mutex };
 }
 
 ImDrawListSharedData* GUI::get_draw_list_shared_data()
