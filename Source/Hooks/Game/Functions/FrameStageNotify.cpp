@@ -54,11 +54,13 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 	}
 
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_END: {
+		const auto lock = GameEntitySystem::shared_lock();
 		model_changer->update_model();
 		break;
 	}
 
 	case FRAME_NET_UPDATE_END: {
+		const auto lock = GameEntitySystem::shared_lock();
 		CSPlayerController* controller = *Memory::local_player_controller;
 		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
 
