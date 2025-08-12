@@ -95,6 +95,8 @@ void Aimbot::create_move(UserCmd* cmd)
 		cmd->csgo_usercmd.base().viewangles().y(),
 	};
 
+	const bool predicted = Prediction::begin(cmd);
+
 	glm::vec2 rots;
 	float fov = FLT_MAX;
 
@@ -179,14 +181,14 @@ void Aimbot::create_move(UserCmd* cmd)
 		if (should_shoot) {
 			cmd->set_buttonstate2(cmd->buttons.buttonstate2 | IN_ATTACK);
 
-			CSubtickMoveStep* new_step = cmd->allocate_new_move_step(0.0001F);
+			CSubtickMoveStep* new_step = cmd->allocate_new_move_step(1.0F);
 
 			new_step->set_button(IN_ATTACK);
 			new_step->set_pressed(true);
 
 			cmd->csgo_usercmd.set_attack1_start_history_index(0);
 
-			new_step = cmd->allocate_new_move_step(0.0001F);
+			new_step = cmd->allocate_new_move_step(1.0F);
 
 			new_step->set_button(IN_ATTACK);
 			new_step->set_pressed(false);
@@ -195,6 +197,9 @@ void Aimbot::create_move(UserCmd* cmd)
 			cmd->csgo_usercmd.set_attack3_start_history_index(0);
 		}
 	}
+
+	if (predicted)
+		Prediction::end();
 }
 
 bool Aimbot::wants_silent_aim() const

@@ -75,11 +75,8 @@ void Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl)
 
 	auto_strafer->create_move(usercmd);
 
-	const bool predicted = Prediction::begin(usercmd);
 	bhop->create_move(usercmd);
 	aimbot->create_move(usercmd);
-	if (predicted)
-		Prediction::end();
 
 	const float new_forward = usercmd->csgo_usercmd.base().forwardmove();
 	const float new_left = usercmd->csgo_usercmd.base().leftmove();

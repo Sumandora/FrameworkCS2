@@ -87,7 +87,7 @@ void AutoStrafer::create_move(UserCmd* cmd)
 			return;
 		last_wish_direction = wish_direction;
 
-		glm::vec3 velocity = local_player->velocity();
+		glm::vec3 velocity = local_player->abs_velocity();
 
 		if (glm::length(velocity.xy()) < 1.0F)
 			return;
