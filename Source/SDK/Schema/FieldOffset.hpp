@@ -16,6 +16,7 @@
 	}
 
 #define SCHEMA_VAR(type, prettyName, name)                                                     \
+	using prettyName##_type = type;                                                            \
 	inline auto& prettyName()                                                                  \
 	{                                                                                          \
 		static const std::int32_t offset = SchemaSystem::findOffset(classInfo(), name);        \
