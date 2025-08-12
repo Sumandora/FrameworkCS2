@@ -8,6 +8,11 @@ static constexpr int time_to_ticks(float dt)
 	return static_cast<int>(0.5F + dt / TICK_INTERVAL);
 }
 
+static constexpr float time_to_ticks_with_partial(float dt)
+{
+	return 0.5F + dt / TICK_INTERVAL;
+}
+
 static constexpr float ticks_to_time(int t)
 {
 	return TICK_INTERVAL * static_cast<float>(t);
