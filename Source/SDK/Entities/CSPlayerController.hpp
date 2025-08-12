@@ -26,6 +26,7 @@ enum CompetitiveRankType : std::uint8_t {
 struct CSPlayerController : public BasePlayerController {
 	CLASS_INFO("libclient.so", "CCSPlayerController");
 
+	SCHEMA_VAR(std::uint32_t, ping, "m_iPing");
 	SCHEMA_VAR(const char*, sanitized_name, "m_sSanitizedPlayerName");
 	SCHEMA_VAR(std::int32_t, competitive_ranking, "m_iCompetitiveRanking");
 	SCHEMA_VAR(std::int32_t, competitive_wins, "m_iCompetitiveWins");

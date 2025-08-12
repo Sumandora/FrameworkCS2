@@ -21,6 +21,7 @@
 #include "../../../Memory.hpp"
 
 #include "../../../Utils/MutexGuard.hpp"
+#include "../../../Utils/SmoothedPing.hpp"
 
 #include "imgui.h"
 
@@ -65,6 +66,9 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		bomb_timer->update();
 		player_list->update();
 		auto_pickup->update();
+
+		average_ping.push(static_cast<float>(controller->ping()));
+
 		break;
 	}
 
