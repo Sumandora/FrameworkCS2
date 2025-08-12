@@ -5,10 +5,11 @@
 #include "../../Settings/Color.hpp"
 
 #include "../../../SDK/ChatPrintf.hpp"
+#include "../../../SDK/Entities/BaseEntity.hpp"
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Entities/CSPlayerPawnBase.hpp"
 #include "../../../SDK/Entities/GameEntitySystem.hpp"
-#include "../../../SDK/Entities/BaseEntity.hpp"
+#include "../../../SDK/Enums/TeamID.hpp"
 #include "../../../SDK/GameClass/GameEvent.hpp"
 #include "../../../SDK/GameClass/Localize.hpp"
 #include "../../../SDK/NetMessages/NetMessagePB.hpp"
@@ -42,7 +43,8 @@ void VoteRevealer::on_vote_start(NetMessagePB<CCSUsrMsg_VoteStart>* net_message)
 	const char* details = *reinterpret_cast<char* const*>(&net_message->pb.details_str());
 	const char* other_team = *reinterpret_cast<char* const*>(&net_message->pb.other_team_str());
 
-	if (std::string_view{ other_team } == "#SFUI_otherteam_vote_unimplemented") {
+	static constexpr std::string_view OTHER_TEAM_FALLBACK{ "#SFUI_otherteam_vote_unimplemented" };
+	if (std::string_view{ other_team } == OTHER_TEAM_FALLBACK) {
 		// If they add a new vote type, then this probably helps debugging,
 		// however one should note that change level votes for example also show up here, since they are displayed to both teams.
 		// I don't filter those as of right now. (mini TODO)
@@ -102,12 +104,14 @@ void VoteRevealer::on_vote_start(NetMessagePB<CCSUsrMsg_VoteStart>* net_message)
 			std::format(R"(<font color="{}">{}</font>)", ChatPrintf::to_html_rgba(player_highlight_color.get()), player_name));
 	}
 
-	if (from_controller)
+	if (from_controller) {
+		std::string issuer_name = from_controller->get_decorated_player_name();
+		html_escape(issuer_name);
 		ChatPrintf::print(R"(<font color="{}">{} <font color="{}">(issued by <font color="{}">{}</font>)</font></font>)",
 			ChatPrintf::to_html_rgba(announce_color.get()), localized,
 			ChatPrintf::to_html_rgba(issued_by_color.get()),
-			ChatPrintf::to_html_rgba(player_highlight_color.get()), from_controller->get_decorated_player_name());
-	else
+			ChatPrintf::to_html_rgba(player_highlight_color.get()), issuer_name);
+	} else
 		ChatPrintf::print(R"(<font color="{}">{}</font>)",
 			ChatPrintf::to_html_rgba(announce_color.get()), localized);
 }
