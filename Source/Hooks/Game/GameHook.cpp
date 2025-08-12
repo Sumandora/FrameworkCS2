@@ -11,17 +11,15 @@
 
 #include "DetourHooking.hpp"
 
-#include "../../SDK/GameClass/ClientModeCSNormal.hpp"
 #include "../../SDK/GameClass/CSGOInput.hpp"
+#include "../../SDK/GameClass/ClientModeCSNormal.hpp"
 #include "../../SDK/GameClass/LightBinnerGPU.hpp"
 #include "../../SDK/GameClass/RenderingPipelineCsgoPostHud.hpp"
 #include "../../SDK/GameClass/Source2Client.hpp"
 
 #include <csignal>
 #include <cstddef>
-#include <cstdint>
 #include <cstring>
-#include <string>
 #include <type_traits>
 #include <unistd.h>
 #include <vector>

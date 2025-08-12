@@ -40,6 +40,8 @@ void Hooks::create()
 	Logging::debug("Paused threads: [{}]", vec_string);
 #endif
 
+	Game::create();
+
 	if (!GraphicsHook::hookSDL()) {
 		Logging::error("Failed to hook SDL");
 		return;
@@ -49,8 +51,6 @@ void Hooks::create()
 		Logging::error("Failed to hook vulkan");
 		return;
 	}
-
-	Game::create();
 
 	for (const pid_t pid : other_threads) {
 		kill(pid, SIGCONT);
