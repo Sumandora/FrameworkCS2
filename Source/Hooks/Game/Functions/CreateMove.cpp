@@ -3,6 +3,7 @@
 #include "RetAddrSpoofer.hpp"
 
 #include "../../../Features/Combat/Aimbot.hpp"
+#include "../../../Features/Griefing/BlockBot.hpp"
 #include "../../../Features/Misc/AutoStrafer.hpp"
 #include "../../../Features/Misc/Bhop.hpp"
 #include "../../../Features/Visuals/BulletTracers.hpp"
@@ -74,6 +75,7 @@ void Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl)
 	const float yaw = usercmd->csgo_usercmd.base().viewangles().y();
 
 	auto_strafer->create_move(usercmd);
+	block_bot->create_move(usercmd);
 
 	bhop->create_move(usercmd);
 	aimbot->create_move(usercmd);

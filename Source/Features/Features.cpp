@@ -2,6 +2,7 @@
 
 #include "Combat/Aimbot.hpp"
 #include "Griefing/AutoPickup.hpp"
+#include "Griefing/BlockBot.hpp"
 #include "Misc/AutoStrafer.hpp"
 #include "Misc/Bhop.hpp"
 #include "Misc/BombTimer.hpp"
@@ -47,12 +48,14 @@ void Features::create()
 	field_of_view.emplace();
 	glow.emplace();
 	auto_pickup.emplace();
+	block_bot.emplace();
 
 	initialized = true;
 }
 
 void Features::destroy()
 {
+	block_bot.reset();
 	auto_pickup.reset();
 	glow.reset();
 	field_of_view.reset();

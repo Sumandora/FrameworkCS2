@@ -3,6 +3,7 @@
 #include "RetAddrSpoofer.hpp"
 
 #include "../../../Features/Griefing/AutoPickup.hpp"
+#include "../../../Features/Griefing/BlockBot.hpp"
 #include "../../../Features/Misc/BombTimer.hpp"
 #include "../../../Features/Misc/Hitmarker.hpp"
 #include "../../../Features/PlayerList/PlayerList.hpp"
@@ -44,6 +45,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 				esp->draw(draw_list);
 				grenade_prediction->draw(draw_list);
 				hit_marker->draw(draw_list);
+				block_bot->draw(draw_list);
 			}
 		}
 
