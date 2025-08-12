@@ -69,6 +69,9 @@ void ModelChanger::update_model()
 		return; // urgh...
 
 	const BodyComponent* body_component = Memory::local_player->body_component();
+	if (!body_component)
+		return;
+
 	const SkeletonInstance& skeleton = static_cast<const BodyComponentSkeletonInstance*>(body_component)->skeleton_instance();
 	const ModelState& model_state = skeleton.model_state();
 
