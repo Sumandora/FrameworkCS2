@@ -7,14 +7,15 @@
 #include "networkbasetypes.pb.h" // IWYU pragma: export
 #include "usercmd.pb.h" // IWYU pragma: export
 
+#include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <string>
 
 struct BasePlayerController;
 
 // @schema InputBitMask_t
-enum InputBitMask : std::uint64_t
-{
+enum InputBitMask : std::uint64_t {
 	IN_NONE = 0x0,
 	IN_ALL = 0xffffffffffffffff,
 	IN_ATTACK = 1UL << 0UL,
@@ -83,8 +84,15 @@ public:
 	// Applies button inputs according to forwardmove and leftmove
 	void fixup_buttons_for_move(float last_forwardmove, float last_leftmove, const Buttons& last_buttons);
 
+	// Adds a single subtick move that turns immediately, if there are no other subticks that turn.
+	void add_single_rotation_subtick();
+
 	// Takes old yaw and pitch and spreads out the movement over the subtick moves
 	void spread_out_rotation_changes(float old_yaw, float old_pitch);
+
+	// @returns how many subticks got deleted.
+	std::size_t erase_subtick_if(const std::function<bool(CSubtickMoveStep&)>& predicate);
+	std::size_t erase_empty_subticks();
 
 	std::string stringify() const;
 };

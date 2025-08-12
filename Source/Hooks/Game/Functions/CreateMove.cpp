@@ -16,6 +16,7 @@
 #include "../../../Utils/Prediction.hpp"
 
 #include "../../../SDK/Entities/CSPlayerController.hpp" // IWYU pragma: keep
+#include "../../../SDK/GameClass/CSGOInput.hpp"
 #include "../../../SDK/GameClass/UserCmd.hpp"
 
 #include "glm/ext/vector_float3.hpp"
@@ -86,6 +87,9 @@ void Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl)
 	const float new_pitch = usercmd->csgo_usercmd.base().viewangles().x();
 	const float new_yaw = usercmd->csgo_usercmd.base().viewangles().y();
 
+	const bool fake_movement = forward != new_forward || left != new_left;
+	const bool fake_rotation = yaw != new_yaw || pitch != new_pitch;
+
 	struct LastCmd {
 		std::int32_t tick;
 
@@ -96,11 +100,14 @@ void Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl)
 		float yaw;
 
 		Buttons buttons;
+
+		bool was_fake_movement;
+		bool was_fake_rotation;
 	};
 	static std::optional<LastCmd> last_cmd = std::nullopt;
 
 	if (last_cmd) {
-		if (forward != new_forward || left != new_left)
+		if (fake_movement || last_cmd->was_fake_movement) {
 			// TODO: This is not accurate, but I think it is still better to do this incorrectly, than not at all.
 			//		 Because these states are dependent on subticks, I think they are not verifiable by valve,
 			// 		 however I might be wrong because of subtick moves and input history vectors inside the command.
@@ -108,10 +115,20 @@ void Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl)
 			//
 			// TODO: Changed some things, is it more correct now?
 			usercmd->fixup_buttons_for_move(last_cmd->forwardmove, last_cmd->leftmove, last_cmd->buttons);
+		}
 
-		if (yaw != new_yaw || pitch != new_pitch)
+		if (fake_rotation || last_cmd->was_fake_rotation) {
+			// If there is no rotation subtick, then we need to create one.
+			if (new_yaw != last_cmd->yaw || new_pitch != last_cmd->pitch)
+				usercmd->add_single_rotation_subtick();
+
 			// Not sure if this is good, but I feel like it.
 			usercmd->spread_out_rotation_changes(last_cmd->yaw, last_cmd->pitch);
+		}
+	}
+
+	if (!usercmd->has_been_predicted) {
+		// std::cout << usercmd->stringify() << std::endl;
 	}
 
 	if (!usercmd->has_been_predicted)
@@ -122,10 +139,9 @@ void Hooks::Game::CreateMove::hook_func(CSGOInput* csgo_input, int esi, char dl)
 			.pitch = usercmd->csgo_usercmd.base().viewangles().x(),
 			.yaw = usercmd->csgo_usercmd.base().viewangles().y(),
 			.buttons = usercmd->buttons,
+			.was_fake_movement = fake_movement,
+			.was_fake_rotation = fake_rotation,
 		};
-
-	// if (!usercmd->has_been_predicted)
-	// 	std::cout << usercmd->stringify() << std::endl;
 
 	// Update the CRC stored in the UserCmd to accommodate our changes.
 	if (usercmd->csgo_usercmd.has_base() && usercmd->csgo_usercmd.base().has_move_crc()) {

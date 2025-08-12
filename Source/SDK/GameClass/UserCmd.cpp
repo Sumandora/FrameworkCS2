@@ -1,5 +1,9 @@
 #include "UserCmd.hpp"
 
+#include "../ConVar/ConVar.hpp"
+#include "../ConVar/EngineCvar.hpp"
+#include "../Entities/BaseEntity.hpp"
+#include "../Entities/CSPlayerPawn.hpp"
 #include "../GameClass/Source2Client.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
@@ -16,16 +20,21 @@
 #include <cstdint>
 #include <cstdlib>
 #include <format>
+#include <functional>
 #include <memory>
 #include <ranges>
 #include <string>
 #include <string_view>
 
+static ConVar* sv_subtick_movement_view_angles = nullptr;
 static UserCmd* (*get_usercmd)(BasePlayerController*, int) = nullptr;
 static CSubtickMoveStep* (*allocate_subtick_move)(google::protobuf::Arena* arena) = nullptr;
 
 void UserCmd::resolve_signatures()
 {
+	sv_subtick_movement_view_angles = Interfaces::engineCvar->findByName("sv_subtick_movement_view_angles");
+	MEM_ACCEPT(sv_subtick_movement_view_angles);
+
 	get_usercmd
 		= BCRL::signature(
 			Memory::mem_mgr,
@@ -64,6 +73,7 @@ CSubtickMoveStep* UserCmd::allocate_new_move_step(float when, bool completely_em
 
 	CSubtickMoveStep* new_step = nullptr;
 
+	// TODO merging with rotation subticks might be a bad thing.
 	if (!completely_empty && !subtick_moves->empty()) {
 		auto it
 			= *subtick_moves
@@ -154,15 +164,7 @@ void UserCmd::fixup_buttons_for_move(float last_forwardmove, float last_leftmove
 	const std::uint64_t changes = last_move ^ next_move;
 	set_buttonstate2((this->buttons.buttonstate2 & ~MOVE_MASK) | changes);
 
-	auto* list = csgo_usercmd.mutable_base()->mutable_subtick_moves();
-
-	while (true) {
-		auto it = std::ranges::find_if(*list,
-			[](CSubtickMoveStep& move_step) { return move_step.button() & MOVE_MASK; });
-		if (it == list->end())
-			break;
-		list->erase(it);
-	}
+	erase_subtick_if([](CSubtickMoveStep& move_step) { return move_step.button() & MOVE_MASK; });
 
 	// TODO randomize timings
 
@@ -184,7 +186,7 @@ void UserCmd::fixup_buttons_for_move(float last_forwardmove, float last_leftmove
 	for (const std::uint64_t bit : { IN_FORWARD, IN_BACK, IN_MOVELEFT, IN_MOVERIGHT }) {
 		if (!(this->buttons.buttonstate2 & bit))
 			continue; // unchanged
-		if (!(buttons & bit))
+		if (buttons & bit)
 			continue;
 		CSubtickMoveStep* step = allocate_new_move_step(0.005F);
 		step->set_pressed(false);
@@ -192,8 +194,37 @@ void UserCmd::fixup_buttons_for_move(float last_forwardmove, float last_leftmove
 	}
 }
 
+static bool has_rotation_subticks()
+{
+	if (!sv_subtick_movement_view_angles->get_bool())
+		// Not needed.
+		return false;
+
+	if (!Memory::local_player || !(Memory::local_player->flags() & FL_ONGROUND))
+		return false; // WTF???
+
+	return true;
+}
+
+void UserCmd::add_single_rotation_subtick()
+{
+	if (!has_rotation_subticks())
+		return;
+
+	if (std::ranges::any_of(csgo_usercmd.base().subtick_moves(), [](const CSubtickMoveStep& move_step) {
+			return move_step.has_analog_yaw_delta() || move_step.has_analog_pitch_delta();
+		}))
+		// There are rotations.
+		return;
+
+	allocate_new_move_step(0.0F);
+}
+
 void UserCmd::spread_out_rotation_changes(float old_yaw, float old_pitch)
 {
+	if (!has_rotation_subticks())
+		return;
+
 	const float pitch = csgo_usercmd.base().viewangles().x();
 	const float yaw = csgo_usercmd.base().viewangles().y();
 
@@ -214,6 +245,37 @@ void UserCmd::spread_out_rotation_changes(float old_yaw, float old_pitch)
 		else
 			move_step.set_analog_pitch_delta(delta_pitch_per_subtick);
 	}
+}
+
+std::size_t UserCmd::erase_subtick_if(const std::function<bool(CSubtickMoveStep&)>& predicate)
+{
+	// TODO since this algorithm isn't exactly optimized, lets just keep it here for the time being so that when I optimize it all code benefits from it.
+	auto* list = csgo_usercmd.mutable_base()->mutable_subtick_moves();
+
+	std::size_t count = 0;
+
+	while (true) {
+		auto it = std::ranges::find_if(*list, predicate);
+		if (it == list->end())
+			break;
+		list->erase(it);
+		count++;
+	}
+
+	return count;
+}
+
+std::size_t UserCmd::erase_empty_subticks()
+{
+	return erase_subtick_if([](CSubtickMoveStep& move_step) {
+		// TODO would prefer if this updates automatically.
+		return !move_step.has_analog_forward_delta()
+			&& !move_step.has_analog_left_delta()
+			&& !move_step.has_analog_pitch_delta()
+			&& !move_step.has_analog_yaw_delta()
+			&& !move_step.has_button()
+			&& !move_step.has_pressed();
+	});
 }
 
 // Because protobufs DebugString() has issues beyond my comprehension and I can't be bothered fixing filthy google software, here we go:
