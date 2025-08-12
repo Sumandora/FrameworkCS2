@@ -38,7 +38,7 @@ void CSPlayerController::resolve_signatures()
 
 std::string CSPlayerController::get_decorated_player_name() const
 {
-	// Not sure if this is the actual max length, but it once was.
+	// Length determined by SourceSDK and invocations of function
 	static constexpr std::size_t MAX_NETWORKID_LENGTH = 64;
 	static constexpr std::size_t MAX_DECORATED_PLAYER_NAME_LENGTH = MAX_NETWORKID_LENGTH * 10 + 20;
 
