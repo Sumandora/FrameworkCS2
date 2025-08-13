@@ -29,7 +29,7 @@ std::optional<float> FieldOfView::get_fov()
 	if (!change_fov.get())
 		return {};
 
-	if (Memory::local_player->isScoped() && ignore_scope.get())
+	if (Memory::local_player->is_scoped() && ignore_scope.get())
 		return {};
 
 	return fov.get();

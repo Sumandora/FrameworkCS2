@@ -19,5 +19,5 @@ bool ForceCrosshair::should_force() const
 		return false;
 
 	auto* player = Memory::local_player;
-	return player != nullptr && player->health() > 0 && (!player->isScoped() || removals->should_remove_scope());
+	return player != nullptr && player->health() > 0 && (!player->is_scoped() || removals->should_remove_scope());
 }
