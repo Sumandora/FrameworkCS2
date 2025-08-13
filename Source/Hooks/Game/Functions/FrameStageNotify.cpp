@@ -4,6 +4,7 @@
 
 #include "../../../Features/Griefing/AutoPickup.hpp"
 #include "../../../Features/Griefing/BlockBot.hpp"
+#include "../../../Features/Misc/AutoAccept.hpp"
 #include "../../../Features/Misc/BombTimer.hpp"
 #include "../../../Features/Misc/Hitmarker.hpp"
 #include "../../../Features/PlayerList/PlayerList.hpp"
@@ -49,6 +50,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 			}
 		}
 
+		auto_accept->update();
 		thread_executor.run_all_queued_functions();
 		break;
 	}

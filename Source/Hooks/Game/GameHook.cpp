@@ -11,8 +11,8 @@
 
 #include "DetourHooking.hpp"
 
-#include "../../SDK/GameClass/CSGOInput.hpp"
 #include "../../SDK/GameClass/ClientModeCSNormal.hpp"
+#include "../../SDK/GameClass/CSGOInput.hpp"
 #include "../../SDK/GameClass/LightBinnerGPU.hpp"
 #include "../../SDK/GameClass/RenderingPipelineCsgoPostHud.hpp"
 #include "../../SDK/GameClass/Source2Client.hpp"
@@ -350,6 +350,26 @@ namespace Hooks::Game {
 				  .dereference()
 				  .BCRL_EXPECT(void*, particles_draw_array);
 
+		void* on_match_found_event
+			= (void*)BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"popup_accept_match_found">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+				  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				  .sub(3)
+				  .repeater([](auto& ptr) {
+					  ptr.next_instruction();
+					  return !ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"e8">());
+				  })
+				  .add(1)
+				  .relative_to_absolute()
+				  // TODO Fix in BCRL: remove duplicates. (probably should use std::set instead of vector)
+				  .peek()
+				  .front()
+				  .get_pointer();
+		// .BCRL_EXPECT(void*, on_match_found_event);
+
 		FrameStageNotify::hook.emplace(
 			Memory::emalloc,
 			frame_stage_notify,
@@ -434,6 +454,10 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			sky_box_draw_array,
 			reinterpret_cast<void*>(SkyBoxDrawArray::hook_func));
+		OnMatchFoundEvent::hook.emplace(
+			Memory::emalloc,
+			on_match_found_event,
+			reinterpret_cast<void*>(OnMatchFoundEvent::hook_func));
 
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
@@ -456,10 +480,12 @@ namespace Hooks::Game {
 		GetGlowColor::hook->enable();
 		AddLayersPostHud::hook->enable();
 		SkyBoxDrawArray::hook->enable();
+		OnMatchFoundEvent::hook->enable();
 	}
 
 	void destroy()
 	{
+		OnMatchFoundEvent::hook.reset();
 		SkyBoxDrawArray::hook.reset();
 		AddLayersPostHud::hook.reset();
 		GetGlowColor::hook.reset();

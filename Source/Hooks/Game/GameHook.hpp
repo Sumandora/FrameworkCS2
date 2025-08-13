@@ -13,7 +13,6 @@
 #include "glm/ext/vector_float3.hpp"
 
 #include <cstddef>
-#include <cstdint>
 #include <string>
 #include <unordered_map>
 
@@ -145,5 +144,10 @@ namespace Hooks::Game {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(void* sky_box_object_desc, void* render_context, MeshDrawPrimitive* mesh_array,
 			int mesh_count, void* scene_view, void* scene_layer, void* scene_system_per_frame_stats);
+	}
+
+	namespace OnMatchFoundEvent {
+		inline UninitializedObject<DetourHook<true>> hook;
+		void* hook_func(void* rdi, const char* rsi, void* rdx, void* rcx);
 	}
 }
