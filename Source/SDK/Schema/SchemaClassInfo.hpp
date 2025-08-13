@@ -3,6 +3,7 @@
 #include "../Padding.hpp"
 
 #include <cstdint>
+#include <string_view>
 
 struct FieldData;
 struct StaticFieldData;
@@ -29,5 +30,6 @@ public:
 	ParentData* parent;
 
 	// Checks if this class bases on the `other` class info (even if it is several base classes deep)
-	bool bases_on(SchemaClassInfo* other) const;
+	[[nodiscard]] bool bases_on(SchemaClassInfo* other) const;
+	[[nodiscard]] std::int32_t find_offset(std::string_view name) const;
 };

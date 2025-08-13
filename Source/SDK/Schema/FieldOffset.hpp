@@ -1,12 +1,12 @@
 #pragma once
 
-#include <type_traits>
-
 #include "../../Interfaces.hpp" // IWYU pragma: keep
 
 #include "SchemaClassInfo.hpp"
 #include "SchemaSystem.hpp"
 #include "SchemaSystemTypeScope.hpp"
+
+#include <type_traits>
 
 #define CLASS_INFO(moduleName, className)                                                                                            \
 	static inline SchemaClassInfo* classInfo()                                                                                       \
@@ -19,13 +19,13 @@
 	using prettyName##_type = type;                                                            \
 	inline auto& prettyName()                                                                  \
 	{                                                                                          \
-		static const std::int32_t offset = SchemaSystem::findOffset(classInfo(), name);        \
+		static const std::int32_t offset = classInfo()->find_offset(name);                     \
 		using T = type;                                                                        \
 		return *reinterpret_cast<T*>(reinterpret_cast<std::byte*>(this) + offset);             \
 	}                                                                                          \
 	inline auto& prettyName() const                                                            \
 	{                                                                                          \
-		static const std::int32_t offset = SchemaSystem::findOffset(classInfo(), name);        \
+		static const std::int32_t offset = classInfo()->find_offset(name);                     \
 		using T = type;                                                                        \
 		return *reinterpret_cast<T const*>(reinterpret_cast<const std::byte*>(this) + offset); \
 	}
