@@ -18,15 +18,13 @@ struct TeamDamageColumn {
 	static constexpr const char* NAME = "Team Damage";
 	static constexpr bool HIDDEN_BY_DEFAULT = true;
 
-	static int max_team_damage_before_warn;
-	static int max_team_damage_before_kick;
+	static ConVar* mp_td_dmgtowarn;
+	static ConVar* mp_td_dmgtokick;
 
 	static void resolve_convars()
 	{
-		ConVar* mp_td_dmgtowarn = Interfaces::engineCvar->findByName("mp_td_dmgtowarn");
-		max_team_damage_before_warn = mp_td_dmgtowarn->get_int();
-		ConVar* mp_td_dmgtokick = Interfaces::engineCvar->findByName("mp_td_dmgtokick");
-		max_team_damage_before_kick = mp_td_dmgtokick->get_int();
+		mp_td_dmgtowarn = Interfaces::engineCvar->findByName("mp_td_dmgtowarn");
+		mp_td_dmgtokick = Interfaces::engineCvar->findByName("mp_td_dmgtokick");
 	}
 
 	int damage = 0;
@@ -57,19 +55,20 @@ struct TeamDamageColumn {
 	{
 		static constexpr ImColor YELLOW{ 1.0F, 1.0F, 0.0F, 1.0F };
 		static constexpr ImColor RED{ 1.0F, 0.0F, 0.0F, 1.0F };
-		if (damage < max_team_damage_before_warn)
-			ImGui::Text("%d/%d", damage, max_team_damage_before_kick);
-		else if (damage < max_team_damage_before_kick)
-			ImGui::TextColored(YELLOW, "%d/%d", damage, max_team_damage_before_kick);
+		const int damage_before_kick = mp_td_dmgtokick->get_int();
+		if (damage < mp_td_dmgtowarn->get_int())
+			ImGui::Text("%d/%d", damage, damage_before_kick);
+		else if (damage < damage_before_kick)
+			ImGui::TextColored(YELLOW, "%d/%d", damage, damage_before_kick);
 		else
-			ImGui::TextColored(RED, "%d/%d", damage, max_team_damage_before_kick);
+			ImGui::TextColored(RED, "%d/%d", damage, damage_before_kick);
 	}
 };
 
 // This is fine here, because these headers are only included once in the PlayerList.cpp
 // NOLINTBEGIN(misc-definitions-in-headers)
-int TeamDamageColumn::max_team_damage_before_warn = 0;
-int TeamDamageColumn::max_team_damage_before_kick = 0;
+ConVar* TeamDamageColumn::mp_td_dmgtowarn = nullptr;
+ConVar* TeamDamageColumn::mp_td_dmgtokick = nullptr;
 // NOLINTEND(misc-definitions-in-headers)
 
 static_assert(Column<TeamDamageColumn>);

@@ -22,15 +22,15 @@ struct ConVar {
 	ConVarValue value_backup;
 
 	// Functions to mirror how the game accesses con vars:
-	[[nodiscard]] float get_float() const
+	[[nodiscard]] constexpr float get_float() const
 	{
 		return value.floatingPoint;
 	}
-	[[nodiscard]] bool get_bool() const
+	[[nodiscard]] constexpr bool get_bool() const
 	{
 		return value.boolean;
 	}
-	[[nodiscard]] int get_int() const
+	[[nodiscard]] constexpr int get_int() const
 	{
 		return value.integer;
 	}
