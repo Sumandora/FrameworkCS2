@@ -16,6 +16,7 @@
 #include "imgui.h"
 
 #include <atomic>
+#include <mutex>
 #include <optional>
 #include <string>
 
@@ -48,7 +49,8 @@ class BlockBot : public Feature {
 		glm::vec3 direction_vector;
 		glm::vec3 movement_target;
 	};
-	std::atomic<std::optional<Visuals>> visuals;
+	std::optional<Visuals> visuals;
+	mutable std::mutex visuals_mutex;
 
 	static CSPlayerPawn* find_new_target(GameSceneNode* local_game_scene_node);
 	glm::vec3 calculate_direction_vector(glm::vec3 local_pos, glm::vec3 other_pos);

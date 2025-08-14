@@ -30,7 +30,9 @@
 #include <atomic>
 #include <cmath>
 #include <ctime>
+#include <mutex>
 #include <optional>
+#include <utility>
 
 static ConVar* sv_subtick_movement_view_angles = nullptr;
 static ConVar* sv_friction = nullptr;
@@ -104,7 +106,8 @@ glm::vec3 BlockBot::calculate_direction_vector(glm::vec3 local_pos, glm::vec3 ot
 void BlockBot::reset()
 {
 	last_target = EntityHandle<CSPlayerPawn>::invalid();
-	visuals.store({}, std::memory_order::relaxed);
+	const std::lock_guard lock{ visuals_mutex };
+	visuals = {};
 }
 
 static glm::vec3 friction(CSPlayerPawn* player, glm::vec3 velocity)
@@ -179,14 +182,15 @@ void BlockBot::create_move(UserCmd* cmd)
 	const glm::vec3 perpendicular = delta - dot;
 	const glm::vec3 p = a + perpendicular;
 
-	visuals.store(
-		Visuals{
+	{
+		const std::lock_guard lock{ visuals_mutex };
+		visuals = Visuals{
 			.from = a,
 			.local_pos = b,
 			.direction_vector = direction_vector,
 			.movement_target = p,
-		},
-		std::memory_order::relaxed);
+		};
+	}
 
 	// Walk to the position
 	const glm::vec3 v = p - b;
@@ -242,7 +246,13 @@ void BlockBot::create_move(UserCmd* cmd)
 
 void BlockBot::draw(ImDrawList* draw_list)
 {
-	const std::optional<Visuals> v = visuals.load(std::memory_order::relaxed);
+	std::optional<Visuals> v;
+
+	{
+		const std::lock_guard lock{ visuals_mutex };
+		v = visuals;
+	}
+
 	if (!v.has_value())
 		return;
 
