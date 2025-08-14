@@ -5,6 +5,7 @@
 #include "../../../SDK/Entities/Components/BodyComponent.hpp"
 #include "../../../SDK/Entities/Components/BodyComponentSkeletonInstance.hpp"
 #include "../../../SDK/Entities/CSPlayerPawn.hpp"
+#include "../../../SDK/GameClass/CollisionProperty.hpp"
 #include "../../../SDK/GameClass/ModelState.hpp"
 #include "../../../SDK/GameClass/NetworkClientService.hpp"
 #include "../../../SDK/GameClass/NetworkGameClient.hpp"
@@ -14,13 +15,14 @@
 #include "../../Feature.hpp"
 
 #include "../../../Memory.hpp"
-
 #include "../../../Interfaces.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
+
+#include "glm/ext/vector_float3.hpp"
 
 #include "RetAddrSpoofer.hpp"
 
@@ -87,5 +89,20 @@ void ModelChanger::update_model()
 		return;
 
 	Interfaces::resource_system->precache(model_path.c_str());
+
+	glm::vec3 mins;
+	glm::vec3 maxs;
+
+	if (CollisionProperty* collision = Memory::local_player->collision(); collision) {
+		mins = Memory::local_player->collision()->mins();
+		maxs = Memory::local_player->collision()->maxs();
+	}
+
 	RetAddrSpoofer::invoke(set_model, static_cast<BaseModelEntity*>(Memory::local_player), model_path.c_str());
+
+	if (CollisionProperty* collision = Memory::local_player->collision(); collision) {
+		// hacky fix for models that have different dimensions
+		Memory::local_player->collision()->mins() = mins;
+		Memory::local_player->collision()->maxs() = maxs;
+	}
 }
