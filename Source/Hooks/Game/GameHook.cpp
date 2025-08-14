@@ -19,6 +19,7 @@
 
 #include <csignal>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <type_traits>
 #include <unistd.h>
@@ -481,6 +482,31 @@ namespace Hooks::Game {
 		AddLayersPostHud::hook->enable();
 		SkyBoxDrawArray::hook->enable();
 		OnMatchFoundEvent::hook->enable();
+
+		// Fix abandon messages in matchmaking
+		const auto session_id_cmp
+			= BCRL::signature(
+				Memory::mem_mgr,
+				SignatureScanner::PatternSignature::for_literal_string<"Matchmaking abandon notification: %x/%s/%u\n">(),
+				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+				  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+				  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<
+					  "48 39 48 48 " // cmp %rcx, 72(%rax)
+					  "0f 84" // jmp if zero
+					  >())
+				  .add(4)
+				  .finalize();
+		Memory::accept("session_id_cmp",
+			session_id_cmp
+				.transform([](std::uintptr_t x) { return reinterpret_cast<void*>(x); })
+				.value_or(nullptr));
+
+		if (session_id_cmp.has_value()) {
+			std::uint8_t replcae_cond_jmp_with_uncond_jmp[] = { 0x90, 0xe9 };
+			Memory::mem_mgr.write(session_id_cmp.value(), replcae_cond_jmp_with_uncond_jmp, 2);
+		}
 	}
 
 	void destroy()
