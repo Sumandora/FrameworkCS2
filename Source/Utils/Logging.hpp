@@ -34,7 +34,7 @@ struct std::formatter<const T*> : public std::formatter<void*> {
 };
 
 template <typename R, typename... Args>
-struct std::formatter<R(*)(Args...)> : public std::formatter<void*> {
+struct std::formatter<R (*)(Args...)> : public std::formatter<void*> {
 	constexpr auto format(auto* ptr, std::format_context& ctx) const
 	{
 		return std::formatter<void*>::format(reinterpret_cast<void*>(ptr), ctx);
@@ -72,28 +72,28 @@ namespace Logging {
 
 		static constexpr std::string_view CLEAR = "\x1B[0;39m";
 
-		void print_raw(std::string_view color, std::string_view line, std::ostream& stream);
+		void print_raw(std::string_view color, std::string_view line);
 
 		template <typename... Args>
-		inline void print(std::string_view color, std::format_string<Args...> fmt, Args&&... args, std::ostream& stream)
+		inline void print(std::string_view color, std::format_string<Args...> fmt, Args&&... args)
 		{
 			const std::string line = std::format(fmt, std::forward<Args>(args)...);
-			print_raw(color, line, stream);
+			print_raw(color, line);
 		}
 	}
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define LOGGING_LOG_FUNCTION(name, color, stream)                                        \
-	template <typename... Args>                                                          \
-	inline void name(std::format_string<Args...> fmt, Args&&... args)                    \
-	{                                                                                    \
-		detail::print<Args...>(detail::color, fmt, std::forward<Args>(args)..., stream); \
+#define LOGGING_LOG_FUNCTION(name, color)                                        \
+	template <typename... Args>                                                  \
+	inline void name(std::format_string<Args...> fmt, Args&&... args)            \
+	{                                                                            \
+		detail::print<Args...>(detail::color, fmt, std::forward<Args>(args)...); \
 	}
 
-	LOGGING_LOG_FUNCTION(debug, GREY, std::clog)
-	LOGGING_LOG_FUNCTION(info, GREEN, std::cout)
-	LOGGING_LOG_FUNCTION(warn, YELLOW, std::cout)
-	LOGGING_LOG_FUNCTION(error, RED, std::cerr)
+	LOGGING_LOG_FUNCTION(debug, GREY)
+	LOGGING_LOG_FUNCTION(info, GREEN)
+	LOGGING_LOG_FUNCTION(warn, YELLOW)
+	LOGGING_LOG_FUNCTION(error, RED)
 
 #undef LOGGING_LOG_FUNCTION
 
