@@ -15,8 +15,6 @@
 #include <cstdint>
 
 static GlobalVars prev_globals{};
-static std::uint32_t prev_flags{};
-static std::uint32_t prev_tick_base{};
 static bool prev_has_been_predicted{};
 
 static UserCmd* prediction_cmd{};
@@ -47,8 +45,6 @@ bool Prediction::begin(UserCmd* cmd)
 		return false;
 
 	prev_globals = **Memory::globals; // TODO only save what's needed
-	prev_flags = Memory::local_player->flags();
-	prev_tick_base = (*Memory::local_player_controller)->tick_base();
 	prev_has_been_predicted = cmd->has_been_predicted;
 
 	prediction_cmd = cmd;
@@ -72,8 +68,6 @@ void Prediction::end()
 	::in_prediction = false;
 
 	prediction_cmd->has_been_predicted = prev_has_been_predicted;
-	Memory::local_player->flags() = prev_flags;
-	(*Memory::local_player_controller)->tick_base() = prev_tick_base;
 	**Memory::globals = prev_globals;
 }
 
