@@ -71,5 +71,5 @@ struct BaseCSGrenade : BasePlayerWeapon {
 
 	SCHEMA_VAR(bool, pin_pulled, "m_bPinPulled");
 
-	VIRTUAL_METHOD(443, get_grenade_type, GrenadeType, (), (this));
+	VIRTUAL_METHOD(439, get_grenade_type, GrenadeType, (), (this));
 };
