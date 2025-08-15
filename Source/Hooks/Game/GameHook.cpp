@@ -222,7 +222,7 @@ namespace Hooks::Game {
 				  .find_xrefs(
 					  SignatureScanner::XRefTypes::relative(),
 					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
-				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 05">())
+				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"4c 8d 3d">())
 				  .add(3)
 				  .relative_to_absolute() // viewmodel_fov convar
 				  .find_xrefs(
