@@ -33,7 +33,9 @@ void Projection::resolve_signatures()
 			BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
 			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
 				  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
-			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"4c 8d 3d">())
+			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 35">())
+			  .add(1)
+			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 35">())
 			  .add(3)
 			  .relative_to_absolute()
 			  .BCRL_EXPECT(ViewRender*, view_render);
