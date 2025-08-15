@@ -15,11 +15,11 @@
 #include "../../../SDK/Entities/Components/BodyComponentSkeletonInstance.hpp"
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Entities/CSPlayerPawn.hpp"
-#include "../../../SDK/Entities/EntityIdentity.hpp"
 #include "../../../SDK/Entities/GameEntitySystem.hpp"
 #include "../../../SDK/Enums/LifeState.hpp"
 #include "../../../SDK/GameClass/CollisionProperty.hpp"
 #include "../../../SDK/GameClass/GameSceneNode.hpp"
+#include "../../../SDK/GameClass/ModelState.hpp"
 #include "../../../SDK/GameClass/SkeletonInstance.hpp"
 
 #include "../../../Utils/Projection.hpp"
@@ -29,7 +29,6 @@
 #include "GenericESP/UnionedRect.hpp"
 
 #include "glm/ext/vector_float3.hpp"
-#include "glm/ext/vector_float4.hpp"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -167,7 +166,9 @@ void ESP::draw(ImDrawList* draw_list)
 
 			const SkeletonInstance& skeleton = static_cast<BodyComponentSkeletonInstance*>(body_component)->skeleton_instance();
 
-			if (skeleton.bone_count == 0)
+			const ModelState& model_state = skeleton.model_state();
+
+			if (model_state.bone_count == 0)
 				continue;
 
 			// The following code mainly tries to avoid projecting points multiple times.
@@ -190,13 +191,13 @@ void ESP::draw(ImDrawList* draw_list)
 			for (const auto& [from, to] : SKELETON_LINES) {
 				ScreenSpacePoint& from_screen_space = screen_space_vecs[from];
 				if (!from_screen_space.looked_up)
-					from_screen_space.get(skeleton.bones[from].pos);
+					from_screen_space.get(model_state.bones[from].pos);
 				if (!from_screen_space.visible)
 					continue;
 
 				ScreenSpacePoint& to_screen_space = screen_space_vecs[to];
 				if (!to_screen_space.looked_up)
-					to_screen_space.get(skeleton.bones[to].pos);
+					to_screen_space.get(model_state.bones[to].pos);
 				if (!to_screen_space.visible)
 					continue;
 

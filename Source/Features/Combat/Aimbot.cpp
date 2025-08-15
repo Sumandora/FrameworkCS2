@@ -14,6 +14,7 @@
 #include "../../SDK/Enums/LifeState.hpp"
 #include "../../SDK/GameClass/CSGOInput.hpp"
 #include "../../SDK/GameClass/EngineToClient.hpp"
+#include "../../SDK/GameClass/ModelState.hpp"
 #include "../../SDK/GameClass/SkeletonInstance.hpp"
 #include "../../SDK/GameClass/UserCmd.hpp"
 
@@ -112,13 +113,14 @@ void Aimbot::create_move(UserCmd* cmd)
 			continue;
 
 		const SkeletonInstance& skeleton = static_cast<BodyComponentSkeletonInstance*>(body_component)->skeleton_instance();
-		if (skeleton.bone_count == 0)
+		const ModelState& model_state = skeleton.model_state();
+		if (model_state.bone_count == 0)
 			continue;
 
-		if (!skeleton.bones)
+		if (!model_state.bones)
 			continue;
 
-		const glm::vec3 to = skeleton.bones[BONE_HEAD].pos;
+		const glm::vec3 to = model_state.bones[BONE_HEAD].pos;
 
 		const glm::vec3 delta = to - from;
 
