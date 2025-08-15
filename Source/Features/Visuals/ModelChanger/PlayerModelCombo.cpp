@@ -39,6 +39,11 @@ static void gather_default_models(std::vector<PlayerModelCombo::DefaultModel>& p
 	Logging::info("Found {} item definitions", schema->items.size);
 
 	for (int i = 0; i < schema->items.size; i++) {
+		// TODO is this better?
+		if (-2 >= schema->items.elements[i].unk) {
+			continue;
+		}
+
 		EconItemDefinition* item = schema->items.elements[i].econ_item_definition;
 		if (!item->type_name() || std::string_view{ item->type_name() } != "#Type_CustomPlayer")
 			continue;
