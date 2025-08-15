@@ -97,7 +97,7 @@ void Memory::create()
 	globals
 		= BCRL::signature(
 			mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 05 ? ? ? ? 48 8b 00 8b 50 ? 31 c0 e8 ? ? ? ? 48 8d 95">(),
+			SignatureScanner::PatternSignature::for_array_of_bytes<"48 8D 05 ? ? ? ? 48 8B 00 F3 0F 6F 00">(),
 			BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(3)
 			  .relative_to_absolute()
