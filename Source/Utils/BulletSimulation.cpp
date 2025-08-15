@@ -81,7 +81,14 @@ struct WeaponData {
 // I don't fully agree with them, but in the spirit of comparability I will use them as well.
 static glm::vec2 (*create_trace)(TraceData*, glm::vec3*, glm::vec3*, TraceFilter*, int) = nullptr; // Interesting, but non-essential return type.
 static bool (*handle_bullet_penetration)(TraceData*, WeaponData*, void*, TeamID, void*) = nullptr;
-static void (*get_trace)(TraceData*, GameTrace*, void*, float) = nullptr;
+
+// NOTE: This is incomplete but since I don't need the other fields I think I don't need to rebuild them
+// TODO rewrite this to not rely on the types here, just give the two values back raw.
+static void get_trace(TraceData* /*param_2*/, GameTrace* param_3, void* param_4, float /*unk*/)
+{
+	param_3->hit_entity = EntityHandle<BaseEntity>{ *reinterpret_cast<std::uint32_t*>(static_cast<char*>(param_4) + 0x24) }.get();
+	param_3->hitbox_data = *reinterpret_cast<TraceHitboxData**>(static_cast<char*>(param_4) + 0x10);
+}
 
 static ConVar* mp_damage_scale_ct_body = nullptr;
 static ConVar* mp_damage_scale_t_body = nullptr;
@@ -98,14 +105,9 @@ void BulletSimulation::resolve_signatures()
 					   .BCRL_EXPECT(decltype(create_trace), create_trace);
 	handle_bullet_penetration = BCRL::signature(
 		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"55 66 0F EF D2 48 89 E5 41 57 41 56 41 55 49 89 F5">(),
+		SignatureScanner::PatternSignature::for_array_of_bytes<"55 66 0F EF D2 48 89 E5 41 57 41 56 41 55 41 54 49 89 F4">(),
 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 									.BCRL_EXPECT(decltype(handle_bullet_penetration), handle_bullet_penetration);
-	get_trace = BCRL::signature(
-		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 66 41 0F 7E C7 41 56 41 55 49 89 FD 48 89 F7">(),
-		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-					.BCRL_EXPECT(decltype(get_trace), get_trace);
 
 	mp_damage_scale_ct_body = Interfaces::engineCvar->findByName("mp_damage_scale_ct_body");
 	MEM_ACCEPT(mp_damage_scale_ct_body);
