@@ -84,13 +84,8 @@ void Memory::create()
 	csgo_input
 		= BCRL::signature(
 			mem_mgr,
-			SignatureScanner::PatternSignature::for_literal_string<"cl_interpolate">(),
+			SignatureScanner::PatternSignature::for_array_of_bytes<"4C 8D 3D ? ? ? ? 4C 89 FF E8 ? ? ? ? 4C 89 FE 48 89 DA">(),
 			BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
-			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
-				  BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
-			  .sub(7)
-			  .filter([](const auto& ptr) { return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"66 0f ef c9">()); })
-			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"4c 8d 3d">())
 			  .add(3)
 			  .relative_to_absolute()
 			  .BCRL_EXPECT(CSGOInput*, csgo_input);
