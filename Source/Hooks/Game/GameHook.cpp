@@ -94,7 +94,7 @@ namespace Hooks::Game {
 				BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
 				  .find_xrefs(SignatureScanner::XRefTypes::relative(),
 					  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
-				  .sub(21)
+				  .sub(39)
 				  .relative_to_absolute()
 				  .find_xrefs(SignatureScanner::XRefTypes::relative(),
 					  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
