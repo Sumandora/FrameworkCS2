@@ -64,7 +64,14 @@ struct BaseEntity : public EntityInstance {
 
 	SCHEMA_VAR(EntityHandle<BaseEntity>, owner_entity, "m_hOwnerEntity");
 
-	SCHEMA_VAR(TeamID, team_id, "m_iTeamNum");
+private:
+	SCHEMA_VAR(std::uint8_t, raw_team_id, "m_iTeamNum");
+
+public:
+	[[nodiscard]] TeamID team_id() const
+	{
+		return static_cast<TeamID>(raw_team_id());
+	}
 
 	SCHEMA_VAR(glm::vec3, abs_velocity, "m_vecAbsVelocity");
 	SCHEMA_VAR(glm::vec3, velocity, "m_vecVelocity");
