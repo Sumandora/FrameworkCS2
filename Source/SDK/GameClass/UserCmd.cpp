@@ -245,6 +245,8 @@ void UserCmd::spread_out_rotation_changes(float old_yaw, float old_pitch)
 		else
 			move_step.set_analog_pitch_delta(delta_pitch_per_subtick);
 	}
+
+	erase_empty_subticks();
 }
 
 std::size_t UserCmd::erase_subtick_if(const std::function<bool(CSubtickMoveStep&)>& predicate)
