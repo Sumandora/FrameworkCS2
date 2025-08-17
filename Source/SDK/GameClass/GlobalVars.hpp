@@ -5,6 +5,7 @@
 struct GlobalVars {
 	PADDING(0x188);
 
+	OFFSET(int, max_clients, 0x10);
 	OFFSET(float, current_time, 0x30);
 };
 

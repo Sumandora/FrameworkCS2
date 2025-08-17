@@ -11,6 +11,7 @@
 #include "../../../SDK/Entities/GameEntitySystem.hpp"
 #include "../../../SDK/Enums/TeamID.hpp"
 #include "../../../SDK/GameClass/GameEvent.hpp"
+#include "../../../SDK/GameClass/GlobalVars.hpp"
 #include "../../../SDK/GameClass/Localize.hpp"
 #include "../../../SDK/NetMessages/NetMessagePB.hpp"
 
@@ -29,6 +30,15 @@
 VoteRevealer::VoteRevealer()
 	: Feature("Misc", "Vote revealer")
 {
+}
+
+// TODO this is technically more general than to the vote revealer, but I have no other place to put this right now.
+static CSPlayerController* get_controller_from_slot(int slot)
+{
+	// NOTE: Server-initiated votes get the player slot 99, the game checks for < max_clients however, so I won't hardcode the 99 here.
+	if (slot <= -1 || !Memory::globals || slot >= (*Memory::globals)->max_clients())
+		return nullptr;
+	return static_cast<CSPlayerController*>(GameEntitySystem::the()->get_entity_by_index(slot + 1));
 }
 
 void VoteRevealer::on_vote_start(NetMessagePB<CCSUsrMsg_VoteStart>* net_message)
@@ -84,10 +94,7 @@ void VoteRevealer::on_vote_start(NetMessagePB<CCSUsrMsg_VoteStart>* net_message)
 
 	std::string localized = Interfaces::localize->find_safe(other_team);
 
-	auto* from_controller
-		= net_message->pb.player_slot() == -1
-		? nullptr
-		: static_cast<CSPlayerController*>(GameEntitySystem::the()->get_entity_by_index(net_message->pb.player_slot() + 1));
+	CSPlayerController* from_controller = get_controller_from_slot(net_message->pb.player_slot());
 
 	std::erase_if(localized, [](char c) {
 		return !isprint(c);
@@ -98,10 +105,7 @@ void VoteRevealer::on_vote_start(NetMessagePB<CCSUsrMsg_VoteStart>* net_message)
 
 	const std::size_t pos = localized.find(PLAYER_NAME_REPLACE);
 	if (pos != std::string::npos) {
-		auto* to_controller
-			= net_message->pb.player_slot_target() == -1
-			? nullptr
-			: static_cast<CSPlayerController*>(GameEntitySystem::the()->get_entity_by_index(net_message->pb.player_slot_target() + 1));
+		CSPlayerController* to_controller = get_controller_from_slot(net_message->pb.player_slot_target());
 
 		std::string player_name = to_controller ? to_controller->get_decorated_player_name() : details;
 		html_escape(player_name);
