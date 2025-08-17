@@ -8,6 +8,7 @@
 
 #include "../Enums/LifeState.hpp"
 #include "../Enums/TeamID.hpp"
+#include "../Enums/Flags.hpp"
 
 #include "EntityInstance.hpp"
 
@@ -23,9 +24,6 @@ struct EntitySubclassVDataBase;
 
 template <typename Ent>
 class EntityHandle;
-
-constexpr std::uint32_t FL_ONGROUND = 1 << 0;
-constexpr std::uint32_t FL_DUCKING = 1 << 1;
 
 // @schema MoveType_t
 enum MoveType : std::uint8_t {
@@ -60,7 +58,7 @@ struct BaseEntity : public EntityInstance {
 	SCHEMA_VAR(std::int32_t, health, "m_iHealth");
 	SCHEMA_VAR(std::int32_t, max_health, "m_iMaxHealth");
 
-	SCHEMA_VAR(std::uint32_t, flags, "m_fFlags");
+	SCHEMA_VAR(Flags, flags, "m_fFlags");
 
 	SCHEMA_VAR(EntityHandle<BaseEntity>, owner_entity, "m_hOwnerEntity");
 
