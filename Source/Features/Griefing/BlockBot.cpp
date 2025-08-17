@@ -203,18 +203,14 @@ void BlockBot::create_move(UserCmd* cmd)
 	// subticks with rotations to make our movement changes fail.
 	if (MovementQuantization::is_movement_quantized() || sv_subtick_movement_view_angles->get_bool()) {
 		const float base_yaw = glm::degrees(glm::atan(v.y, v.x));
-		float best = base_yaw;
-		for (int i = 0; i < 8; i++) {
-			const float theoretical_yaw = base_yaw + static_cast<float>(i) * 45;
-			const float delta = glm::abs(std::remainder(theoretical_yaw - yaw, 360.0F));
-			const float best_delta = glm::abs(std::remainder(best - yaw, 360.0F));
-			if (delta < best_delta) {
-				best = theoretical_yaw;
-			}
-		}
-
-		base->mutable_viewangles()->set_y(best);
-		yaw = best;
+		const float delta_yaw = yaw - base_yaw;
+		static constexpr float MAX_ANGLE = 360.0F;
+		static constexpr float DIRECTIONS_POSSIBLE_WITH_WASD = 8.0F; // since opposing keys cancel each other out
+		static constexpr float MIN_ANGLE_INCREASE_WITH_WASD = MAX_ANGLE / DIRECTIONS_POSSIBLE_WITH_WASD;
+		const float best = base_yaw + std::round(delta_yaw / MIN_ANGLE_INCREASE_WITH_WASD) * MIN_ANGLE_INCREASE_WITH_WASD;
+		const float wrapped = std::remainder(best, 360.0F); // For good measure
+		base->mutable_viewangles()->set_y(wrapped);
+		yaw = wrapped;
 	}
 
 	const float v_length = glm::length(v);
