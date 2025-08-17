@@ -2,6 +2,8 @@
 
 #include "../Feature.hpp"
 
+#include "../../SDK/Enums/GrenadeType.hpp"
+
 #include "../Settings/Checkbox.hpp"
 #include "../Settings/Color.hpp"
 #include "../Settings/FloatSlider.hpp"

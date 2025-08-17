@@ -6,7 +6,7 @@
 #include "../../SDK/ConVar/EngineCvar.hpp"
 #include "../../SDK/Entities/BaseEntity.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
-#include "../../SDK/GameClass/Source2ClientPrediction.hpp"
+#include "../../SDK/Enums/Flags.hpp"
 #include "../../SDK/GameClass/UserCmd.hpp"
 
 #include "../../Memory.hpp"

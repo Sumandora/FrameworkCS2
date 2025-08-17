@@ -10,6 +10,7 @@
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../SDK/Entities/Services/CSPlayerMovementServices.hpp"
 #include "../../SDK/Entities/Services/PlayerWeaponServices.hpp"
+#include "../../SDK/Enums/GrenadeType.hpp"
 #include "../../SDK/GameClass/GameEvent.hpp"
 #include "../../SDK/GameClass/GameSceneNode.hpp"
 
