@@ -140,17 +140,6 @@ namespace Hooks::Game {
 				CSGOInput::sync_view_angles_index)
 				  .BCRL_EXPECT(void*, sync_view_angles);
 
-		void* emit_sound
-			= BCRL::signature(
-				Memory::mem_mgr,
-				SignatureScanner::PatternSignature::for_literal_string<"player_sound">(), // lovely
-				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
-				  .find_xrefs(SignatureScanner::XRefTypes::relative(),
-					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
-				  // This is not the beginning of the function, but it doesn't matter.
-				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 b8 00 00 00 00 ff ff ff ff">())
-				  .BCRL_EXPECT(void*, emit_sound);
-
 		void* override_view
 			= BCRL::pointer_array(
 				Memory::mem_mgr,
@@ -407,10 +396,6 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			sync_view_angles,
 			reinterpret_cast<void*>(SyncViewAngles::hook_func));
-		EmitSound::hook.emplace(
-			Memory::emalloc,
-			emit_sound,
-			reinterpret_cast<void*>(EmitSound::hook_func));
 		OverrideView::hook.emplace(
 			Memory::emalloc,
 			override_view,
@@ -469,7 +454,6 @@ namespace Hooks::Game {
 		RenderLegs::hook->enable();
 		DrawArrayExt::hook->enable();
 		SyncViewAngles::hook->enable();
-		// EmitSound::hook->enable();
 		OverrideView::hook->enable();
 		OnVoteStart::hook->enable();
 		ParticlesDrawArray::hook->enable();
@@ -523,7 +507,6 @@ namespace Hooks::Game {
 		ParticlesDrawArray::hook.reset();
 		OnVoteStart::hook.reset();
 		OverrideView::hook.reset();
-		// EmitSound::hook.reset();
 		SyncViewAngles::hook.reset();
 		DrawArrayExt::hook.reset();
 		RenderLegs::hook.reset();
