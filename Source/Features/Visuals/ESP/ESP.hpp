@@ -25,8 +25,8 @@ class ESP : public Feature {
 	Tabs entity_types{ this, "Entity types" };
 
 	Tabs players{ entity_types, "Players" };
-	ESPPlayer teammates{ players, "Teammates" };
 	ESPPlayer enemies{ players, "Enemies" };
+	ESPPlayer teammates{ players, "Teammates" };
 	ESPPlayer local{ players, "Local" };
 
 	ESPWeapon weapons{ entity_types, "Weapons" };
