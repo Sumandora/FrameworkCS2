@@ -4,6 +4,7 @@
 #include <array>
 #include <atomic>
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -179,6 +180,12 @@ void ESP::draw(ImDrawList* draw_list)
 			rectangle.Max.x = std::max(point_2d.x, rectangle.Max.x);
 			rectangle.Max.y = std::max(point_2d.y, rectangle.Max.y);
 		}
+
+		// Round the rectangle points to align them to the pixel grid. This massively improves quality since anti-aliasing isn't screwing us over
+		rectangle.Min.x = std::round(rectangle.Min.x);
+		rectangle.Min.y = std::round(rectangle.Min.y);
+		rectangle.Max.x = std::round(rectangle.Max.x);
+		rectangle.Max.y = std::round(rectangle.Max.y);
 
 		esp_entities.emplace(
 			entity,
