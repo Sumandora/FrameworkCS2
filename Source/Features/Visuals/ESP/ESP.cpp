@@ -117,19 +117,24 @@ void ESP::draw(ImDrawList* draw_list)
 	std::multiset<ESPEntity, ESPEntity::DistanceComparator> esp_entities;
 	const glm::vec3 camera_position = this->camera_position.load(std::memory_order::relaxed);
 
-	for (CSPlayerPawn* player_pawn : GameEntitySystem::the()->entities_of_type<CSPlayerPawn>()) {
-		if (player_pawn->health() <= 0 || player_pawn->life_state() != LIFE_ALIVE)
+	for (BaseEntity* entity : GameEntitySystem::the()->entities()) {
+		SchemaClassInfo* class_info = entity->getSchemaType();
+
+		if (class_info == CSPlayerPawn::classInfo()) {
+			if (entity->health() <= 0 || entity->life_state() != LIFE_ALIVE)
+				continue;
+
+			// We don't want to render this one? Sure, then don't even care about it.
+			if (!get_player_by_pawn(static_cast<CSPlayerPawn*>(entity)).is_enabled())
+				continue;
+		} else
 			continue;
 
-		// We don't want to render this one? Sure, then don't even care about it.
-		if (!get_player_by_pawn(player_pawn).is_enabled())
-			continue;
-
-		GameSceneNode* game_scene_node = player_pawn->gameSceneNode();
+		GameSceneNode* game_scene_node = entity->gameSceneNode();
 		if (!game_scene_node)
 			continue;
 
-		CollisionProperty* collision = player_pawn->collision();
+		CollisionProperty* collision = entity->collision();
 		if (!collision)
 			continue;
 
@@ -187,9 +192,9 @@ void ESP::draw(ImDrawList* draw_list)
 		}
 
 		esp_entities.emplace(
-			player_pawn,
+			entity,
 			// NOLINTNEXTLINE(readability-static-accessed-through-instance) -- TODO more entities
-			player_pawn->classInfo(),
+			class_info,
 			glm::distance(camera_position, vec),
 			rectangle);
 
