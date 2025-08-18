@@ -40,7 +40,7 @@ ModelChanger::ModelChanger()
 	set_model
 		= BCRL::signature(Memory::mem_mgr,
 			SignatureScanner::PatternSignature::for_literal_string<"models/inventory_items/dogtags.vmdl">(),
-			BCRL::everything(Memory::mem_mgr).with_flags("r*-").with_name("libclient.so"))
+			BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
 			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
 				  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
 			  .add(8)
