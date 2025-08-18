@@ -5,9 +5,7 @@
 #include <atomic>
 #include <cassert>
 #include <cstddef>
-#include <initializer_list>
 #include <limits>
-#include <ranges>
 #include <set>
 #include <string>
 #include <utility>
@@ -15,15 +13,13 @@
 #include "../../../Memory.hpp"
 
 #include "../../../SDK/Entities/BaseEntity.hpp"
-#include "../../../SDK/Entities/Components/BodyComponentSkeletonInstance.hpp"
 #include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../../SDK/Entities/GameEntitySystem.hpp"
 #include "../../../SDK/Enums/LifeState.hpp"
+#include "../../../SDK/Enums/TeamID.hpp"
 #include "../../../SDK/GameClass/CollisionProperty.hpp"
 #include "../../../SDK/GameClass/GameSceneNode.hpp"
-#include "../../../SDK/GameClass/ModelState.hpp"
-#include "../../../SDK/GameClass/SkeletonInstance.hpp"
 #include "../../../SDK/Schema/SchemaClassInfo.hpp"
 
 #include "../../../Utils/BulletSimulation.hpp"
@@ -53,12 +49,57 @@ struct ESPEntity {
 	ImRect screenspace_rect;
 
 	struct DistanceComparator {
-		static bool operator()(const ESPEntity& a, const ESPEntity& b) {
+		static bool operator()(const ESPEntity& a, const ESPEntity& b)
+		{
 			// Since we want to draw entities further away first, we sort with greater than
 			return a.distance > b.distance;
 		}
 	};
 };
+
+bool ESP::Player::is_enabled() const
+{
+	if (this == &esp->local) {
+		// TODO If we are in first person then never say yes here.
+	}
+	return box_enabled.get() || name_enabled.get() || healthbar_enabled.get() || skeleton_enabled.get();
+}
+
+void ESP::Player::draw_player(ImDrawList* draw_list, CSPlayerPawn* player_pawn, const ImRect& screenspace_rect) const
+{
+	GenericESP::UnionedRect unioned_rect{ screenspace_rect };
+
+	if (box_enabled.get())
+		box.draw(draw_list, player_pawn, unioned_rect);
+
+	if (name_enabled.get()) {
+		CSPlayerController* controller = player_pawn->original_controller().get();
+		if (controller)
+			name.draw(draw_list, player_pawn, controller->get_decorated_player_name(), unioned_rect);
+	}
+
+	if (healthbar_enabled.get())
+		healthbar.draw(draw_list, player_pawn, unioned_rect);
+
+	if (this->skeleton_enabled.get())
+		draw_skeleton(player_pawn, draw_list, skeleton_line);
+}
+
+ESP::Player& ESP::get_player_by_pawn(CSPlayerPawn* player_pawn)
+{
+	if (player_pawn == Memory::local_player)
+		return local;
+
+	const TeamID local_team = Memory::local_player->team_id();
+	const TeamID other_team = player_pawn->team_id();
+
+	if (local_team == other_team)
+		return teammates;
+	if (local_team != other_team)
+		return enemies;
+
+	std::unreachable();
+}
 
 void ESP::update_camera_position(const glm::vec3& new_camera_position)
 {
@@ -70,13 +111,18 @@ void ESP::draw(ImDrawList* draw_list)
 	if (!enabled.get())
 		return;
 
+	if (!Memory::local_player)
+		return;
+
 	std::multiset<ESPEntity, ESPEntity::DistanceComparator> esp_entities;
+	const glm::vec3 camera_position = this->camera_position.load(std::memory_order::relaxed);
 
 	for (CSPlayerPawn* player_pawn : GameEntitySystem::the()->entities_of_type<CSPlayerPawn>()) {
-		if (player_pawn == Memory::local_player)
+		if (player_pawn->health() <= 0 || player_pawn->life_state() != LIFE_ALIVE)
 			continue;
 
-		if (player_pawn->health() <= 0 || player_pawn->life_state() != LIFE_ALIVE)
+		// We don't want to render this one? Sure, then don't even care about it.
+		if (!get_player_by_pawn(player_pawn).is_enabled())
 			continue;
 
 		GameSceneNode* game_scene_node = player_pawn->gameSceneNode();
@@ -144,33 +190,19 @@ void ESP::draw(ImDrawList* draw_list)
 			player_pawn,
 			// NOLINTNEXTLINE(readability-static-accessed-through-instance) -- TODO more entities
 			player_pawn->classInfo(),
-			glm::distance(camera_position.load(std::memory_order::relaxed), vec),
+			glm::distance(camera_position, vec),
 			rectangle);
 
 	next_ent:;
 	}
 
 	for (const ESPEntity& esp_entity : esp_entities) {
-		// TODO different entities
-		assert(esp_entity.class_info == CSPlayerPawn::classInfo());
-		auto* player_pawn = static_cast<CSPlayerPawn*>(esp_entity.entity);
 
-		{
-			GenericESP::UnionedRect unioned_rect{ esp_entity.screenspace_rect };
-			if (box_enabled.get())
-				box.draw(draw_list, player_pawn, unioned_rect);
-			if (name_enabled.get()) {
-				CSPlayerController* controller = player_pawn->original_controller().get();
-				if (controller)
-					name.draw(draw_list, player_pawn, controller->get_decorated_player_name(), unioned_rect);
-			}
-			if (healthbar_enabled.get())
-				healthbar.draw(draw_list, player_pawn, unioned_rect);
+		if (esp_entity.class_info == CSPlayerPawn::classInfo()) {
+			auto* player_pawn = static_cast<CSPlayerPawn*>(esp_entity.entity);
+			const Player& player_type = get_player_by_pawn(player_pawn);
+			player_type.draw_player(draw_list, player_pawn, esp_entity.screenspace_rect);
+			continue;
 		}
-
-		if (this->skeleton.get()) {
-			draw_skeleton(player_pawn, draw_list, skeleton_line);
-		}
-
 	}
 }
