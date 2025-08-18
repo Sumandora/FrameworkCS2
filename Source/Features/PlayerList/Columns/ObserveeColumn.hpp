@@ -15,6 +15,7 @@
 
 struct ObserveeColumn {
 	static constexpr const char* NAME = "Observee";
+	static constexpr bool HIDDEN_BY_DEFAULT = true;
 	std::string name;
 	bool enabled = false;
 

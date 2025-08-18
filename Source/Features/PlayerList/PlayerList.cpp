@@ -19,6 +19,7 @@
 #include "Columns/TeamColumn.hpp"
 #include "Columns/TeamDamageColumn.hpp"
 #include "Columns/TeamKillsColumn.hpp"
+#include "Columns/MoneyColumn.hpp"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -45,7 +46,8 @@ using Columns
 		TeamKillsColumn,
 		ObserveeColumn,
 		ObserverModeColumn,
-		PingColumn>;
+		PingColumn,
+		MoneyColumn>;
 
 struct PlayerData {
 	Columns columns;

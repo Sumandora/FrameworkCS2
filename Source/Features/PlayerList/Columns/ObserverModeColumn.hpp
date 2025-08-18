@@ -21,6 +21,7 @@
 
 struct ObserverModeColumn {
 	static constexpr const char* NAME = "Observer Mode";
+	static constexpr bool HIDDEN_BY_DEFAULT = true;
 	std::string observer_mode_name;
 	ObserverMode last_mode = NUM_OBSERVER_MODES;
 	bool enabled = false;
