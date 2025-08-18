@@ -8,10 +8,13 @@
 
 #include "../../../Utils/UninitializedObject.hpp"
 
+#include "glm/ext/vector_float3.hpp"
+
 #include "imgui.h"
 
 #include "Elements.hpp"
 
+#include <atomic>
 #include <string>
 
 class ESP : public Feature {
@@ -36,8 +39,12 @@ class ESP : public Feature {
 	PlayerLine skeleton_line{ skeleton_meta, "Line" };
 
 
+	std::atomic<glm::vec3> camera_position;
+
 public:
 	ESP();
+
+	void update_camera_position(glm::vec3 new_camera_position);
 
 	void draw(ImDrawList* draw_list);
 };

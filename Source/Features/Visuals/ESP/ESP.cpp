@@ -2,10 +2,13 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
+#include <cassert>
 #include <cstddef>
 #include <initializer_list>
 #include <limits>
 #include <ranges>
+#include <set>
 #include <string>
 #include <utility>
 
@@ -21,6 +24,7 @@
 #include "../../../SDK/GameClass/GameSceneNode.hpp"
 #include "../../../SDK/GameClass/ModelState.hpp"
 #include "../../../SDK/GameClass/SkeletonInstance.hpp"
+#include "../../../SDK/Schema/SchemaClassInfo.hpp"
 
 #include "../../../Utils/Projection.hpp"
 
@@ -29,6 +33,7 @@
 #include "GenericESP/UnionedRect.hpp"
 
 #include "glm/ext/vector_float3.hpp"
+#include "glm/geometric.hpp"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -73,10 +78,31 @@ static constexpr std::size_t HIGHEST_SKELETON_INDEX
 		std::ranges::max(SKELETON_LINES | std::ranges::views::keys),
 		std::ranges::max(SKELETON_LINES | std::ranges::views::values));
 
+struct ESPEntity {
+	BaseEntity* entity;
+	SchemaClassInfo* class_info;
+	float distance;
+	ImRect screenspace_rect;
+
+	struct DistanceComparator {
+		static bool operator()(const ESPEntity& a, const ESPEntity& b) {
+			// Since we want to draw entities further away first, we sort with greater than
+			return a.distance > b.distance;
+		}
+	};
+};
+
+void ESP::update_camera_position(glm::vec3 new_camera_position)
+{
+	camera_position.store(new_camera_position, std::memory_order::relaxed);
+}
+
 void ESP::draw(ImDrawList* draw_list)
 {
 	if (!enabled.get())
 		return;
+
+	std::multiset<ESPEntity, ESPEntity::DistanceComparator> esp_entities;
 
 	for (CSPlayerPawn* player_pawn : GameEntitySystem::the()->entities_of_type<CSPlayerPawn>()) {
 		if (player_pawn == Memory::local_player)
@@ -146,8 +172,23 @@ void ESP::draw(ImDrawList* draw_list)
 			rectangle.Max.y = std::max(point_2d.y, rectangle.Max.y);
 		}
 
+		esp_entities.emplace(
+			player_pawn,
+			// NOLINTNEXTLINE(readability-static-accessed-through-instance) -- TODO more entities
+			player_pawn->classInfo(),
+			glm::distance(camera_position.load(std::memory_order::relaxed), vec),
+			rectangle);
+
+	next_ent:;
+	}
+
+	for (const ESPEntity& esp_entity : esp_entities) {
+		// TODO different entities
+		assert(esp_entity.class_info == CSPlayerPawn::classInfo());
+		auto* player_pawn = static_cast<CSPlayerPawn*>(esp_entity.entity);
+
 		{
-			GenericESP::UnionedRect unioned_rect{ rectangle };
+			GenericESP::UnionedRect unioned_rect{ esp_entity.screenspace_rect };
 			if (box_enabled.get())
 				box.draw(draw_list, player_pawn, unioned_rect);
 			if (name_enabled.get()) {
@@ -206,6 +247,5 @@ void ESP::draw(ImDrawList* draw_list)
 		}
 
 
-	next_ent:;
 	}
 }

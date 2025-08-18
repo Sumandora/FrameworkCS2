@@ -1,7 +1,10 @@
 #include "../GameHook.hpp"
 
+#include "../../../SDK/GameClass/ViewSetup.hpp"
+
 #include "../../../Features/Visuals/ForceThirdPerson.hpp"
 #include "../../../Features/Visuals/Removals.hpp"
+#include "../../../Features/Visuals/ESP/ESP.hpp"
 
 #include "RetAddrSpoofer.hpp"
 
@@ -11,4 +14,6 @@ void Hooks::Game::OverrideView::hook_func(ViewRender* thisptr, ViewSetup* view_s
 
 	force_third_person->override_view(view_setup);
 	removals->override_view(view_setup);
+
+	esp->update_camera_position(view_setup->camera_position());
 }
