@@ -60,7 +60,7 @@ struct ESPEntity {
 	};
 };
 
-void ESP::update_camera_position(glm::vec3 new_camera_position)
+void ESP::update_camera_position(const glm::vec3& new_camera_position)
 {
 	camera_position.store(new_camera_position, std::memory_order::relaxed);
 }

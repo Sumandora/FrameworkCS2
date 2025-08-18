@@ -44,7 +44,7 @@ class ESP : public Feature {
 public:
 	ESP();
 
-	void update_camera_position(glm::vec3 new_camera_position);
+	void update_camera_position(const glm::vec3& new_camera_position);
 
 	void draw(ImDrawList* draw_list);
 };
