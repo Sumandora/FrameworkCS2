@@ -9,6 +9,8 @@
 
 #include "../Enums/TeamID.hpp"
 
+#include "VData/CSWeaponBaseVData.hpp"
+
 struct CSWeaponBase : public BasePlayerWeapon {
 	CLASS_INFO("libclient.so", "C_CSWeaponBase");
 
@@ -17,4 +19,9 @@ struct CSWeaponBase : public BasePlayerWeapon {
 	SCHEMA_VAR(bool, dropped_near_buy_zone, "m_bDroppedNearBuyZone");
 	SCHEMA_VAR(TeamID, most_recent_team_number, "m_iMostRecentTeamNumber");
 	SCHEMA_VAR(GameTime, dropped_at_time, "m_flDroppedAtTime");
+
+	[[nodiscard]] CSWeaponBaseVData* get_vdata() const
+	{
+		return static_cast<CSWeaponBaseVData*>(BasePlayerWeapon::get_vdata());
+	}
 };

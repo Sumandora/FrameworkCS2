@@ -13,5 +13,5 @@ struct EconItemView {
 
 	SCHEMA_VAR(std::uint16_t, item_definition_index, "m_iItemDefinitionIndex");
 
-	VIRTUAL_METHOD(14, get_item_definition, EconItemDefinition*, (), (this));
+	VIRTUAL_METHOD(14, get_item_definition, EconItemDefinition*, () const, (this));
 };

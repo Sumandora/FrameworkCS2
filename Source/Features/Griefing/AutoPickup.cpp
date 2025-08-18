@@ -171,13 +171,7 @@ void AutoPickup::update()
 		Interfaces::engine->execute_client_cmd(cmd.c_str());
 
 		// And inform the user that we tried:
-		EconItemDefinition* econ_item_definition = view.get_item_definition();
-		std::string name;
-		if (econ_item_definition && econ_item_definition->internal_name()) {
-			name = Interfaces::localize->find_safe(econ_item_definition->internal_name());
-		} else if (EntityIdentity* identity = best_weapon->entity(); identity) {
-			name = identity->designer_name().string();
-		}
+		std::string name = best_weapon->get_display_name();
 
 		// TODO since this is subject to ping, maybe the notification should only be printed every multiple of the ping?
 		Notifications::create(auto_pickup->get_name() /* <- consistency right there*/,

@@ -27,7 +27,7 @@ template <typename Ent>
 class EntityHandle;
 
 struct BaseEntity : public EntityInstance {
-	VIRTUAL_METHOD(43, getSchemaType, SchemaClassInfo*, (), (this));
+	VIRTUAL_METHOD(43, getSchemaType, SchemaClassInfo*, () const, (this));
 
 	CLASS_INFO("libclient.so", "C_BaseEntity");
 
@@ -62,10 +62,10 @@ public:
 	SCHEMA_VAR(float, simulation_time, "m_flSimulationTime");
 
 	// This type changes based on the entity type
-	EntitySubclassVDataBase* get_vdata()
+	[[nodiscard]] EntitySubclassVDataBase* get_vdata() const
 	{
 		static const std::int32_t OFFSET = SchemaSystem::findOffset(classInfo(), "m_nSubclassID");
-		return *reinterpret_cast<EntitySubclassVDataBase**>(reinterpret_cast<char*>(this) + OFFSET + 0x8);
+		return *reinterpret_cast<EntitySubclassVDataBase* const*>(reinterpret_cast<const char*>(this) + OFFSET + 0x8);
 	}
 
 	template <typename T>

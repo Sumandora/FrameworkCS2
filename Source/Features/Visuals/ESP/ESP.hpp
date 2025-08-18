@@ -12,6 +12,7 @@
 #include "imgui.h"
 
 #include "Player.hpp"
+#include "Weapon.hpp"
 
 #include <atomic>
 #include <string>
@@ -24,16 +25,17 @@ class ESP : public Feature {
 	Tabs entity_types{ this, "Entity types" };
 
 	Tabs players{ entity_types, "Players" };
-
 	ESPPlayer teammates{ players, "Teammates" };
 	ESPPlayer enemies{ players, "Enemies" };
 	ESPPlayer local{ players, "Local" };
 
+	ESPWeapon weapons{ entity_types, "Weapons" };
+
+	std::atomic<glm::vec3> camera_position;
+
 	friend ESPPlayer;
 
 	ESPPlayer& get_player_by_pawn(CSPlayerPawn* player_pawn);
-
-	std::atomic<glm::vec3> camera_position;
 
 public:
 	ESP();
