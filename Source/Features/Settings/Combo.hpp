@@ -22,6 +22,7 @@ template <typename E>
 	requires std::is_enum_v<E>
 class RawCombo : public Setting {
 	E value;
+	// TODO thread-safety?
 
 public:
 	RawCombo(SettingsHolder* parent, std::string name, E value = magic_enum::enum_values<E>()[0])
@@ -31,6 +32,7 @@ public:
 	}
 
 	[[nodiscard]] E get() const { return value; }
+	void set(E new_value) { value = new_value; }
 
 	void render() override
 	{

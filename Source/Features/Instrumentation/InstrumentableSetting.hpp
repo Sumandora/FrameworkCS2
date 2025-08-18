@@ -66,6 +66,11 @@ public:
 		return setting.get();
 	}
 
+	// TEMP
+	auto set(auto v) {
+		setting.set(v);
+	}
+
 	void make_node_circuit()
 	{
 		node_circuit = std::make_unique<NodeCircuit>(NODE_TYPE, [&s = this->setting] {

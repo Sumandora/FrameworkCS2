@@ -45,5 +45,6 @@ public:
 	friend void from_json(const nlohmann::json& json, Setting& setting) { setting.deserialize(json); }
 
 	bool is_visible();
+	// TODO Rename to set_visible_condition, since you can't have multiple
 	void add_visible_condition(std::function<bool()> visible) &;
 };

@@ -5,6 +5,7 @@
 
 #include "imgui.h"
 
+#include <mutex>
 #include <shared_mutex>
 #include <string>
 
@@ -19,6 +20,11 @@ public:
 	{
 		const std::shared_lock lock{ mutex };
 		return value;
+	}
+	void set(ImColor new_value)
+	{
+		const std::unique_lock lock{ mutex };
+		value = new_value;
 	}
 
 	void render() override;

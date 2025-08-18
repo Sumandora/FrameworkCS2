@@ -7,6 +7,7 @@
 #include "../../../SDK/Entities/VData/BasePlayerWeaponVData.hpp"
 
 #include "GenericESP/Element/Element.hpp"
+#include "GenericESP/Element/SidedElement.hpp"
 #include "GenericESP/UnionedRect.hpp"
 
 #include "imgui.h"
@@ -30,7 +31,9 @@ std::string WeaponAmmobar::get_number_text_content(const GenericESP::EntityType*
 ESPWeapon::ESPWeapon(SettingsHolder* parent, std::string name)
 	: MetaSetting(parent, std::move(name))
 {
-	// TODO Make the ammo bar default to being at the bottom. (Also the colors are laughable, make them blue)
+	ammobar.filled_color.set(ImColor{ 0.0F, 0.5F, 1.0F, 1.0F });
+	ammobar.empty_color.set(ImColor{ 0.0F, 0.5F, 1.0F, 1.0F });
+	ammobar.side.set(GenericESP::Side::BOTTOM);
 }
 
 bool ESPWeapon::is_enabled() const
