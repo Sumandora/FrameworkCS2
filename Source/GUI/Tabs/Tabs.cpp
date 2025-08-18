@@ -8,13 +8,16 @@
 
 #include "imgui.h"
 
+#include <cfloat>
 #include <ranges>
 #include <string>
 
 void GUI::Tabs::render()
 {
-	ImGui::SetNextWindowSizeConstraints(ImVec2{ 400, 300 } * GUI::get_scale(), ImVec2(FLT_MAX, FLT_MAX));
-	ImGui::SetNextWindowSize(ImVec2{ 600, 450 } * GUI::get_scale(), ImGuiCond_Once);
+	static constexpr ImVec2 MIN_SIZE{ 400, 300 };
+	static constexpr ImVec2 DEFAULT_SIZE{ 600, 450 };
+	ImGui::SetNextWindowSizeConstraints(MIN_SIZE * GUI::get_scale(), ImVec2(FLT_MAX, FLT_MAX));
+	ImGui::SetNextWindowSize(DEFAULT_SIZE * GUI::get_scale(), ImGuiCond_Once);
 	if (ImGui::Begin("Framework CS2", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar)) {
 		const ImVec2 remaining_size{ 0.0F, -ImGui::GetFontSize() };
 
