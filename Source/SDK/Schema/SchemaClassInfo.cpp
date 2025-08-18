@@ -6,7 +6,9 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <format>
 #include <span>
+#include <stdexcept>
 #include <string_view>
 
 bool SchemaClassInfo::bases_on(SchemaClassInfo* other) const
@@ -28,9 +30,12 @@ bool SchemaClassInfo::bases_on(SchemaClassInfo* other) const
 
 std::int32_t SchemaClassInfo::find_offset(std::string_view field_name) const
 {
-	return std::ranges::find(
-		std::span{ fields, fields + fieldsCount },
+	const std::span fields_span{ fields, fields + fieldsCount };
+	const auto it = std::ranges::find(
+		fields_span,
 		field_name,
-		[](const FieldData& field_data) { return field_data.fieldName; })
-		->offset;
+		[](const FieldData& field_data) { return field_data.fieldName; });
+	if (it == fields_span.end())
+		throw std::runtime_error{ std::format("Couldn't find schema variable {}", field_name) };
+	return it->offset;
 }
