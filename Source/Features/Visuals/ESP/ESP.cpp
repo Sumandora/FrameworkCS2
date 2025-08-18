@@ -13,7 +13,6 @@
 #include "../../../Memory.hpp"
 
 #include "../../../SDK/Entities/BaseEntity.hpp"
-#include "../../../SDK/Entities/CSPlayerController.hpp"
 #include "../../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../../SDK/Entities/GameEntitySystem.hpp"
 #include "../../../SDK/Enums/LifeState.hpp"
@@ -27,65 +26,20 @@
 
 #include "../../Feature.hpp"
 
-#include "GenericESP/UnionedRect.hpp"
-
 #include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 
 #include "imgui.h"
 #include "imgui_internal.h"
 
-#include "Skeleton.hpp"
+#include "Player.hpp"
 
 ESP::ESP()
 	: Feature("Visuals", "ESP")
 {
 }
 
-struct ESPEntity {
-	BaseEntity* entity;
-	SchemaClassInfo* class_info;
-	float distance;
-	ImRect screenspace_rect;
-
-	struct DistanceComparator {
-		static bool operator()(const ESPEntity& a, const ESPEntity& b)
-		{
-			// Since we want to draw entities further away first, we sort with greater than
-			return a.distance > b.distance;
-		}
-	};
-};
-
-bool ESP::Player::is_enabled() const
-{
-	if (this == &esp->local) {
-		// TODO If we are in first person then never say yes here.
-	}
-	return box_enabled.get() || name_enabled.get() || healthbar_enabled.get() || skeleton_enabled.get();
-}
-
-void ESP::Player::draw_player(ImDrawList* draw_list, CSPlayerPawn* player_pawn, const ImRect& screenspace_rect) const
-{
-	GenericESP::UnionedRect unioned_rect{ screenspace_rect };
-
-	if (box_enabled.get())
-		box.draw(draw_list, player_pawn, unioned_rect);
-
-	if (name_enabled.get()) {
-		CSPlayerController* controller = player_pawn->original_controller().get();
-		if (controller)
-			name.draw(draw_list, player_pawn, controller->get_decorated_player_name(), unioned_rect);
-	}
-
-	if (healthbar_enabled.get())
-		healthbar.draw(draw_list, player_pawn, unioned_rect);
-
-	if (this->skeleton_enabled.get())
-		draw_skeleton(player_pawn, draw_list, skeleton_line);
-}
-
-ESP::Player& ESP::get_player_by_pawn(CSPlayerPawn* player_pawn)
+ESPPlayer& ESP::get_player_by_pawn(CSPlayerPawn* player_pawn)
 {
 	if (player_pawn == Memory::local_player)
 		return local;
@@ -105,6 +59,21 @@ void ESP::update_camera_position(const glm::vec3& new_camera_position)
 {
 	camera_position.store(new_camera_position, std::memory_order::relaxed);
 }
+
+struct ESPEntity {
+	BaseEntity* entity;
+	SchemaClassInfo* class_info;
+	float distance;
+	ImRect screenspace_rect;
+
+	struct DistanceComparator {
+		static bool operator()(const ESPEntity& a, const ESPEntity& b)
+		{
+			// Since we want to draw entities further away first, we sort with greater than
+			return a.distance > b.distance;
+		}
+	};
+};
 
 void ESP::draw(ImDrawList* draw_list)
 {
@@ -193,7 +162,6 @@ void ESP::draw(ImDrawList* draw_list)
 
 		esp_entities.emplace(
 			entity,
-			// NOLINTNEXTLINE(readability-static-accessed-through-instance) -- TODO more entities
 			class_info,
 			glm::distance(camera_position, vec),
 			rectangle);
@@ -205,7 +173,7 @@ void ESP::draw(ImDrawList* draw_list)
 
 		if (esp_entity.class_info == CSPlayerPawn::classInfo()) {
 			auto* player_pawn = static_cast<CSPlayerPawn*>(esp_entity.entity);
-			const Player& player_type = get_player_by_pawn(player_pawn);
+			const ESPPlayer& player_type = get_player_by_pawn(player_pawn);
 			player_type.draw_player(draw_list, player_pawn, esp_entity.screenspace_rect);
 			continue;
 		}
