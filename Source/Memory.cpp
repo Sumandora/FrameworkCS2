@@ -18,6 +18,7 @@
 #include "SDK/GameClass/KeyValues3.hpp"
 #include "SDK/GameClass/MemAlloc.hpp"
 #include "SDK/GameClass/NetworkGameClient.hpp"
+#include "SDK/GameClass/Source2Client.hpp"
 #include "SDK/GameClass/UserCmd.hpp"
 #include "SDK/Particles/GameParticleManager.hpp"
 
@@ -117,10 +118,12 @@ void Memory::create()
 	UserCmd::resolve_signatures();
 
 	globals
-		= BCRL::signature(
-			mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"48 8D 05 ? ? ? ? 48 8B 00 F3 0F 6F 00">(),
-			BCRL::everything(mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
+		= BCRL::pointer(mem_mgr, Interfaces::source2_client)
+			  .dereference()
+			  .add(sizeof(void*) * Source2Client::set_globals_index)
+			  .dereference()
+			  // As of the time of writing this, this matches the very same place it starts at, however this is trying to
+			  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8b 05">())
 			  .add(3)
 			  .relative_to_absolute()
 			  .BCRL_EXPECT(GlobalVars**, globals);
