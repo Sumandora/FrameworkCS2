@@ -193,7 +193,7 @@ void AutoPickup::update()
 
 			EngineTrace::the()->trace_shape(&ray, current_step, game_scene_node->transform().m_Position + glm::lerp(collision->mins(), collision->maxs(), 0.5F), &filter, &trace);
 
-			if (trace.hit_entity == weapon) {
+			if (!trace.hit_entity || trace.hit_entity == weapon) {
 				hit_world = false;
 				break;
 			}
