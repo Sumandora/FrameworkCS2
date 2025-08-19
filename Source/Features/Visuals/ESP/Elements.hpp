@@ -163,13 +163,8 @@ struct PlayerBar : MetaSetting, GenericESP::BarWithText {
 	PlayerBar(SettingsHolder* parent, std::string name)
 		: MetaSetting(parent, std::move(name))
 	{
-		// These only make sense if the colors differ.
+		// This only make sense if the colors differ.
 		gradient.add_visible_condition([this] {
-			const ImColor filled_color = this->filled_color.get_raw();
-			const ImColor empty_color = this->empty_color.get_raw();
-			return filled_color.Value != empty_color.Value;
-		});
-		flipped.add_visible_condition([this] {
 			const ImColor filled_color = this->filled_color.get_raw();
 			const ImColor empty_color = this->empty_color.get_raw();
 			return filled_color.Value != empty_color.Value;
