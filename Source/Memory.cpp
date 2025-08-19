@@ -84,10 +84,32 @@ void Memory::create()
 	csgo_input
 		= BCRL::signature(
 			mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"4C 8D 3D ? ? ? ? 4C 89 FF E8 ? ? ? ? 4C 89 FE 48 89 DA">(),
-			BCRL::everything(mem_mgr).thats_readable().with_name("libclient.so"))
-			  .add(3)
+			SignatureScanner::PatternSignature::for_literal_string<"10CCSGOInput">(),
+			BCRL::everything(mem_mgr).with_flags("r--").with_name("libclient.so"))
+			  .find_xrefs(SignatureScanner::XRefTypes::absolute(),
+				  BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+			  .sub(sizeof(void*))
+			  .find_xrefs(SignatureScanner::XRefTypes::absolute(),
+				  BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
+			  .add(sizeof(void*))
+			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .add(4)
+			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
+			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
+				  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .sub(8)
 			  .relative_to_absolute()
+			  .filter([](const auto& ptr) {
+				  return ptr
+					  .clone()
+					  .dereference()
+					  .sub(sizeof(void*))
+					  .dereference()
+					  .add(sizeof(void*))
+					  .dereference()
+					  .does_match(SignatureScanner::PatternSignature::for_literal_string<"10CCSGOInput">());
+			  })
 			  .BCRL_EXPECT(CSGOInput*, csgo_input);
 
 	MemAlloc::resolve_signatures();
