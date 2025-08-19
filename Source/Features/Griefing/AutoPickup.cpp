@@ -4,26 +4,33 @@
 
 #include "../../SDK/CUtl/Vector.hpp"
 #include "../../SDK/Econ/EconItemView.hpp"
-#include "../../SDK/Econ/ItemDefinition.hpp"
+#include "../../SDK/EngineTrace/EngineTrace.hpp"
+#include "../../SDK/EngineTrace/GameTrace.hpp"
+#include "../../SDK/EngineTrace/Ray.hpp"
+#include "../../SDK/EngineTrace/TraceFilter.hpp"
 #include "../../SDK/Entities/BaseEntity.hpp"
 #include "../../SDK/Entities/BasePlayerWeapon.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
 #include "../../SDK/Entities/CSWeaponBase.hpp"
-#include "../../SDK/Entities/EntityIdentity.hpp"
 #include "../../SDK/Entities/GameEntitySystem.hpp"
 #include "../../SDK/Entities/Services/CSPlayerWeaponServices.hpp"
 #include "../../SDK/Entities/VData/CSWeaponBaseVData.hpp"
+#include "../../SDK/Entities/World.hpp"
 #include "../../SDK/EntityHandle.hpp"
+#include "../../SDK/GameClass/CollisionProperty.hpp"
 #include "../../SDK/GameClass/CSGameRules.hpp"
 #include "../../SDK/GameClass/EngineToClient.hpp"
+#include "../../SDK/GameClass/GameSceneNode.hpp"
 #include "../../SDK/GameClass/GameTypes.hpp"
 #include "../../SDK/GameClass/GlobalVars.hpp"
-#include "../../SDK/GameClass/Localize.hpp"
 
 #include "../../Interfaces.hpp"
 #include "../../Memory.hpp"
 
 #include "../../Notifications/Notifications.hpp"
+
+#include "glm/ext/vector_float3.hpp"
+#include "glm/gtx/compatibility.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
@@ -100,6 +107,13 @@ void AutoPickup::update()
 	if (!weapon_services)
 		return;
 
+	const NetworkedClientInfo network_client_info = Interfaces::engine->get_network_client_info();
+
+	if (network_client_info.local_data == nullptr)
+		return;
+
+	const glm::vec3 from = network_client_info.local_data->eye_pos;
+
 	std::array<int, GEAR_SLOT_COUNT> price_per_slot{};
 
 	const UtlVector<EntityHandle<BasePlayerWeapon>>& weapons = weapon_services->my_weapons();
@@ -122,6 +136,14 @@ void AutoPickup::update()
 	for (BaseEntity* entity : GameEntitySystem::the()->entities()) {
 		auto* weapon = entity->entity_cast<CSWeaponBase*>();
 		if (!weapon)
+			continue;
+
+		GameSceneNode* game_scene_node = weapon->gameSceneNode();
+		if (!game_scene_node)
+			continue;
+
+		CollisionProperty* collision = weapon->collision();
+		if (!collision)
 			continue;
 
 		if (weapon->most_recent_team_number() != Memory::local_player->team_id())
@@ -153,6 +175,37 @@ void AutoPickup::update()
 
 		if (other_vdata->price() <= price_per_slot[other_vdata->gear_slot()])
 			continue;
+
+		// Due to legacy reasons, weapons can only be picked up when there is an LOS between the player and the weapon.
+		// The game does not account for this in the CS2 GUIs like the buy menu, however since it relies on old pickup code, it is subject
+		//  to the condition of an LOS existing.
+
+		bool hit_world = true;
+		BaseEntity* last_entity = Memory::local_player;
+		glm::vec3 current_step = from;
+		while (true) {
+			// TODO I'm pretty sure there is a better way to ignore all entities but one and the world, but this is the only thing that came to my mind.
+			// 	Not sure how the game does this since it TraceFilters only get two excludes...
+			GameTrace trace = GameTrace::initialized();
+			TraceFilter filter{ TraceFilter::MASK1 };
+			filter.add_skip(last_entity);
+			Ray ray{};
+
+			EngineTrace::the()->trace_shape(&ray, current_step, game_scene_node->transform().m_Position + glm::lerp(collision->mins(), collision->maxs(), 0.5F), &filter, &trace);
+
+			if (trace.hit_entity == weapon) {
+				hit_world = false;
+				break;
+			}
+			if (trace.hit_entity->getSchemaType() == World::classInfo())
+				break;
+
+			last_entity = trace.hit_entity;
+			current_step = trace.to;
+		}
+
+		if (hit_world)
+			continue; // meh unfortunate...
 
 		best_price = other_vdata->price();
 		best_weapon = weapon;

@@ -26,7 +26,6 @@ struct TraceFilter {
 	void add_skip(BaseEntity* entity);
 
 	virtual ~TraceFilter() = default;
-	// virtual void commit_suicide() { /* Game deletes the class here, I don't do heap allocations tho. */ }
 	virtual std::uint64_t unk() { return 1; }
 };
 
