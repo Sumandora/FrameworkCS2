@@ -126,12 +126,12 @@ void VoteRevealer::on_vote_start(NetMessagePB<CCSUsrMsg_VoteStart>* net_message)
 			ChatPrintf::to_html_rgba(announce_color.get()), localized);
 }
 
-void VoteRevealer::event_handler(GameEvent* event)
+void VoteRevealer::event_handler(GameEvent* event, std::string_view event_name)
 {
 	if (!enabled.get())
 		return;
 
-	if (std::string_view{ event->GetName() } != "vote_cast")
+	if (event_name != "vote_cast")
 		return;
 
 	auto* controller = static_cast<CSPlayerController*>(GameEntitySystem::the()->get_entity_by_index(event->get_userid("userid", -2) + 1));

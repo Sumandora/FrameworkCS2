@@ -174,9 +174,9 @@ void GrenadeHelper::reset_octree()
 	new (&grenades) Octree({ glm::vec3{ -OCTREE_SIZE }, glm::vec3{ OCTREE_SIZE } });
 }
 
-void GrenadeHelper::event_handler(GameEvent* event)
+void GrenadeHelper::event_handler(GameEvent* event, std::string_view event_name)
 {
-	if (std::string_view{ event->GetName() } != "game_newmap")
+	if (event_name != "game_newmap")
 		return;
 
 	const std::string_view new_map = event->get_string("mapname", "");

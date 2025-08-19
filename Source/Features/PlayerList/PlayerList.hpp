@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <mutex>
+#include <string_view>
 
 struct CSPlayerController;
 struct PlayerData;
@@ -33,7 +34,7 @@ public:
 	PlayerList();
 
 	void update();
-	void event_handler(GameEvent* event);
+	void event_handler(GameEvent* event, std::string_view event_name);
 	void draw();
 };
 

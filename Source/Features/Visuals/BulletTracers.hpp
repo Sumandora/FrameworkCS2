@@ -12,6 +12,8 @@
 
 #include "imgui.h"
 
+#include <string_view>
+
 class GameEvent;
 
 class BulletTracers : public Feature {
@@ -27,7 +29,7 @@ public:
 
 	void update_viewangles(const glm::vec3& view_angles);
 
-	void event_handler(GameEvent* event);
+	void event_handler(GameEvent* event, std::string_view event_name);
 };
 
 inline UninitializedObject<BulletTracers> bullet_tracers;

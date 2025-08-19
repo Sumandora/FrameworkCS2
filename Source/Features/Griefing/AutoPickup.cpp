@@ -161,7 +161,7 @@ void AutoPickup::update()
 		if (weapon->owner_entity().has_entity())
 			continue;
 
-		const auto* other_vdata = static_cast<CSWeaponBaseVData*>(weapon->get_vdata());
+		const auto* other_vdata = weapon->get_vdata();
 
 		if (!other_vdata)
 			continue;

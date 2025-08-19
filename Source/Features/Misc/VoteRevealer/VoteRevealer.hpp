@@ -15,6 +15,8 @@
 
 #include "imgui.h"
 
+#include <string_view>
+
 struct GameEvent;
 
 class VoteRevealer : public Feature {
@@ -35,7 +37,7 @@ public:
 	VoteRevealer();
 
 	void on_vote_start(NetMessagePB<CCSUsrMsg_VoteStart>* net_message);
-	void event_handler(GameEvent* event);
+	void event_handler(GameEvent* event, std::string_view event_name);
 };
 
 inline UninitializedObject<VoteRevealer> vote_revealer;

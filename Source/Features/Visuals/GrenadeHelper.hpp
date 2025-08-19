@@ -23,6 +23,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -77,7 +78,7 @@ public:
 	void update_viewangles(const glm::vec3& viewangles);
 	void update();
 
-	void event_handler(GameEvent* event);
+	void event_handler(GameEvent* event, std::string_view event_name);
 	void draw() const;
 };
 

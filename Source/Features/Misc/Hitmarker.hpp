@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <ranges>
 #include <string>
+#include <string_view>
 #include <utility>
 
 struct GameEvent;
@@ -104,7 +105,7 @@ class HitMarker : public Feature {
 public:
 	HitMarker();
 
-	void event_handler(GameEvent* event);
+	void event_handler(GameEvent* event, std::string_view event_name);
 	void draw(ImDrawList* draw_list);
 };
 

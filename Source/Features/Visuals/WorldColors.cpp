@@ -2,8 +2,6 @@
 
 #include "../../Features/Feature.hpp"
 
-#include "../../SDK/Color.hpp"
-#include "../../SDK/GameClass/GameEvent.hpp"
 #include "../../SDK/GameClass/MeshDrawPrimitive.hpp"
 #include "../../SDK/GameClass/SceneLightObject.hpp"
 #include "../../SDK/Padding.hpp"
@@ -129,13 +127,13 @@ bool WorldColors::handle_sky(MeshDrawPrimitive* sky_draw_primitives, int count,
 	return true;
 }
 
-void WorldColors::event_handler(GameEvent* event)
+void WorldColors::event_handler(std::string_view event_name)
 {
 	if (original_light_colors.empty())
 		return;
 
 	// TODO No clue where to write this down, but I should probably stop call GetName() all the time...
-	if (std::string_view{ event->GetName() } != "game_newmap")
+	if (event_name != "game_newmap")
 		return;
 
 	// New map... well our old lights wont matter on the new one, so dump them.

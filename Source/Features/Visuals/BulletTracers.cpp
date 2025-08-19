@@ -47,12 +47,12 @@ void BulletTracers::update_viewangles(const glm::vec3& view_angles)
 	this->view_angles = view_angles + glm::vec3{ Memory::local_player->get_aim_punch(), 0.0F };
 }
 
-void BulletTracers::event_handler(GameEvent* event)
+void BulletTracers::event_handler(GameEvent* event, std::string_view event_name)
 {
 	if (!enabled.get())
 		return;
 
-	if (std::string_view{ event->GetName() } != "weapon_fire")
+	if (event_name != "weapon_fire")
 		return;
 
 	BaseEntity* shooter = event->get_entity("userid");

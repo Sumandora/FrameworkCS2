@@ -11,6 +11,7 @@
 #include "imgui.h"
 
 #include <functional>
+#include <string_view>
 #include <unordered_map>
 
 struct SceneLightObject;
@@ -43,7 +44,7 @@ public:
 	void handle_particle(MeshDrawPrimitive* particle_draw_primitives, int count) const;
 	void handle_light(SceneLightObject* scene_light_object);
 	bool handle_sky(MeshDrawPrimitive* sky_draw_primitives, int count, const std::function<void(MeshDrawPrimitive*, int)>& draw_mesh) const;
-	void event_handler(GameEvent* event);
+	void event_handler(std::string_view event_name);
 };
 
 inline UninitializedObject<WorldColors> world_colors;

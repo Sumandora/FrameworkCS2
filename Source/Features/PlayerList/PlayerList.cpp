@@ -29,6 +29,7 @@
 #include <map>
 #include <mutex>
 #include <ranges>
+#include <string_view>
 #include <tuple>
 #include <utility>
 
@@ -151,14 +152,14 @@ void PlayerList::update()
 	std::erase_if(player_data_map, [](const auto& pair) { return pair.second.invalid; });
 }
 
-static void update_column(auto& column, CSPlayerPawn* pawn, GameEvent* event)
+static void update_column(auto& column, CSPlayerPawn* pawn, GameEvent* event, std::string_view event_name)
 {
 	if constexpr (UpdateColoumnWithGameEvent<decltype(column)>) {
-		column.update(pawn, event);
+		column.update(pawn, event, event_name);
 	}
 }
 
-void PlayerList::event_handler(GameEvent* event)
+void PlayerList::event_handler(GameEvent* event, std::string_view event_name)
 {
 	const std::lock_guard guard{ mutex };
 
@@ -172,7 +173,7 @@ void PlayerList::event_handler(GameEvent* event)
 		PlayerData& data = player_data_map[controller->get_handle()];
 		CSPlayerPawn* pawn = controller->player_pawn().get();
 
-		std::apply([event, pawn](auto&... columns) { (update_column(columns, pawn, event), ...); }, data.columns);
+		std::apply([event, pawn, event_name](auto&... columns) { (update_column(columns, pawn, event, event_name), ...); }, data.columns);
 	}
 }
 

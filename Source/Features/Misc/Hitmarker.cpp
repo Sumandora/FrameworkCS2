@@ -102,14 +102,14 @@ void HitMarker::do_hit_logs(CSPlayerPawn* victim, int damage) const
 	}
 }
 
-void HitMarker::event_handler(GameEvent* game_event)
+void HitMarker::event_handler(GameEvent* game_event, std::string_view event_name)
 {
 	const bool hit_sound_enabled = this->hit_sound_enabled.get();
 	const bool hit_logs_enabled = this->hit_logs_enabled.get();
 	if (!hit_marker_enabled.get() && !hit_sound_enabled && !hit_logs_enabled)
 		return;
 
-	if (std::string_view{ game_event->GetName() } != "player_hurt")
+	if (event_name != "player_hurt")
 		return;
 
 	BaseEntity* attacker = game_event->get_entity("attacker");

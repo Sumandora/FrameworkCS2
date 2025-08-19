@@ -19,12 +19,12 @@ struct TeamKillsColumn {
 
 	int kills = 0;
 
-	void update(CSPlayerPawn* pawn, GameEvent* event)
+	void update(CSPlayerPawn* pawn, GameEvent* event, std::string_view event_name)
 	{
 		if (!pawn)
 			return;
 
-		if (std::string_view{ event->GetName() } != "player_death")
+		if (event_name != "player_death")
 			return;
 
 		BaseEntity* attacker = event->get_entity("attacker");

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <string_view>
 #include <utility>
 
 template <typename T>
@@ -26,8 +27,8 @@ concept UpdateColoumnWithPawn = requires(Column column, CSPlayerPawn* pawn) {
 // Perhaps a variant of this with the controller would be helpful, but it wasn't needed yet.
 // If you feel like you need that then feel free to add it here.
 template <typename Column>
-concept UpdateColoumnWithGameEvent = requires(Column column, CSPlayerPawn* pawn, GameEvent* game_event) {
-	{ column.update(pawn, game_event) };
+concept UpdateColoumnWithGameEvent = requires(Column column, CSPlayerPawn* pawn, GameEvent* game_event, std::string_view event_name) {
+	{ column.update(pawn, game_event, event_name) };
 };
 
 template <typename Column>
