@@ -5,7 +5,6 @@
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
-
 #include "SignatureScanner/PatternSignature.hpp"
 #include "SignatureScanner/XRefSignature.hpp"
 
@@ -67,18 +66,6 @@ namespace Hooks::Game {
 				  // What is the lea in the middle of the prologue?
 				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 8d 87 ? ? ? ? 48 89 e5">())
 				  .BCRL_EXPECT(void*, fire_event);
-
-		void* get_fun_loading
-			= BCRL::signature(
-				Memory::mem_mgr,
-				SignatureScanner::PatternSignature::for_literal_string<"#LoadingProgress_CSFunLoading%d">(),
-				BCRL::everything(Memory::mem_mgr).thats_readable().thats_not_executable().with_name("libclient.so"))
-				  .find_xrefs(SignatureScanner::XRefTypes::relative(),
-					  BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-				  .sub(3)
-				  .filter([](const auto& ptr) { return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 35">()); })
-				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
-				  .BCRL_EXPECT(void*, get_fun_loading);
 
 		void* create_move
 			= BCRL::pointer_array(
@@ -372,10 +359,6 @@ namespace Hooks::Game {
 			Memory::emalloc,
 			fire_event,
 			reinterpret_cast<void*>(FireEvent::hookFunc));
-		GetFunLoading::hook.emplace(
-			Memory::emalloc,
-			get_fun_loading,
-			reinterpret_cast<void*>(GetFunLoading::hook_func));
 		CreateMove::hook.emplace(
 			Memory::emalloc,
 			create_move,
@@ -448,7 +431,6 @@ namespace Hooks::Game {
 		FrameStageNotify::hook->enable();
 		ShouldShowCrosshair::hook->enable();
 		FireEvent::hook->enable();
-		GetFunLoading::hook->enable();
 		CreateMove::hook->enable();
 		RadarUpdate::hook->enable();
 		RenderLegs::hook->enable();
@@ -512,7 +494,6 @@ namespace Hooks::Game {
 		RenderLegs::hook.reset();
 		RadarUpdate::hook.reset();
 		CreateMove::hook.reset();
-		GetFunLoading::hook.reset();
 		FireEvent::hook.reset();
 		ShouldShowCrosshair::hook.reset();
 		FrameStageNotify::hook.reset();

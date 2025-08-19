@@ -53,11 +53,6 @@ namespace Hooks::Game {
 		inline std::unordered_map<std::string, std::size_t> event_counters;
 	}
 
-	namespace GetFunLoading {
-		inline UninitializedObject<DetourHook<true>> hook;
-		const char* hook_func(const char* fallback);
-	}
-
 	namespace CreateMove {
 		inline UninitializedObject<DetourHook<true>> hook;
 		void hook_func(CSGOInput* csgo_input, int, char);
