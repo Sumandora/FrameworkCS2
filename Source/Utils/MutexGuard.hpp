@@ -19,7 +19,6 @@ public:
 	{
 	}
 
-	// TODO remove pointer on mutex
 	explicit MutexGuard(T* value, Lock::mutex_type& mutex)
 		: value(value)
 		, lock(mutex)
