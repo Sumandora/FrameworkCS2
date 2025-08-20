@@ -29,7 +29,7 @@ struct VulkanErrorSink {
 
 	const VulkanErrorSink& operator<<(int error_value) const
 	{
-		if (!error_value)
+		if (error_value == 0)
 			return *this;
 
 		Logging::error("vulkan error: {}", error_value);
