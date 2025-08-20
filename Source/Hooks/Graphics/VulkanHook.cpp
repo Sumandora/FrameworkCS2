@@ -46,45 +46,10 @@ static void CreateDevice()
 	}
 
 	// Select GPU
-	{
-		uint32_t gpu_count;
-		vkEnumeratePhysicalDevices(g_Instance, &gpu_count, nullptr);
-		IM_ASSERT(gpu_count > 0);
-
-		std::unique_ptr<VkPhysicalDevice[]> gpus = std::make_unique<VkPhysicalDevice[]>(gpu_count);
-		vkEnumeratePhysicalDevices(g_Instance, &gpu_count, gpus.get());
-
-		// If a number >1 of GPUs got reported, find discrete GPU if present, or
-		// use first one available. This covers most common cases
-		// (multi-gpu/integrated+dedicated graphics). Handling more complicated
-		// setups (multiple dedicated GPUs) is out of scope of this sample.
-		int use_gpu = 0;
-		for (int i = 0; i < (int)gpu_count; ++i) {
-			VkPhysicalDeviceProperties properties;
-			vkGetPhysicalDeviceProperties(gpus[i], &properties);
-			if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
-				use_gpu = i;
-				break;
-			}
-		}
-
-		g_PhysicalDevice = gpus[use_gpu];
-	}
+	g_PhysicalDevice = ImGui_ImplVulkanH_SelectPhysicalDevice(g_Instance);
 
 	// Select graphics queue family
-	{
-		uint32_t count;
-		vkGetPhysicalDeviceQueueFamilyProperties(g_PhysicalDevice, &count, nullptr);
-		g_QueueFamilies.resize(count);
-		vkGetPhysicalDeviceQueueFamilyProperties(g_PhysicalDevice, &count, g_QueueFamilies.data());
-		for (uint32_t i = 0; i < count; ++i) {
-			if (g_QueueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-				g_QueueFamily = i;
-				break;
-			}
-		}
-		IM_ASSERT(g_QueueFamily != (uint32_t)-1);
-	}
+	g_QueueFamily = ImGui_ImplVulkanH_SelectQueueFamilyIndex(g_PhysicalDevice);
 
 	// Create Logical Device (with 1 queue)
 	{
