@@ -14,8 +14,8 @@
 
 #include "../../Feature.hpp"
 
-#include "../../../Memory.hpp"
 #include "../../../Interfaces.hpp"
+#include "../../../Memory.hpp"
 
 #include "BCRL/SearchConstraints.hpp"
 #include "BCRL/Session.hpp"
@@ -45,7 +45,7 @@ ModelChanger::ModelChanger()
 				  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
 			  .add(8)
 			  .relative_to_absolute()
-			  .filter(BCRL::everything(Memory::mem_mgr).with_flags("r-x"))
+			  .filter(BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
 			  .BCRL_EXPECT(decltype(set_model), set_model);
 }
 
