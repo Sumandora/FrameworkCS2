@@ -14,6 +14,7 @@
 
 #include "../Utils/Logging.hpp"
 #include "../Utils/MutexGuard.hpp"
+#include "../Utils/UninitializedObject.hpp"
 
 #include <atomic>
 #include <cfloat>
@@ -161,6 +162,8 @@ static float font_size = 12.0F;
 static std::mutex draw_list_mutex;
 static ImDrawList* draw_list = nullptr;
 static ImDrawListSharedData* draw_list_shared_data = nullptr;
+static UninitializedObject<GUI::TextureManager> texture_manager{};
+static UninitializedObject<GUI::InputManager> input_manager{};
 
 void GUI::init(const std::filesystem::path& config_directory)
 {
@@ -174,6 +177,9 @@ void GUI::init(const std::filesystem::path& config_directory)
 	Logging::info("Initialized ImGui Context");
 
 	Theme::anti_purple_theme();
+
+	texture_manager.emplace();
+	input_manager.emplace();
 }
 
 void GUI::destroy()
@@ -399,4 +405,14 @@ MutexGuard<ImDrawList*> GUI::get_draw_list()
 ImDrawListSharedData* GUI::get_draw_list_shared_data()
 {
 	return draw_list_shared_data;
+}
+
+GUI::TextureManager& GUI::get_texture_manager()
+{
+	return texture_manager;
+}
+
+GUI::InputManager& GUI::get_input_manager()
+{
+	return input_manager;
 }

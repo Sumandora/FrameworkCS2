@@ -140,9 +140,3 @@ void GUI::InputManager::update_states()
 		return true;
 	});
 }
-
-GUI::InputManager& GUI::get_input_manager()
-{
-	static InputManager input_manager{};
-	return input_manager;
-}

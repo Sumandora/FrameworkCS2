@@ -101,9 +101,3 @@ void GUI::TextureManager::purge_all_textures()
 
 	textures.clear();
 }
-
-GUI::TextureManager& GUI::get_texture_manager()
-{
-	static GUI::TextureManager texture_manager{};
-	return texture_manager;
-}
