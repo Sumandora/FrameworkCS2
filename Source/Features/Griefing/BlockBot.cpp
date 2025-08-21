@@ -97,7 +97,7 @@ glm::vec3 BlockBot::calculate_direction_vector(glm::vec3 local_pos, glm::vec3 ot
 	const glm::vec3 right{
 		potentially_rounded.x * glm::cos(RAD90) + potentially_rounded.y * glm::sin(RAD90),
 		-potentially_rounded.x * glm::sin(RAD90) + potentially_rounded.y * glm::cos(RAD90),
-		potentially_rounded.z
+		0.0F /* This is purely about horizontal movement. */
 	};
 
 	return right;
@@ -173,8 +173,8 @@ void BlockBot::create_move(UserCmd* cmd)
 	const float additional_ping_ticks = add_ping ? time_to_ticks_with_partial(average_ping.get_average() / 1000.0F) : 0;
 	const float self_interp_ticks = local_extrapolation_ticks.get() + additional_ping_ticks;
 	const float target_interp_ticks = target_extrapolation_ticks.get() + additional_ping_ticks;
-	const glm::vec3 a = current_target->gameSceneNode()->transform().m_Position + current_target->velocity() * TICK_INTERVAL * target_interp_ticks;
-	const glm::vec3 velocity = friction(Memory::local_player, Memory::local_player->velocity()) * TICK_INTERVAL;
+	const glm::vec3 a = current_target->gameSceneNode()->transform().m_Position + current_target->abs_velocity() * TICK_INTERVAL * target_interp_ticks;
+	const glm::vec3 velocity = friction(Memory::local_player, Memory::local_player->abs_velocity()) * TICK_INTERVAL;
 	const glm::vec3 b = local_pos + velocity * self_interp_ticks;
 	const glm::vec3 delta = b - a;
 
