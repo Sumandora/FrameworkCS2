@@ -33,8 +33,11 @@ KeybindNode* KeybindNode::uninitialized(NodeCircuit* parent)
 
 void KeybindNode::render_io()
 {
-	if (ImGui::BeginChild("##Key", { 100.0F, 0.0F }, ImGuiChildFlags_AutoResizeY))
-		key->draw();
+	if (ImGui::BeginChild("##Key", { 100.0F, 0.0F }, ImGuiChildFlags_AutoResizeY)) {
+		key->draw_bind();
+		key->draw_type();
+	}
+
 	ImGui::EndChild();
 
 	ImGui::Spacing();

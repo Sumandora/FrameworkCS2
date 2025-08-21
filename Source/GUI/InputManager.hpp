@@ -85,7 +85,8 @@ namespace GUI {
 			[[nodiscard]] bool is_active() const;
 
 			void update_state();
-			void draw();
+			void draw_bind();
+			void draw_type();
 		};
 
 	private:
