@@ -3,19 +3,15 @@
 #include "../SDK/Entities/CSPlayerController.hpp"
 #include "../SDK/Entities/CSPlayerPawn.hpp"
 #include "../SDK/Entities/Services/PlayerMovementServices.hpp"
-#include "../SDK/GameClass/GlobalVars.hpp"
 #include "../SDK/GameClass/NetworkClientService.hpp"
 #include "../SDK/GameClass/NetworkGameClient.hpp"
-#include "../SDK/GameClass/Source2ClientPrediction.hpp"
 #include "../SDK/GameClass/UserCmd.hpp"
 
 #include "../Interfaces.hpp"
 #include "../Memory.hpp"
 
-#include <cstdint>
-
-static GlobalVars prev_globals{};
 static bool prev_has_been_predicted{};
+static UserCmd* prev_cmd{};
 
 static UserCmd* prediction_cmd{};
 
@@ -44,8 +40,8 @@ bool Prediction::begin(UserCmd* cmd)
 	if (!movement_services)
 		return false;
 
-	prev_globals = **Memory::globals; // TODO only save what's needed
 	prev_has_been_predicted = cmd->has_been_predicted;
+	prev_cmd = *(*Memory::local_player_controller)->get_current_command();
 
 	prediction_cmd = cmd;
 
@@ -63,12 +59,11 @@ void Prediction::end()
 	// Since in the header, we declared that end may not be called when begin returned false, we can assume that all the variables are non-null.
 
 	Memory::local_player->movement_services()->reset_prediction_command();
-	*(*Memory::local_player_controller)->get_current_command() = nullptr;
+	*(*Memory::local_player_controller)->get_current_command() = prev_cmd;
 
 	::in_prediction = false;
 
 	prediction_cmd->has_been_predicted = prev_has_been_predicted;
-	**Memory::globals = prev_globals;
 }
 
 bool Prediction::in_prediction()
