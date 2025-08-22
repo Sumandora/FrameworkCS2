@@ -65,10 +65,10 @@ void ModelChanger::update_model()
 	if (model_path.empty())
 		return;
 
-	if (Interfaces::network_client_service && Interfaces::network_client_service->network_game_client
-			? Interfaces::network_client_service->network_game_client->delta_tick == -1
-			: false)
-		return; // urgh...
+	if (Interfaces::network_client_service)
+		if (NetworkGameClient* network_game_client = Interfaces::network_client_service->network_game_client;
+			network_game_client && network_game_client->delta_tick == -1)
+			return; // urgh...
 
 	const BodyComponent* body_component = Memory::local_player->body_component();
 	if (!body_component)
