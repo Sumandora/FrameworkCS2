@@ -11,4 +11,5 @@ void Logging::detail::print_raw(std::string_view color, std::string_view line)
 		static_cast<int>(color.size()), color.data(),
 		static_cast<int>(CLEAR.size()), CLEAR.data(),
 		static_cast<int>(line.size()), line.data());
+	(void)std::fflush(stdout);
 }
