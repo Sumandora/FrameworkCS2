@@ -142,6 +142,28 @@ static glm::vec3 friction(CSPlayerPawn* player, glm::vec3 velocity)
 	return velocity;
 }
 
+// This makes local_pos->move_target not point away more than 90° from target_pos, e.g. we don't walk backwards.
+static glm::vec3 rotate_towards(const glm::vec3& local_pos, const glm::vec3& target_pos, const glm::vec3& move_target)
+{
+	const glm::vec3 u = target_pos - local_pos;
+	const glm::vec3 v = move_target - local_pos;
+
+	const glm::vec3 u_norm = glm::normalize(u);
+	const glm::vec3 v_norm = glm::normalize(v);
+
+	const float dot = glm::dot(u_norm, v_norm);
+	const float angle = glm::acos(dot);
+
+	if (angle <= glm::radians(90.0F))
+		return move_target;
+
+	const glm::vec3 v_parallel = glm::dot(v, u_norm) * u_norm;
+	const glm::vec3 v_perp = v - v_parallel;
+	const glm::vec3 v_perp_resized = glm::normalize(v_perp) * glm::length(v);
+
+	return local_pos + v_perp_resized;
+}
+
 void BlockBot::create_move(UserCmd* cmd)
 {
 	if (!enabled.get() || !Memory::local_player) {
@@ -192,7 +214,8 @@ void BlockBot::create_move(UserCmd* cmd)
 
 	const glm::vec3 dot = glm::dot(delta, direction_vector) * direction_vector;
 	const glm::vec3 perpendicular = delta - dot;
-	const glm::vec3 p = a + perpendicular;
+	const glm::vec3 move_target = a + perpendicular;
+	const glm::vec3 p = rotate_towards(a, b, move_target);
 
 	{
 		const std::lock_guard lock{ visuals_mutex };
