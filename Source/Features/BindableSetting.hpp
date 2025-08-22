@@ -12,6 +12,7 @@
 
 #include "nlohmann/json.hpp"
 
+#include <concepts>
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -22,6 +23,8 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+
+class RawCheckbox;
 
 template <typename T>
 struct SettingWithBind : public T {
@@ -142,6 +145,13 @@ public:
 				SettingWithBind<T>* new_bind = factory(this);
 				new_bind->key = std::make_shared<GUI::InputManager::Key>();
 				GUI::get_input_manager().register_key(new_bind->key);
+
+				// Flip checkbox since that seems appropriate, if there are more settings that want to change
+				// their default value based on the original setting then perhaps this should be rewritten to
+				// be more expandable (e.g. concepts)
+				if constexpr(std::same_as<T, RawCheckbox>) {
+					new_bind->set(!original_setting.get());
+				}
 			}
 
 			ImGui::EndPopup();

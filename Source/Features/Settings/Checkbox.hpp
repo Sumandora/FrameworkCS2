@@ -13,6 +13,7 @@ public:
 	RawCheckbox(SettingsHolder* parent, std::string name, bool value);
 
 	[[nodiscard]] bool get() const { return value.load(std::memory_order::relaxed); }
+	void set(bool b) { value = b; }
 
 	void render() override;
 	void serialize(nlohmann::json& output_json) const override;
