@@ -191,7 +191,7 @@ void AutoPickup::update()
 			filter.add_skip(last_entity);
 			Ray ray{};
 
-			EngineTrace::the()->trace_shape(&ray, current_step, game_scene_node->transform().m_Position + glm::lerp(collision->mins(), collision->maxs(), 0.5F), &filter, &trace);
+			EngineTrace::the()->trace_shape(&ray, current_step, game_scene_node->transform().m_Position, &filter, &trace);
 
 			if (!trace.hit_entity || trace.hit_entity == weapon) {
 				hit_world = false;
