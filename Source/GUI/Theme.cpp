@@ -1,7 +1,6 @@
 #include "Theme.hpp"
 
 #include "imgui.h"
-#include "imnodes.h"
 
 static constexpr ImColor with_alpha(ImColor color, int a)
 {
@@ -92,29 +91,4 @@ void GUI::Theme::anti_purple_theme()
 	style.TabBarBorderSize = style.TabBarOverlineSize = 0;
 
 	style.FramePadding.x = 10;
-}
-
-void GUI::Theme::anti_purple_imnodes_theme()
-{
-	auto& colors = ImNodes::GetStyle().Colors;
-
-	colors[ImNodesCol_TitleBar] = with_alpha(ACCENT, 140);
-	colors[ImNodesCol_TitleBarHovered] = with_alpha(ACCENT, 180);
-	colors[ImNodesCol_TitleBarSelected] = ACCENT;
-
-	colors[ImNodesCol_Link] = with_alpha(ACCENT, 140);
-	colors[ImNodesCol_LinkHovered] = with_alpha(ACCENT, 180);
-	colors[ImNodesCol_LinkSelected] = ACCENT;
-
-	colors[ImNodesCol_Pin] = with_alpha(ACCENT, 180);
-	colors[ImNodesCol_PinHovered] = ACCENT;
-
-	colors[ImNodesCol_BoxSelector] = with_alpha(ACCENT, 30);
-	colors[ImNodesCol_BoxSelectorOutline] = with_alpha(ACCENT, 150);
-
-	colors[ImNodesCol_GridBackground] = TRANS;
-	colors[ImNodesCol_GridLine] = with_alpha(WHITE, 40);
-
-	colors[ImNodesCol_MiniMapLink] = colors[ImNodesCol_Link];
-	colors[ImNodesCol_MiniMapLinkSelected] = colors[ImNodesCol_LinkSelected];
 }
