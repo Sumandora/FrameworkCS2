@@ -31,6 +31,14 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 {
 	switch (stage) {
 		using enum ClientFrameStage;
+	case FRAME_SIMULATE_START: {
+		CSPlayerController* controller = *Memory::local_player_controller;
+		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;
+
+		grenade_prediction->calculate_grenade_prediction();
+		break;
+	}
+
 	case FRAME_SIMULATE_END: {
 		CSPlayerController* controller = *Memory::local_player_controller;
 		Memory::local_player = controller ? controller->player_pawn().get() : nullptr;

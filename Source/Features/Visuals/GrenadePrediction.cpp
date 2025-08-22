@@ -10,7 +10,6 @@
 
 #include "../../Memory.hpp"
 
-#include "../../Utils/Logging.hpp"
 #include "../../Utils/Projection.hpp"
 
 #include "glm/ext/vector_float3.hpp"
@@ -19,14 +18,15 @@
 
 #include "imgui.h"
 
-#include "../../SDK/CUtl/Vector.hpp"
 #include "../../SDK/Entities/BaseCSGrenade.hpp"
 #include "../../SDK/Entities/BasePlayerWeapon.hpp"
 #include "../../SDK/Entities/CSPlayerPawn.hpp"
+#include "../../SDK/Entities/Services/CSPlayerWeaponServices.hpp"
 #include "../../SDK/Entities/Services/PlayerWeaponServices.hpp"
 #include "../../SDK/Padding.hpp"
 
 #include <cstddef>
+#include <mutex>
 #include <vector>
 
 struct GrenadePredictor {
@@ -119,17 +119,22 @@ GrenadePrediction::GrenadePrediction()
 			  .BCRL_EXPECT(decltype(remove_entity), remove_entity);
 }
 
-static std::vector<glm::vec3> points;
-
 void GrenadePrediction::calculate_grenade_prediction()
 {
-	BaseEntity* player = Memory::local_player;
+	const std::lock_guard lock{ mutex };
+	points.clear();
+	if (!enabled.get())
+		return;
+
+	CSPlayerPawn* player = Memory::local_player;
 	if (!player)
 		return;
 
-	BasePlayerWeapon* weapon = Memory::local_player->weapon_services()
-		? Memory::local_player->weapon_services()->active_weapon().get()
-		: nullptr;
+	CSPlayerWeaponServices* weapon_services = player->weapon_services();
+	if (!weapon_services)
+		return;
+
+	BasePlayerWeapon* weapon = weapon_services->active_weapon().get();
 	if (!weapon)
 		return;
 
@@ -144,7 +149,7 @@ void GrenadePrediction::calculate_grenade_prediction()
 	glm::vec3 position;
 	glm::vec3 velocity;
 
-	RetAddrSpoofer::invoke(calculate_initial_state, weapon, player, &position, &velocity, predict_jumpthrow.get());
+	RetAddrSpoofer::invoke(calculate_initial_state, weapon, static_cast<BaseEntity*>(player), &position, &velocity, predict_jumpthrow.get());
 	RetAddrSpoofer::invoke(predict_grenade, predictor, &position, &velocity);
 
 	for (int i = 0; i < predictor->count; i++) {
@@ -161,12 +166,10 @@ void GrenadePrediction::calculate_grenade_prediction()
 
 void GrenadePrediction::draw(ImDrawList* draw_list)
 {
-	points.clear();
 	if (!enabled.get())
 		return;
 
-	calculate_grenade_prediction();
-
+	const std::lock_guard lock{ mutex };
 	std::vector<ImVec2> screen_points;
 	screen_points.reserve(points.size());
 
