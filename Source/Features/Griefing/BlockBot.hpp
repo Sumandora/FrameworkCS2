@@ -4,8 +4,11 @@
 
 #include "../Settings/Checkbox.hpp"
 #include "../Settings/Color.hpp"
+#include "../Settings/Combo.hpp"
 #include "../Settings/FloatSlider.hpp"
 #include "../Settings/HelpMarker.hpp"
+
+#include "../../GUI/Elements/EnumCombo.hpp"
 
 #include "../../SDK/EntityHandle.hpp"
 
@@ -15,18 +18,43 @@
 
 #include "imgui.h"
 
-#include <atomic>
+#include "magic_enum/magic_enum.hpp"
+
+#include <cstdint>
 #include <mutex>
 #include <optional>
+#include <ranges>
 #include <string>
+#include <utility>
 
 struct CSPlayerPawn;
 struct UserCmd;
 struct GameSceneNode;
 
+enum class BlockBotMode : std::uint8_t {
+	// NOLINTBEGIN(readability-identifier-naming)
+	Round_to_45,
+	Round_to_90,
+	Free,
+	// NOLINTEND(readability-identifier-naming)
+};
+
+template <>
+struct EnumNames<BlockBotMode> {
+	static constexpr auto NAMES = magic_enum::enum_entries<BlockBotMode>()
+		| std::ranges::views::transform([](const auto& pair) {
+			  std::string no_underscores{ pair.second };
+			  for (char& c : no_underscores) {
+				  if (c == '_')
+					  c = ' ';
+			  }
+			  return std::pair<BlockBotMode, std::string>{ pair.first, no_underscores };
+		  });
+};
+
 class BlockBot : public Feature {
 	Checkbox enabled{ this, "Enabled", false };
-	Checkbox round_direction{ this, "Round direction", true };
+	Combo<BlockBotMode> mode{ this, "Mode" };
 	HelpMarker round_direction_explanation{ this, "Rounds direction to closest 45° angle." };
 
 	// credits to @michtarxd for those values:

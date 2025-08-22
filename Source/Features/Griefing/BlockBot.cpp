@@ -86,10 +86,22 @@ glm::vec3 BlockBot::calculate_direction_vector(glm::vec3 local_pos, glm::vec3 ot
 	const glm::vec3 delta = other_pos - local_pos;
 	const glm::vec3 norm = glm::normalize(delta);
 
-	// TODO more modes: free, 45°, 90° and yaw based.
-	glm::vec3 potentially_rounded = norm;
-	if (round_direction.get()) {
+	glm::vec3 potentially_rounded;
+	switch (mode.get()) {
+	case BlockBotMode::Round_to_45:
 		potentially_rounded = glm::round(norm);
+		break;
+	case BlockBotMode::Round_to_90:
+		if (std::abs(norm.x) > std::abs(norm.y))
+			potentially_rounded = glm::vec3{ norm.x, 0.0F, norm.z };
+		else if (std::abs(norm.x) < std::abs(norm.y))
+			potentially_rounded = glm::vec3{ 0.0F, norm.y, norm.z };
+		else
+			potentially_rounded = {};
+		break;
+	case BlockBotMode::Free:
+		potentially_rounded = norm;
+		break;
 	}
 
 	static constexpr float RAD90 = glm::radians(90.0F);
