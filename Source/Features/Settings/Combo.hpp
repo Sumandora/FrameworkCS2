@@ -1,8 +1,9 @@
 #pragma once
 
+#include "../BindableSetting.hpp"
 #include "../Instrumentation/IdType.hpp"
-#include "../Instrumentation/InstrumentableSetting.hpp"
 #include "../Instrumentation/Node.hpp"
+#include "../Instrumentation/NodeCircuit.hpp"
 #include "../Instrumentation/NodeResult.hpp"
 #include "../Instrumentation/NodeType.hpp"
 #include "../Setting.hpp"
@@ -103,4 +104,4 @@ public:
 };
 
 template <typename E>
-using Combo = InstrumentableSetting<RawCombo<E>, EnumNode<E>>;
+using Combo = BindableSetting<RawCombo<E>>;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Instrumentation/InstrumentableSetting.hpp"
+#include "../BindableSetting.hpp"
 #include "../Setting.hpp"
 
 #include <atomic>
@@ -21,4 +21,4 @@ public:
 	void deserialize(const nlohmann::json& input_json) override;
 };
 
-using FloatSlider = InstrumentableSetting<RawFloatSlider>;
+using FloatSlider = BindableSetting<RawFloatSlider>;

@@ -18,9 +18,12 @@ RawColor::RawColor(SettingsHolder* parent, std::string name, ImColor value)
 
 void RawColor::render()
 {
+	// Group the color button and the text together for the BindableSetting
+	ImGui::BeginGroup();
 	const bool clicked = ImGui::ColorButton((get_name() + "##Button").c_str(), value, ImGuiColorEditFlags_None, ImVec2(0, 0));
 	ImGui::SameLine();
 	ImGui::Text("%s", get_name().c_str());
+	ImGui::EndGroup();
 
 	auto id = get_name() + "##Popup";
 	if (clicked)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Instrumentation/InstrumentableSetting.hpp"
+#include "../BindableSetting.hpp"
 #include "../Setting.hpp"
 
 #include "imgui.h"
@@ -32,4 +32,4 @@ public:
 	void deserialize(const nlohmann::json& input_json) override;
 };
 
-using Color = InstrumentableSetting<RawColor>;
+using Color = BindableSetting<RawColor>;

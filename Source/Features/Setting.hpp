@@ -3,7 +3,8 @@
 #include <cstring>
 #include <functional>
 #include <string>
-#include <vector>
+
+#include "gch/small_vector.hpp"
 
 #include "nlohmann/json.hpp" // IWYU pragma: keep
 
@@ -11,8 +12,10 @@ class Setting;
 
 class SettingsHolder {
 protected:
+	// Since BindableSettings all are technically setting-holders as well and the most common case
+	// is that there are no binds, I think a small vector makes sense here.
 	// NOLINTNEXTLINE(cppcoreguidelines-non-private-member-variables-in-classes)
-	std::vector<Setting*> settings;
+	gch::small_vector<Setting*, 1> settings;
 
 	friend Setting;
 

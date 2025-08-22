@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../BindableSetting.hpp"
 #include "../Setting.hpp"
-#include "../Instrumentation/InstrumentableSetting.hpp"
 
 #include <atomic>
 #include <string>
@@ -19,4 +19,4 @@ public:
 	void deserialize(const nlohmann::json& input_json) override;
 };
 
-using Checkbox = InstrumentableSetting<RawCheckbox>;
+using Checkbox = BindableSetting<RawCheckbox>;
