@@ -34,8 +34,7 @@
 template <typename T, typename R>
 T schema_cast(R from, SchemaClassInfo* schema_class_info = std::remove_pointer_t<R>::classInfo())
 {
-	if (schema_class_info->bases_on(std::remove_pointer_t<T>::classInfo())
-		|| std::remove_pointer_t<T>::classInfo()->bases_on(schema_class_info))
+	if (schema_class_info->bases_on(std::remove_pointer_t<T>::classInfo()))
 		return static_cast<T>(from);
 	return nullptr;
 }
