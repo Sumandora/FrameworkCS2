@@ -207,6 +207,9 @@ void PlayerList::draw()
 		{ FLT_MAX, FLT_MAX },
 		+[](ImGuiSizeCallbackData* data) { data->DesiredSize.y = data->CurrentSize.y; });
 
+	// Starting at the minimum size is a bit ugly
+	ImGui::SetNextWindowSize({ 500.0F, 0 }, ImGuiCond_FirstUseEver);
+
 	if (ImGui::Begin("Player list", nullptr, GUI::is_menu_open() ? MENU_OPEN_FLAGS : MENU_CLOSED_FLAGS)) {
 		static std::size_t last_size = 0;
 		const std::size_t new_size = render_player_list();
