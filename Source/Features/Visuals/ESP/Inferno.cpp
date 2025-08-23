@@ -45,7 +45,7 @@ void ESPInferno::draw_inferno(ImDrawList* draw_list, Inferno* inferno, const ImR
 	}
 
 	// Drawing the convex hull:
-	if (inferno->fire_count() <= 0)
+	if (!convex_hull_enabled.get() || inferno->fire_count() <= 0)
 		return;
 
 	// TODO Cache this:
