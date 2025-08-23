@@ -88,6 +88,7 @@ std::size_t PlayerList::render_player_list()
 			ImGuiTableFlags_Resizable
 				| ImGuiTableFlags_Reorderable
 				| ImGuiTableFlags_Hideable
+				| ImGuiTableFlags_ContextMenuInBody
 				| ImGuiTableFlags_SizingStretchProp
 				| ImGuiTableFlags_Borders)) {
 		create_columns(std::make_index_sequence<std::tuple_size_v<Columns>>{});
