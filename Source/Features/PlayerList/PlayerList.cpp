@@ -12,14 +12,15 @@
 #include "Columns/CompetitiveRankingColumn.hpp"
 #include "Columns/CompetitiveWinsColumn.hpp"
 #include "Columns/HealthColumn.hpp"
+#include "Columns/MoneyColumn.hpp"
 #include "Columns/NameColumn.hpp"
 #include "Columns/ObserveeColumn.hpp"
 #include "Columns/ObserverModeColumn.hpp"
 #include "Columns/PingColumn.hpp"
+#include "Columns/ScoreboardBasicColumns.hpp"
 #include "Columns/TeamColumn.hpp"
 #include "Columns/TeamDamageColumn.hpp"
 #include "Columns/TeamKillsColumn.hpp"
-#include "Columns/MoneyColumn.hpp"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -48,7 +49,33 @@ using Columns
 		ObserveeColumn,
 		ObserverModeColumn,
 		PingColumn,
-		MoneyColumn>;
+		MoneyColumn,
+
+		// Scoreboard basics:
+		KillsColumn,
+		DeathsColumn,
+		AssistsColumn,
+		DamageColumn,
+		EquipmentValueColumn,
+		MoneySavedColumn,
+		KillRewardColumn,
+		LiveTimeColumn,
+		HeadShotKillsColumn,
+		ObjectiveColumn,
+		CashEarnedColumn,
+		UtilityDamageColumn,
+		EnemiesFlashedColumn,
+		Enemy5KsColumn,
+		Enemy4KsColumn,
+		Enemy3KsColumn,
+		EnemyKnifeKillsColumn,
+		EnemyTaserKillsColumn,
+		NumRoundKillsColumn,
+		NumRoundKillsHeadshotsColumn,
+		TotalRoundDamageDealtColumn
+
+		// TODO K/D ratio maybe
+>;
 
 struct PlayerData {
 	Columns columns;
