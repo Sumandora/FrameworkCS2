@@ -14,10 +14,16 @@
 
 #include "../../../Memory.hpp"
 
+#include "../../../SDK/Entities/BaseCSGrenadeProjectile.hpp"
 #include "../../../SDK/Entities/BaseEntity.hpp"
 #include "../../../SDK/Entities/BasePlayerWeapon.hpp"
 #include "../../../SDK/Entities/CSPlayerPawn.hpp"
+#include "../../../SDK/Entities/DecoyProjectile.hpp"
+#include "../../../SDK/Entities/FlashbangProjectile.hpp"
 #include "../../../SDK/Entities/GameEntitySystem.hpp"
+#include "../../../SDK/Entities/HEGrenadeProjectile.hpp"
+#include "../../../SDK/Entities/MolotovProjectile.hpp"
+#include "../../../SDK/Entities/SmokeGrenadeProjectile.hpp"
 #include "../../../SDK/Enums/LifeState.hpp"
 #include "../../../SDK/Enums/TeamID.hpp"
 #include "../../../SDK/GameClass/CollisionProperty.hpp"
@@ -37,6 +43,7 @@
 #include "imgui_internal.h"
 
 #include "Player.hpp"
+#include "Projectile.hpp"
 
 ESP::ESP()
 	: Feature("Visuals", "ESP")
@@ -59,6 +66,25 @@ ESPPlayer& ESP::get_player_by_pawn(CSPlayerPawn* player_pawn)
 	std::unreachable();
 }
 
+ESPProjectile& ESP::get_projectile_by_entity_and_class(BaseCSGrenadeProjectile* projectile, SchemaClassInfo* class_info)
+{
+	if (class_info == HEGrenadeProjectile::classInfo())
+		return hegrenade;
+	if (class_info == FlashbangProjectile::classInfo())
+		return flashbang;
+	if (class_info == MolotovProjectile::classInfo()) {
+		if (static_cast<MolotovProjectile*>(projectile)->is_inc_grenade())
+			return incgrenade;
+		return molotov;
+	}
+	if (class_info == DecoyProjectile::classInfo())
+		return decoy;
+	if (class_info == SmokeGrenadeProjectile::classInfo())
+		return smokegrenade;
+
+	std::unreachable();
+}
+
 void ESP::update_camera_position(const glm::vec3& new_camera_position)
 {
 	camera_position.store(new_camera_position, std::memory_order::relaxed);
@@ -67,7 +93,8 @@ void ESP::update_camera_position(const glm::vec3& new_camera_position)
 enum class EntityType : std::int8_t {
 	UNK = -1,
 	PLAYER,
-	WEAPON
+	WEAPON,
+	PROJECTILE,
 };
 
 struct ESPEntity {
@@ -75,6 +102,7 @@ struct ESPEntity {
 	EntityType type;
 	float distance;
 	ImRect screenspace_rect;
+	SchemaClassInfo* class_info;
 
 	struct DistanceComparator {
 		static bool operator()(const ESPEntity& a, const ESPEntity& b)
@@ -117,6 +145,11 @@ void ESP::draw(ImDrawList* draw_list)
 				continue;
 
 			type = EntityType::WEAPON;
+		} else if (auto* projectile = schema_cast<BaseCSGrenadeProjectile*>(entity, class_info); projectile) {
+			if (!get_projectile_by_entity_and_class(projectile, class_info).is_enabled())
+				continue;
+
+			type = EntityType::PROJECTILE;
 		} else
 			continue;
 
@@ -191,7 +224,8 @@ void ESP::draw(ImDrawList* draw_list)
 			entity,
 			type,
 			glm::distance(camera_position, vec),
-			rectangle);
+			rectangle,
+			class_info);
 
 	next_ent:;
 	}
@@ -207,6 +241,12 @@ void ESP::draw(ImDrawList* draw_list)
 		case EntityType::WEAPON: {
 			auto* weapon = static_cast<BasePlayerWeapon*>(esp_entity.entity);
 			weapons.draw_weapon(draw_list, weapon, esp_entity.screenspace_rect);
+			break;
+		}
+		case EntityType::PROJECTILE: {
+			auto* projectile = static_cast<BaseCSGrenadeProjectile*>(esp_entity.entity);
+			const ESPProjectile& projectile_type = get_projectile_by_entity_and_class(projectile, esp_entity.class_info);
+			projectile_type.draw_projectile(draw_list, projectile, esp_entity.screenspace_rect);
 			break;
 		}
 		default:

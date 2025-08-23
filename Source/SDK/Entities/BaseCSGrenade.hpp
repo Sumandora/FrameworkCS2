@@ -1,12 +1,9 @@
 #pragma once
 
-#include "../Schema/FieldOffset.hpp"
-
-#include "../VirtualMethod.hpp"
-
-#include "BasePlayerWeapon.hpp"
-
 #include "../Enums/GrenadeType.hpp"
+#include "../Schema/FieldOffset.hpp"
+#include "../VirtualMethod.hpp"
+#include "BasePlayerWeapon.hpp"
 
 #include <string_view>
 

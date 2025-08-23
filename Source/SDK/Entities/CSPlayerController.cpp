@@ -42,6 +42,7 @@ std::string CSPlayerController::get_decorated_player_name() const
 	static constexpr std::size_t MAX_NETWORKID_LENGTH = 64;
 	static constexpr std::size_t MAX_DECORATED_PLAYER_NAME_LENGTH = MAX_NETWORKID_LENGTH * 10 + 20;
 
+	// TODO rewrite to remove the double allocation.
 	char chars[MAX_DECORATED_PLAYER_NAME_LENGTH];
 	::get_decorated_player_name(this, chars, std::ranges::size(chars), DecoratedPlayerNameFlag::DONT_MAKE_STRING_SAFE);
 
