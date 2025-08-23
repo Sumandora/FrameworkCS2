@@ -53,6 +53,7 @@ include("Buildscripts/MurmurHash.cmake")
 include("Buildscripts/SmallVector.cmake")
 include("Buildscripts/LZ4.cmake")
 include("Buildscripts/StaticLibatomic.cmake")
+include("Buildscripts/ConvexHull.cmake")
 
 add_subdirectory("${MemoryManager_SOURCE_DIR}/Modules/Linux" "LinuxMemoryManager")
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE LinuxMemoryManager)
