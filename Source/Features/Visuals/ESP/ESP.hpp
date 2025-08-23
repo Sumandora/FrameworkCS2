@@ -8,6 +8,7 @@
 #include "../../../Utils/UninitializedObject.hpp"
 
 #include "glm/ext/vector_float3.hpp"
+#include "Inferno.hpp"
 
 #include "imgui.h"
 
@@ -43,6 +44,10 @@ class ESP : public Feature {
 	ESPProjectile decoy{ projectiles, "Decoy", "#SFUI_WPNHUD_Decoy" };
 	ESPProjectile smokegrenade{ projectiles, "Smoke Grenade", "#SFUI_WPNHUD_Smoke_Grenade" };
 	// TODO sensor grenades and snowballs? :^)
+
+	// This tab seems appropriate for the more meme-y or niche esp targets, like chickens or infernos
+	Tabs misc{ entity_types, "Misc" };
+	ESPInferno inferno{ misc, "Inferno" };
 
 	std::atomic<glm::vec3> camera_position;
 

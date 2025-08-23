@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <limits>
 #include <set>
 #include <string>
@@ -22,6 +23,7 @@
 #include "../../../SDK/Entities/FlashbangProjectile.hpp"
 #include "../../../SDK/Entities/GameEntitySystem.hpp"
 #include "../../../SDK/Entities/HEGrenadeProjectile.hpp"
+#include "../../../SDK/Entities/Inferno.hpp"
 #include "../../../SDK/Entities/MolotovProjectile.hpp"
 #include "../../../SDK/Entities/SmokeGrenadeProjectile.hpp"
 #include "../../../SDK/Enums/LifeState.hpp"
@@ -95,6 +97,7 @@ enum class EntityType : std::int8_t {
 	PLAYER,
 	WEAPON,
 	PROJECTILE,
+	INFERNO,
 };
 
 struct ESPEntity {
@@ -150,6 +153,12 @@ void ESP::draw(ImDrawList* draw_list)
 				continue;
 
 			type = EntityType::PROJECTILE;
+		} else if (class_info == Inferno::classInfo()) {
+			const auto* inferno = static_cast<Inferno*>(entity);
+			if (std::ranges::none_of(inferno->fire_is_burning(), std::identity{}))
+				continue;
+
+			type = EntityType::INFERNO;
 		} else
 			continue;
 
@@ -247,6 +256,11 @@ void ESP::draw(ImDrawList* draw_list)
 			auto* projectile = static_cast<BaseCSGrenadeProjectile*>(esp_entity.entity);
 			const ESPProjectile& projectile_type = get_projectile_by_entity_and_class(projectile, esp_entity.class_info);
 			projectile_type.draw_projectile(draw_list, projectile, esp_entity.screenspace_rect);
+			break;
+		}
+		case EntityType::INFERNO: {
+			auto* inferno = static_cast<Inferno*>(esp_entity.entity);
+			this->inferno.draw_inferno(draw_list, inferno, esp_entity.screenspace_rect);
 			break;
 		}
 		default:

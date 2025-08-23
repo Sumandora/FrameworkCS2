@@ -38,7 +38,7 @@ public:
 	explicit Setting(SettingsHolder* parent, std::string name);
 	virtual ~Setting() = default;
 
-	const std::string& get_name() { return name; }
+	[[nodiscard]] const std::string& get_name() const { return name; }
 
 	virtual void render() = 0;
 	virtual void serialize(nlohmann::json& output_json) const = 0;

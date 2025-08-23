@@ -4,6 +4,7 @@
 #include "GenericESP/Element/Circle.hpp"
 #include "GenericESP/Element/Element.hpp"
 #include "GenericESP/Element/Line.hpp"
+#include "GenericESP/Element/Polygon.hpp"
 #include "GenericESP/Element/Rectangle.hpp"
 #include "GenericESP/Element/SidedElement.hpp"
 #include "GenericESP/Element/SidedText.hpp"
@@ -249,4 +250,22 @@ struct PlayerCircle : MetaSetting, GenericESP::Circle {
 	bool get_outlined(const GenericESP::EntityType* /*e*/) const override { return outlined.get(); }
 	ImColor get_outline_color(const GenericESP::EntityType* /*e*/) const override { return outline_color.get(); }
 	float get_outline_radius(const GenericESP::EntityType* /*e*/) const override { return outline_radius.get(); }
+};
+
+struct PlayerPolygon : public GenericESP::Polygon, MetaSetting {
+	Color color{ this, "Color", ImColor{ 1.0F, 1.0F, 1.0F, 1.0F } };
+	FloatSlider radius{ this, "Radius", 0.0F, 10.0F, 1.0F };
+	Checkbox outlined{ this, "Outlined", true };
+	Color outline_color{ this, "Outline color", ImColor{ 0.0F, 0.0F, 0.0F, 1.0F } };
+	FloatSlider outline_thickness{ this, "Outline thickness", 0.0F, 10.0F, 2.0F };
+
+	PlayerPolygon(SettingsHolder* parent, std::string name)
+		: MetaSetting(parent, std::move(name))
+	{
+	}
+
+	ImColor get_color(const GenericESP::EntityType* /*e*/) const override { return color.get(); }
+	bool get_outlined(const GenericESP::EntityType* /*e*/) const override { return outlined.get(); }
+	ImColor get_outline_color(const GenericESP::EntityType* /*e*/) const override { return outline_color.get(); }
+	float get_outline_thickness(const GenericESP::EntityType* /*e*/) const override { return outline_thickness.get(); }
 };
