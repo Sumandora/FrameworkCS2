@@ -95,8 +95,19 @@ inline void draw_skeleton(CSPlayerPawn* player_pawn, ImDrawList* draw_list, cons
 		if (!to_screen_space.visible)
 			continue;
 
-		// TODO The shadows should be drawn first and then have a separate pass adding the actual lines, so that the shadows are actually behind the lines
-		// -> Fix in GenericESP
-		skeleton_line.draw(draw_list, player_pawn, from_screen_space.coords, to_screen_space.coords);
+		skeleton_line.draw_outline(draw_list, player_pawn, from_screen_space.coords, to_screen_space.coords);
+	}
+
+	// Since all needed points have now been calculated, we can safely just draw them again
+	for (const auto& [from, to] : SKELETON_LINES) {
+		const ScreenSpacePoint& from_screen_space = screen_space_vecs[from];
+		if (!from_screen_space.visible)
+			continue;
+
+		const ScreenSpacePoint& to_screen_space = screen_space_vecs[to];
+		if (!to_screen_space.visible)
+			continue;
+
+		skeleton_line.draw_without_outline(draw_list, player_pawn, from_screen_space.coords, to_screen_space.coords);
 	}
 }
