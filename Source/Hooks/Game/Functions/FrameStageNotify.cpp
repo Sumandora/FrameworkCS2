@@ -66,6 +66,7 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_END: {
 		const auto lock = GameEntitySystem::shared_lock();
 		model_changer->update_model();
+		auto_pickup->update();
 		break;
 	}
 
@@ -79,7 +80,6 @@ void Hooks::Game::FrameStageNotify::hookFunc([[maybe_unused]] void* thisptr, Cli
 		removals->remove_ads_update();
 		bomb_timer->update();
 		player_list->update();
-		auto_pickup->update();
 
 		average_ping.push(static_cast<float>(controller->ping()));
 
