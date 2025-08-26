@@ -23,59 +23,42 @@
 #include "Visuals/Radar.hpp"
 #include "Visuals/Removals.hpp"
 #include "Visuals/WorldColors.hpp"
+#include <tuple>
+
+static constexpr std::tuple ALL_FEATURES{
+	&esp,
+	&force_crosshair,
+	&grenade_prediction,
+	&grenade_helper,
+	&bhop,
+	&radar,
+	&aimbot,
+	&auto_strafer,
+	&removals,
+	&chams,
+	&model_changer,
+	&hit_marker,
+	&force_third_person,
+	&bomb_timer,
+	&vote_revealer,
+	&world_colors,
+	&player_list,
+	&bullet_tracers,
+	&field_of_view,
+	&glow,
+	&auto_pickup,
+	&block_bot,
+	&auto_accept,
+};
 
 void Features::create()
 {
-	esp.emplace();
-	force_crosshair.emplace();
-	grenade_prediction.emplace();
-	grenade_helper.emplace();
-	bhop.emplace();
-	radar.emplace();
-	aimbot.emplace();
-	auto_strafer.emplace();
-	removals.emplace();
-	chams.emplace();
-	model_changer.emplace();
-	hit_marker.emplace();
-	force_third_person.emplace();
-	bomb_timer.emplace();
-	vote_revealer.emplace();
-	world_colors.emplace();
-	player_list.emplace();
-	bullet_tracers.emplace();
-	field_of_view.emplace();
-	glow.emplace();
-	auto_pickup.emplace();
-	block_bot.emplace();
-	auto_accept.emplace();
+	std::apply([](auto&... feature) { (feature->emplace(), ...); }, ALL_FEATURES);
 
 	initialized = true;
 }
 
 void Features::destroy()
 {
-	auto_accept.reset();
-	block_bot.reset();
-	auto_pickup.reset();
-	glow.reset();
-	field_of_view.reset();
-	bullet_tracers.reset();
-	player_list.reset();
-	world_colors.reset();
-	vote_revealer.reset();
-	bomb_timer.reset();
-	force_third_person.reset();
-	hit_marker.reset();
-	model_changer.reset();
-	chams.reset();
-	removals.reset();
-	auto_strafer.reset();
-	aimbot.reset();
-	radar.reset();
-	bhop.reset();
-	grenade_helper.reset();
-	grenade_prediction.reset();
-	force_crosshair.reset();
-	esp.reset();
+	std::apply([](auto&... feature) { (..., feature->reset()); }, ALL_FEATURES);
 }
