@@ -83,7 +83,7 @@ CSPlayerPawn* BlockBot::find_new_target(GameSceneNode* local_game_scene_node)
 
 glm::vec3 BlockBot::calculate_direction_vector(glm::vec3 local_pos, glm::vec3 other_pos)
 {
-	const glm::vec3 delta = other_pos - local_pos;
+	const glm::vec3 delta{ (other_pos - local_pos).xy(), 0.0F /* This is purely about horizontal movement. */ };
 	const glm::vec3 norm = glm::normalize(delta);
 
 	glm::vec3 potentially_rounded;
@@ -109,7 +109,7 @@ glm::vec3 BlockBot::calculate_direction_vector(glm::vec3 local_pos, glm::vec3 ot
 	const glm::vec3 right{
 		potentially_rounded.x * glm::cos(RAD90) + potentially_rounded.y * glm::sin(RAD90),
 		-potentially_rounded.x * glm::sin(RAD90) + potentially_rounded.y * glm::cos(RAD90),
-		0.0F /* This is purely about horizontal movement. */
+		potentially_rounded.z,
 	};
 
 	return right;
