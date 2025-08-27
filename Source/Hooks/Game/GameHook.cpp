@@ -457,6 +457,8 @@ namespace Hooks::Game {
 				BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
 				  .find_xrefs(SignatureScanner::XRefTypes::relative(),
 					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				  .sub(3)
+				  .filter([](const auto& ptr) { return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 3d">()); })
 				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 				  .next_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<
 					  "48 39 48 48 " // cmp %rcx, 72(%rax)
@@ -470,8 +472,8 @@ namespace Hooks::Game {
 				.value_or(nullptr));
 
 		if (session_id_cmp.has_value()) {
-			std::uint8_t replcae_cond_jmp_with_uncond_jmp[] = { 0x90, 0xe9 };
-			Memory::mem_mgr.write(session_id_cmp.value(), replcae_cond_jmp_with_uncond_jmp, 2);
+			std::uint8_t replace_cond_jmp_with_uncond_jmp[] = { 0x90, 0xe9 };
+			Memory::mem_mgr.write(session_id_cmp.value(), replace_cond_jmp_with_uncond_jmp, 2);
 		}
 	}
 
