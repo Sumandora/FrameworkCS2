@@ -2,7 +2,9 @@
 
 #include "../EngineTrace/GameTrace.hpp"
 #include "../GameClass/GlobalVars.hpp"
+#include "../TickTimeConversion.hpp"
 #include "BasePlayerWeapon.hpp"
+#include "CSPlayerController.hpp"
 #include "CSWeaponBase.hpp"
 #include "Services/CSPlayerItemServices.hpp"
 #include "Services/CSPlayerWeaponServices.hpp"
@@ -126,7 +128,8 @@ bool CSPlayerPawn::can_perform_primary_attack() const
 	if (cs_weapon && cs_weapon->in_reload())
 		return false;
 
-	const float curtime = (*Memory::globals)->current_time();
+	// TODO I think this is wrong, prediction is not respected. We need to use the tick base here I think.
+	const float curtime = ticks_to_time((*Memory::local_player_controller)->tick_base());
 
 	if (weapon_services->next_attack() > curtime)
 		return false;
