@@ -1,6 +1,7 @@
 #include "Features.hpp"
 
 #include "Combat/Aimbot.hpp"
+#include "Combat/TriggerBot.hpp"
 #include "Griefing/AutoPickup.hpp"
 #include "Griefing/BlockBot.hpp"
 #include "Misc/AutoAccept.hpp"
@@ -49,6 +50,7 @@ static constexpr std::tuple ALL_FEATURES{
 	&auto_pickup,
 	&block_bot,
 	&auto_accept,
+	&trigger_bot,
 };
 
 void Features::create()

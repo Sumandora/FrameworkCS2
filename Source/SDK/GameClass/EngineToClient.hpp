@@ -9,12 +9,18 @@
 
 // TODO No clue where windows folks get this name from...
 struct NetworkedClientInfo {
-	PADDING(0x18);
+	PADDING(0x4);
+	std::int32_t render_tick_count;
+	float render_tick_fraction;
+	std::int32_t player_tick_count;
+	float player_tick_fraction;
+
 	// Same for this name, no clue where they get it from...
 	struct LocalData {
 		glm::vec3 viewangles;
 		glm::vec3 eye_pos;
 	};
+	PADDING(0x4);
 	LocalData* local_data;
 	PADDING(0x8);
 };
