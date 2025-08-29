@@ -11,6 +11,7 @@
 #include "../Memory.hpp"
 
 static bool prev_has_been_predicted{};
+static CSPlayerController::tick_base_type prev_tick_base{};
 static UserCmd* prev_cmd{};
 
 static UserCmd* prediction_cmd{};
@@ -41,6 +42,7 @@ bool Prediction::begin(UserCmd* cmd)
 		return false;
 
 	prev_has_been_predicted = cmd->has_been_predicted;
+	prev_tick_base = (*Memory::local_player_controller)->tick_base();
 	prev_cmd = *(*Memory::local_player_controller)->get_current_command();
 
 	prediction_cmd = cmd;
@@ -63,6 +65,7 @@ void Prediction::end()
 
 	::in_prediction = false;
 
+	(*Memory::local_player_controller)->tick_base() = prev_tick_base;
 	prediction_cmd->has_been_predicted = prev_has_been_predicted;
 }
 
