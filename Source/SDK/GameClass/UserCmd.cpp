@@ -35,13 +35,12 @@ void UserCmd::resolve_signatures()
 	sv_subtick_movement_view_angles = Interfaces::engineCvar->findByName("sv_subtick_movement_view_angles");
 	MEM_ACCEPT(sv_subtick_movement_view_angles);
 
+	// TODO Better signature
 	get_usercmd
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"E8 ? ? ? ? 49 89 C7 48 8B 05 ? ? ? ? 66 0F 6E 40">(),
+			SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 54 4C 8B 25 ? ? ? ? 53 89 F3">(),
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
-			  .add(1)
-			  .relative_to_absolute()
 			  .BCRL_EXPECT(decltype(get_usercmd), get_usercmd);
 	allocate_subtick_move
 		= BCRL::signature(
