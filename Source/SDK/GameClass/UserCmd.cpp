@@ -52,6 +52,8 @@ void UserCmd::resolve_signatures()
 			  .sub(8)
 			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
 				  BCRL::everything(Memory::mem_mgr).thats_readable().with_name("libclient.so"))
+			  .sub(3)
+			  .filter([](const auto& ptr) { return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 15">()); })
 			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 			  .BCRL_EXPECT(decltype(allocate_subtick_move), allocate_subtick_move);
 }
