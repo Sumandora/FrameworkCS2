@@ -263,6 +263,9 @@ namespace Hooks::Game {
 				  .find_xrefs(
 					  SignatureScanner::XRefTypes::relative(),
 					  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+				  // Verify that this was a JNZ instruction
+				  .sub(2)
+				  .filter([](const auto& ptr) { return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"0f 85">()); })
 				  // Now we are in the right basic block
 				  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"e8 ? ? ? ? 49">())
 				  .add(1)
