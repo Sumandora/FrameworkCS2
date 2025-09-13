@@ -1,6 +1,6 @@
 #pragma once
 
-#include "glm/ext/vector_float3.hpp"
+#include "glm/gtx/string_cast.hpp"
 
 #include <cerrno>
 #include <concepts>
@@ -41,25 +41,17 @@ struct std::formatter<R (*)(Args...)> : public std::formatter<void*> {
 	}
 };
 
-template <>
-struct std::formatter<glm::vec3> {
-	std::formatter<float> float_formatter;
+template <typename T>
+concept GLMGenType = requires(T t) {
+	{ glm::detail::compute_to_string<T>::call(t) } -> std::same_as<std::string>;
+};
 
-	constexpr auto parse(std::format_parse_context& ctx)
+template <typename GenType>
+	requires GLMGenType<GenType>
+struct std::formatter<GenType> : public std::formatter<std::string> {
+	auto format(const GenType& gen_type, std::format_context& ctx) const
 	{
-		return float_formatter.parse(ctx);
-	}
-
-	auto format(const glm::vec3& vec, std::format_context& ctx) const
-	{
-		*ctx.out()++ = '[';
-		float_formatter.format(vec.x, ctx);
-		*ctx.out()++ = ',';
-		float_formatter.format(vec.y, ctx);
-		*ctx.out()++ = ',';
-		float_formatter.format(vec.z, ctx);
-		*ctx.out()++ = ']';
-		return ctx.out();
+		return std::formatter<std::string>::format(glm::to_string(gen_type), ctx);
 	}
 };
 
