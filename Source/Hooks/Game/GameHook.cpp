@@ -116,7 +116,7 @@ namespace Hooks::Game {
 				  .find_xrefs(
 					  SignatureScanner::XRefTypes::absolute(),
 					  BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libscenesystem.so"))
-				  .add(sizeof(void*) * 2)
+				  .add(sizeof(void*))
 				  .dereference()
 				  .BCRL_EXPECT(void*, draw_array_ext);
 
