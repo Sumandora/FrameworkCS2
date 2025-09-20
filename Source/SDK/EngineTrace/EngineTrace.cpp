@@ -19,7 +19,7 @@ void EngineTrace::resolve_signatures()
 	engine_trace
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"48 8D 05 ? ? ? ? 4D 89 E1 66 0F EF C0 4C 8B 85">(),
+			SignatureScanner::PatternSignature::for_array_of_bytes<"48 8D 05 ? ? ? ? 48 89 8D ? ? ? ? 0F 58 C1">(),
 			BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 			  .add(3)
 			  .relative_to_absolute()
