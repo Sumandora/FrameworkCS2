@@ -21,6 +21,8 @@ void GameTrace::resolve_signatures()
 			BCRL::everything(Memory::mem_mgr).with_flags("r--").with_name("libclient.so"))
 			  .find_xrefs(SignatureScanner::XRefTypes::relative(),
 				  BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
+			  .sub(3)
+			  .filter([](const auto& ptr) { return ptr.does_match(SignatureScanner::PatternSignature::for_array_of_bytes<"48 8d 35">()); })
 			  .prev_signature_occurrence(SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 e5">())
 			  .BCRL_EXPECT(decltype(init_game_trace), init_game_trace);
 }
