@@ -1,3 +1,13 @@
+## This project is EOL
+I do not have the time to continue supporting this project nor do I have a reason to.
+I initially started this as project mainly for my friends, but I have either not talked with them in a while or they are no longer are interested in the game.
+There is a partial update, "working" as of the 20th September, on the `20th-september-partial-update` branch.
+However, while making it, I realized that I ultimately don't feel like pushing through.
+A lot of things have changed in slight ways and I don't want to figure out new solutions.
+Feel free to learn from my code, I don't have time to expand on this anymore at least for the foreseeable future.
+
+Goodbye, cya!
+
 # FrameworkCS2
 A fully-featured training software for Counter Strike: 2, made for Linux.
 
