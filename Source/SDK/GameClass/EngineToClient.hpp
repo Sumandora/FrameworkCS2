@@ -43,5 +43,5 @@ struct EngineToClient {
 private:
 	VIRTUAL_METHOD(49, execute_client_cmd, void, (std::uint64_t rdi, const char* command, std::uint64_t rdx), (this, rdi, command, rdx));
 
-	STATIC_VIRTUAL_METHOD(178, get_network_client_info, NetworkedClientInfo*, (NetworkedClientInfo * info), (this, info));
+	STATIC_VIRTUAL_METHOD(179, get_network_client_info, NetworkedClientInfo*, (NetworkedClientInfo * info), (this, info));
 };
