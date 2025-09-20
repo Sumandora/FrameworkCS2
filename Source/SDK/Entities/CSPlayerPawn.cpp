@@ -159,7 +159,7 @@ void CSPlayerPawn::resolve_signatures()
 	::get_aim_punch
 		= BCRL::signature(
 			Memory::mem_mgr,
-			SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 66 41 0F 7E C7 41 56 4C 8D 75 ? 41 55 4C 8D 6D ? 41 54 49 89 FC">(),
+			SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 49 89 FF 41 56 41 55 41 54 4C 8D A5 ? ? ? ? 53 48 89 F3">(),
 			BCRL::everything(Memory::mem_mgr).with_flags("r-x").with_name("libclient.so"))
 			  .BCRL_EXPECT(decltype(::get_aim_punch), ::get_aim_punch);
 }
