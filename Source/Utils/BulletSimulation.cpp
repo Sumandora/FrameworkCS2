@@ -100,7 +100,7 @@ void BulletSimulation::resolve_signatures()
 	// TODO Find better signatures, this may be hard because all of these functions are in the penetration of FX_FireBullets
 	create_trace = BCRL::signature(
 		Memory::mem_mgr,
-		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 49 89 CF 41 56 49 89 F6 41 55 41 54">(),
+		SignatureScanner::PatternSignature::for_array_of_bytes<"55 48 89 E5 41 57 49 89 F7 41 56 49 89 CE 41 55 41 54 53">(),
 		BCRL::everything(Memory::mem_mgr).thats_readable().thats_executable().with_name("libclient.so"))
 					   .BCRL_EXPECT(decltype(create_trace), create_trace);
 	handle_bullet_penetration = BCRL::signature(
