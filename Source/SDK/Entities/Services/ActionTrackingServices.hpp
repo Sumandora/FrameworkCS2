@@ -38,5 +38,5 @@ struct ActionTrackingServices : public PlayerControllerComponent {
 	SCHEMA_VAR(CSMatchStats, match_stats, "m_matchStats");
 	SCHEMA_VAR(std::int32_t, round_kills, "m_iNumRoundKills");
 	SCHEMA_VAR(std::int32_t, round_kills_headshots, "m_iNumRoundKillsHeadshots");
-	SCHEMA_VAR(std::uint32_t, total_round_damage_dealt, "m_unTotalRoundDamageDealt");
+	SCHEMA_VAR(float, total_round_damage_dealt, "m_flTotalRoundDamageDealt");
 };

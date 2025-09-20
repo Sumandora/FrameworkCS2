@@ -10,23 +10,29 @@
 #include <optional>
 #include <utility>
 
-#define BASIC_SCOREBOARD_COLUMN(ClassName, Name, Code)                                                                               \
-	struct ClassName {                                                                                                               \
-		static constexpr const char* NAME = Name;                                                                                    \
-		static constexpr bool HIDDEN_BY_DEFAULT = true;                                                                              \
-		std::optional<decltype(Code(std::declval<ActionTrackingServices*>()))> value;                                                \
-                                                                                                                                     \
-		void update(CSPlayerController* controller)                                                                                  \
-		{                                                                                                                            \
-			if (ActionTrackingServices* action_tracking_services = controller->action_tracking_services(); action_tracking_services) \
-				value = Code(action_tracking_services);                                                                              \
-		}                                                                                                                            \
-                                                                                                                                     \
-		void fill() const                                                                                                            \
-		{                                                                                                                            \
-			if (value.has_value())                                                                                                   \
-				ImGui::Text("%d", value.value());                                                                                    \
-		}                                                                                                                            \
+// TODO Ugly
+static void text(float f) { ImGui::Text("%f", f); }
+static void text(int i) { ImGui::Text("%d", i); }
+
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define BASIC_SCOREBOARD_COLUMN(ClassName, Name, Code)                                                     \
+	struct ClassName {                                                                                     \
+		static constexpr const char* NAME = Name;                                                          \
+		static constexpr bool HIDDEN_BY_DEFAULT = true;                                                    \
+		std::optional<decltype(Code(std::declval<ActionTrackingServices*>()))> value;                      \
+                                                                                                           \
+		void update(CSPlayerController* controller)                                                        \
+		{                                                                                                  \
+			if (ActionTrackingServices* action_tracking_services = controller->action_tracking_services(); \
+				action_tracking_services)                                                                  \
+				value = Code(action_tracking_services);                                                    \
+		}                                                                                                  \
+                                                                                                           \
+		void fill() const                                                                                  \
+		{                                                                                                  \
+			if (value.has_value())                                                                         \
+				text(value.value());                                                                       \
+		}                                                                                                  \
 	}
 
 BASIC_SCOREBOARD_COLUMN(KillsColumn, "Kills", [](ActionTrackingServices* action_tracking_services) { return action_tracking_services->match_stats().kills(); });
