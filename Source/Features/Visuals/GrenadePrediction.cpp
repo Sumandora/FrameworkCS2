@@ -37,7 +37,7 @@ struct GrenadePredictor {
 		PADDING(4);
 	};
 	static_assert(sizeof(Element) == 0x18);
-	PADDING(0xe90);
+	PADDING(0xe98);
 	int count;
 	PADDING(0x4);
 	Element* elements;
